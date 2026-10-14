@@ -40,6 +40,7 @@ import org.chimeramc.client.core.mods.inbuilt.model.ModAvailability;
 import org.chimeramc.client.core.mods.inbuilt.overlay.ControllerProfileEditor;
 import org.chimeramc.client.core.mods.inbuilt.overlay.InbuiltOverlayManager;
 import org.chimeramc.client.core.mods.inbuilt.overlay.ModConfigView;
+import org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuGuard;
 import org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuNavigation;
 import org.chimeramc.client.core.replay.ReplayPanel;
 import org.chimeramc.client.launcher.controller.ControllerInputProcessor;
@@ -604,24 +605,20 @@ public class VipModMenuOverlay {
 
         // Opening a section is where the Modules tab used to die: the Controller and Keyboard
         // builders run here and a single bad profile/illustration lookup would propagate out of
-        // show() and crash the game. Each is isolated so the module grid -- the tab's real content
-        // -- always comes up even if one sub-mode cannot be built.
+        // show() and crash the game. Each is isolated via ModMenuGuard so the failure is recorded
+        // for the diagnostics report (with its class, message and first 12 frames) instead of
+        // killing the process, and the module grid -- the tab's real content -- still comes up.
         selectTabSafe(VipTab.defaultFor(inputMode));
-        try {
-            refreshControllerSection();
-        } catch (Throwable ignored) {
-        }
-        try {
-            refreshKeyboardSection();
-        } catch (Throwable ignored) {
-        }
+        ModMenuGuard.run("refreshControllerSection", this::refreshControllerSection);
+        ModMenuGuard.run("refreshKeyboardSection", this::refreshKeyboardSection);
     }
 
     /** Runs {@link #selectTab} without letting a section-build failure escape into the game. */
     private void selectTabSafe(VipTab tab) {
         try {
             selectTab(tab);
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            ModMenuGuard.record("selectTab:" + tab, t, SystemClock.uptimeMillis());
             // The tab indicator or a section host failed; fall back to making the General (module)
             // section visible directly, since that is the one surface a controller user needs.
             if (generalView != null) generalView.setVisibility(View.VISIBLE);
@@ -837,28 +834,44 @@ public class VipModMenuOverlay {
 
         ControllerType type = hasPad ? ControllerType.from(gamepad) : ControllerType.XBOX;
         if (type == null) type = ControllerType.XBOX;
-        controllerIllustration.setType(type);
-        controllerTypeText.setText(type.getDisplayName());
+        // Each step is isolated so one bad widget (the illustration, a chip, a slider) cannot take
+        // down the whole section -- or the game. Failures land in the diagnostics report.
+        final ControllerType resolvedType = type;
+        ModMenuGuard.run("controller.setType", () -> {
+            controllerIllustration.setType(resolvedType);
+            controllerTypeText.setText(resolvedType.getDisplayName());
+        });
 
         if (profileManager == null) return;
-        List<ControllerProfile> profiles = profileManager.getProfiles(type);
-        int activeSlot = profileManager.getActiveSlot(type);
-        String name = profiles.isEmpty() ? "Default"
-                : profiles.get(Math.min(activeSlot, profiles.size() - 1)).getName();
-        controllerStatusText.setText(activity.getString(
-                R.string.vip_controller_active_profile) + ": " + name);
-
-        InbuiltModManager modManager = InbuiltModManager.getInstance(activity);
-        controllerIllustration.clearConfirmed();
-        if (modManager != null) {
-            String region = controllerIllustration.regionIdForKey(
-                    modManager.getModMenuControllerBind());
-            if (region != null) controllerIllustration.setRegionConfirmed(region, true);
-        }
-
-        rebuildProfileChips(type, profiles, activeSlot);
-        rebuildStickSliders(type, profiles, activeSlot);
-        ensureFullEditorButton(type);
+        final ControllerType sectionType = resolvedType;
+        ModMenuGuard.run("controller.status", () -> {
+            List<ControllerProfile> profiles = profileManager.getProfiles(sectionType);
+            int activeSlot = profileManager.getActiveSlot(sectionType);
+            String name = profiles.isEmpty() ? "Default"
+                    : profiles.get(Math.min(activeSlot, profiles.size() - 1)).getName();
+            controllerStatusText.setText(activity.getString(
+                    R.string.vip_controller_active_profile) + ": " + name);
+        });
+        ModMenuGuard.run("controller.bindGlow", () -> {
+            InbuiltModManager modManager = InbuiltModManager.getInstance(activity);
+            controllerIllustration.clearConfirmed();
+            if (modManager != null) {
+                String region = controllerIllustration.regionIdForKey(
+                        modManager.getModMenuControllerBind());
+                if (region != null) controllerIllustration.setRegionConfirmed(region, true);
+            }
+        });
+        ModMenuGuard.run("controller.chips", () -> {
+            List<ControllerProfile> profiles = profileManager.getProfiles(sectionType);
+            int activeSlot = profileManager.getActiveSlot(sectionType);
+            rebuildProfileChips(sectionType, profiles, activeSlot);
+        });
+        ModMenuGuard.run("controller.sliders", () -> {
+            List<ControllerProfile> profiles = profileManager.getProfiles(sectionType);
+            int activeSlot = profileManager.getActiveSlot(sectionType);
+            rebuildStickSliders(sectionType, profiles, activeSlot);
+        });
+        ModMenuGuard.run("controller.fullEditorButton", () -> ensureFullEditorButton(sectionType));
     }
 
     /**
@@ -882,10 +895,14 @@ public class VipModMenuOverlay {
         button.setBackground(bg);
         DynamicAnim.applyPressScale(button);
         button.setOnClickListener(v -> {
-            if (profileEditor == null) {
-                profileEditor = new ControllerProfileEditor(activity, profileManager);
-            }
-            profileEditor.show(type, saved -> refreshControllerSection());
+            boolean ok = ModMenuGuard.run("openFullControllerEditor", () -> {
+                if (profileEditor == null) {
+                    profileEditor = new ControllerProfileEditor(activity, profileManager);
+                }
+                profileEditor.show(type, saved -> ModMenuGuard.run(
+                        "refreshControllerSection(after edit)", this::refreshControllerSection));
+            });
+            if (!ok) toastGuardFailure();
         });
         controllerSliders.addView(button);
         fullEditorButton = button;
@@ -953,7 +970,13 @@ public class VipModMenuOverlay {
 
     private void persistProfile(ControllerType type, int slot, ControllerProfile profile) {
         if (profileManager == null) return;
-        profileManager.saveProfiles(type, profileManager.getProfiles(type));
+        // Save the edited object, not a fresh read from prefs. `getProfiles` deserialises new
+        // objects each call, so saving that list wrote the *unmodified* profiles back and a slider
+        // change was applied to the running processor but never persisted.
+        java.util.List<ControllerProfile> profiles =
+                org.chimeramc.client.launcher.controller.ControllerProfileList
+                        .replaceAt(profileManager.getProfiles(type), slot, profile);
+        profileManager.saveProfiles(type, profiles);
         profileManager.setActiveSlot(type, slot);
         ControllerInputProcessor.setActiveProfile(type, profile);
         ControllerInputProcessor.reload(activity);
@@ -1320,5 +1343,18 @@ public class VipModMenuOverlay {
 
     private float density() {
         return activity.getResources().getDisplayMetrics().density;
+    }
+
+    /**
+     * Shows a short toast after a guarded menu step fails, so the failure is visible to the player
+     * (and the diagnostics report carries the details) instead of the screen silently doing nothing.
+     */
+    private void toastGuardFailure() {
+        try {
+            android.widget.Toast.makeText(activity, R.string.vip_controller_step_failed,
+                    android.widget.Toast.LENGTH_SHORT).show();
+        } catch (Throwable ignored) {
+            // A toast failure must never be the thing that breaks the menu.
+        }
     }
 }

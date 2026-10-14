@@ -52,6 +52,26 @@ public class CosmeticsDiagnosticsReportTest {
         assertTrue(report.contains("Published geometry bytes: 2048"));
         assertTrue(report.contains("Piece atlases: cape hat"));
         assertTrue(report.contains("published under key: \"local\""));
+        assertTrue(report.contains("Mod-menu build failures (containment guard)"));
+        assertTrue(report.contains("Last crash report: none"));
+    }
+
+    @Test
+    public void theLastCrashReportIsIncludedWhenPresent() {
+        CosmeticsDiagnosticsReport.Inputs in = fullInputs();
+        in.lastCrashReport = "java.lang.IllegalStateException: already has a parent\n\tat A.b";
+        String report = CosmeticsDiagnosticsReport.format(in);
+        assertTrue(report.contains("Last crash report:"));
+        assertTrue(report.contains("already has a parent"));
+    }
+
+    @Test
+    public void menuGuardFailuresAreIncludedWhenPresent() {
+        CosmeticsDiagnosticsReport.Inputs in = fullInputs();
+        in.menuGuardFailures = "  buildControllerSection: java.lang.NullPointerException: boom\n";
+        String report = CosmeticsDiagnosticsReport.format(in);
+        assertTrue(report.contains("buildControllerSection"));
+        assertTrue(report.contains("NullPointerException"));
     }
 
     @Test

@@ -1,8 +1,10 @@
 package org.chimeramc.client.core.cosmetics;
 
 import org.chimeramc.client.BuildConfig;
+import org.chimeramc.client.core.crash.CrashReportStore;
 import org.chimeramc.client.core.versions.GameVersion;
 import org.chimeramc.client.core.versions.VersionManager;
+import org.chimeramc.client.util.LauncherStorage;
 import org.chimeramc.client.preloader.PreloaderInput;
 
 import android.content.Context;
@@ -62,6 +64,12 @@ public final class CosmeticsDiagnosticsReport {
         public java.util.List<CosmeticAssetAudit.Entry> cosmeticAssets;
         /** Faces the scene refused to build (a size mismatch), as one-line descriptions. */
         public java.util.List<String> skippedFaces;
+        /** The most recent crash report text (from the crash_logs dir), or "" when none. */
+        public String lastCrashReport = "";
+        /** True when the crash report was truncated for display. */
+        public boolean lastCrashTruncated;
+        /** Mod-menu build-step failures captured by the containment guard (formatted). */
+        public String menuGuardFailures = "  none\n";
         public long timestampMs;
     }
 
@@ -98,6 +106,20 @@ public final class CosmeticsDiagnosticsReport {
         } catch (Throwable ignored) {
         }
         in.skinFeedInstalled = GameSkinSource.hasProvider();
+
+        // The most recent crash report, so a device crash trace can be copied/shared from inside the
+        // app (logcat is not app-readable without READ_LOGS).
+        try {
+            CrashReportStore.Report report =
+                    CrashReportStore.readDir(LauncherStorage.getCrashLogsDir(context));
+            if (report.isPresent()) {
+                in.lastCrashReport = report.text;
+                in.lastCrashTruncated = report.truncated;
+            }
+        } catch (Throwable ignored) {
+        }
+        // Mod-menu build failures the containment guard caught (item 1 of the v3 update).
+        in.menuGuardFailures = org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuGuard.format();
 
         // Per-cosmetic asset audit: the real PNG size, the geometry's declared size and the cube
         // count, so a size mismatch (which used to crash the preview) is visible without a device.
@@ -195,6 +217,20 @@ public final class CosmeticsDiagnosticsReport {
         b.append('\n');
 
         b.append("Status: ").append(statusText(v)).append('\n');
+        b.append('\n');
+
+        b.append("Mod-menu build failures (containment guard):\n");
+        b.append(v.menuGuardFailures == null ? "  none\n" : v.menuGuardFailures);
+        b.append('\n');
+
+        b.append("Last crash report: ");
+        if (v.lastCrashReport == null || v.lastCrashReport.isEmpty()) {
+            b.append("none\n");
+        } else {
+            b.append(v.lastCrashTruncated ? "(truncated)\n" : "\n");
+            b.append(v.lastCrashReport);
+            if (!v.lastCrashReport.endsWith("\n")) b.append('\n');
+        }
         b.append('\n');
         b.append("Note: whether cosmetics actually appear in game is unverified on device. This "
                 + "report only describes the state of the native render path.\n");

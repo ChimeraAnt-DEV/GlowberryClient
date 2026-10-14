@@ -972,6 +972,13 @@ Migration must complete before GlowberryClient can continue.</string>
     <string name="cosmetics_diagnostics_debug_cube">Draw test cube above local player</string>
     <string name="cosmetics_diagnostics_debug_cube_note">Draws one bright cube above your character in game, to prove the draw path. Whether it appears is unverified on device — screenshot it and report back.</string>
     <string name="cosmetics_diagnostics_note">This report describes the state of the native render path only. Whether cosmetics actually appear in game can only be confirmed by a device test.</string>
+    <string name="crash_report_copy">Copy last crash report</string>
+    <string name="crash_report_share">Share last crash report</string>
+    <string name="crash_report_copied">Crash report copied.</string>
+    <string name="crash_report_share_title">Share crash report</string>
+    <string name="crash_report_none">No crash report found.</string>
+    <string name="third_person_hint">Switch to third person to see cosmetics — in first person the game does not render your player model.</string>
+    <string name="vip_controller_step_failed">Controller settings step failed — see diagnostics</string>
     <string name="mod_menu_version">v1.0</string>
     <string name="mod_menu_enabled">Mod Menu enabled</string>
     <string name="mod_menu_disabled">Mod Menu disabled</string>
