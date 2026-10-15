@@ -882,8 +882,6 @@ Migration must complete before GlowberryClient can continue.</string>
          from the touch Mod Menu opened by the launcher nav bar. -->
     <string name="vip_menu_title">VIP Mod Menu</string>
     <string name="vip_menu_subtitle">Premium in-game control</string>
-    <!-- The touch Mod Menu's top-bar subtitle, matching the VIP shell's lockup. -->
-    <string name="mod_menu_subtitle">In-game control</string>
     <string name="vip_tab_general">General</string>
     <string name="vip_tab_controller">Controller</string>
     <string name="vip_tab_keyboard">Keyboard</string>

@@ -1,7 +1,6 @@
 package org.chimeramc.client.core.cosmetics;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -34,19 +33,6 @@ public class CosmeticsDiagnosticsReportTest {
         in.capeOverrides = 1;
         in.textureOverrides = 2;
         in.timestampMs = 0;
-        in.lastDrawDecision = 0;
-        in.localPlayerLive = true;
-        in.localPlayerPosition = new float[] {10.5f, 64.0f, -3.25f, 90.0f, 12.5f};
-        in.rulesSource = "bundled";
-        in.rulesRevision = 6;
-        in.rulesMergeConflicts = 1;
-        in.rulesHaveRenderIndex = true;
-        in.rulesLoadAttempted = true;
-        in.preloaderModuleMappings = 1;
-        in.hookInstallState = 2;
-        in.hookInstallFrameTicks = 3;
-        in.cameraAnchorSource = 1;
-        in.rulesSummary = "pauseMenuDtorSig,playerRenderVtableIndex=17";
         return in;
     }
 
@@ -68,44 +54,6 @@ public class CosmeticsDiagnosticsReportTest {
         assertTrue(report.contains("published under key: \"local\""));
         assertTrue(report.contains("Mod-menu build failures (containment guard)"));
         assertTrue(report.contains("Last crash report: none"));
-    }
-
-    @Test
-    public void theReportCarriesTheStageOneDiagnostics() {
-        String report = CosmeticsDiagnosticsReport.format(fullInputs());
-        assertTrue(report.contains("Rules source: bundled (revision 6)"));
-        assertTrue(report.contains("Rules delivered to native: yes"));
-        assertTrue(report.contains("Effective rule: pauseMenuDtorSig,playerRenderVtableIndex=17"));
-        assertTrue(report.contains("Rule has render slot: yes"));
-        assertTrue(report.contains("Hook install state: resolved after 3 frame tick(s)"));
-        assertTrue(report.contains("libpreloader.so copies mapped: 1"));
-        assertTrue(report.contains("Local player feed: live x=10.50 y=64.00 z=-3.25"));
-        assertTrue(report.contains("Camera anchor source: engine view-projection"));
-        assertTrue(report.contains("Last draw decision: draw"));
-    }
-
-    @Test
-    public void aSplitPreloaderMappingIsCalledOut() {
-        CosmeticsDiagnosticsReport.Inputs in = fullInputs();
-        in.preloaderModuleMappings = 2;
-        assertTrue(CosmeticsDiagnosticsReport.format(in).contains("SPLIT"));
-    }
-
-    @Test
-    public void theFirstPersonFallbackIsNotReportedAsTheEngineCamera() {
-        CosmeticsDiagnosticsReport.Inputs in = fullInputs();
-        in.cameraAnchorSource = 0;
-        String report = CosmeticsDiagnosticsReport.format(in);
-        assertTrue(report.contains("first-person fallback"));
-        assertFalse(report.contains("Camera anchor source: engine view-projection"));
-    }
-
-    @Test
-    public void aSkipDrawDecisionIsNamed() {
-        CosmeticsDiagnosticsReport.Inputs in = fullInputs();
-        in.lastDrawDecision = 4;
-        assertTrue(CosmeticsDiagnosticsReport.format(in)
-                .contains("Last draw decision: skip: no published geometry"));
     }
 
     @Test

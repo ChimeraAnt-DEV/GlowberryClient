@@ -102,10 +102,6 @@ public class ModManager {
     private static native void nativeDisableAndUnloadLoadedMods();
     private static native boolean nativePumpGameHookInstall();
     private static native boolean nativeIsGameHookInstallPending();
-    /** Deferred-install state: {state (0 not armed, 1 waiting, 2 resolved), frameTicks}. */
-    private static native int[] nativeGameHookInstallState();
-    /** The effective hook rule's resolved fields (which rule and slots the running build used). */
-    private static native String nativeGameHookRulesSummary();
 
     public static ModManager getInstance() {
         ModManager result = instance;
@@ -203,39 +199,6 @@ public class ModManager {
             return nativeIsGameHookInstallPending();
         } catch (UnsatisfiedLinkError e) {
             return false;
-        }
-    }
-
-    /** The deferred-install state for diagnostics: 0 not armed, 1 waiting, 2 resolved. */
-    public static int gameHookInstallState() {
-        if (!ensurePreloaderLoaded()) return 0;
-        try {
-            int[] value = nativeGameHookInstallState();
-            return value != null && value.length >= 1 ? value[0] : 0;
-        } catch (UnsatisfiedLinkError e) {
-            return 0;
-        }
-    }
-
-    /** The frame ticks the install gate observed before deciding, or 0 when unavailable. */
-    public static int gameHookInstallFrameTicks() {
-        if (!ensurePreloaderLoaded()) return 0;
-        try {
-            int[] value = nativeGameHookInstallState();
-            return value != null && value.length >= 2 ? value[1] : 0;
-        } catch (UnsatisfiedLinkError e) {
-            return 0;
-        }
-    }
-
-    /** The effective hook rule's resolved fields, or "" when unavailable. */
-    public static String gameHookRulesSummary() {
-        if (!ensurePreloaderLoaded()) return "";
-        try {
-            String value = nativeGameHookRulesSummary();
-            return value == null ? "" : value;
-        } catch (UnsatisfiedLinkError e) {
-            return "";
         }
     }
 

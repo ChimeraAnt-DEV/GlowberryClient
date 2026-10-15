@@ -195,25 +195,11 @@ public class PreloaderInput {
      * the app without READ_LOGS, so the diagnostics screen reads this instead).
      *
      * <p>Layout: {renderSlot, resolvedBy, glBackend, eglContextCurrent, hookInstalled, framesSeen,
-     * lastError, geometryBytes, pieceAtlasMask, lastDrawDecision, localPlayerLive, rulesRevision,
-     * rulesMergeConflicts, rulesHaveRenderIndex, rulesLoadAttempted, preloaderModuleMappings,
-     * trianglesDrawn}. All entries are -1 when the native library is absent. Never fabricates a
-     * reading: an unresolved slot or a missing GLES surface is reported as such.
+     * lastError, geometryBytes, pieceAtlasMask}. All entries are -1 when the native library is
+     * absent. Never fabricates a reading: an unresolved slot or a missing GLES surface is reported as
+     * such.
      */
     public static native int[] nativeReadRenderDiagnostics();
-
-    /**
-     * The local-player feed as {live, xBits, yBits, zBits, yawBits, pitchBits}. Floats are the raw
-     * IEEE-754 bits of the position and view rotation; the caller decodes them.
-     */
-    public static native int[] nativeReadLocalPlayerFeed();
-
-    /**
-     * Whether the last frame's cosmetic anchor came from the engine's view-projection: 1 engine,
-     * 0 first-person fallback, -1 unknown. A device test must not confuse the fallback with a
-     * resolved engine camera.
-     */
-    public static native int nativeCameraAnchorSource();
 
     /**
      * Arms the debug draw: the native renderer draws one bright cube above the local player's head
@@ -620,43 +606,9 @@ public class PreloaderInput {
     public static int[] readRenderDiagnostics() {
         try {
             int[] value = nativeReadRenderDiagnostics();
-            if (value == null || value.length < 9) return null;
-            if (value.length >= 17) return value;
-            // A native library older than this launcher returns fewer fields; pad the additions with
-            // -1 ("unknown") so the report can read a fixed layout either way.
-            int[] padded = new int[17];
-            System.arraycopy(value, 0, padded, 0, value.length);
-            for (int i = value.length; i < padded.length; i++) padded[i] = -1;
-            return padded;
+            return value != null && value.length >= 9 ? value : null;
         } catch (UnsatisfiedLinkError e) {
             return null;
-        }
-    }
-
-    /**
-     * The local-player feed as {live, xBits, yBits, zBits, yawBits, pitchBits}, or null when the
-     * library is absent. Floats travel as their raw int bits; decode with
-     * {@link Float#intBitsToFloat(int)}.
-     */
-    public static int[] readLocalPlayerFeed() {
-        try {
-            int[] value = nativeReadLocalPlayerFeed();
-            return value != null && value.length >= 6 ? value : null;
-        } catch (UnsatisfiedLinkError e) {
-            return null;
-        }
-    }
-
-    /**
-     * Whether the cosmetic anchor for the last frame came from the engine's view-projection.
-     *
-     * @return 1 engine, 0 first-person fallback, -1 unknown (library or frame absent)
-     */
-    public static int cameraAnchorSource() {
-        try {
-            return nativeCameraAnchorSource();
-        } catch (UnsatisfiedLinkError e) {
-            return -1;
         }
     }
 

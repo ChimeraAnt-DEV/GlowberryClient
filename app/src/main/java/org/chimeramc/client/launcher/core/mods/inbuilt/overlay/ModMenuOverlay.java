@@ -20,8 +20,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -74,9 +72,6 @@ public class ModMenuOverlay {
     private EditText searchInput;
     private ImageButton clearSearchBtn;
     private TextView navGeneral, navSettings, navHudEditor, navCosmetics, navPacks, navVoice, navReplay;
-
-    /** The icon rail. Built from ModMenuPage.sharedPages(), the registry the VIP menu also reads. */
-    private ModMenuRail rail;
     private TextView filterAll, filterFavorites, filterEnabled, filterInbuilt, filterExternal, filterPvp;
     private TextView moduleCountText, emptyStateText;
     private TextView compactFilterSelector, compactModuleCount;
@@ -469,18 +464,13 @@ public class ModMenuOverlay {
         searchInput = overlayView.findViewById(R.id.search_input);
         clearSearchBtn = overlayView.findViewById(R.id.btn_clear_search);
         modsRecycler = overlayView.findViewById(R.id.mods_grid_recycler);
-        // The destination entries left the top bar for the icon rail, so these ids no longer exist
-        // in the layout. The fields are kept (always null) so updateNavigationItems' call sites do
-        // not change shape; the rail is what paints selection now.
-        navGeneral = null;
-        navVoice = null;
-        navSettings = null;
-        navHudEditor = null;
-        navCosmetics = null;
-        navPacks = null;
-        navReplay = null;
-        buildRail();
-        determineInputMode();
+        navGeneral = overlayView.findViewById(R.id.nav_general);
+        navVoice = overlayView.findViewById(R.id.nav_voice);
+        navSettings = overlayView.findViewById(R.id.nav_settings);
+        navHudEditor = overlayView.findViewById(R.id.nav_hud_editor);
+        navCosmetics = overlayView.findViewById(R.id.nav_cosmetics);
+        navPacks = overlayView.findViewById(R.id.nav_packs);
+        navReplay = overlayView.findViewById(R.id.nav_replay);
         filterAll = overlayView.findViewById(R.id.filter_all);
         filterFavorites = overlayView.findViewById(R.id.filter_favorites);
         filterEnabled = overlayView.findViewById(R.id.filter_enabled);
@@ -533,10 +523,14 @@ public class ModMenuOverlay {
             updateHudEditorSizeControls(0);
         }
 
-        // Touch feedback on the stable chrome (filter chips + close). Recycler rows get their own
-        // feedback in the adapter, since they are recycled and rebound; the rail tiles get theirs
-        // from ModMenuRail's own click handling.
-        for (View v : new View[]{
+        if (navHudEditor != null) {
+            navHudEditor.setOnClickListener(v -> enterHudEditorMode(modMenuContainer, hudEditorTools));
+        }
+
+        // Touch feedback on the stable chrome (nav + filter chips + close). Recycler rows get
+        // their own feedback in the adapter, since they are recycled and rebound.
+        for (View v : new View[]{navVoice, navGeneral, navSettings, navHudEditor, navCosmetics,
+                navPacks, navReplay,
                 filterAll, filterFavorites, filterEnabled, filterInbuilt, filterExternal, filterPvp,
                 closeBtn, clearSearchBtn}) {
             if (v != null) DynamicAnim.applyPressScale(v);
@@ -601,12 +595,10 @@ public class ModMenuOverlay {
             btnBackToModules.setOnClickListener(v -> showModulesSection());
         }
 
-        // Navigation. The top bar carries no destinations any more; these text entries are gone
-        // from the layout and the rail drives routing via selectPage(). The bindings stay
-        // null-guarded so a layout that still declares one keeps working.
+        // Navigation
         if (navVoice != null) navVoice.setOnClickListener(v -> showVoiceSection());
-        if (navGeneral != null) navGeneral.setOnClickListener(v -> showModulesSection());
-        if (navSettings != null) navSettings.setOnClickListener(v -> showSettingsSection());
+        navGeneral.setOnClickListener(v -> showModulesSection());
+        navSettings.setOnClickListener(v -> showSettingsSection());
         if (navCosmetics != null) navCosmetics.setOnClickListener(v -> showCosmeticsSection());
         if (navPacks != null) navPacks.setOnClickListener(v -> showPacksSection());
         if (navReplay != null) navReplay.setOnClickListener(v -> showReplaySection());
@@ -1855,93 +1847,6 @@ public class ModMenuOverlay {
         updateNavigationItem(navSettings, settings);
         updateNavigationItem(navPacks, packs);
         updateNavigationItem(navReplay, replay);
-        // The rail is the same selection in icon form. The explicit booleans above still drive the
-        // (now hidden) text entries, so a caller that lights a destination also lights its rail
-        // tile. Exactly one boolean is true per call site.
-        if (rail != null) {
-            ModMenuPage page = null;
-            if (voice) page = ModMenuPage.VOICE;
-            else if (modules) page = ModMenuPage.GENERAL;
-            else if (cosmetics) page = ModMenuPage.COSMETICS;
-            else if (hudEditor) page = ModMenuPage.HUD_EDITOR;
-            else if (settings) page = ModMenuPage.SETTINGS;
-            else if (packs) page = ModMenuPage.PACKS;
-            else if (replay) page = ModMenuPage.REPLAY;
-            if (page != null) rail.setSelected(page);
-            if (page != null) updateTopBarTitle(page);
-        }
-    }
-
-    /** Sets the top-bar title to the active destination, like the VIP shell's lockup. */
-    private void updateTopBarTitle(ModMenuPage page) {
-        if (overlayView == null || page == null) return;
-        TextView title = overlayView.findViewById(R.id.mod_menu_title);
-        if (title != null) {
-            title.setText(page.getTitleRes());
-        }
-    }
-
-    /** Builds the destination rail from the shared page registry. */
-    private void buildRail() {
-        LinearLayout railContainer = overlayView == null
-                ? null : overlayView.findViewById(R.id.mod_menu_tab_bar);
-        if (railContainer == null) return;
-        rail = new ModMenuRail(activity, railContainer, getAccentColor());
-        rail.build(this::selectPage);
-    }
-
-    /**
-     * Fills the top-bar input-mode badge from the connected input, so the shell reads the same as
-     * the VIP menu's. A pad present shows the controller badge, otherwise the keyboard badge.
-     */
-    private void determineInputMode() {
-        if (overlayView == null) return;
-        TextView badge = overlayView.findViewById(R.id.mod_menu_mode_badge);
-        if (badge == null) return;
-        boolean controller = hasConnectedGamepad();
-        badge.setText(controller ? R.string.vip_mode_controller : R.string.vip_mode_keyboard);
-        badge.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                controller ? R.drawable.ic_controller : R.drawable.ic_keyboard, 0, 0, 0);
-    }
-
-    /** Dispatches a rail selection to the matching section. The single source of tab routing. */
-    private void selectPage(ModMenuPage page) {
-        if (page == null) return;
-        switch (page) {
-            case GENERAL:
-                showModulesSection();
-                break;
-            case VOICE:
-                showVoiceSection();
-                break;
-            case PACKS:
-                showPacksSection();
-                break;
-            case COSMETICS:
-                showCosmeticsSection();
-                break;
-            case HUD_EDITOR:
-                showHudEditorSection();
-                break;
-            case REPLAY:
-                showReplaySection();
-                break;
-            case SETTINGS:
-                showSettingsSection();
-                break;
-            default:
-                break;
-        }
-    }
-
-    /** Enters HUD-editor mode from the rail (the top bar no longer carries that destination). */
-    private void showHudEditorSection() {
-        if (overlayView == null) return;
-        View modMenuContainer = overlayView.findViewById(R.id.mod_menu_container);
-        View hudEditorTools = overlayView.findViewById(R.id.hud_editor_tools);
-        if (modMenuContainer != null && hudEditorTools != null) {
-            enterHudEditorMode(modMenuContainer, hudEditorTools);
-        }
     }
 
     private void updateModuleCount() {

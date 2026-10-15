@@ -40,16 +40,6 @@ Record the whole report. The lines that matter most:
 | `Published geometry bytes` | Did the launcher publish the equipped geometry? | A size > 0 confirms the launcher half. |
 | `Piece atlases` | Which of cape/hat/pet textures were published. | Confirms per-piece textures. |
 | `Local cosmetics published under key` | Should read `"local"`. | Confirms the key scheme. |
-| `Rules source` | `bundled` or `remote`, and the revision (should be ≥ 6). | A remote file with an older or field-less rule would disable the hook. |
-| `Rules delivered to native` | Did the native library receive the rules path at all? | If `no`, the hooks refuse to install (fail-closed vanilla). |
-| `Effective rule` | The merged fields the native hook used; must contain `playerRenderVtableIndex=17`. | If the slot is missing here, the hook installed without one. |
-| `Rules matching this version (extra)` | `> 0` means several rules covered this build — exactly where first-match selection used to drop fields. | The merge now inherits the missing field. |
-| `Rule has render slot` | `yes`. | The single most important post-fix line. |
-| `Hook install state` | `resolved after N frame tick(s)` vs `armed, waiting`. | Distinguishes a slow runtime from a failure. |
-| `libpreloader.so copies mapped` | Must be exactly `1`. | `> 1` = **SPLIT**: JNI and the hook are in different copies; nothing can ever draw. |
-| `Local player feed` | `live x=… y=… z=… yaw=… pitch=…` with plausible values. | Cosmetics are scoped to a live local player. |
-| `Camera anchor source` | `engine view-projection` or `first-person fallback`. | A pass/fail test must not accept the fallback as the engine camera. |
-| `Last draw decision` | `draw` or a named `skip: …`. | The report now names *why* a frame did not draw. |
 
 ---
 

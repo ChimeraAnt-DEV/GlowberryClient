@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.chimeramc.client.util.JsonIOUtils;
 import org.chimeramc.client.util.LauncherStorage;
 
@@ -28,13 +30,6 @@ public final class PreloaderSignatureRulesManager {
     private static final String LOCAL_RULES_FILE = "preloader_signature_rules.json";
     private static final String PREFS_NAME = "preloader_signature_rules";
     private static final String KEY_LAST_SUCCESSFUL_UPDATE_TIME = "last_successful_update_time";
-
-    /** Where the rules file currently in use came from. Reported by the diagnostics summary. */
-    public static final String SOURCE_BUNDLED = "bundled";
-    public static final String SOURCE_REMOTE = "remote";
-    private static final String KEY_RULES_SOURCE = "rules_source";
-
-    private static volatile String sLastSource = SOURCE_BUNDLED;
 
     /**
      * Signature rules are fetched from these sources in order. The first source that returns
@@ -149,21 +144,13 @@ public final class PreloaderSignatureRulesManager {
         String localRules = JsonIOUtils.read(localFile);
         String bundledRules = readAsset(context, ASSET_DEFAULT_RULES);
 
-        if (!PreloaderRules.hasValidRules(bundledRules)) {
+        if (!hasValidRules(bundledRules)) {
             Log.w(TAG, "Bundled preloader signature rules are invalid");
             return localFile;
         }
 
-        // The bundled copy is the safe floor. It is written whenever the installed copy is invalid
-        // OR the bundled copy's revision is at least as high as the local one — using >= rather than
-        // > means a locally built APK whose bundled rules were bumped (e.g. to revision 5 with the
-        // render slot fields) is not silently held back by an equal-revision file already on disk.
-        int localRevision = PreloaderRules.revision(localRules);
-        int bundledRevision = PreloaderRules.revision(bundledRules);
-        if (!PreloaderRules.hasValidRules(localRules) || bundledRevision >= localRevision) {
+        if (!hasValidRules(localRules) || getRulesRevision(bundledRules) > getRulesRevision(localRules)) {
             writeFileIfChanged(localFile, bundledRules);
-            sLastSource = SOURCE_BUNDLED;
-            setRulesSource(context, SOURCE_BUNDLED);
         }
         return localFile;
     }
@@ -188,7 +175,7 @@ public final class PreloaderSignatureRulesManager {
             if (isBlank(candidate)) {
                 continue;
             }
-            if (!PreloaderRules.hasValidRules(candidate)) {
+            if (!hasValidRules(candidate)) {
                 Log.w(TAG, "Signature rules from " + url + " are invalid, trying next source");
                 failureMessage = "Remote preloader signature rules are invalid";
                 continue;
@@ -208,31 +195,11 @@ public final class PreloaderSignatureRulesManager {
 
         File localFile = getLocalRulesFile(context);
         String localRules = JsonIOUtils.read(localFile);
-        String bundledRules = readAsset(context, ASSET_DEFAULT_RULES);
-
-        int remoteRevision = PreloaderRules.revision(remoteRules);
-        int floorRevision = Math.max(PreloaderRules.revision(localRules),
-                PreloaderRules.revision(bundledRules));
-        if (remoteRevision <= floorRevision) {
-            // A revision that is not strictly newer than the installed copy cannot silently
-            // downgrade the rules. (Previously only a strictly LOWER revision was refused, so an
-            // equal-revision remote file replaced a working local copy.)
+        if (hasValidRules(localRules) && getRulesRevision(remoteRules) < getRulesRevision(localRules)) {
             return new RefreshResult(
                     true,
                     false,
-                    "Remote preloader signature rules are not newer than the installed rules",
-                    getLastSuccessfulUpdateTime(context)
-            );
-        }
-        if (!PreloaderRules.coversBundledRules(remoteRules, bundledRules)) {
-            // A newer revision that has dropped a field the bundled copy carries (e.g.
-            // playerRenderVtableIndex) would install hooks without a slot and fail on the running
-            // build, so it is refused. The bundled copy stays authoritative.
-            Log.w(TAG, "Remote preloader signature rules are newer but incomplete; keeping bundled rules");
-            return new RefreshResult(
-                    true,
-                    false,
-                    "Remote preloader signature rules are newer but missing fields the bundled rules carry",
+                    "Remote preloader signature rules are older than the installed rules",
                     getLastSuccessfulUpdateTime(context)
             );
         }
@@ -247,10 +214,6 @@ public final class PreloaderSignatureRulesManager {
             );
         }
 
-        if (writeResult.changed) {
-            sLastSource = SOURCE_REMOTE;
-            setRulesSource(context, SOURCE_REMOTE);
-        }
         long updateTime = System.currentTimeMillis();
         setLastSuccessfulUpdateTime(context, updateTime);
         return new RefreshResult(true, writeResult.changed, "", updateTime);
@@ -269,6 +232,54 @@ public final class PreloaderSignatureRulesManager {
         } catch (Exception e) {
             Log.w(TAG, "Failed to fetch remote preloader signature rules", e);
             return null;
+        }
+    }
+
+    private static boolean hasValidRules(String content) {
+        if (isBlank(content)) {
+            return false;
+        }
+
+        try {
+            JSONObject root = new JSONObject(content);
+            JSONArray rules = root.optJSONArray("rules");
+            if (rules == null || rules.length() == 0) {
+                return false;
+            }
+
+            for (int i = 0; i < rules.length(); i++) {
+                JSONObject rule = rules.optJSONObject(i);
+                if (rule != null && hasCompleteSignatures(rule)) {
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    private static boolean hasCompleteSignatures(JSONObject rule) {
+        JSONObject sigs = rule.optJSONObject("sigs");
+        if (sigs == null) {
+            sigs = rule;
+        }
+
+        return !isBlank(sigs.optString("pauseMenuDtorSig", ""))
+                && !isBlank(sigs.optString("pauseMenuOpenSig", ""))
+                && !isBlank(sigs.optString("hudScreenDtorSig", ""))
+                && !isBlank(sigs.optString("hudScreenOpenSig", ""))
+                && (!isBlank(sigs.optString("isShowingMenuSig", ""))
+                    || rule.optInt("isShowingMenuVtableIndex", -1) >= 0);
+    }
+
+    private static int getRulesRevision(String content) {
+        if (isBlank(content)) {
+            return 0;
+        }
+        try {
+            return Math.max(0, new JSONObject(content).optInt("revision", 0));
+        } catch (Exception ignored) {
+            return 0;
         }
     }
 
@@ -347,34 +358,6 @@ public final class PreloaderSignatureRulesManager {
         prefs.edit()
                 .putLong(KEY_LAST_SUCCESSFUL_UPDATE_TIME, updateTime)
                 .apply();
-    }
-
-    private static void setRulesSource(Context context, String source) {
-        if (context == null) {
-            return;
-        }
-        context.getApplicationContext()
-                .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .putString(KEY_RULES_SOURCE, source)
-                .apply();
-    }
-
-    /**
-     * The source of the rules file currently in use ("bundled" or "remote"), recorded at the last
-     * resolve. Used by the diagnostics summary so a player can see whether the running build used
-     * the shipped rules or a fetched copy, without reading logcat.
-     */
-    public static String getRulesSource(Context context) {
-        if (context != null) {
-            String recorded = context.getApplicationContext()
-                    .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                    .getString(KEY_RULES_SOURCE, null);
-            if (recorded != null) {
-                return recorded;
-            }
-        }
-        return sLastSource;
     }
 
     private static void postCallback(RefreshCallback callback, RefreshResult result) {

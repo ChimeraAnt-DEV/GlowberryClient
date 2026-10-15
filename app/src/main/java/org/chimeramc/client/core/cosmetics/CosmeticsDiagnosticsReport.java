@@ -61,34 +61,6 @@ public final class CosmeticsDiagnosticsReport {
         public int textureOverrides;
         public String localKeyId = NativeCosmeticsBridge.LOCAL_PLAYER_ID;
         public boolean debugCubeArmed;
-        /** The last render call's draw decision (0 draw; else the gate that skipped), or -1 unknown. */
-        public int lastDrawDecision = -1;
-        /** Whether the local-player position feed produced a reading this frame. */
-        public boolean localPlayerLive;
-        /** The effective hook rule's resolved fields (which slots the running build used). */
-        public String rulesSummary = "";
-        /** The rules file's declared revision, or -1 when unknown. */
-        public int rulesRevision = -1;
-        /** Extra rules that matched this version (>0 is where first-match selection lost fields). */
-        public int rulesMergeConflicts = -1;
-        /** Whether the effective rule carries a playerRenderVtableIndex. */
-        public boolean rulesHaveRenderIndex;
-        /** Whether the rules were delivered to the native library at all this session. */
-        public boolean rulesLoadAttempted;
-        /** How many copies of libpreloader.so are mapped; >1 means a split, empty registry. */
-        public int preloaderModuleMappings = -1;
-        /** Triangles the renderer has submitted this session, or -1 when unknown. */
-        public int trianglesDrawn = -1;
-        /** The deferred hook-install state: 0 not armed, 1 waiting, 2 resolved. */
-        public int hookInstallState;
-        /** Frame ticks the install gate observed before deciding. */
-        public int hookInstallFrameTicks;
-        /** Camera anchor source: 1 engine view-projection, 0 first-person fallback, -1 unknown. */
-        public int cameraAnchorSource = -1;
-        /** The rules source actually in use ("bundled" / "remote"), for the report. */
-        public String rulesSource = "bundled";
-        /** Local player feed: {x, y, z, yaw, pitch} when live, else null. */
-        public float[] localPlayerPosition;
         /** True when the engine captured a base-skin texture this session (the real-skin route). */
         public boolean skinCaptured;
         /** True when a game-skin provider is installed (the engine-hook seam is active). */
@@ -130,39 +102,6 @@ public final class CosmeticsDiagnosticsReport {
             in.lastError = diag[6];
             in.geometryBytes = diag[7];
             in.pieceAtlasMask = diag[8];
-            if (diag.length >= 17) {
-                in.lastDrawDecision = diag[9];
-                in.localPlayerLive = diag[10] == 1;
-                in.rulesRevision = diag[11];
-                in.rulesMergeConflicts = diag[12];
-                in.rulesHaveRenderIndex = diag[13] == 1;
-                in.rulesLoadAttempted = diag[14] == 1;
-                in.preloaderModuleMappings = diag[15];
-                in.trianglesDrawn = diag[16];
-            }
-        }
-        in.cameraAnchorSource = PreloaderInput.cameraAnchorSource();
-
-        // The local-player feed, decoded from its raw float bits. Only present when live.
-        int[] feed = PreloaderInput.readLocalPlayerFeed();
-        if (feed != null && feed.length >= 6 && feed[0] == 1) {
-            in.localPlayerPosition = new float[] {
-                    Float.intBitsToFloat(feed[1]), Float.intBitsToFloat(feed[2]),
-                    Float.intBitsToFloat(feed[3]), Float.intBitsToFloat(feed[4]),
-                    Float.intBitsToFloat(feed[5])};
-        }
-
-        try {
-            in.hookInstallState = org.chimeramc.client.core.mods.ModManager.gameHookInstallState();
-            in.hookInstallFrameTicks =
-                    org.chimeramc.client.core.mods.ModManager.gameHookInstallFrameTicks();
-            in.rulesSummary = org.chimeramc.client.core.mods.ModManager.gameHookRulesSummary();
-        } catch (Throwable ignored) {
-        }
-        try {
-            in.rulesSource = org.chimeramc.client.preloader.PreloaderSignatureRulesManager
-                    .getRulesSource(context);
-        } catch (Throwable ignored) {
         }
         in.rendererDrawable = NativeCosmeticsFeed.isRendererDrawable();
         in.drawsThisSession = NativeCosmeticsFeed.drawCount();
@@ -254,27 +193,13 @@ public final class CosmeticsDiagnosticsReport {
         b.append('\n');
 
         b.append("Native library loaded: ").append(yesNo(v.nativeLoaded)).append('\n');
-        b.append("Rules source: ").append(v.rulesSource == null ? "bundled" : v.rulesSource)
-                .append(" (revision ").append(countText(v.rulesRevision)).append(")\n");
-        b.append("Rules delivered to native: ").append(yesNo(v.rulesLoadAttempted)).append('\n');
-        b.append("Effective rule: ").append(ruleSummaryText(v)).append('\n');
-        b.append("Rules matching this version (extra): ").append(countText(v.rulesMergeConflicts))
-                .append('\n');
-        b.append("Rule has render slot: ").append(yesNo(v.rulesHaveRenderIndex)).append('\n');
-        b.append("Hook install state: ").append(installStateText(v)).append('\n');
-        b.append("libpreloader.so copies mapped: ").append(mappingText(v.preloaderModuleMappings))
-                .append('\n');
         b.append("Player-render slot: ").append(slotText(v)).append('\n');
         b.append("Hook installed: ").append(hookText(v)).append('\n');
         b.append("Frames seen: ").append(countText(v.framesSeen)).append('\n');
-        b.append("Local player feed: ").append(localPlayerText(v)).append('\n');
-        b.append("Camera anchor source: ").append(cameraText(v)).append('\n');
-        b.append("Last draw decision: ").append(drawDecisionText(v.lastDrawDecision)).append('\n');
         b.append("Renderer drawable: ").append(yesNo(v.rendererDrawable)).append('\n');
         b.append("GL backend: ").append(backendText(v.glBackend)).append('\n');
         b.append("EGL context current: ").append(yesNo(v.eglContextCurrent)).append('\n');
         b.append("Successful draws this session: ").append(v.drawsThisSession).append('\n');
-        b.append("Triangles drawn this session: ").append(countText(v.trianglesDrawn)).append('\n');
         b.append("Last GL error: ").append(errorText(v.lastError)).append('\n');
         b.append('\n');
 
@@ -374,54 +299,6 @@ public final class CosmeticsDiagnosticsReport {
         if ((mask & 2) != 0) b.append("hat ");
         if ((mask & 4) != 0) b.append("pet ");
         return b.length() == 0 ? "none published" : b.toString().trim();
-    }
-
-    private static String ruleSummaryText(Inputs v) {
-        if (v.rulesSummary == null || v.rulesSummary.isEmpty()) return "unknown";
-        return v.rulesSummary;
-    }
-
-    private static String installStateText(Inputs v) {
-        switch (v.hookInstallState) {
-            case 0: return "not armed";
-            case 1: return "armed, waiting for the render context (" + v.hookInstallFrameTicks
-                    + " frame tick(s))";
-            case 2: return "resolved after " + v.hookInstallFrameTicks + " frame tick(s)";
-            default: return "unknown";
-        }
-    }
-
-    private static String mappingText(int count) {
-        if (count < 0) return "unknown";
-        if (count > 1) return count + " (SPLIT: more than one copy has an empty registry)";
-        return Integer.toString(count);
-    }
-
-    private static String localPlayerText(Inputs v) {
-        if (!v.localPlayerLive) return "no live local player";
-        if (v.localPlayerPosition == null || v.localPlayerPosition.length < 5) return "live (values unavailable)";
-        return String.format(Locale.US, "live x=%.2f y=%.2f z=%.2f yaw=%.2f pitch=%.2f",
-                v.localPlayerPosition[0], v.localPlayerPosition[1], v.localPlayerPosition[2],
-                v.localPlayerPosition[3], v.localPlayerPosition[4]);
-    }
-
-    private static String cameraText(Inputs v) {
-        if (v.cameraAnchorSource < 0) return "unknown";
-        return v.cameraAnchorSource == 1
-                ? "engine view-projection"
-                : "first-person fallback (engine camera did not resolve)";
-    }
-
-    private static String drawDecisionText(int decision) {
-        switch (decision) {
-            case -1: return "unknown";
-            case 0: return "draw";
-            case 1: return "skip: nothing equipped (and the debug cube is off)";
-            case 2: return "skip: no published frame";
-            case 3: return "skip: no live local player";
-            case 4: return "skip: no published geometry";
-            default: return "unknown (" + decision + ")";
-        }
     }
 
     /** The honest status line, matching the rule the Cosmetics panel uses. */
