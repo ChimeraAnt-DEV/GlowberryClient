@@ -15,6 +15,27 @@
     android:background="@android:color/transparent"
     android:defaultFocusHighlightEnabled="false">
 
+    <!-- The blurred backdrop of the game behind the panel (M4). It is a sibling of the panel, not a
+         child, so the panel's own text is never blurred: on API 31+ the blur is a RenderEffect on
+         this layer, and below 31 a downscale/upscale blit is set as this layer's bitmap. It is
+         driven by the glass-intensity setting; with glass off it stays hidden and the panel draws
+         its opaque fill. -->
+    <ImageView
+        android:id="@+id/mod_menu_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:visibility="gone" />
+
+    <!-- The scrim over the backdrop, so the panel's text always has something to sit on. Its
+         opacity follows the glass intensity (less scrim when the glass is thick). -->
+    <View
+        android:id="@+id/mod_menu_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66070A0F" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/mod_menu_container"
         android:layout_width="match_parent"

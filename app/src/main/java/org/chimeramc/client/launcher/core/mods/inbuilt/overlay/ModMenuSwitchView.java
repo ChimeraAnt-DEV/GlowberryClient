@@ -46,6 +46,7 @@ public class ModMenuSwitchView extends View {
     private boolean failed;
     private boolean hapticsEnabled = true;
     private boolean reducedMotion;
+    private ModMenuSettings.ToggleStyle toggleStyle = ModMenuSettings.ToggleStyle.SWITCH;
     private String label;
     private OnCheckedChangeListener listener;
     private ValueAnimator animator;
@@ -126,6 +127,27 @@ public class ModMenuSwitchView extends View {
         this.reducedMotion = value;
     }
 
+    /**
+     * Switches the control's visual to the player's chosen toggle style (M6).
+     *
+     * <p>Only the visual changes: the state, the touch target and the listener are identical for all
+     * three styles, so a player who picks the checkbox still gets the same module state as one who
+     * keeps the pill.
+     */
+    public void setToggleStyle(ModMenuSettings.ToggleStyle value) {
+        ModMenuSettings.ToggleStyle next = value == null
+                ? ModMenuSettings.ToggleStyle.SWITCH : value;
+        if (this.toggleStyle == next) return;
+        this.toggleStyle = next;
+        requestLayout();
+        invalidate();
+    }
+
+    /** The style currently drawn (M6). */
+    public ModMenuSettings.ToggleStyle getToggleStyle() {
+        return toggleStyle;
+    }
+
     public void setOnCheckedChangeListener(OnCheckedChangeListener value) {
         this.listener = value;
     }
@@ -134,11 +156,17 @@ public class ModMenuSwitchView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (getWidth() <= 0 || getHeight() <= 0) return;
-        // Centre the 52x32dp control in whatever the layout gave us, so the invisible padding the
-        // touch target needs does not shift the visual.
-        float left = (getWidth() - ModMenuMetrics.SWITCH_WIDTH_DP * density) / 2f;
-        float top = (getHeight() - ModMenuMetrics.SWITCH_HEIGHT_DP * density) / 2f;
-        ModMenuSwitch.draw(canvas, paint, left, top, density, checked, progress, interactive, failed);
+        // Centre the visual in whatever the layout gave us, so the invisible padding the touch
+        // target needs does not shift the control. The visual's width follows the toggle style
+        // (M6): a plain pill, a pill with a state word, or a square checkbox.
+        float visualWidth = ModMenuSwitch.visualWidthDp(toggleStyle) * density;
+        float visualHeight = (toggleStyle == ModMenuSettings.ToggleStyle.CHECKBOX
+                ? ModMenuSwitch.CHECKBOX_SIZE_DP
+                : ModMenuMetrics.SWITCH_HEIGHT_DP) * density;
+        float left = (getWidth() - visualWidth) / 2f;
+        float top = (getHeight() - visualHeight) / 2f;
+        ModMenuSwitch.draw(canvas, paint, left, top, density, checked, progress, interactive,
+                failed, toggleStyle);
     }
 
     @Override
@@ -232,7 +260,10 @@ public class ModMenuSwitchView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int desiredW = (int) (ModMenuMetrics.MIN_TOUCH_TARGET_DP * density);
+        // The touch target is always at least 48dp; the pill+label style is wider than that, so the
+        // visual is never clipped by the target (M6).
+        int desiredW = (int) (Math.max(ModMenuMetrics.MIN_TOUCH_TARGET_DP,
+                ModMenuSwitch.visualWidthDp(toggleStyle)) * density);
         int desiredH = (int) (ModMenuMetrics.MIN_TOUCH_TARGET_DP * density);
         setMeasuredDimension(
                 resolveSize(desiredW, widthMeasureSpec),

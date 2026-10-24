@@ -123,4 +123,49 @@ public class ModMenuPaletteTest {
         assertTrue(alpha > 0);
         assertFalse(alpha == 0xFF);
     }
+
+    @Test
+    public void theGlassPanelFillIsTranslucentAndTintedLikeTheWheel() {
+        // M4: the panel with glass on must be the wheel's regular tier, not a second material. The
+        // two halves of that claim are the fill alpha and the white tint; asserting both is what
+        // keeps "the panel and the wheel look like one product" from silently drifting.
+        ModMenuPalette.Scheme scheme = ModMenuPalette.schemeFor(
+                ModMenuSettings.Theme.NAVY, true);
+        int glass = ModMenuPalette.panelFill(scheme, ModMenuSettings.GlassIntensity.SUBTLE);
+        assertEquals("the fill carries the regular tier's alpha",
+                RadialWheelMaterial.REGULAR_FILL_ALPHA, (glass >>> 24) & 0xFF);
+        assertTrue("the tint lightens the fill", luminance(glass) > luminance(scheme.surface1));
+        assertTrue("the tint is not a white-out",
+                luminance(glass) < luminance(0xFFFFFFFF));
+    }
+
+    @Test
+    public void withGlassOffThePanelFillIsOpaqueSoTheGameDoesNotShowThroughTheText() {
+        ModMenuPalette.Scheme scheme = ModMenuPalette.schemeFor(
+                ModMenuSettings.Theme.NAVY, true);
+        int solid = ModMenuPalette.panelFill(scheme, ModMenuSettings.GlassIntensity.OFF);
+        assertEquals(0xFF, (solid >>> 24) & 0xFF);
+        assertEquals(scheme.surface1, solid);
+    }
+
+    @Test
+    public void thePanelFillFollowsTheThemePreset() {
+        // A preset change must move the panel; a panel that keeps the navy fill under "True Black"
+        // is the setting not reaching a pixel.
+        ModMenuPalette.Scheme navy = ModMenuPalette.schemeFor(ModMenuSettings.Theme.NAVY, true);
+        ModMenuPalette.Scheme black = ModMenuPalette.schemeFor(ModMenuSettings.Theme.TRUE_BLACK, true);
+        assertNotEquals(ModMenuPalette.panelFill(navy, ModMenuSettings.GlassIntensity.OFF),
+                ModMenuPalette.panelFill(black, ModMenuSettings.GlassIntensity.OFF));
+    }
+
+    @Test
+    public void withAlphaKeepsTheChannelsAndClampsTheAlpha() {
+        assertEquals(0x00ABCDEF, ModMenuPalette.withAlpha(0xFFABCDEF, 0) & 0x00FFFFFF);
+        assertEquals(0xFF, (ModMenuPalette.withAlpha(0xFFABCDEF, 999) >>> 24) & 0xFF);
+        assertEquals(0x7F, (ModMenuPalette.withAlpha(0xFFABCDEF, 0x7F) >>> 24) & 0xFF);
+    }
+
+    private static int luminance(int color) {
+        return ((color >>> 16) & 0xFF) + ((color >>> 8) & 0xFF) + (color & 0xFF);
+    }
 }

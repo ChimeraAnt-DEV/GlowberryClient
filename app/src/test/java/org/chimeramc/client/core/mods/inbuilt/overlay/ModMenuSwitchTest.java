@@ -121,4 +121,23 @@ public class ModMenuSwitchTest {
     public void theLabelIsTrimmedSoTheAnnouncementHasNoDoubledSpace() {
         assertEquals("Keystrokes, On", ModMenuSwitch.accessibilityLabel("  Keystrokes  ", true));
     }
+
+    @Test
+    public void eachToggleStyleHasItsOwnVisualWidthButTheSameTouchTarget() {
+        // M6: the three styles differ only in the visual. The plain switch is the pill's width, the
+        // labelled pill adds room for the state word, and the checkbox is its own square. The touch
+        // target is the view's, not this number, so a narrow checkbox is still tappable.
+        assertEquals(ModMenuMetrics.SWITCH_WIDTH_DP,
+                ModMenuSwitch.visualWidthDp(ModMenuSettings.ToggleStyle.SWITCH));
+        assertTrue(ModMenuSwitch.visualWidthDp(ModMenuSettings.ToggleStyle.PILL_LABEL)
+                > ModMenuMetrics.SWITCH_WIDTH_DP);
+        assertEquals(ModMenuSwitch.CHECKBOX_SIZE_DP,
+                ModMenuSwitch.visualWidthDp(ModMenuSettings.ToggleStyle.CHECKBOX));
+    }
+
+    @Test
+    public void aNullStyleDegradesToTheDefaultSwitchRatherThanCrashing() {
+        // A recycled view can be bound before the settings arrive; the control must not throw.
+        assertEquals(ModMenuMetrics.SWITCH_WIDTH_DP, ModMenuSwitch.visualWidthDp(null));
+    }
 }

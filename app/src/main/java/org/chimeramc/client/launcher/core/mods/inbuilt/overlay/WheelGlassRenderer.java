@@ -102,6 +102,73 @@ public final class WheelGlassRenderer {
     }
 
     /**
+     * Applies the {@code RenderEffect} blur to a whole-window layer (M4).
+     *
+     * <p>The panel backdrop is a rectangle rather than the wheel's disc, so it needs the effect on
+     * a layer rather than the canvas route. Isolated here so the {@code RenderEffect} type is
+     * reached from exactly one place, behind this class's API guard.
+     */
+    public void applyLayerBlur(ImageView layer, float radiusPx) {
+        if (layer == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return;
+        Api31.applyBlur(layer, radiusPx);
+    }
+
+    /**
+     * Produces a blurred copy of a whole capture for an {@link ImageView} layer (M4).
+     *
+     * <p>The API 28-30 counterpart of the {@code RenderEffect} route: the capture is shrunk and
+     * stretched back, and the filtered second blit <em>is</em> the blur. Used for the Mod Menu's
+     * panel backdrop, which is a rectangle rather than the wheel's disc, so it cannot go through
+     * {@link #drawBackdrop}.
+     *
+     * <p>Returns null when there is nothing to blur or the scratch cannot be allocated; the caller
+     * then leaves the layer hidden and the panel falls back to its solid fill.
+     */
+    public Bitmap stackBlurCopy(Bitmap capture) {
+        if (capture == null || capture.isRecycled()) return null;
+        int w = capture.getWidth();
+        int h = capture.getHeight();
+        if (w <= 0 || h <= 0) return null;
+        int sw = Math.max(1, w / STACK_BLUR_DIVISOR);
+        int sh = Math.max(1, h / STACK_BLUR_DIVISOR);
+        Bitmap out;
+        try {
+            out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        } catch (Throwable ignored) {
+            return null;
+        }
+        Bitmap scratch = scratchFor(sw, sh);
+        if (scratch == null) {
+            recycleQuietly(out);
+            return null;
+        }
+        try {
+            Canvas canvas = new Canvas(out);
+            srcRect.set(0, 0, w, h);
+            scratchDstRect.set(0, 0, sw, sh);
+            scratchCanvas.setBitmap(scratch);
+            scratchCanvas.drawBitmap(capture, srcRect, scratchDstRect, bitmapPaint);
+            scratchCanvas.setBitmap(null);
+            // The filtered stretch back up is the blur.
+            srcRect.set(0, 0, sw, sh);
+            dstRect.set(0, 0, w, h);
+            canvas.drawBitmap(scratch, srcRect, dstRect, bitmapPaint);
+        } catch (Throwable ignored) {
+            recycleQuietly(out);
+            return null;
+        }
+        return out;
+    }
+
+    private static void recycleQuietly(Bitmap bitmap) {
+        if (bitmap == null || bitmap.isRecycled()) return;
+        try {
+            bitmap.recycle();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
      * Draws the backdrop's non-blurred layers: the black scrim floor, the tier's dark fill and its
      * white tint (R2).
      *
