@@ -120,8 +120,13 @@ public final class WheelBackdropCapture {
                 schedule.markCaptured(nowMs);
                 if (result == PixelCopy.SUCCESS) {
                     captureFailed = false;
-                    swap(buffer);
+                    // Hand the new capture over BEFORE recycling the previous one: the wheel now
+                    // displays the capture on a layer (R3), so the old bitmap must not be recycled
+                    // while that layer still points at it.
+                    Bitmap previous = lastCapture;
+                    lastCapture = buffer;
                     if (callback != null) callback.onCaptured(lastCapture);
+                    recycleQuietly(previous);
                 } else {
                     captureFailed = true;
                     recycleQuietly(buffer);
@@ -142,12 +147,6 @@ public final class WheelBackdropCapture {
         lastCapture = null;
         captureFailed = false;
         schedule.reset();
-    }
-
-    private void swap(Bitmap next) {
-        Bitmap previous = lastCapture;
-        lastCapture = next;
-        recycleQuietly(previous);
     }
 
     private static void recycleQuietly(Bitmap bitmap) {

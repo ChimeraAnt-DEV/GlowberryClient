@@ -258,6 +258,37 @@ public class RadialWheelMaterialTest {
         assertEquals(100L, RadialWheelMaterial.blurIntervalMs(1000));
     }
 
+    // --- The blur route (R12) ------------------------------------------------------------------
+
+    @Test
+    public void api31UsesTheRenderEffectAndBelowUsesTheStackBlur() {
+        // R12: RenderEffect is API 31+. The route is decided in one place so the layer and the
+        // canvas cannot disagree about which mechanism is in play.
+        Resolved blurring = RadialWheelMaterial.resolve(Tier.REGULAR, cool());
+        assertEquals(RadialWheelMaterial.BlurRoute.RENDER_EFFECT,
+                RadialWheelMaterial.blurRoute(31, blurring));
+        assertEquals(RadialWheelMaterial.BlurRoute.RENDER_EFFECT,
+                RadialWheelMaterial.blurRoute(35, blurring));
+        assertEquals(RadialWheelMaterial.BlurRoute.STACK,
+                RadialWheelMaterial.blurRoute(30, blurring));
+        assertEquals(RadialWheelMaterial.BlurRoute.STACK,
+                RadialWheelMaterial.blurRoute(28, blurring));
+    }
+
+    @Test
+    public void aSolidMaterialHasNoBlurRouteAtAll() {
+        // A solid tier (below API 31, no capture, reduce-transparency, or a thermal drop) must not
+        // ask for a blur by either mechanism.
+        Resolved solid = RadialWheelMaterial.resolve(Tier.REGULAR, cool().apiLevel(28));
+        assertEquals(Tier.SOLID, solid.tier);
+        assertEquals(RadialWheelMaterial.BlurRoute.NONE,
+                RadialWheelMaterial.blurRoute(35, solid));
+        assertEquals(RadialWheelMaterial.BlurRoute.NONE,
+                RadialWheelMaterial.blurRoute(28, solid));
+        assertEquals(RadialWheelMaterial.BlurRoute.NONE,
+                RadialWheelMaterial.blurRoute(31, null));
+    }
+
     // --- Squircle (R1/R13) ---------------------------------------------------------------------
 
     @Test

@@ -224,4 +224,42 @@ public class RadialWheelMotionTest {
     public void theMinimumSegmentArcIsTheTouchTarget() {
         assertEquals(48f, RadialWheelMotion.MIN_SEGMENT_ARC_DP, 1e-6);
     }
+
+    // --- The count the wheel actually uses (R1) ------------------------------------------------
+
+    @Test
+    public void aWheelWithRoomKeepsEveryEntry() {
+        // A 400dp-wide wheel has plenty of room for six 48dp segments.
+        assertEquals(6, RadialWheelMotion.segmentsFor(6, 400f, 2f));
+        // The cap still applies to an over-full profile.
+        assertEquals(RadialWheelMotion.MAX_SEGMENTS, RadialWheelMotion.segmentsFor(12, 400f, 2f));
+    }
+
+    @Test
+    public void aCrampedWheelDropsSegmentsRatherThanDrawingUntouchableOnes() {
+        // At 100px radius a 48dp (96px) target fits six ways but not seven or eight, so an
+        // eight-entry profile must be drawn as six — and the result must satisfy the target rule.
+        assertEquals(6, RadialWheelMotion.segmentsFor(8, 100f, 2f));
+        assertTrue(RadialWheelMotion.hasTouchTargets(100f, 6, 2f));
+        assertFalse(RadialWheelMotion.hasTouchTargets(100f, 8, 2f));
+    }
+
+    @Test
+    public void aSingleEntryIsARingAndIsNeverReduced() {
+        // One entry draws a full ring, which has no 48dp-per-segment requirement to satisfy.
+        assertEquals(1, RadialWheelMotion.segmentsFor(1, 40f, 3f));
+        assertEquals(0, RadialWheelMotion.segmentsFor(0, 40f, 3f));
+    }
+
+    @Test
+    public void theReducedCountNeverGoesBelowTheFloor() {
+        // However cramped the wheel, it never drops below two: below that it is not a wheel.
+        assertEquals(RadialWheelMotion.MIN_SEGMENTS, RadialWheelMotion.segmentsFor(8, 1f, 4f));
+    }
+
+    @Test
+    public void theSegmentCountNeverExceedsTheEntriesAvailable() {
+        // A four-entry profile must not be drawn as six sectors with two empty wedges.
+        assertEquals(4, RadialWheelMotion.segmentsFor(4, 400f, 2f));
+    }
 }
