@@ -665,10 +665,6 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
         <item>Chargez des modules natifs SO externes pour étendre ou améliorer les performances de Minecraft.</item>
     </string-array>
 
-    <string name="theme_color_title">Couleur du thème</string>
-    <string name="theme_color_desc">La couleur d\'accentuation principale</string>
-    <string name="preset_colors">COULEURS PRÉDÉFINIES</string>
-    <string name="more_colors">PLUS DE COULEURS</string>
     <string name="bg_image_title">Image de fond</string>
     <string name="bg_image_desc">Sélectionnez une image de fond</string>
     <string name="bg_image_none">Aucune image sélectionnée</string>
@@ -857,7 +853,6 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="pagination_page_of">Page %1$d sur %2$s</string>
     <string name="pagination_page_one">Page 1</string>
     <string name="logcat_filter_all">TOUS</string>
-    <string name="invalid_color_format">Format de couleur invalide</string>
     <string name="world_directory_not_found">Dossier du monde introuvable</string>
     <string name="worlds_directory_unavailable">Le dossier des mondes n\'est pas disponible</string>
     <string name="delete_screenshot_confirm">Voulez-vous vraiment supprimer cette capture d\'écran ?</string>
@@ -884,8 +879,6 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="resource_pack_description_placeholder">La description du pack apparaît ici</string>
     <string name="mod_name_placeholder">Nom du mod</string>
     <string name="mod_load_order_placeholder">Ordre de chargement : 1</string>
-    <string name="custom_color_hex_rgb">Couleur personnalisée (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB ou R,G,B</string>
     <string name="screenshot_name_placeholder">Nom de la capture d\'écran</string>
     <string name="screenshot_date_placeholder">Date : 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Créez des boutons à l\'écran de style Minecraft, chacun associé à exactement une touche du clavier. Les boutons n\'exécutent jamais de macros, de séquences de touches, de répétitions automatiques ni d\'autoclic.</string>

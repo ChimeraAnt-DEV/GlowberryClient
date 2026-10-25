@@ -792,10 +792,6 @@
         <item>CurseForge 可以让你直接浏览并下载社区内容。</item>
         <item>导入模组以扩展或增强 Minecraft 功能和性能。</item>
     </string-array>
-    <string name="theme_color_title">主题颜色</string>
-    <string name="theme_color_desc">应用的主强调色</string>
-    <string name="preset_colors">预设颜色</string>
-    <string name="more_colors">更多颜色</string>
     <string name="bg_image_title">背景图片</string>
     <string name="bg_image_desc">选择一张图片作为背景</string>
     <string name="bg_image_none">未选择图片</string>
@@ -878,7 +874,6 @@
     <string name="pagination_page_of">第 %1$d 页，共 %2$s 页</string>
     <string name="pagination_page_one">第 1 页</string>
     <string name="logcat_filter_all">全部</string>
-    <string name="invalid_color_format">颜色格式无效</string>
     <string name="world_directory_not_found">未找到世界目录</string>
     <string name="worlds_directory_unavailable">世界目录不可用</string>
     <string name="delete_screenshot_confirm">确定要删除此截图吗？</string>
@@ -905,8 +900,6 @@
     <string name="resource_pack_description_placeholder">资源包描述显示在这里</string>
     <string name="mod_name_placeholder">Mod 名称</string>
     <string name="mod_load_order_placeholder">加载顺序：1</string>
-    <string name="custom_color_hex_rgb">自定义颜色 (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB 或 R,G,B</string>
     <string name="screenshot_name_placeholder">截图名称</string>
     <string name="screenshot_date_placeholder">日期：2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">创建 Minecraft 风格的屏幕按钮，每个按钮仅映射到一个键盘按键。按钮不会执行宏、按键序列、自动重复或自动点击。</string>

@@ -665,10 +665,6 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
         <item>Carregue módulos SO para estender ou melhorar os recursos e o desempenho do Minecraft.</item>
     </string-array>
 
-    <string name="theme_color_title">Cor do Tema</string>
-    <string name="theme_color_desc">A cor de destaque principal do app</string>
-    <string name="preset_colors">CORES PRÉ-DEFINIDAS</string>
-    <string name="more_colors">MAIS CORES</string>
     <string name="bg_image_title">Imagem de Fundo</string>
     <string name="bg_image_desc">Selecione uma imagem para usar como fundo</string>
     <string name="bg_image_none">Nenhuma imagem selecionada</string>
@@ -857,7 +853,6 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
     <string name="pagination_page_of">Página %1$d de %2$s</string>
     <string name="pagination_page_one">Página 1</string>
     <string name="logcat_filter_all">TODOS</string>
-    <string name="invalid_color_format">Formato de cor inválido</string>
     <string name="world_directory_not_found">Diretório do mundo não encontrado</string>
     <string name="worlds_directory_unavailable">O diretório de mundos não está disponível</string>
     <string name="delete_screenshot_confirm">Tem certeza de que deseja excluir esta captura de tela?</string>
@@ -884,8 +879,6 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
     <string name="resource_pack_description_placeholder">A descrição do pacote aparece aqui</string>
     <string name="mod_name_placeholder">Nome do mod</string>
     <string name="mod_load_order_placeholder">Ordem de carregamento: 1</string>
-    <string name="custom_color_hex_rgb">Cor personalizada (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB ou R,G,B</string>
     <string name="screenshot_name_placeholder">Nome da captura de tela</string>
     <string name="screenshot_date_placeholder">Data: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Crie botões na tela no estilo Minecraft, cada um mapeado para exatamente uma tecla do teclado. Os botões nunca executam macros, sequências de teclas, repetições automáticas ou autoclick.</string>
