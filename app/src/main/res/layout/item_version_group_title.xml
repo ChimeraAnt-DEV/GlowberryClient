@@ -4,7 +4,7 @@
     android:paddingTop="10dp"
     android:paddingBottom="6dp"
     android:textStyle="bold"
-    android:textSize="14sp"
+    android:textAppearance="@style/TextAppearance.Glowberry.Body"
     android:textColor="@color/on_surface"
     android:fontFamily="@font/misans"
     android:layout_marginBottom="2dp"

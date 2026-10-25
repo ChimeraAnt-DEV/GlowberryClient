@@ -9,4 +9,4 @@
     android:paddingEnd="8dp"
     android:paddingVertical="6dp"
     android:textColor="@color/on_surface"
-    android:textSize="15sp" />
+    android:textAppearance="@style/TextAppearance.Glowberry.Title" />

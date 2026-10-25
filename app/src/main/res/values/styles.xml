@@ -142,4 +142,68 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
+
+    <!--
+        The five type roles (U8). A surface picks a role, never a raw sp value, so two screens
+        showing the same kind of text cannot drift apart. This is the XML half of {@code UiType};
+        {@code TypeRoleTest} reads this file and asserts the two agree, so a size changed in one
+        place and not the other fails the build.
+
+        The family is the one CJK-capable family the app ships. It is deliberately NOT the
+        variable {@code dmsans}: no shipped font is both variable and CJK-capable, and the app
+        ships Chinese, Japanese and Hindi. Pointing every surface at a Latin-only family would
+        render those locales as tofu boxes, which is a worse defect than a coarse weight. A role
+        therefore carries size and family, and a role that wants emphasis still sets
+        {@code textStyle="bold"}; the continuous {@code wght} axis is available only through
+        {@code UiType.applyWeight}, on a surface that has deliberately chosen a variable family.
+    -->
+    <style name="TextAppearance.Glowberry" parent="">
+        <item name="android:fontFamily">@font/misans</item>
+    </style>
+
+    <!-- 22sp / 600 — a screen's own title. -->
+    <style name="TextAppearance.Glowberry.Display" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- 16sp / 600 — a card or section title. -->
+    <style name="TextAppearance.Glowberry.Title" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- 14sp / 400 — body copy and control labels. -->
+    <style name="TextAppearance.Glowberry.Body" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- 13sp / 500 — a row's own title. -->
+    <style name="TextAppearance.Glowberry.Label" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <!-- 11sp / 400 — captions, metadata, secondary lines. -->
+    <style name="TextAppearance.Glowberry.Caption" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <!--
+        The two sizes the role scale genuinely cannot express, kept as named styles rather than as
+        bare literals so they stay visible and countable. Both are deliberate:
+
+        - Wordmark: the splash lockup. It is display art, not a text role; collapsing it to the
+          22sp display role would visibly shrink the app's own logo.
+        - Micro: a badge or chip that sits inside a 20-24dp pill. The 11sp caption does not fit the
+          pill's height, and the badge is decoration around a one- or two-word value.
+    -->
+    <style name="TextAppearance.Glowberry.Wordmark" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Glowberry.Micro" parent="TextAppearance.Glowberry">
+        <item name="android:textSize">9sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

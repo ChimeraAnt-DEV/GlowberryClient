@@ -27,7 +27,7 @@
                 android:maxLines="1"
                 android:text="@string/edit_options"
                 android:textColor="@color/primary"
-                android:textSize="22sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <EditText
@@ -45,7 +45,7 @@
                 android:padding="10dp"
                 android:textColor="@color/on_surface"
                 android:textColorHint="@color/on_surface"
-                android:textSize="13sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
             <Button
                 android:id="@+id/save_button"
@@ -55,7 +55,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/save"
                 android:textColor="@color/on_primary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         </LinearLayout>
 
@@ -88,7 +88,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/no_options_found"
                 android:textColor="@color/on_surface"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Body"
                 android:visibility="gone" />
 
         </FrameLayout>

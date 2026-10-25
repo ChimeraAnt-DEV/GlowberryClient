@@ -34,7 +34,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/javabridge_title"
                 android:textColor="@color/on_surface"
-                android:textSize="24sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <TextView
@@ -44,7 +44,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/javabridge_subtitle"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <!-- Honest scope: this rewrites mods, it does not run Java Edition. -->
             <TextView
@@ -57,7 +57,7 @@
                 android:padding="10dp"
                 android:text="@string/javabridge_scope_note"
                 android:textColor="@color/on_surface"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="18sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold"
                     tools:text="Cool Mod" />
 
@@ -112,7 +112,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     tools:text="Fabric \u00b7 1.2.0 \u00b7 by Alice" />
 
                 <!-- Portability score pill. -->
@@ -126,7 +126,7 @@
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
                     android:textColor="@color/primary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     tools:text="Portability: High" />
 
@@ -137,7 +137,7 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     tools:text="This is a small, data-driven mod." />
 
                 <TextView
@@ -150,7 +150,7 @@
                     android:padding="10dp"
                     android:text="@string/javabridge_reimplementation_warning"
                     android:textColor="@color/on_surface"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -159,7 +159,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_what_ported"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -177,7 +177,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_what_partial"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -195,7 +195,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_what_dropped"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -212,7 +212,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_mapped_apis"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <TextView
@@ -222,7 +222,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     tools:text="Item.Settings \u2192 AntEggItemDef\nRegistry.register \u2192 AntEggRegistry.register" />
 
                 <Button
@@ -253,7 +253,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_inspecting"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <View
                     android:layout_width="180dp"
@@ -299,7 +299,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_empty_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -311,7 +311,7 @@
                     android:paddingHorizontal="24dp"
                     android:text="@string/javabridge_empty_body"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

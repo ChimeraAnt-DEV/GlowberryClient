@@ -62,7 +62,7 @@
                         android:text="@string/not_signed_in"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <Button
                         android:id="@+id/header_sign_in_button"
@@ -78,7 +78,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/sign_in"
                         android:textColor="@color/on_header_gradient"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textStyle="bold"
                         android:lineSpacingExtra="0dp"
                         android:includeFontPadding="true"
@@ -179,14 +179,14 @@
                         android:text="@string/worlds_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/contentWorldsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -226,14 +226,14 @@
                         android:text="@string/resource_packs"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/contentResourcePacksCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -273,14 +273,14 @@
                         android:text="@string/behavior_packs"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/contentBehaviorPacksCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -329,7 +329,7 @@
                         android:text="@string/curseforge_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -369,7 +369,7 @@
                         android:text="@string/mod_hub_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -409,7 +409,7 @@
                         android:text="@string/discord_join"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -449,7 +449,7 @@
                         android:text="@string/accounts_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -489,7 +489,7 @@
                         android:text="@string/quick_launch"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
@@ -508,7 +508,7 @@
                     android:layout_marginTop="16dp"
                     android:gravity="center"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

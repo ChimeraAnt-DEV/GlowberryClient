@@ -95,7 +95,7 @@
                         android:ellipsize="end"
                         android:singleLine="true"
                         android:textColor="@color/mod_menu_text_primary"
-                        android:textSize="14sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -107,7 +107,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/mod_menu_text_secondary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:visibility="gone" />
 
                 <TextView
@@ -118,7 +118,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/mod_menu_text_secondary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:visibility="gone" />
 
                 <TextView
@@ -129,7 +129,7 @@
                     android:letterSpacing="0.08"
                     android:text="@string/mod_unavailable_message"
                     android:textColor="@color/mod_menu_state_error"
-                    android:textSize="9sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Micro"
                     android:textStyle="bold"
                     android:visibility="gone" />
             </LinearLayout>

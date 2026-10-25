@@ -39,7 +39,7 @@
             android:text="@string/nav_voice"
             android:fontFamily="@font/misans"
             android:textColor="@color/primary"
-            android:textSize="22sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold" />
 
         <View
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/voice_master_switch"
@@ -84,7 +84,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/voice_consent_title"
             android:textColor="@color/on_surface"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:textStyle="bold" />
 
         <TextView
@@ -95,7 +95,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/voice_consent_body"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,7 +112,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/voice_consent_accept"
                 android:textColor="@color/primary"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
 
             <TextView
@@ -125,7 +125,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/voice_report_button"
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
         </LinearLayout>
 
@@ -141,7 +141,7 @@
         android:fontFamily="@font/misans"
         android:text="@string/voice_chat_scope_note"
         android:textColor="@color/text_secondary"
-        android:textSize="11sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -188,7 +188,7 @@
                             android:text="@string/voice_relay_title"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/on_surface"
-                            android:textSize="15sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Title"
                             android:textStyle="bold" />
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
@@ -215,7 +215,7 @@
                         android:singleLine="true"
                         android:textColor="@color/on_surface"
                         android:textColorHint="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <EditText
                         android:id="@+id/voice_relay_password"
@@ -232,7 +232,7 @@
                         android:singleLine="true"
                         android:textColor="@color/on_surface"
                         android:textColorHint="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <EditText
                         android:id="@+id/voice_relay_token_secret"
@@ -249,7 +249,7 @@
                         android:singleLine="true"
                         android:textColor="@color/on_surface"
                         android:textColorHint="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <Button
                         android:id="@+id/voice_relay_save_button"
@@ -262,7 +262,7 @@
                         android:text="@string/voice_relay_apply"
                         android:textAllCaps="false"
                         android:textColor="@color/on_primary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/voice_relay_status"
@@ -271,7 +271,7 @@
                         android:layout_marginTop="6dp"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -280,7 +280,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/voice_relay_scope_note"
                         android:textColor="@color/text_secondary"
-                        android:textSize="11sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 </LinearLayout>
 
@@ -296,7 +296,7 @@
                         android:text="@string/voice_current_channel"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="15sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -306,7 +306,7 @@
                         android:layout_marginTop="6dp"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/primary"
-                        android:textSize="18sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -316,7 +316,7 @@
                         android:layout_marginTop="2dp"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="11sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <TextView
                         android:id="@+id/voice_proximity_mode"
@@ -325,7 +325,7 @@
                         android:layout_marginTop="2dp"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="11sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <TextView
                         android:id="@+id/voice_members_label"
@@ -334,7 +334,7 @@
                         android:layout_marginTop="12dp"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -353,7 +353,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/voice_blocked_players"
                         android:textColor="@color/on_surface"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -371,7 +371,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/voice_mute_scope"
                         android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <TextView
                         android:id="@+id/voice_block_scope"
@@ -381,7 +381,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/voice_block_scope"
                         android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -399,7 +399,7 @@
                             android:fontFamily="@font/misans"
                             android:text="@string/voice_copy_code"
                             android:textAllCaps="false"
-                            android:textSize="13sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                         <Button
                             android:id="@+id/voice_share_code_button"
@@ -412,7 +412,7 @@
                             android:fontFamily="@font/misans"
                             android:text="@string/voice_share_code"
                             android:textAllCaps="false"
-                            android:textSize="13sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     </LinearLayout>
 
@@ -426,7 +426,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/voice_leave_channel"
                         android:textAllCaps="false"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                 </LinearLayout>
 
@@ -443,7 +443,7 @@
                         android:text="@string/voice_create_channel"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="15sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <EditText
@@ -461,7 +461,7 @@
                         android:singleLine="true"
                         android:textColor="@color/on_surface"
                         android:textColorHint="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -481,7 +481,7 @@
                             android:fontFamily="@font/misans"
                             android:text="@string/voice_channel_public"
                             android:textColor="@color/on_primary"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Body"
                             android:textStyle="bold" />
 
                         <TextView
@@ -494,7 +494,7 @@
                             android:fontFamily="@font/misans"
                             android:text="@string/voice_channel_private_short"
                             android:textColor="@color/on_surface"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Body"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -512,7 +512,7 @@
                             android:fontFamily="@font/misans"
                             android:text="@string/voice_capacity_label"
                             android:textColor="@color/on_surface"
-                            android:textSize="14sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                         <LinearLayout
                             android:id="@+id/voice_capacity_stepper"
@@ -528,7 +528,7 @@
                             android:fontFamily="@font/misans"
                             android:text="@string/voice_capacity_hint"
                             android:textColor="@color/text_secondary"
-                            android:textSize="11sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     </LinearLayout>
 
@@ -539,7 +539,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/voice_channel_private_desc"
                         android:textColor="@color/text_secondary"
-                        android:textSize="11sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <Button
                         android:id="@+id/voice_create_button"
@@ -552,7 +552,7 @@
                         android:text="@string/voice_create_button"
                         android:textAllCaps="false"
                         android:textColor="@color/on_primary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                 </LinearLayout>
 
@@ -579,7 +579,7 @@
                     android:text="@string/voice_join_by_code"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -603,7 +603,7 @@
                         android:singleLine="true"
                         android:textColor="@color/on_surface"
                         android:textColorHint="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <Button
                         android:id="@+id/voice_join_button"
@@ -616,7 +616,7 @@
                         android:text="@string/voice_join_button"
                         android:textAllCaps="false"
                         android:textColor="@color/on_primary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                 </LinearLayout>
 
@@ -636,7 +636,7 @@
                     android:text="@string/voice_public_directory"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -647,7 +647,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/voice_directory_empty"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <!-- Pull-to-refresh with the launcher's overshoot physics; no spinner. -->
                 <org.chimeramc.client.ui.animation.OverscrollRefreshLayout

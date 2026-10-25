@@ -19,7 +19,7 @@
         android:layout_weight="1"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
     <TextView
         android:id="@+id/voice_channel_row_count"
@@ -28,6 +28,6 @@
         android:layout_marginStart="8dp"
         android:fontFamily="@font/misans"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
 </LinearLayout>

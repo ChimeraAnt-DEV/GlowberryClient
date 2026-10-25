@@ -22,7 +22,7 @@
             android:gravity="center_vertical"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="15sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Title" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_value"

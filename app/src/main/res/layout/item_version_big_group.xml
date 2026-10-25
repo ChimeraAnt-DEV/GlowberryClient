@@ -5,7 +5,7 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:textStyle="bold"
-    android:textSize="16sp"
+    android:textAppearance="@style/TextAppearance.Glowberry.Title"
     android:textColor="@color/on_surface"
     android:fontFamily="@font/misans"
     android:layout_marginTop="6dp"

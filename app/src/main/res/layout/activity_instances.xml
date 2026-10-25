@@ -22,7 +22,7 @@
             android:text="@string/select_instance_title"
             android:fontFamily="@font/misans"
             android:textColor="@color/primary"
-            android:textSize="22sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -47,7 +47,7 @@
                     android:gravity="center"
                     android:text="@string/filter_all"
                     android:fontFamily="@font/misans"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     android:textColor="@color/on_primary"
                     android:background="@drawable/bg_filter_chip"
@@ -64,7 +64,7 @@
                     android:gravity="center"
                     android:text="@string/filter_custom"
                     android:fontFamily="@font/misans"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textColor="@color/on_surface"
                     android:background="@drawable/bg_filter_chip"
                     android:clickable="true"
@@ -97,7 +97,7 @@
                     android:hint="@string/search_instances_hint"
                     android:textColorHint="@color/text_secondary"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:fontFamily="@font/misans"
                     android:inputType="text"
                     android:imeOptions="actionSearch"
@@ -131,7 +131,7 @@
                     android:text="@string/sort_version_newest"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
             </LinearLayout>
 
             <TextView
@@ -144,7 +144,7 @@
                 android:text="0"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/on_surface"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold"
                 android:background="@drawable/bg_count_badge" />
 
@@ -174,7 +174,7 @@
                     android:text="@string/instance_batch_backup_button"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_primary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     android:background="@drawable/bg_filter_chip"
                     android:clickable="true"
@@ -191,7 +191,7 @@
                     android:text="@string/instance_import_backup_button"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_primary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     android:background="@drawable/bg_filter_chip"
                     android:clickable="true"
@@ -208,7 +208,7 @@
                     android:text="@string/import_apk"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_primary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     android:background="@drawable/bg_filter_chip"
                     android:clickable="true"
@@ -253,7 +253,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/empty_instances_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="16sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -264,7 +264,7 @@
                     android:gravity="center"
                     android:text="@string/empty_instances_message"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
             </LinearLayout>
         </FrameLayout>

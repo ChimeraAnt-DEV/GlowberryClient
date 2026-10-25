@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="@string/mod_menu_controller_bind"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold" />
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_marginTop="6dp"
         android:text="@string/mod_menu_bind_press_button"
         android:textColor="@color/ui_text_secondary"
-        android:textSize="12sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     <org.chimeramc.client.launcher.ui.views.Controller3DView
         android:id="@+id/bind_dialog_illustration"
@@ -39,7 +39,7 @@
         android:gravity="center"
         android:text="@string/mod_menu_bind_none"
         android:textColor="@color/primary"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:textStyle="bold" />
 
     <LinearLayout

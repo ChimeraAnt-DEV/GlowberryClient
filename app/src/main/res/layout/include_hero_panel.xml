@@ -60,7 +60,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/last_played_title"
                     android:textColor="@color/dock_text_secondary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
 
                 <TextView
@@ -74,7 +74,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/last_played_tap"
                     android:textColor="@color/on_hero_card"
-                    android:textSize="10sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -110,7 +110,7 @@
                         android:ellipsize="end"
                         android:text="@string/not_found_version"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="18sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -126,7 +126,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/dock_text_secondary"
-                            android:textSize="12sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                         <TextView
                             android:id="@+id/last_played_abi_badge"
@@ -139,7 +139,7 @@
                             android:background="@drawable/bg_alpha_chip"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/primary"
-                            android:textSize="9sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Micro"
                             android:textStyle="bold"
                             android:visibility="gone" />
                     </LinearLayout>
@@ -164,7 +164,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="17sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -174,7 +174,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/stat_instances"
                         android:textColor="@color/dock_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
 
                 <View
@@ -196,7 +196,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="17sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -206,7 +206,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/stat_mods"
                         android:textColor="@color/dock_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
 
                 <View
@@ -228,7 +228,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="17sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -238,7 +238,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/stat_playtime"
                         android:textColor="@color/dock_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

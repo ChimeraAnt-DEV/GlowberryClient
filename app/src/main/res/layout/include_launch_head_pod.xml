@@ -30,5 +30,5 @@
         android:fontFamily="@font/misans"
         android:text="@string/launch_head_pod_hint"
         android:textColor="@color/dock_text_secondary"
-        android:textSize="10sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 </LinearLayout>

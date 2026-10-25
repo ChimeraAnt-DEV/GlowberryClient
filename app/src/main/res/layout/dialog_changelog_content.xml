@@ -24,7 +24,7 @@
             android:gravity="center"
             android:paddingHorizontal="10dp"
             android:textColor="@color/primary"
-            android:textSize="10sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_marginTop="6dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary_light"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <TextView
             android:id="@+id/changelog_headline"
@@ -43,7 +43,7 @@
             android:layout_marginTop="10dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
 
         <TextView
@@ -54,7 +54,7 @@
             android:fontFamily="@font/misans"
             android:lineSpacingMultiplier="1.08"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
         <LinearLayout
             android:id="@+id/changelog_sections"

@@ -27,7 +27,7 @@
                 android:text="@string/diagnostics_title"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/primary"
-                android:textSize="22sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <TextView
@@ -37,7 +37,7 @@
                 android:text="@string/diagnostics_subtitle"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
             <!-- Repair installation (G2) -->
             <LinearLayout
@@ -54,7 +54,7 @@
                     android:text="@string/diagnostics_repair"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -64,7 +64,7 @@
                     android:text="@string/diagnostics_repair_desc"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <Button
                     android:id="@+id/diagnostics_repair_button"
@@ -75,7 +75,7 @@
                     android:minHeight="44dp"
                     android:fontFamily="@font/misans"
                     android:text="@string/diagnostics_repair"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textAllCaps="false"
                     android:textColor="@color/primary" />
             </LinearLayout>
@@ -95,7 +95,7 @@
                     android:text="@string/diagnostics_section_app"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -121,7 +121,7 @@
                     android:text="@string/diagnostics_section_readiness"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -147,7 +147,7 @@
                     android:text="@string/diagnostics_section_libs"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -173,7 +173,7 @@
                     android:text="@string/diagnostics_section_rules"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -199,7 +199,7 @@
                     android:text="@string/diagnostics_section_native"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -225,7 +225,7 @@
                     android:text="@string/diagnostics_section_account"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -251,7 +251,7 @@
                     android:text="@string/diagnostics_section_mods"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -278,7 +278,7 @@
                     android:minHeight="44dp"
                     android:fontFamily="@font/misans"
                     android:text="@string/diagnostics_copy"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textAllCaps="false"
                     android:textColor="@color/primary" />
 
@@ -292,7 +292,7 @@
                     android:minHeight="44dp"
                     android:fontFamily="@font/misans"
                     android:text="@string/diagnostics_share"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textAllCaps="false"
                     android:textColor="@color/primary" />
             </LinearLayout>
@@ -306,7 +306,7 @@
                 android:minHeight="44dp"
                 android:fontFamily="@font/misans"
                 android:text="@string/diagnostics_refresh"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textAllCaps="false"
                 android:textColor="@color/primary" />
         </LinearLayout>

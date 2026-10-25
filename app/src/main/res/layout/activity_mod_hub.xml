@@ -21,7 +21,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/mod_hub_title"
             android:textColor="@color/on_surface"
-            android:textSize="24sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold" />
 
         <TextView
@@ -32,7 +32,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/mod_hub_subtitle"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <!-- Two sources, one screen: browsing an index vs. importing what is already on disk. -->
         <com.google.android.material.tabs.TabLayout
@@ -67,7 +67,7 @@
                 android:padding="10dp"
                 android:text="@string/modrinth_java_warning"
                 android:textColor="@color/on_surface"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -103,7 +103,7 @@
                     android:minHeight="40dp"
                     android:text="@string/sort"
                     android:textColor="@color/on_surface"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     app:cornerRadius="18dp"
                     app:strokeColor="@color/divider" />
             </LinearLayout>
@@ -156,7 +156,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/no_mods_found"
                         android:textColor="@color/on_surface"
-                        android:textSize="16sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
                 </LinearLayout>
             </FrameLayout>
@@ -191,7 +191,7 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     tools:text="3 importable of 5 found" />
 
                 <com.google.android.material.button.MaterialButton
@@ -200,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:text="@string/downloads_import_all"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     app:cornerRadius="18dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -212,7 +212,7 @@
                     android:minHeight="40dp"
                     android:text="@string/downloads_scan"
                     android:textColor="@color/on_surface"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     app:cornerRadius="18dp"
                     app:strokeColor="@color/divider" />
             </LinearLayout>
@@ -251,7 +251,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/downloads_empty_title"
                         android:textColor="@color/on_surface"
-                        android:textSize="16sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -262,7 +262,7 @@
                         android:fontFamily="@font/misans"
                         android:text="@string/downloads_empty_message"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>

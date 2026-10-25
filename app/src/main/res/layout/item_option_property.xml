@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:textStyle="bold" />
 
         <TextView
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:alpha="0.6" />
     </LinearLayout>
 
@@ -41,7 +41,7 @@
         android:fontFamily="@font/misans"
         android:padding="8dp"
         android:textColor="@color/on_surface"
-        android:textSize="13sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Label"
         android:maxLines="1"
         android:inputType="text"
         android:imeOptions="actionDone" />

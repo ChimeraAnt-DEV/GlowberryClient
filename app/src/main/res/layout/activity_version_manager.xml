@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Version Manager"
-            android:textSize="20sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:padding="16dp" />
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Import New Version"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary" />
 
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Select .apk, .apks or .xapk file to import"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Body"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="4dp" />
 
@@ -70,7 +70,7 @@
                 android:id="@+id/import_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="8dp" />
         </LinearLayout>
@@ -80,7 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Installed Versions"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold"
         android:textColor="@color/text_primary"
         android:layout_marginStart="16dp"

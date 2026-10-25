@@ -12,7 +12,7 @@
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:textSize="16sp"/>
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"/>
         
     <EditText
         android:id="@+id/edit_value"

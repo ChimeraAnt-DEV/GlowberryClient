@@ -29,7 +29,7 @@
                 android:text="@string/skins_title"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/primary"
-                android:textSize="22sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <Button
@@ -47,7 +47,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/skins_reset_default"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textAllCaps="false" />
 
             <Button
@@ -65,7 +65,7 @@
                 android:backgroundTint="@color/primary"
                 android:text="@string/skins_import"
                 android:textColor="@color/on_primary"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold"
                 android:textAllCaps="false" />
         </LinearLayout>
@@ -84,7 +84,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/skins_cape_note"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         </LinearLayout>
 
@@ -122,7 +122,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/skins_loading"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
             </LinearLayout>
 
             <LinearLayout
@@ -147,7 +147,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/skins_empty_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="17sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -159,7 +159,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/skins_empty_message"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                 <Button
                     android:id="@+id/skins_empty_import_button"
@@ -177,7 +177,7 @@
                     android:backgroundTint="@color/primary"
                     android:text="@string/skins_import_pack"
                     android:textColor="@color/on_primary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     android:textAllCaps="false" />
             </LinearLayout>

@@ -13,7 +13,7 @@
         android:fontFamily="@font/misans"
         android:text="@string/category"
         android:textColor="@color/primary"
-        android:textSize="13sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Label"
         android:textStyle="bold" />
 
 </LinearLayout>

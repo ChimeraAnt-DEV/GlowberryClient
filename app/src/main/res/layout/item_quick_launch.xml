@@ -18,7 +18,7 @@
             android:id="@+id/title_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold"
             android:textColor="?android:textColorPrimary" />
 
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:textColor="?android:textColorSecondary" />
 
     </LinearLayout>

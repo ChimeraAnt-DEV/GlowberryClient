@@ -32,7 +32,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_title"
                 android:textColor="@color/on_surface"
-                android:textSize="24sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <TextView
@@ -45,7 +45,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_refresh"
                 android:textColor="?attr/colorOnPrimary"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold"
                 android:background="@drawable/button_accent"
                 android:clickable="true"
@@ -60,7 +60,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/installations_subtitle"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <!-- Says plainly where packages come from; the site is a third-party mirror. -->
         <TextView
@@ -71,7 +71,7 @@
             android:fontFamily="@font/misans"
             tools:text="Packages are downloaded from mcpedl.org, a third-party mirror."
             android:textColor="@color/text_secondary"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:background="@drawable/bg_alpha_chip"
             android:paddingHorizontal="10dp"
             android:paddingVertical="8dp" />
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -108,7 +108,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/installations_retry_import"
                     android:textColor="?attr/colorOnPrimary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     android:background="@drawable/button_accent"
                     android:clickable="true"
@@ -125,7 +125,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/installations_clear_staged"
                     android:textColor="@color/on_surface"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:background="@drawable/button_accent"
                     android:clickable="true"
                     android:focusable="true" />
@@ -172,7 +172,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_empty_title"
                 android:textColor="@color/on_surface"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold" />
 
             <TextView
@@ -184,7 +184,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_empty_message"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
         </LinearLayout>
         </FrameLayout>
       <LinearLayout
@@ -204,7 +204,7 @@
               android:layout_weight="1"
               android:fontFamily="@font/misans"
               android:textColor="@color/text_secondary"
-              android:textSize="12sp"
+              android:textAppearance="@style/TextAppearance.Glowberry.Caption"
               tools:text="Page 1" />
 
           <TextView
@@ -217,7 +217,7 @@
               android:fontFamily="@font/misans"
               android:text="@string/installations_prev_page"
               android:textColor="@color/on_surface"
-              android:textSize="12sp"
+              android:textAppearance="@style/TextAppearance.Glowberry.Caption"
               android:textStyle="bold"
               android:background="@drawable/bg_alpha_chip"
               android:clickable="true"
@@ -234,7 +234,7 @@
               android:fontFamily="@font/misans"
               android:text="@string/installations_next_page"
               android:textColor="?attr/colorOnPrimary"
-              android:textSize="12sp"
+              android:textAppearance="@style/TextAppearance.Glowberry.Caption"
               android:textStyle="bold"
               android:background="@drawable/button_accent"
               android:clickable="true"
@@ -274,7 +274,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_challenge_hint"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <TextView
                 android:id="@+id/installations_browser_cancel"
@@ -287,7 +287,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/cancel"
                 android:textColor="@color/on_surface"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold"
                 android:background="@drawable/bg_alpha_chip"
                 android:clickable="true"

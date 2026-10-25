@@ -24,7 +24,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/on_surface"
-            android:textSize="15sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_marginTop="2dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <TextView
             android:id="@+id/node_meta"
@@ -43,7 +43,7 @@
             android:layout_marginTop="3dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/accent_text"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold"
             android:visibility="gone" />
     </LinearLayout>

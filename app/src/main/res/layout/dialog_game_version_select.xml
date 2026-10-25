@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/game_version_select_title"
-                android:textSize="20sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary"
                 android:fontFamily="@font/misans"/>

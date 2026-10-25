@@ -8,5 +8,5 @@
     android:paddingEnd="12dp"
     android:paddingBottom="12dp"
     android:textColor="@color/on_surface"
-    android:textSize="13sp"
+    android:textAppearance="@style/TextAppearance.Glowberry.Label"
     android:background="?attr/selectableItemBackground" />

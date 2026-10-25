@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/misans"
         android:textColor="@color/text_secondary"
-        android:textSize="11sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     <TextView
         android:id="@+id/meta_value"
@@ -21,6 +21,6 @@
         android:layout_marginTop="3dp"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"
-        android:textSize="13sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Label"
         android:textStyle="bold" />
 </LinearLayout>

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="@string/rename_version_message"
         android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:layout_marginBottom="12dp"/>
 
     <EditText
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:singleLine="true"
         android:inputType="text"
         android:background="@drawable/bg_edit_text"
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:text="@string/name_invalid"
         android:textColor="#FF5252"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:visibility="gone"
         android:layout_marginTop="4dp" />
 

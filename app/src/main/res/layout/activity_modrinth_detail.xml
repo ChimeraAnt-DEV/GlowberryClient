@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="22sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold"
             tools:text="Fresh Animations" />
 
@@ -32,7 +32,7 @@
             android:layout_marginTop="2dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             tools:text="by FreshLX • 47.3M downloads" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_marginTop="8dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             tools:text="Make your game like the trailers!" />
 
         <TextView
@@ -55,7 +55,7 @@
             android:padding="10dp"
             android:text="@string/modrinth_java_warning"
             android:textColor="@color/on_surface"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <TextView
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/modrinth_versions_title"
             android:textColor="@color/on_surface"
-            android:textSize="15sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -97,7 +97,7 @@
             android:padding="32dp"
             android:text="@string/modrinth_no_versions"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

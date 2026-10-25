@@ -28,7 +28,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/mod_detail_title"
                 android:textColor="@color/primary"
-                android:textSize="22sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -83,7 +83,7 @@
                             android:fontFamily="@font/misans"
                             android:maxLines="2"
                             android:textColor="@color/on_surface"
-                            android:textSize="20sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Title"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -101,7 +101,7 @@
                                 android:fontFamily="@font/misans"
                                 android:maxLines="1"
                                 android:textColor="@color/on_surface"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <TextView
                                 android:id="@+id/mod_version_detail"
@@ -110,7 +110,7 @@
                                 android:layout_marginStart="12dp"
                                 android:fontFamily="@font/misans"
                                 android:textColor="@color/on_surface"
-                                android:textSize="13sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                 android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
@@ -124,7 +124,7 @@
                     android:fontFamily="@font/misans"
                     android:lineSpacingExtra="2dp"
                     android:textColor="@color/on_surface_variant"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:visibility="gone" />
 
                 <LinearLayout
@@ -142,7 +142,7 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="15sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <Switch
@@ -166,7 +166,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/mod_metadata_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="16sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <include
@@ -196,7 +196,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/mod_actions_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="16sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <Button
@@ -215,7 +215,7 @@
                     android:text="@string/configure"
                     android:textAllCaps="false"
                     android:textColor="@color/on_primary"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:visibility="gone" />
 
                 <Button
@@ -234,7 +234,7 @@
                     android:text="@string/delete_mod"
                     android:textAllCaps="false"
                     android:textColor="@color/on_primary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
             </LinearLayout>
         </LinearLayout>
         </LinearLayout>

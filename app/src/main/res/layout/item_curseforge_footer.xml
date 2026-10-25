@@ -21,7 +21,7 @@
         app:backgroundTint="@null"
         android:text="@string/previous"
         android:textColor="@color/primary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold"
         android:textAllCaps="false"
         android:fontFamily="@font/misans"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:text="@string/pagination_page_one"
         android:layout_marginHorizontal="16dp"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"/>
 
@@ -51,7 +51,7 @@
         app:backgroundTint="@null"
         android:text="@string/next"
         android:textColor="@color/primary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold"
         android:textAllCaps="false"
         android:fontFamily="@font/misans"

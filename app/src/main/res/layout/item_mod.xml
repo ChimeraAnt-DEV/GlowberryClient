@@ -34,7 +34,7 @@
             android:fontFamily="@font/misans"
             android:maxLines="1"
             android:textColor="@color/on_surface"
-            android:textSize="15sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold"/>
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/mod_load_order_placeholder"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
             android:visibility="gone"/>
@@ -58,7 +58,7 @@
             android:paddingHorizontal="7dp"
             android:paddingVertical="2dp"
             android:textColor="@color/text_secondary"
-            android:textSize="10sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:visibility="gone" />
 
         <TextView
@@ -72,7 +72,7 @@
             android:paddingVertical="2dp"
             android:text="@string/mod_load_failed_badge"
             android:textColor="?attr/colorOnErrorContainer"
-            android:textSize="10sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold"
             android:visibility="gone" />
 
@@ -87,7 +87,7 @@
             android:paddingVertical="2dp"
             android:text="@string/mod_config_badge"
             android:textColor="@color/primary"
-            android:textSize="10sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold"
             android:visibility="gone" />
 
@@ -101,7 +101,7 @@
             android:paddingHorizontal="7dp"
             android:paddingVertical="2dp"
             android:text="@string/mod_verified_badge"
-            android:textSize="10sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold"
             android:visibility="gone" />
     </LinearLayout>
@@ -122,7 +122,7 @@
             android:fontFamily="@font/misans"
             android:maxLines="1"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <TextView
             android:id="@+id/mod_version"
@@ -134,7 +134,7 @@
             android:fontFamily="@font/misans"
             android:maxLines="1"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold" />
     </LinearLayout>
 

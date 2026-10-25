@@ -12,7 +12,7 @@
         android:padding="16dp"
         android:paddingBottom="4dp"
         android:textColor="?attr/colorPrimary"
-        android:textSize="18sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold"
         android:fontFamily="@font/misans" />
 
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/overlay_button_size"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans" />
 
                 <LinearLayout
@@ -79,7 +79,7 @@
                         android:gravity="center"
                         android:text="48dp"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:fontFamily="@font/misans" />
 
                 </LinearLayout>
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/overlay_button_opacity"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans" />
 
                 <LinearLayout
@@ -126,7 +126,7 @@
                         android:gravity="center"
                         android:text="100%"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:fontFamily="@font/misans" />
 
                 </LinearLayout>
@@ -151,7 +151,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/overlay_button_lock"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="14sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body"
                         android:fontFamily="@font/misans" />
 
                     <TextView
@@ -159,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/overlay_button_lock_desc"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:fontFamily="@font/misans"
                         android:alpha="0.8" />
 
@@ -189,7 +189,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/autosprint_keybind_label"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans" />
 
                 <Button
@@ -201,7 +201,7 @@
                     android:background="@drawable/bg_spinner_dark"
                     android:text="CTRL_LEFT"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans"
                     android:textAllCaps="true" />
 
@@ -221,7 +221,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/cursor_sensitivity_label"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans" />
 
                 <LinearLayout
@@ -250,7 +250,7 @@
                         android:gravity="center"
                         android:text="120%"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:fontFamily="@font/misans" />
 
                 </LinearLayout>
@@ -270,7 +270,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/zoom_level_label"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans" />
 
                 <LinearLayout
@@ -299,7 +299,7 @@
                         android:gravity="center"
                         android:text="50%"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:fontFamily="@font/misans" />
 
                 </LinearLayout>
@@ -310,7 +310,7 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/zoom_keybind_label"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans" />
 
                 <Button
@@ -322,7 +322,7 @@
                     android:background="@drawable/bg_spinner_dark"
                     android:text="C"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:fontFamily="@font/misans"
                     android:textAllCaps="true" />
 
@@ -353,7 +353,7 @@
             android:layout_height="wrap_content"
             android:text="@string/dialog_negative_cancel"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:fontFamily="@font/misans"
             android:textAllCaps="false"
             android:layout_marginEnd="12dp" />
@@ -365,7 +365,7 @@
             android:backgroundTint="?attr/colorPrimary"
             android:text="@string/save"
             android:textColor="?attr/colorOnPrimary"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:fontFamily="@font/misans"
             android:textAllCaps="false" />
 

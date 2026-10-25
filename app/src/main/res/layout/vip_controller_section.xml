@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:letterSpacing="0.12"
             android:textColor="@color/ui_text_secondary"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold" />
 
         <org.chimeramc.client.launcher.ui.views.Controller3DView
@@ -50,7 +50,7 @@
             android:paddingEnd="12dp"
             android:paddingBottom="6dp"
             android:textColor="@color/ui_text_secondary"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -74,7 +74,7 @@
                 android:text="@string/vip_controller_profiles"
                 android:textAllCaps="true"
                 android:textColor="@color/ui_text_secondary"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -93,7 +93,7 @@
                 android:padding="16dp"
                 android:text="@string/vip_empty_no_controller"
                 android:textColor="@color/ui_text_secondary"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:visibility="gone" />
 
             <TextView
@@ -104,7 +104,7 @@
                 android:text="@string/vip_dead_zone"
                 android:textAllCaps="true"
                 android:textColor="@color/ui_text_secondary"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
 
             <LinearLayout

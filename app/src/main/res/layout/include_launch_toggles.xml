@@ -46,7 +46,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/launch_toggle_antegg"
                 android:textColor="@color/dock_text_primary"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/dock_text_secondary"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -95,7 +95,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/launch_toggle_voice"
                 android:textColor="@color/dock_text_primary"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
 
             <TextView
@@ -105,7 +105,7 @@
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/dock_text_secondary"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -144,7 +144,7 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/launch_toggle_replay"
                 android:textColor="@color/dock_text_primary"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
 
             <TextView
@@ -154,7 +154,7 @@
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/dock_text_secondary"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

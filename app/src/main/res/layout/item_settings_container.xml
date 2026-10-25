@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="@string/about_title"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textColor="@color/on_surface"
             android:fontFamily="@font/misans" />
 
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/copyright"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:textColor="@color/text_secondary"
             android:fontFamily="@font/misans" />
 
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/font_license"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:textColor="@color/text_secondary"
             android:fontFamily="@font/misans" />
 
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:text="@string/about_footer_github"
             android:autoLink="web"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:textColor="@color/primary"
             android:fontFamily="@font/misans" />
     </LinearLayout>

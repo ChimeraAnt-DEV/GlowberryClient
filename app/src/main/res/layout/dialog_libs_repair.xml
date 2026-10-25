@@ -42,7 +42,7 @@
                 android:maxLines="2"
                 android:text="@string/repair_libs_dialog_title"
                 android:textColor="?attr/colorPrimary"
-                android:textSize="20sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold" />
 
             <TextView
@@ -53,7 +53,7 @@
                 android:maxLines="2"
                 android:text="@string/repair_libs_dialog_subtitle"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="13sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
         </LinearLayout>
     </LinearLayout>
 
@@ -80,7 +80,7 @@
                 android:maxLines="2"
                 android:text="@string/repair_preparing"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold" />
 
             <TextView
@@ -92,7 +92,7 @@
                 android:minWidth="54dp"
                 android:text="0%"
                 android:textColor="?attr/colorPrimary"
-                android:textSize="20sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -103,7 +103,7 @@
             android:layout_marginTop="8dp"
             android:maxLines="2"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:visibility="gone" />
 
         <ProgressBar
@@ -123,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:visibility="gone" />
 
         <Button

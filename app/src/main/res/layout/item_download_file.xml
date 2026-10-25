@@ -34,7 +34,7 @@
             android:fontFamily="@font/misans"
             android:maxLines="1"
             android:textColor="@color/on_surface"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:textStyle="bold"
             tools:text="FurnitureAddon.mcaddon" />
 
@@ -45,7 +45,7 @@
             android:layout_marginTop="2dp"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             tools:text="Add-on • 2.4 MB" />
     </LinearLayout>
 
@@ -64,6 +64,6 @@
         android:text="@string/downloads_import"
         android:textAllCaps="false"
         android:textColor="@color/on_primary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold" />
 </LinearLayout>

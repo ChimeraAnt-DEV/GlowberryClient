@@ -36,7 +36,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/worlds_title"
                     android:textColor="@color/primary"
-                    android:textSize="22sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Display"
                     android:textStyle="bold" />
 
                 <Button
@@ -47,7 +47,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/custom_flat_world"
                     android:textColor="@color/on_primary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -66,7 +66,7 @@
                 android:drawablePadding="12dp"
                 android:textColor="@color/on_surface"
                 android:textColorHint="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Body" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -112,7 +112,7 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="17sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -124,7 +124,7 @@
                     android:gravity="center"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
             </LinearLayout>
         </FrameLayout>
 

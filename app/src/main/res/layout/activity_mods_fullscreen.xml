@@ -19,7 +19,7 @@
             android:text="@string/full_mods_title"
             android:fontFamily="@font/misans"
             android:textColor="@color/primary"
-            android:textSize="22sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -46,7 +46,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/total_mods"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textColor="@color/text_secondary"
                         android:fontFamily="@font/misans" />
 
@@ -56,7 +56,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="0"
-                        android:textSize="18sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textColor="@color/accent_text"
                         android:fontFamily="@font/misans"
                         android:textStyle="bold" />
@@ -73,7 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/enabled_mods"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textColor="@color/text_secondary"
                         android:fontFamily="@font/misans" />
 
@@ -83,7 +83,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="0"
-                        android:textSize="18sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textColor="@color/accent_text"
                         android:fontFamily="@font/misans"
                         android:textStyle="bold" />
@@ -101,7 +101,7 @@
                 android:textColor="@color/on_secondary"
                 android:paddingHorizontal="18dp"
                 android:layout_marginStart="10dp"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:gravity="center"
@@ -119,7 +119,7 @@
                 android:textColor="@color/on_secondary"
                 android:paddingHorizontal="16dp"
                 android:layout_marginStart="10dp"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:gravity="center"
@@ -137,7 +137,7 @@
                 android:textColor="@color/on_secondary"
                 android:paddingHorizontal="16dp"
                 android:layout_marginStart="10dp"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:gravity="center"
@@ -155,7 +155,7 @@
                 android:textColor="@color/on_primary"
                 android:paddingHorizontal="18dp"
                 android:layout_marginStart="10dp"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:gravity="center"
@@ -197,7 +197,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/mod_load_diagnostics_title"
                     android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:textStyle="bold" />
 
                 <TextView
@@ -207,7 +207,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/misans"
                     android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <TextView
                     android:id="@+id/mod_load_diagnostics_details"
@@ -216,7 +216,7 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/misans"
                     android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <TextView
                     android:id="@+id/mod_load_diagnostics_dismiss"
@@ -230,7 +230,7 @@
                     android:paddingVertical="6dp"
                     android:text="@string/mod_load_diagnostics_dismiss"
                     android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -265,7 +265,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/empty_mods_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="16sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -276,7 +276,7 @@
                     android:gravity="center"
                     android:text="@string/empty_mods_message"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
             </LinearLayout>
 

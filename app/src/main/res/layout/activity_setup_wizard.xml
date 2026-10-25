@@ -30,11 +30,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
-            android:fontFamily="@font/dmsans"
+            android:fontFamily="@font/misans"
             android:gravity="center"
             android:text="@string/setup_step_import_title"
             android:textColor="@color/ui_text_primary"
-            android:textSize="22sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold" />
 
         <TextView
@@ -42,21 +42,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_3"
-            android:fontFamily="@font/dmsans"
+            android:fontFamily="@font/misans"
             android:gravity="center"
             android:text="@string/setup_step_import_body"
             android:textColor="@color/ui_text_secondary"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
         <TextView
             android:id="@+id/setup_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_3"
-            android:fontFamily="@font/dmsans"
+            android:fontFamily="@font/misans"
             android:gravity="center"
             android:textColor="@color/ui_danger"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:visibility="gone" />
 
         <Button
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
             android:minHeight="@dimen/min_touch_target"
-            android:fontFamily="@font/dmsans"
+            android:fontFamily="@font/misans"
             android:text="@string/setup_step_import_action" />
 
         <Button
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_2"
             android:minHeight="@dimen/min_touch_target"
-            android:fontFamily="@font/dmsans"
+            android:fontFamily="@font/misans"
             android:text="@string/setup_skip"
             android:textColor="@color/ui_text_secondary" />
     </LinearLayout>

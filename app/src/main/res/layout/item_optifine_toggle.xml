@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/on_surface"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
 
             <TextView
@@ -35,7 +35,7 @@
                 android:layout_marginTop="1dp"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary_light"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <TextView
                 android:id="@+id/optifine_item_status"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/misans"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
         </LinearLayout>
 

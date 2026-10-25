@@ -6,4 +6,4 @@
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
     android:textColor="@android:color/white"
-    android:textSize="12sp" />
+    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />

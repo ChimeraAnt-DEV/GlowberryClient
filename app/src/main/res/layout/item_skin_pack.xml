@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/on_surface"
-                android:textSize="15sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -65,7 +65,7 @@
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:maxLines="2"
                 android:ellipsize="end" />
 
@@ -76,7 +76,7 @@
                 android:layout_marginTop="4dp"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/primary"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -96,7 +96,7 @@
             android:backgroundTint="@color/primary"
             android:text="@string/skins_apply"
             android:textColor="@color/on_primary"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold"
             android:textAllCaps="false" />
     </LinearLayout>

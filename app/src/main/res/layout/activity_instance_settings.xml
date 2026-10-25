@@ -39,7 +39,7 @@
                         android:text="@string/instance_settings_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/primary"
-                        android:textSize="22sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Display"
                         android:textStyle="bold" />
 
                     <TextView
@@ -49,7 +49,7 @@
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -76,7 +76,7 @@
                         android:text="@string/instance_tab_general"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_primary"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                         android:textStyle="bold"
                         android:background="@drawable/bg_tab_selected"
                         android:clickable="true"
@@ -93,7 +93,7 @@
                         android:text="@string/instance_tab_launch_options"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                         android:background="@drawable/bg_tab_unselected"
                         android:clickable="true"
                         android:focusable="true" />
@@ -109,7 +109,7 @@
                         android:text="@string/instance_tab_management"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                         android:background="@drawable/bg_tab_unselected"
                         android:clickable="true"
                         android:focusable="true" />
@@ -141,7 +141,7 @@
                             android:text="@string/instance_new_name"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/on_surface"
-                            android:textSize="15sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Title"
                             android:textStyle="bold" />
 
                         <EditText
@@ -154,7 +154,7 @@
                             android:fontFamily="@font/misans"
                             android:textColor="@color/on_surface"
                             android:textColorHint="@color/text_secondary"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Body"
                             android:singleLine="true"
                             android:importantForAutofill="no" />
 
@@ -165,7 +165,7 @@
                             android:text="@string/instance_rename_hint"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
-                            android:textSize="11sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -201,7 +201,7 @@
                                     android:text="@string/version_isolation"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -211,7 +211,7 @@
                                     android:text="@string/instance_isolation_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -241,7 +241,7 @@
                                     android:text="@string/launch_vertically"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -251,7 +251,7 @@
                                     android:text="@string/launch_vertically_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -282,7 +282,7 @@
                                     android:text="Shader compatibility fixer"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -292,7 +292,7 @@
                                     android:text="Fixes shader/materialbin compatibility for resource packs"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -323,7 +323,7 @@
                                     android:text="@string/in_game_pack_changer_title"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -333,7 +333,7 @@
                                     android:text="@string/in_game_pack_changer_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -364,7 +364,7 @@
                                     android:text="@string/instance_account_title"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -375,7 +375,7 @@
                                     android:text="@string/instance_account_active"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 <TextView
                                     android:id="@+id/bound_account_warning"
@@ -385,7 +385,7 @@
                                     android:text="@string/instance_account_stale"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/mod_menu_state_warn"
-                                    android:textSize="12sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                     android:visibility="gone" />
                             </LinearLayout>
 
@@ -399,7 +399,7 @@
                                 android:text="@string/instance_account_change"
                                 android:textColor="@color/on_secondary"
                                 android:paddingHorizontal="16dp"
-                                android:textSize="13sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                 android:textStyle="bold"
                                 android:textAllCaps="false"
                                 android:gravity="center"
@@ -432,7 +432,7 @@
                                     android:text="@string/instance_shortcut_title"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -442,7 +442,7 @@
                                     android:text="@string/instance_shortcut_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                         </LinearLayout>
@@ -460,7 +460,7 @@
                                 android:text="@string/instance_shortcut_name"
                                 android:fontFamily="@font/misans"
                                 android:textColor="@color/on_surface"
-                                android:textSize="13sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                 android:textStyle="bold" />
 
                             <EditText
@@ -475,7 +475,7 @@
                                 android:singleLine="true"
                                 android:textColor="@color/on_surface"
                                 android:textColorHint="@color/text_secondary"
-                                android:textSize="14sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -484,7 +484,7 @@
                                 android:text="@string/instance_shortcut_icon"
                                 android:fontFamily="@font/misans"
                                 android:textColor="@color/on_surface"
-                                android:textSize="13sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                 android:textStyle="bold" />
 
                             <LinearLayout
@@ -514,7 +514,7 @@
                                     android:text="@string/instance_shortcut_choose_icon"
                                     android:textAllCaps="false"
                                     android:textColor="@color/on_primary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 <Button
                                     android:id="@+id/btn_reset_shortcut_icon"
@@ -526,7 +526,7 @@
                                     android:paddingHorizontal="14dp"
                                     android:text="@string/instance_shortcut_default_icon"
                                     android:textAllCaps="false"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                             <Button
@@ -541,7 +541,7 @@
                                 android:text="@string/instance_shortcut_add_button"
                                 android:textAllCaps="false"
                                 android:textColor="@color/on_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -566,7 +566,7 @@
                             android:text="@string/instance_backup_title"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/on_surface"
-                            android:textSize="15sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Title"
                             android:textStyle="bold" />
 
                         <TextView
@@ -576,7 +576,7 @@
                             android:text="@string/instance_backup_desc"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                         <Button
                             android:id="@+id/btn_backup_instance"
@@ -587,7 +587,7 @@
                             android:paddingHorizontal="20dp"
                             android:text="@string/instance_backup_button"
                             android:fontFamily="@font/misans"
-                            android:textSize="13sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Label"
                             android:textColor="@color/on_primary"
                             android:backgroundTint="@color/primary"
                             android:textAllCaps="false" />
@@ -607,7 +607,7 @@
                             android:text="@string/instance_danger_zone"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/on_surface"
-                            android:textSize="15sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Title"
                             android:textStyle="bold" />
 
                         <TextView
@@ -617,7 +617,7 @@
                             android:text="@string/instance_danger_zone_desc"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                         <View
                             android:layout_width="match_parent"
@@ -645,7 +645,7 @@
                                     android:text="@string/delete"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
-                                    android:textSize="15sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -655,7 +655,7 @@
                                     android:text="@string/instance_delete_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -664,7 +664,7 @@
                                     android:text="@string/instance_delete_warning"
                                     android:fontFamily="@font/misans"
                                     android:textColor="#E53935"
-                                    android:textSize="11sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
                             <Button
@@ -675,7 +675,7 @@
                                 android:paddingHorizontal="20dp"
                                 android:text="@string/delete"
                                 android:fontFamily="@font/misans"
-                                android:textSize="13sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                 android:textColor="#FFFFFF"
                                 android:backgroundTint="#E53935"
                                 android:textAllCaps="false" />

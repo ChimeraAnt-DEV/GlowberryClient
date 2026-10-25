@@ -26,7 +26,7 @@
             android:fontFamily="@font/misans"
             android:maxLines="1"
             android:textColor="@color/on_surface"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:textStyle="bold"
             tools:text="Fresh Animations 1.10.5" />
 
@@ -39,7 +39,7 @@
             android:fontFamily="@font/misans"
             android:maxLines="2"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             tools:text="release • 26.1, 26.2 • 631 KB" />
     </LinearLayout>
 
@@ -58,6 +58,6 @@
         android:text="@string/modrinth_download_version"
         android:textAllCaps="false"
         android:textColor="@color/on_primary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold" />
 </LinearLayout>

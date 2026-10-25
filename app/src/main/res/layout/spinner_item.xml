@@ -7,4 +7,4 @@
     android:paddingEnd="4dp"
     android:paddingVertical="4dp"
     android:textColor="@color/on_surface"
-    android:textSize="11sp" />
+    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />

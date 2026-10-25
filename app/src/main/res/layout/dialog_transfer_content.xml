@@ -11,7 +11,7 @@
         android:fontFamily="@font/misans"
         android:text="@string/transfer_to"
         android:textColor="@color/on_surface"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
     <RadioGroup
         android:id="@+id/storage_radio_group"
@@ -27,7 +27,7 @@
             android:padding="8dp"
             android:text="@string/storage_internal"
             android:textColor="@color/on_surface"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
         <RadioButton
             android:id="@+id/radio_external"
@@ -37,7 +37,7 @@
             android:padding="8dp"
             android:text="@string/storage_external"
             android:textColor="@color/on_surface"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
         <RadioButton
             android:id="@+id/radio_version_isolation_internal"
@@ -47,7 +47,7 @@
             android:padding="8dp"
             android:text="@string/storage_version_isolation"
             android:textColor="@color/on_surface"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
         <RadioButton
             android:id="@+id/radio_version_isolation"
@@ -57,7 +57,7 @@
             android:padding="8dp"
             android:text="@string/storage_version_isolation"
             android:textColor="@color/on_surface"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
     </RadioGroup>
 

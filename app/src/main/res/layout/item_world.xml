@@ -21,7 +21,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/world_name_placeholder"
             android:textColor="@color/on_surface"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -33,7 +33,7 @@
         android:fontFamily="@font/misans"
         android:text="@string/world_game_mode_survival_placeholder"
         android:textColor="@color/on_surface"
-        android:textSize="12sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,7 +49,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/world_size_placeholder"
             android:textColor="@color/on_surface"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <TextView
             android:id="@+id/world_last_played"
@@ -58,7 +58,7 @@
             android:fontFamily="@font/misans"
             android:text="@string/world_last_played_placeholder"
             android:textColor="@color/on_surface"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
     </LinearLayout>
 
     <LinearLayout
@@ -81,7 +81,7 @@
             android:text="@string/edit"
             android:textAllCaps="false"
             android:textColor="@color/on_primary"
-            android:textSize="10sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <Button
             android:id="@+id/world_extract_structures_button"
@@ -97,7 +97,7 @@
             android:text="@string/extract_structures"
             android:textAllCaps="false"
             android:textColor="@color/on_tertiary"
-            android:textSize="10sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <Button
             android:id="@+id/world_transfer_button"
@@ -113,7 +113,7 @@
             android:text="@string/transfer"
             android:textAllCaps="false"
             android:textColor="@color/on_secondary"
-            android:textSize="10sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <View
             android:layout_width="0dp"
@@ -134,7 +134,7 @@
             android:text="@string/export"
             android:textAllCaps="false"
             android:textColor="@color/on_primary"
-            android:textSize="10sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <Button
             android:id="@+id/world_backup_button"
@@ -150,7 +150,7 @@
             android:text="@string/backup"
             android:textAllCaps="false"
             android:textColor="@color/on_primary"
-            android:textSize="10sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <Button
             android:id="@+id/world_delete_button"
@@ -165,6 +165,6 @@
             android:text="@string/delete"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="10sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
     </LinearLayout>
 </LinearLayout>
