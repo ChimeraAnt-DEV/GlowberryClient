@@ -16,8 +16,8 @@
     android:background="@drawable/section_header_bg"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="9dp">
+    android:paddingHorizontal="@dimen/space_3"
+    android:paddingVertical="@dimen/space_2">
 
     <FrameLayout
         android:layout_width="34dp"
@@ -41,7 +41,7 @@
         android:id="@+id/section_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/space_3"
         android:layout_weight="1"
         android:fontFamily="@font/misans"
         android:letterSpacing="0.01"
@@ -57,8 +57,8 @@
         android:clickable="true"
         android:focusable="true"
         android:fontFamily="@font/misans"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
+        android:paddingHorizontal="@dimen/space_2"
+        android:paddingVertical="@dimen/space_1"
         android:textColor="@color/primary"
         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:visibility="gone" />

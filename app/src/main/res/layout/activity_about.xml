@@ -16,10 +16,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="15dp"
-            android:paddingBottom="24dp">
+            android:paddingStart="@dimen/space_6"
+            android:paddingEnd="@dimen/space_6"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_6">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/space_1"
                 android:text="@string/about_subtitle"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary"
@@ -42,10 +42,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/space_6"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/space_4">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -73,7 +73,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="@dimen/space_3"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -96,8 +96,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="18dp"
-                                android:layout_marginStart="8dp"
-                                android:paddingHorizontal="8dp"
+                                android:layout_marginStart="@dimen/space_2"
+                                android:paddingHorizontal="@dimen/space_2"
                                 android:gravity="center"
                                 android:text="@string/about_author_badge"
                                 android:fontFamily="@font/misans"
@@ -110,7 +110,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="@dimen/space_hairline"
                             android:text="@string/about_author_role"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
@@ -121,7 +121,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:orientation="horizontal">
 
                     <TextView
@@ -129,7 +129,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="28dp"
-                        android:paddingHorizontal="14dp"
+                        android:paddingHorizontal="@dimen/space_4"
                         android:gravity="center"
                         android:text="@string/about_patreon"
                         android:fontFamily="@font/misans"
@@ -138,7 +138,7 @@
                         android:textStyle="bold"
                         android:background="@drawable/bg_link_chip_orange"
                         android:drawableStart="@drawable/ic_patreon"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="@dimen/space_2"
                         android:clickable="true"
                         android:focusable="true" />
 
@@ -147,8 +147,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="28dp"
-                        android:layout_marginStart="8dp"
-                        android:paddingHorizontal="14dp"
+                        android:layout_marginStart="@dimen/space_2"
+                        android:paddingHorizontal="@dimen/space_4"
                         android:gravity="center"
                         android:text="@string/about_afdian"
                         android:fontFamily="@font/misans"
@@ -157,7 +157,7 @@
                         android:textStyle="bold"
                         android:background="@drawable/bg_link_chip_pink"
                         android:drawableStart="@drawable/ic_afdian"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="@dimen/space_2"
                         android:clickable="true"
                         android:focusable="true" />
                 </LinearLayout>
@@ -165,14 +165,14 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="2dp"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:layout_marginBottom="@dimen/space_hairline"
                     android:background="#1A000000" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -186,7 +186,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="@dimen/space_3"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -209,8 +209,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="18dp"
-                                android:layout_marginStart="8dp"
-                                android:paddingHorizontal="8dp"
+                                android:layout_marginStart="@dimen/space_2"
+                                android:paddingHorizontal="@dimen/space_2"
                                 android:gravity="center"
                                 android:text="@string/maintainer"
                                 android:fontFamily="@font/misans"
@@ -223,7 +223,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="@dimen/space_hairline"
                             android:text="@string/maintainer"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
@@ -234,7 +234,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:orientation="horizontal">
 
                     <TextView
@@ -242,7 +242,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="28dp"
-                        android:paddingHorizontal="14dp"
+                        android:paddingHorizontal="@dimen/space_4"
                         android:gravity="center"
                         android:text="@string/youtube"
                         android:fontFamily="@font/misans"
@@ -251,7 +251,7 @@
                         android:textStyle="bold"
                         android:background="@drawable/bg_link_chip_pink"
                         android:drawableStart="@drawable/ic_youtube"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="@dimen/space_2"
                         android:clickable="true"
                         android:focusable="true" />
                 </LinearLayout>
@@ -260,17 +260,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/space_3"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="@dimen/space_2"
                     style="@style/Widget.Chimera.Card.Compact"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/space_4">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -281,12 +281,12 @@
                         android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold"
                         android:drawableStart="@drawable/ic_code"
-                        android:drawablePadding="8dp" />
+                        android:drawablePadding="@dimen/space_2" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/space_3"
                         android:orientation="horizontal">
 
                         <TextView
@@ -294,7 +294,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="28dp"
-                            android:paddingHorizontal="14dp"
+                            android:paddingHorizontal="@dimen/space_4"
                             android:gravity="center"
                             android:text="@string/about_github_repo"
                             android:fontFamily="@font/misans"
@@ -302,7 +302,7 @@
                             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                             android:background="@drawable/bg_link_chip_blue"
                             android:drawableStart="@drawable/ic_github"
-                            android:drawablePadding="6dp"
+                            android:drawablePadding="@dimen/space_2"
                             android:clickable="true"
                             android:focusable="true" />
 
@@ -311,8 +311,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="28dp"
-                            android:layout_marginStart="8dp"
-                            android:paddingHorizontal="14dp"
+                            android:layout_marginStart="@dimen/space_2"
+                            android:paddingHorizontal="@dimen/space_4"
                             android:gravity="center"
                             android:text="@string/about_github_org"
                             android:fontFamily="@font/misans"
@@ -320,7 +320,7 @@
                             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                             android:background="@drawable/bg_link_chip_blue"
                             android:drawableStart="@drawable/ic_github"
-                            android:drawablePadding="6dp"
+                            android:drawablePadding="@dimen/space_2"
                             android:clickable="true"
                             android:focusable="true" />
                     </LinearLayout>
@@ -328,7 +328,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/space_3"
                         android:text="@string/about_license_note"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
@@ -339,10 +339,10 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="@dimen/space_2"
                     style="@style/Widget.Chimera.Card.Compact"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/space_4">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -353,12 +353,12 @@
                         android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold"
                         android:drawableStart="@drawable/ic_github"
-                        android:drawablePadding="8dp" />
+                        android:drawablePadding="@dimen/space_2" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/space_2"
                         android:text="@string/about_contribute_desc"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
@@ -367,7 +367,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/space_3"
                         android:orientation="horizontal">
 
                         <TextView
@@ -375,7 +375,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="28dp"
-                            android:paddingHorizontal="14dp"
+                            android:paddingHorizontal="@dimen/space_4"
                             android:gravity="center"
                             android:text="@string/about_issues"
                             android:fontFamily="@font/misans"
@@ -383,7 +383,7 @@
                             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                             android:background="@drawable/bg_link_chip_blue"
                             android:drawableStart="@drawable/ic_github"
-                            android:drawablePadding="6dp"
+                            android:drawablePadding="@dimen/space_2"
                             android:clickable="true"
                             android:focusable="true" />
 
@@ -392,8 +392,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="28dp"
-                            android:layout_marginStart="8dp"
-                            android:paddingHorizontal="14dp"
+                            android:layout_marginStart="@dimen/space_2"
+                            android:paddingHorizontal="@dimen/space_4"
                             android:gravity="center"
                             android:text="@string/about_star_fork"
                             android:fontFamily="@font/misans"
@@ -402,7 +402,7 @@
                             android:textStyle="bold"
                             android:background="@drawable/bg_link_chip_green"
                             android:drawableStart="@drawable/ic_star"
-                            android:drawablePadding="6dp"
+                            android:drawablePadding="@dimen/space_2"
                             android:clickable="true"
                             android:focusable="true" />
                     </LinearLayout>

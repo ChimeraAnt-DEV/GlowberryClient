@@ -15,9 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingTop="@dimen/space_4"
+        android:paddingBottom="@dimen/space_2">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="32dp"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/space_4"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_refresh"
@@ -56,7 +56,7 @@
             android:id="@+id/installations_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:fontFamily="@font/misans"
             android:text="@string/installations_subtitle"
             android:textColor="@color/text_secondary"
@@ -67,20 +67,20 @@
             android:id="@+id/installations_source_warning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_3"
             android:fontFamily="@font/misans"
             tools:text="Packages are downloaded from mcpedl.org, a third-party mirror."
             android:textColor="@color/text_secondary"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:background="@drawable/bg_alpha_chip"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="8dp" />
+            android:paddingHorizontal="@dimen/space_3"
+            android:paddingVertical="@dimen/space_2" />
 
         <LinearLayout
             android:id="@+id/installations_staged_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_3"
             android:orientation="vertical"
             android:visibility="gone">
 
@@ -95,7 +95,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/space_2"
                 android:orientation="horizontal">
 
                 <TextView
@@ -103,7 +103,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minHeight="32dp"
-                    android:paddingHorizontal="16dp"
+                    android:paddingHorizontal="@dimen/space_4"
                     android:gravity="center"
                     android:fontFamily="@font/misans"
                     android:text="@string/installations_retry_import"
@@ -119,8 +119,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minHeight="32dp"
-                    android:layout_marginStart="8dp"
-                    android:paddingHorizontal="16dp"
+                    android:layout_marginStart="@dimen/space_2"
+                    android:paddingHorizontal="@dimen/space_4"
                     android:gravity="center"
                     android:fontFamily="@font/misans"
                     android:text="@string/installations_clear_staged"
@@ -143,8 +143,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="16dp"
+            android:paddingHorizontal="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:scrollbars="vertical" />
 
         <ProgressBar
@@ -162,7 +162,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingHorizontal="32dp"
+            android:paddingHorizontal="@dimen/space_8"
             android:visibility="gone">
 
             <TextView
@@ -179,7 +179,7 @@
                 android:id="@+id/installations_empty_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/space_2"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
                 android:text="@string/installations_empty_message"
@@ -193,8 +193,8 @@
           android:layout_height="wrap_content"
           android:orientation="horizontal"
           android:gravity="center_vertical"
-          android:paddingHorizontal="16dp"
-          android:paddingVertical="10dp"
+          android:paddingHorizontal="@dimen/space_4"
+          android:paddingVertical="@dimen/space_3"
           android:visibility="gone">
 
           <TextView
@@ -212,7 +212,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:minHeight="32dp"
-              android:paddingHorizontal="16dp"
+              android:paddingHorizontal="@dimen/space_4"
               android:gravity="center"
               android:fontFamily="@font/misans"
               android:text="@string/installations_prev_page"
@@ -228,8 +228,8 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:minHeight="32dp"
-              android:layout_marginStart="8dp"
-              android:paddingHorizontal="16dp"
+              android:layout_marginStart="@dimen/space_2"
+              android:paddingHorizontal="@dimen/space_4"
               android:gravity="center"
               android:fontFamily="@font/misans"
               android:text="@string/installations_next_page"
@@ -264,7 +264,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:orientation="vertical"
-            android:padding="12dp"
+            android:padding="@dimen/space_3"
             android:background="@color/background">
 
             <TextView
@@ -280,9 +280,9 @@
                 android:id="@+id/installations_browser_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/space_2"
                 android:minHeight="32dp"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/space_4"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
                 android:text="@string/cancel"

@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="@dimen/space_2"
     android:background="@drawable/bg_instance_card"
     android:orientation="vertical"
-    android:padding="14dp">
+    android:padding="@dimen/space_4">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="22dp"
-            android:paddingHorizontal="10dp"
+            android:paddingHorizontal="@dimen/space_3"
             android:gravity="center"
             android:fontFamily="@font/misans"
             android:text="@string/installations_release_tag"
@@ -45,8 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="22dp"
-            android:layout_marginStart="6dp"
-            android:paddingHorizontal="10dp"
+            android:layout_marginStart="@dimen/space_2"
+            android:paddingHorizontal="@dimen/space_3"
             android:gravity="center"
             android:fontFamily="@font/misans"
             android:text="@string/installations_installed_tag"
@@ -60,7 +60,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/space_3"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="34dp"
-            android:paddingHorizontal="18dp"
+            android:paddingHorizontal="@dimen/space_4"
             android:gravity="center"
             android:fontFamily="@font/misans"
             android:text="@string/installations_download"
@@ -97,7 +97,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/space_3"
         android:max="100"
         android:progress="0"
         android:visibility="gone" />

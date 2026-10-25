@@ -13,8 +13,8 @@
     android:layout_gravity="center_horizontal"
     android:background="@drawable/bg_launch_quickdock"
     android:orientation="horizontal"
-    android:paddingHorizontal="10dp"
-    android:paddingVertical="8dp">
+    android:paddingHorizontal="@dimen/space_3"
+    android:paddingVertical="@dimen/space_2">
 
     <LinearLayout
         android:id="@+id/quickdock_mods"

@@ -92,6 +92,24 @@
     <dimen name="space_6">24dp</dimen>
     <dimen name="space_8">32dp</dimen>
 
+    <!--
+        Values that are deliberately not on the rhythm, named so they read as choices.
+
+        - {@code space_hairline} (2dp): the gap between a label and the value under it, and the
+          offset that makes a 1dp divider sit optically centred. A 4dp floor would loosen a tight
+          coupling that is the point of the pairing.
+        - {@code space_divider} (1dp): a divider's own optical offset. A divider is a line, not a
+          step, so it is not part of the rhythm at all.
+        - {@code space_align_inset} (52dp): the version row's start inset, which lines its text up
+          with the icon column above it. Snapping it would break that alignment.
+        - {@code space_dock_clearance} (168dp): how far the launch scroll's bottom padding reaches
+          past the docked Play control. It is a measured clearance, not a rhythm step.
+    -->
+    <dimen name="space_hairline">2dp</dimen>
+    <dimen name="space_divider">1dp</dimen>
+    <dimen name="space_align_inset">52dp</dimen>
+    <dimen name="space_dock_clearance">168dp</dimen>
+
     <!-- The 48dp minimum touch target (U6/U9), mirrored from UiTokens.MIN_TOUCH_TARGET. -->
     <dimen name="min_touch_target">48dp</dimen>
 </resources>

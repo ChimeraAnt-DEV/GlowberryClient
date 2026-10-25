@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="@dimen/space_2"
     android:orientation="vertical"
-    android:paddingVertical="6dp">
+    android:paddingVertical="@dimen/space_2">
 
     <TextView
         android:id="@+id/meta_label"
@@ -18,7 +18,7 @@
         android:id="@+id/meta_value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="@dimen/space_1"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"
         android:textAppearance="@style/TextAppearance.Glowberry.Label"

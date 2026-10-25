@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="@dimen/space_6"
     android:minWidth="480dp"
     android:minHeight="320dp"
     style="@style/Widget.Chimera.Card">
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="12dp">
+            android:paddingLeft="@dimen/space_3">
             <TextView
                 android:id="@+id/settings_title"
                 android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:paddingTop="@dimen/space_3">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

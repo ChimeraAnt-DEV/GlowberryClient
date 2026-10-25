@@ -11,8 +11,8 @@
         android:minHeight="56dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="4dp"
-        android:paddingVertical="8dp">
+        android:paddingHorizontal="@dimen/space_1"
+        android:paddingVertical="@dimen/space_2">
 
         <TextView
             android:id="@+id/tv_title"

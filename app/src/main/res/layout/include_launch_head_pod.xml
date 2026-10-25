@@ -13,8 +13,8 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="6dp"
-    android:paddingBottom="10dp">
+    android:paddingTop="@dimen/space_2"
+    android:paddingBottom="@dimen/space_3">
 
     <org.chimeramc.client.ui.components.HeadPodView
         android:id="@+id/launch_head_pod"
@@ -26,7 +26,7 @@
         android:id="@+id/launch_head_pod_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/space_1"
         android:fontFamily="@font/misans"
         android:text="@string/launch_head_pod_hint"
         android:textColor="@color/dock_text_secondary"

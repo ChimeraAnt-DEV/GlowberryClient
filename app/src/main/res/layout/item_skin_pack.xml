@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="@dimen/space_1"
     style="@style/Widget.Chimera.Card"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="@dimen/space_3">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/space_3"
             android:orientation="vertical">
 
             <TextView
@@ -62,7 +62,7 @@
                 android:id="@+id/skin_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/space_hairline"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary"
                 android:textAppearance="@style/TextAppearance.Glowberry.Caption"
@@ -73,7 +73,7 @@
                 android:id="@+id/skin_applied"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/space_1"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/primary"
                 android:textAppearance="@style/TextAppearance.Glowberry.Caption"
@@ -85,12 +85,12 @@
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/space_2"
             android:minWidth="0dp"
             android:minHeight="34dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:paddingHorizontal="14dp"
+            android:paddingHorizontal="@dimen/space_4"
             android:paddingVertical="0dp"
             android:fontFamily="@font/misans"
             android:backgroundTint="@color/primary"

@@ -7,8 +7,8 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:minHeight="56dp"
-    android:paddingHorizontal="4dp"
-    android:paddingVertical="8dp">
+    android:paddingHorizontal="@dimen/space_1"
+    android:paddingVertical="@dimen/space_2">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -31,7 +31,7 @@
             android:id="@+id/node_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
@@ -40,7 +40,7 @@
             android:id="@+id/node_meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/space_1"
             android:fontFamily="@font/misans"
             android:textColor="@color/accent_text"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
@@ -52,7 +52,7 @@
         android:id="@+id/node_controls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
+        android:layout_marginStart="@dimen/space_4"
         android:gravity="center_vertical"
         android:orientation="horizontal" />
 </LinearLayout>

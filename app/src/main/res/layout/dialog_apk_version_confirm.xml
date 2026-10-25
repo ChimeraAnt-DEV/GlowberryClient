@@ -6,7 +6,7 @@
     android:background="@drawable/dialog_background_black_border"
     android:orientation="vertical"
     android:minWidth="360dp"
-    android:padding="24dp">
+    android:padding="@dimen/space_6">
 
     <TextView
         android:id="@+id/tv_title"
@@ -22,8 +22,8 @@
         android:id="@+id/edit_version_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"
+        android:layout_marginTop="@dimen/space_4"
+        android:padding="@dimen/space_3"
         android:textColor="?attr/colorOnSurface"
         android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:singleLine="true"
@@ -40,7 +40,7 @@
         android:textColor="#FF5252"
         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:visibility="gone"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="@dimen/space_1" />
 
     <TextView
         android:id="@+id/text_isolation_note"
@@ -49,14 +49,14 @@
         android:text="@string/import_isolation_note"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
-        android:layout_marginTop="12sp" />
+        android:layout_marginTop="@dimen/space_3" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="@dimen/space_6">
 
         <Button
             android:id="@+id/btn_cancel"
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:text="@string/install"
             android:enabled="false"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/space_3"
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="?attr/colorOnPrimary" />
     </LinearLayout>

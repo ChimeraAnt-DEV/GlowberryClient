@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="@dimen/space_4">
 
     <TextView
         android:layout_width="match_parent"
@@ -11,7 +11,7 @@
         android:text="@string/select_tab"
         android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:textColor="?android:textColorSecondary"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="@dimen/space_2" />
 
     <Spinner
         android:id="@+id/tab_spinner"

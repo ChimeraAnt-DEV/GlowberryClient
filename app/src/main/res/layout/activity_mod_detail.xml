@@ -10,10 +10,10 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingStart="20dp"
-        android:paddingTop="15dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="24dp">
+        android:paddingStart="@dimen/space_6"
+        android:paddingTop="@dimen/space_4"
+        android:paddingEnd="@dimen/space_6"
+        android:paddingBottom="@dimen/space_6">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,17 +34,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/space_3"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:id="@+id/mod_detail_header_container"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="@dimen/space_2"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingEnd="15dp">
+                    android:paddingEnd="@dimen/space_4">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         android:background="@drawable/plugin_field_background"
-                        android:padding="10dp">
+                        android:padding="@dimen/space_3">
 
                         <ImageView
                             android:id="@+id/mod_icon_detail"
@@ -71,7 +71,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="@dimen/space_4"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -89,7 +89,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="@dimen/space_1"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -107,7 +107,7 @@
                                 android:id="@+id/mod_version_detail"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="@dimen/space_3"
                                 android:fontFamily="@font/misans"
                                 android:textColor="@color/on_surface"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Label"
@@ -120,7 +120,7 @@
                     android:id="@+id/mod_description_detail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:fontFamily="@font/misans"
                     android:lineSpacingExtra="2dp"
                     android:textColor="@color/on_surface_variant"
@@ -130,10 +130,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingVertical="4dp">
+                    android:paddingVertical="@dimen/space_1">
 
                     <TextView
                         android:id="@+id/mod_status_text"
@@ -155,10 +155,10 @@
                 android:id="@+id/mod_detail_info_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="@dimen/space_2"
                 android:layout_weight="1.15"
                 android:orientation="vertical"
-                android:paddingHorizontal="15dp">
+                android:paddingHorizontal="@dimen/space_4">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -186,7 +186,7 @@
                 android:id="@+id/mod_detail_actions_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="@dimen/space_3"
                 android:layout_weight="0.75"
                 android:orientation="vertical">
 
@@ -203,14 +203,14 @@
                     android:id="@+id/configure_mod_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:background="@drawable/bg_launch_button"
                     android:fontFamily="@font/misans"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:minHeight="40dp"
                     android:minWidth="0dp"
-                    android:paddingHorizontal="14dp"
+                    android:paddingHorizontal="@dimen/space_4"
                     android:paddingVertical="0dp"
                     android:text="@string/configure"
                     android:textAllCaps="false"
@@ -222,14 +222,14 @@
                     android:id="@+id/delete_mod_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/bg_error_button"
                     android:fontFamily="@font/misans"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:minHeight="40dp"
                     android:minWidth="0dp"
-                    android:paddingHorizontal="14dp"
+                    android:paddingHorizontal="@dimen/space_4"
                     android:paddingVertical="0dp"
                     android:text="@string/delete_mod"
                     android:textAllCaps="false"

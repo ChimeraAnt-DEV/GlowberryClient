@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:minHeight="40dp"
     android:gravity="center_vertical"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    android:paddingVertical="6dp"
+    android:paddingStart="@dimen/space_2"
+    android:paddingEnd="@dimen/space_2"
+    android:paddingVertical="@dimen/space_2"
     android:textColor="@color/on_surface"
     android:textAppearance="@style/TextAppearance.Glowberry.Title" />

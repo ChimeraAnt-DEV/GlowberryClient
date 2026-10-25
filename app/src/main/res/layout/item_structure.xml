@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="12dp"
+    android:padding="@dimen/space_3"
     android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground">
 
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:textColor="#AAAAAA"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
-            android:layout_marginTop="2dp" />
+            android:layout_marginTop="@dimen/space_hairline" />
 
     </LinearLayout>
 

@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingTop="@dimen/space_4"
+        android:paddingBottom="@dimen/space_2">
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,7 +28,7 @@
             android:id="@+id/mod_hub_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:fontFamily="@font/misans"
             android:text="@string/mod_hub_subtitle"
             android:textColor="@color/text_secondary"
@@ -39,7 +39,7 @@
             android:id="@+id/mod_hub_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_3"
             app:tabMode="fixed"
             app:tabGravity="fill" />
     </LinearLayout>
@@ -60,11 +60,11 @@
                 android:id="@+id/modrinth_warning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginHorizontal="@dimen/space_4"
+                android:layout_marginBottom="@dimen/space_2"
                 android:background="@drawable/bg_diagnostics_banner"
                 android:fontFamily="@font/misans"
-                android:padding="10dp"
+                android:padding="@dimen/space_3"
                 android:text="@string/modrinth_java_warning"
                 android:textColor="@color/on_surface"
                 android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
@@ -74,8 +74,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="8dp">
+                android:paddingHorizontal="@dimen/space_4"
+                android:paddingBottom="@dimen/space_2">
 
                 <EditText
                     android:id="@+id/modrinth_search_box"
@@ -84,13 +84,13 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_search_box"
                     android:drawableStart="@drawable/ic_search"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/space_3"
                     android:drawableTint="@color/on_surface"
                     android:fontFamily="@font/misans"
                     android:hint="@string/modrinth_hub_search_hint"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
-                    android:paddingHorizontal="14dp"
+                    android:paddingHorizontal="@dimen/space_4"
                     android:textColor="@color/on_surface"
                     android:textColorHint="@color/text_secondary" />
 
@@ -99,7 +99,7 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/space_2"
                     android:minHeight="40dp"
                     android:text="@string/sort"
                     android:textColor="@color/on_surface"
@@ -111,8 +111,8 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="8dp"
+                android:paddingHorizontal="@dimen/space_4"
+                android:paddingBottom="@dimen/space_2"
                 android:scrollbars="none">
 
                 <RadioGroup
@@ -132,7 +132,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
-                    android:paddingBottom="12dp" />
+                    android:paddingBottom="@dimen/space_3" />
 
                 <ProgressBar
                     android:id="@+id/modrinth_progress"
@@ -147,7 +147,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="32dp"
+                    android:padding="@dimen/space_8"
                     android:visibility="gone">
 
                     <TextView
@@ -181,8 +181,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="8dp">
+                android:paddingHorizontal="@dimen/space_4"
+                android:paddingBottom="@dimen/space_2">
 
                 <TextView
                     android:id="@+id/downloads_summary"
@@ -208,7 +208,7 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/space_2"
                     android:minHeight="40dp"
                     android:text="@string/downloads_scan"
                     android:textColor="@color/on_surface"
@@ -227,7 +227,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
-                    android:paddingBottom="12dp" />
+                    android:paddingBottom="@dimen/space_3" />
 
                 <ProgressBar
                     android:id="@+id/downloads_progress"
@@ -242,7 +242,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="32dp"
+                    android:padding="@dimen/space_8"
                     android:visibility="gone">
 
                     <TextView
@@ -257,7 +257,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="@dimen/space_2"
                         android:gravity="center"
                         android:fontFamily="@font/misans"
                         android:text="@string/downloads_empty_message"

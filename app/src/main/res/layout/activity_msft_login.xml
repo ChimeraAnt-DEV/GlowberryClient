@@ -18,7 +18,7 @@
             android:elevation="6dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="14dp">
+            android:paddingHorizontal="@dimen/space_4">
 
             <ImageButton
                 android:id="@+id/msft_back_button"
@@ -26,14 +26,14 @@
                 android:layout_height="42dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/back"
-                android:padding="10dp"
+                android:padding="@dimen/space_3"
                 android:src="@drawable/ic_arrow_back"
                 android:tint="@color/on_surface" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="@dimen/space_3"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -73,20 +73,20 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="@dimen/space_6">
 
                     <ImageView
                         android:layout_width="58dp"
                         android:layout_height="58dp"
                         android:contentDescription="@null"
-                        android:padding="8dp"
+                        android:padding="@dimen/space_2"
                         android:src="@drawable/ic_qa_account"
                         android:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="@dimen/space_3"
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:text="@string/ms_choose_login_method"
@@ -97,7 +97,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="@dimen/space_2"
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:maxWidth="620dp"
@@ -109,12 +109,12 @@
                         android:id="@+id/msft_method_error"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="@dimen/space_4"
                         style="@style/Widget.Chimera.Card.Compact"
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:maxWidth="720dp"
-                        android:padding="12dp"
+                        android:padding="@dimen/space_3"
                         android:textColor="#D32F2F"
                         android:textAppearance="@style/TextAppearance.Glowberry.Body"
                         android:visibility="gone" />
@@ -122,7 +122,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="@dimen/space_4"
                         android:gravity="center"
                         android:orientation="horizontal"
                         android:weightSum="3">
@@ -130,7 +130,7 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/space_2"
                             android:layout_weight="1"
                             app:cardBackgroundColor="@color/surface"
                             app:cardCornerRadius="@dimen/radius_card"
@@ -141,7 +141,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="@dimen/space_4">
 
                                 <ImageView
                                     android:layout_width="42dp"
@@ -153,7 +153,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:text="@string/ms_device_code_option_title"
@@ -164,7 +164,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:minHeight="44dp"
@@ -177,7 +177,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:minHeight="54dp"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="@dimen/space_3"
                                     android:fontFamily="@font/misans"
                                     android:maxLines="1"
                                     android:text="@string/ms_device_code_login"
@@ -194,8 +194,8 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:layout_marginEnd="4dp"
+                            android:layout_marginStart="@dimen/space_1"
+                            android:layout_marginEnd="@dimen/space_1"
                             android:layout_weight="1"
                             app:cardBackgroundColor="@color/surface"
                             app:cardCornerRadius="@dimen/radius_card"
@@ -206,7 +206,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="@dimen/space_4">
 
                                 <ImageView
                                     android:layout_width="42dp"
@@ -218,7 +218,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:text="@string/ms_webview_option_title"
@@ -229,7 +229,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:minHeight="44dp"
@@ -243,7 +243,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:minHeight="54dp"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="@dimen/space_3"
                                     android:fontFamily="@font/misans"
                                     android:maxLines="1"
                                     android:text="@string/ms_webview_login"
@@ -259,7 +259,7 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="@dimen/space_2"
                             android:layout_weight="1"
                             app:cardBackgroundColor="@color/surface"
                             app:cardCornerRadius="@dimen/radius_card"
@@ -270,7 +270,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="@dimen/space_4">
 
                                 <ImageView
                                     android:layout_width="42dp"
@@ -282,7 +282,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:text="@string/ms_oauth_option_title"
@@ -293,7 +293,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:minHeight="44dp"
@@ -307,7 +307,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:minHeight="54dp"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="@dimen/space_3"
                                     android:fontFamily="@font/misans"
                                     android:maxLines="1"
                                     android:text="@string/ms_oauth_button_signin"
@@ -336,13 +336,13 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="24dp"
+                    android:padding="@dimen/space_6"
                     android:weightSum="2">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:layout_weight="1.12"
                         android:orientation="vertical">
 
@@ -358,7 +358,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="@dimen/space_2"
                             android:fontFamily="@font/misans"
                             android:text="@string/ms_device_code_instructions"
                             android:textColor="@color/text_secondary"
@@ -367,7 +367,7 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/space_4"
                             app:cardBackgroundColor="@color/surface"
                             app:cardCornerRadius="@dimen/radius_card"
                             app:cardElevation="3dp">
@@ -377,7 +377,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="@dimen/space_4">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -393,7 +393,7 @@
                                     android:id="@+id/msft_device_code"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:autoSizeMaxTextSize="32sp"
                                     android:autoSizeMinTextSize="20sp"
                                     android:autoSizeStepGranularity="1sp"
@@ -411,14 +411,14 @@
                                 <View
                                     android:layout_width="match_parent"
                                     android:layout_height="1dp"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="@dimen/space_3"
                                     android:background="#20888888" />
 
                                 <TextView
                                     android:id="@+id/msft_device_url"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="@dimen/space_3"
                                     android:fontFamily="@font/misans"
                                     android:gravity="center"
                                     android:text="@string/ms_device_code_requesting"
@@ -431,11 +431,11 @@
                                     android:id="@+id/msft_device_expiry"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:background="@drawable/bg_filter_chip"
                                     android:fontFamily="@font/misans"
-                                    android:paddingHorizontal="12dp"
-                                    android:paddingVertical="5dp"
+                                    android:paddingHorizontal="@dimen/space_3"
+                                    android:paddingVertical="@dimen/space_1"
                                     android:textColor="@color/text_secondary"
                                     android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
@@ -445,7 +445,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="@dimen/space_3"
                         android:layout_weight="0.88"
                         android:orientation="vertical">
 
@@ -460,7 +460,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="@dimen/space_4">
 
                                 <TextView
                                     android:layout_width="match_parent"
@@ -474,7 +474,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="5dp"
+                                    android:layout_marginTop="@dimen/space_1"
                                     android:fontFamily="@font/misans"
                                     android:text="@string/ms_device_code_browser_note"
                                     android:textColor="@color/text_secondary"
@@ -485,7 +485,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:minHeight="56dp"
-                                    android:layout_marginTop="14dp"
+                                    android:layout_marginTop="@dimen/space_4"
                                     android:autoSizeMaxTextSize="15sp"
                                     android:autoSizeMinTextSize="11sp"
                                     android:autoSizeStepGranularity="1sp"
@@ -507,7 +507,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:minHeight="52dp"
-                                    android:layout_marginTop="10dp"
+                                    android:layout_marginTop="@dimen/space_3"
                                     android:enabled="false"
                                     android:fontFamily="@font/misans"
                                     android:maxLines="1"
@@ -521,7 +521,7 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="16dp"
+                                    android:layout_marginTop="@dimen/space_4"
                                     android:gravity="center_vertical"
                                     android:orientation="horizontal">
 
@@ -535,7 +535,7 @@
                                         android:id="@+id/msft_device_status"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="12dp"
+                                        android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:fontFamily="@font/misans"
                                         android:text="@string/ms_device_code_requesting"
@@ -549,7 +549,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:minHeight="48dp"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:fontFamily="@font/misans"
                                     android:text="@string/ms_choose_other_method"
                                     android:textAllCaps="false" />
@@ -577,7 +577,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="48dp"
                     android:layout_gravity="bottom|end"
-                    android:layout_margin="14dp"
+                    android:layout_margin="@dimen/space_4"
                     android:fontFamily="@font/misans"
                     android:text="@string/ms_choose_other_method"
                     android:textAllCaps="false"
@@ -598,20 +598,20 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="@dimen/space_6">
 
                     <ImageView
                         android:layout_width="58dp"
                         android:layout_height="58dp"
                         android:contentDescription="@null"
-                        android:padding="8dp"
+                        android:padding="@dimen/space_2"
                         android:src="@drawable/ic_qa_account"
                         android:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="@dimen/space_3"
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:text="@string/ms_oauth_option_title"
@@ -622,7 +622,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="@dimen/space_2"
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:maxWidth="620dp"
@@ -633,7 +633,7 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="@dimen/space_4"
                         app:cardBackgroundColor="@color/surface"
                         app:cardCornerRadius="@dimen/radius_card"
                         app:cardElevation="3dp">
@@ -642,7 +642,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="18dp">
+                            android:padding="@dimen/space_4">
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -656,7 +656,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
+                                android:layout_marginTop="@dimen/space_1"
                                 android:fontFamily="@font/misans"
                                 android:text="Official Microsoft Authentication Library (MSAL) integration"
                                 android:textColor="@color/text_secondary"
@@ -667,7 +667,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:minHeight="56dp"
-                                android:layout_marginTop="14dp"
+                                android:layout_marginTop="@dimen/space_4"
                                 android:autoSizeMaxTextSize="15sp"
                                 android:autoSizeMinTextSize="11sp"
                                 android:autoSizeStepGranularity="1sp"
@@ -685,7 +685,7 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
+                                android:layout_marginTop="@dimen/space_4"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -700,7 +700,7 @@
                                     android:id="@+id/msft_msal_status"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:fontFamily="@font/misans"
                                     android:text="@string/ms_oauth_initializing"
@@ -714,7 +714,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:minHeight="48dp"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/space_2"
                                 android:fontFamily="@font/misans"
                                 android:text="@string/ms_oauth_button_cancel"
                                 android:textAllCaps="false" />
@@ -724,7 +724,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="@dimen/space_4"
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:maxWidth="620dp"
@@ -759,7 +759,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="@dimen/space_6">
 
                 <ProgressBar
                     android:id="@+id/msft_progress_bar"
@@ -771,7 +771,7 @@
                     android:id="@+id/msft_progress_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:fontFamily="@font/misans"
                     android:gravity="center"
                     android:text="@string/ms_login_exchanging"

@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:paddingTop="8dp">
+        android:paddingTop="@dimen/space_2">
 
         <ImageView
             android:id="@+id/nav_back_button"
@@ -46,7 +46,7 @@
             android:id="@+id/nav_logo"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="@dimen/space_2"
             android:contentDescription="@string/app_name"
             android:src="@drawable/ic_glowberry_logo" />
     </LinearLayout>
@@ -57,7 +57,7 @@
         android:id="@+id/nav_app_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/space_2"
         android:ellipsize="end"
         android:fontFamily="@font/misans"
         android:gravity="center"
@@ -72,7 +72,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/space_2"
         android:background="@color/divider" />
 
     <!--
@@ -98,8 +98,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="@dimen/space_2"
+                android:paddingBottom="@dimen/space_2">
 
                 <TextView
                     android:id="@+id/nav_tab_launch"
@@ -144,8 +144,8 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="8dp"
-        android:paddingBottom="10dp">
+        android:paddingTop="@dimen/space_2"
+        android:paddingBottom="@dimen/space_3">
 
         <Button
             android:id="@+id/nav_sign_in_button"
@@ -154,7 +154,7 @@
             android:layout_height="wrap_content"
             android:minWidth="0dp"
             android:minHeight="34dp"
-            android:paddingHorizontal="14dp"
+            android:paddingHorizontal="@dimen/space_4"
             android:paddingVertical="0dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"

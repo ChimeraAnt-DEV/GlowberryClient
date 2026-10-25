@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="@dimen/space_4">
 
     <Button
         android:id="@+id/btn_prev_page"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:minWidth="0dp"
         android:minHeight="32dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="@dimen/space_4"
         android:paddingVertical="0dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/pagination_page_one"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="@dimen/space_4"
         android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"/>
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:minWidth="0dp"
         android:minHeight="32dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="@dimen/space_4"
         android:paddingVertical="0dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"

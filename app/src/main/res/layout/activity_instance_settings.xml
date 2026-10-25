@@ -16,10 +16,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="15dp"
-            android:paddingBottom="24dp">
+            android:paddingStart="@dimen/space_6"
+            android:paddingEnd="@dimen/space_6"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_6">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -46,7 +46,7 @@
                         android:id="@+id/instance_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="@dimen/space_1"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
                         android:textAppearance="@style/TextAppearance.Glowberry.Label" />
@@ -57,7 +57,7 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:scrollbars="none"
                 android:overScrollMode="never">
 
@@ -71,7 +71,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="32dp"
-                        android:paddingHorizontal="16dp"
+                        android:paddingHorizontal="@dimen/space_4"
                         android:gravity="center"
                         android:text="@string/instance_tab_general"
                         android:fontFamily="@font/misans"
@@ -87,8 +87,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="32dp"
-                        android:layout_marginStart="8dp"
-                        android:paddingHorizontal="16dp"
+                        android:layout_marginStart="@dimen/space_2"
+                        android:paddingHorizontal="@dimen/space_4"
                         android:gravity="center"
                         android:text="@string/instance_tab_launch_options"
                         android:fontFamily="@font/misans"
@@ -103,8 +103,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="32dp"
-                        android:layout_marginStart="8dp"
-                        android:paddingHorizontal="16dp"
+                        android:layout_marginStart="@dimen/space_2"
+                        android:paddingHorizontal="@dimen/space_4"
                         android:gravity="center"
                         android:text="@string/instance_tab_management"
                         android:fontFamily="@font/misans"
@@ -119,7 +119,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="@dimen/space_6">
 
                 <LinearLayout
                     android:id="@+id/section_general"
@@ -133,7 +133,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.Chimera.Card.Compact"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="@dimen/space_4">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -148,8 +148,8 @@
                             android:id="@+id/edit_instance_name"
                             android:layout_width="match_parent"
                             android:layout_height="44dp"
-                            android:layout_marginTop="10dp"
-                            android:paddingHorizontal="14dp"
+                            android:layout_marginTop="@dimen/space_3"
+                            android:paddingHorizontal="@dimen/space_4"
                             android:background="@drawable/bg_search_field_light"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/on_surface"
@@ -161,7 +161,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="@dimen/space_2"
                             android:text="@string/instance_rename_hint"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
@@ -181,7 +181,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.Chimera.Card.Compact"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="@dimen/space_4">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -207,7 +207,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_isolation_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -225,7 +225,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/space_4"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -247,7 +247,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/launch_vertically_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -266,7 +266,7 @@
                             android:id="@+id/shader_compat_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/space_4"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -288,7 +288,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="Fixes shader/materialbin compatibility for resource packs"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -307,7 +307,7 @@
                             android:id="@+id/in_game_pack_changer_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/space_4"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -329,7 +329,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/in_game_pack_changer_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -348,7 +348,7 @@
                             android:id="@+id/bound_account_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/space_4"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -371,7 +371,7 @@
                                     android:id="@+id/bound_account_value"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_account_active"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -381,7 +381,7 @@
                                     android:id="@+id/bound_account_warning"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_account_stale"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/mod_menu_state_warn"
@@ -398,7 +398,7 @@
                                 android:backgroundTint="@color/secondary"
                                 android:text="@string/instance_account_change"
                                 android:textColor="@color/on_secondary"
-                                android:paddingHorizontal="16dp"
+                                android:paddingHorizontal="@dimen/space_4"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                 android:textStyle="bold"
                                 android:textAllCaps="false"
@@ -409,8 +409,8 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:layout_marginBottom="@dimen/space_4"
                             android:background="@color/divider"
                             android:alpha="0.3" />
 
@@ -438,7 +438,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_shortcut_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -451,7 +451,7 @@
                             android:id="@+id/shortcut_config"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="@dimen/space_4"
                             android:orientation="vertical">
 
                             <TextView
@@ -467,11 +467,11 @@
                                 android:id="@+id/edit_shortcut_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="44dp"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/space_2"
                                 android:background="@drawable/bg_search_field_light"
                                 android:fontFamily="@font/misans"
                                 android:importantForAutofill="no"
-                                android:paddingHorizontal="14dp"
+                                android:paddingHorizontal="@dimen/space_4"
                                 android:singleLine="true"
                                 android:textColor="@color/on_surface"
                                 android:textColorHint="@color/text_secondary"
@@ -480,7 +480,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="@dimen/space_3"
                                 android:text="@string/instance_shortcut_icon"
                                 android:fontFamily="@font/misans"
                                 android:textColor="@color/on_surface"
@@ -490,7 +490,7 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/space_2"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -507,10 +507,10 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:minHeight="36dp"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:backgroundTint="@color/primary"
                                     android:fontFamily="@font/misans"
-                                    android:paddingHorizontal="16dp"
+                                    android:paddingHorizontal="@dimen/space_4"
                                     android:text="@string/instance_shortcut_choose_icon"
                                     android:textAllCaps="false"
                                     android:textColor="@color/on_primary"
@@ -521,9 +521,9 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:minHeight="36dp"
-                                    android:layout_marginStart="8dp"
+                                    android:layout_marginStart="@dimen/space_2"
                                     android:fontFamily="@font/misans"
-                                    android:paddingHorizontal="14dp"
+                                    android:paddingHorizontal="@dimen/space_4"
                                     android:text="@string/instance_shortcut_default_icon"
                                     android:textAllCaps="false"
                                     android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
@@ -534,10 +534,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="40dp"
-                                android:layout_marginTop="14dp"
+                                android:layout_marginTop="@dimen/space_4"
                                 android:backgroundTint="@color/primary"
                                 android:fontFamily="@font/misans"
-                                android:paddingHorizontal="20dp"
+                                android:paddingHorizontal="@dimen/space_6"
                                 android:text="@string/instance_shortcut_add_button"
                                 android:textAllCaps="false"
                                 android:textColor="@color/on_primary"
@@ -558,7 +558,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.Chimera.Card.Compact"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="@dimen/space_4">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -572,7 +572,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="@dimen/space_hairline"
                             android:text="@string/instance_backup_desc"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
@@ -583,8 +583,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="36dp"
-                            android:layout_marginTop="14dp"
-                            android:paddingHorizontal="20dp"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:paddingHorizontal="@dimen/space_6"
                             android:text="@string/instance_backup_button"
                             android:fontFamily="@font/misans"
                             android:textAppearance="@style/TextAppearance.Glowberry.Label"
@@ -596,10 +596,10 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="@dimen/space_4"
                         style="@style/Widget.Chimera.Card.Compact"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="@dimen/space_4">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -613,7 +613,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="@dimen/space_hairline"
                             android:text="@string/instance_danger_zone_desc"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/text_secondary"
@@ -622,8 +622,8 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginTop="14dp"
-                            android:layout_marginBottom="14dp"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:layout_marginBottom="@dimen/space_4"
                             android:background="@color/divider"
                             android:alpha="0.3" />
 
@@ -651,7 +651,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_delete_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
@@ -660,7 +660,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_delete_warning"
                                     android:fontFamily="@font/misans"
                                     android:textColor="#E53935"
@@ -672,7 +672,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="36dp"
-                                android:paddingHorizontal="20dp"
+                                android:paddingHorizontal="@dimen/space_6"
                                 android:text="@string/delete"
                                 android:fontFamily="@font/misans"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Label"

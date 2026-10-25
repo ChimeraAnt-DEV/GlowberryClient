@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/space_4">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                 android:id="@+id/version_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/space_hairline"
                 android:fontFamily="@font/misans"
                 android:text="@string/not_found_version"
                 android:textColor="@color/text_secondary"
@@ -48,7 +48,7 @@
             android:id="@+id/import_content_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/space_2"
             android:backgroundTint="@color/primary"
             android:fontFamily="@font/misans"
             android:text="@string/import_content"
@@ -76,12 +76,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="56dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/space_3"
         style="@style/Widget.Chimera.Card.Compact"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="8dp">
+        android:paddingHorizontal="@dimen/space_3"
+        android:paddingVertical="@dimen/space_2">
 
         <TextView
             android:layout_width="0dp"
@@ -105,7 +105,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/space_3"
         android:orientation="vertical">
 
         <LinearLayout
@@ -119,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="80dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
+                android:layout_marginEnd="@dimen/space_2"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -135,7 +135,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:text="@string/worlds_category"
                     android:textColor="@color/on_surface"
@@ -150,7 +150,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="80dp"
                 android:layout_weight="1"
-                android:layout_marginHorizontal="3dp"
+                android:layout_marginHorizontal="@dimen/space_1"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -166,7 +166,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:text="@string/skin_packs_category"
                     android:textColor="@color/on_surface"
@@ -181,7 +181,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="80dp"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="@dimen/space_2"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -197,7 +197,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:text="@string/screenshots_category"
                     android:textColor="@color/on_surface"
@@ -211,7 +211,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_3"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -220,7 +220,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="80dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
+                android:layout_marginEnd="@dimen/space_2"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -236,7 +236,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:text="@string/resource_packs_category"
                     android:textColor="@color/on_surface"
@@ -251,7 +251,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="80dp"
                 android:layout_weight="1"
-                android:layout_marginHorizontal="3dp"
+                android:layout_marginHorizontal="@dimen/space_1"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -267,7 +267,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:text="@string/behavior_packs_category"
                     android:textColor="@color/on_surface"
@@ -282,7 +282,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="80dp"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="@dimen/space_2"
                 style="@style/Widget.Chimera.Card.Compact"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -298,7 +298,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:text="@string/servers_category"
                     android:textColor="@color/on_surface"

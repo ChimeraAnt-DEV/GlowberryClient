@@ -18,11 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="12dp"
+            android:paddingHorizontal="@dimen/space_4"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_3"
             style="@style/Widget.Chimera.Card"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/space_2"
             android:elevation="4dp"
             app:layout_scrollFlags="scroll">
 
@@ -30,7 +30,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="@dimen/space_3">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
                     android:text="@string/sort"
                     android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textColor="@color/on_surface"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="@dimen/space_3"
                     app:strokeColor="@color/divider"
                     app:icon="@drawable/ic_arrow_down" 
                     app:iconTint="@color/on_surface"
@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_search_box"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/space_4"
                 android:hint="@string/curseforge_search_hint"
                 android:textColorHint="@color/text_secondary"
                 android:textColor="@color/on_surface"
@@ -77,8 +77,8 @@
                 android:inputType="text"
                 android:drawableStart="@drawable/ic_search"
                 android:drawableTint="@color/on_surface"
-                android:drawablePadding="12dp"
-                android:layout_marginBottom="16dp"/>
+                android:drawablePadding="@dimen/space_3"
+                android:layout_marginBottom="@dimen/space_4"/>
 
             <!-- Horizontal Scrollable Categories -->
             <HorizontalScrollView
@@ -105,7 +105,7 @@
             android:id="@+id/mods_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
+            android:padding="@dimen/space_2"
             android:clipToPadding="false"/>
 
         <ProgressBar

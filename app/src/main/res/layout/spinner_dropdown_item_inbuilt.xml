@@ -5,6 +5,6 @@
     android:layout_height="wrap_content"
     android:textColor="#000000"
     android:textAppearance="@style/TextAppearance.Glowberry.Caption"
-    android:padding="10dp"
+    android:padding="@dimen/space_3"
     android:background="@color/secondary"
     android:fontFamily="@font/misans" />

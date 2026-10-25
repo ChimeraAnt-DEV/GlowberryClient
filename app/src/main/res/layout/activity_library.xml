@@ -23,9 +23,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="15dp">
+        android:paddingStart="@dimen/space_6"
+        android:paddingEnd="@dimen/space_6"
+        android:paddingTop="@dimen/space_4">
 
         <TextView
             android:id="@+id/library_title"
@@ -42,9 +42,9 @@
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:layout_marginTop="8dp"
+        android:paddingStart="@dimen/space_6"
+        android:paddingEnd="@dimen/space_6"
+        android:layout_marginTop="@dimen/space_2"
         android:scrollbars="none"
         android:overScrollMode="never">
 
@@ -58,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
-                android:paddingHorizontal="18dp"
+                android:paddingHorizontal="@dimen/space_4"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
                 android:text="@string/nav_instances"
@@ -74,8 +74,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
-                android:layout_marginStart="8dp"
-                android:paddingHorizontal="18dp"
+                android:layout_marginStart="@dimen/space_2"
+                android:paddingHorizontal="@dimen/space_4"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
                 android:text="@string/nav_installations"
@@ -90,8 +90,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
-                android:layout_marginStart="8dp"
-                android:paddingHorizontal="18dp"
+                android:layout_marginStart="@dimen/space_2"
+                android:paddingHorizontal="@dimen/space_4"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
                 android:text="@string/launch_toggle_replay"

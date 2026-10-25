@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="2dp">
+    android:padding="@dimen/space_hairline">
 
     <TextView
         android:layout_width="match_parent"
@@ -11,13 +11,13 @@
         android:text="@string/rename_version_message"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textAppearance="@style/TextAppearance.Glowberry.Body"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="@dimen/space_3"/>
 
     <EditText
         android:id="@+id/edit_version_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
+        android:padding="@dimen/space_3"
         android:textColor="?attr/colorOnSurface"
         android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:singleLine="true"
@@ -34,6 +34,6 @@
         android:textColor="#FF5252"
         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:visibility="gone"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="@dimen/space_1" />
 
 </LinearLayout>

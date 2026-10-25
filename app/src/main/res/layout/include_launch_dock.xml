@@ -22,8 +22,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_launch_dock"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp">
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingVertical="@dimen/space_4">
 
         <!--
             Profile on the left, version as a chip on the right (U15). The chip is the version
@@ -62,7 +62,7 @@
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="12dp">
+                android:paddingHorizontal="@dimen/space_3">
 
                 <TextView
                     android:id="@+id/text_minecraft_version"
@@ -79,7 +79,7 @@
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="@dimen/space_2"
                     android:src="@drawable/ic_arrow_down"
                     app:tint="@color/dock_text_secondary" />
             </LinearLayout>
@@ -90,7 +90,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="@dimen/space_3">
 
             <Button
                 android:id="@+id/launch_button"
@@ -129,7 +129,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_3"
             android:indeterminate="true"
             android:visibility="gone"
             android:indeterminateTint="@color/primary" />

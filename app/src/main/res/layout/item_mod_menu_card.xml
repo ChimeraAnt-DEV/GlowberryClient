@@ -16,10 +16,10 @@
     android:id="@+id/mod_card_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="6dp"
-    android:layout_marginTop="3dp"
-    android:layout_marginEnd="6dp"
-    android:layout_marginBottom="3dp"
+    android:layout_marginStart="@dimen/space_2"
+    android:layout_marginTop="@dimen/space_1"
+    android:layout_marginEnd="@dimen/space_2"
+    android:layout_marginBottom="@dimen/space_1"
     android:clickable="true"
     android:defaultFocusHighlightEnabled="false"
     android:focusable="false"
@@ -45,10 +45,10 @@
             android:minHeight="64dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="10dp">
+            android:paddingStart="@dimen/space_3"
+            android:paddingTop="@dimen/space_3"
+            android:paddingEnd="@dimen/space_3"
+            android:paddingBottom="@dimen/space_3">
 
             <FrameLayout
                 android:id="@+id/mod_card_icon_tile"
@@ -69,7 +69,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="@dimen/space_3"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -83,7 +83,7 @@
                         android:id="@+id/mod_card_status_dot"
                         android:layout_width="8dp"
                         android:layout_height="8dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="@dimen/space_2"
                         android:background="@drawable/bg_mod_status_dot"
                         android:visibility="gone" />
 
@@ -103,7 +103,7 @@
                     android:id="@+id/mod_card_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="@dimen/space_hairline"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/mod_menu_text_secondary"
@@ -114,7 +114,7 @@
                     android:id="@+id/mod_card_reason"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="@dimen/space_hairline"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/mod_menu_text_secondary"
@@ -125,7 +125,7 @@
                     android:id="@+id/mod_card_unavailable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:letterSpacing="0.08"
                     android:text="@string/mod_unavailable_message"
                     android:textColor="@color/mod_menu_state_error"
@@ -141,7 +141,7 @@
                 android:background="@drawable/bg_vip_icon_button"
                 android:contentDescription="@string/mod_menu_favorite"
                 android:defaultFocusHighlightEnabled="false"
-                android:padding="13dp"
+                android:padding="@dimen/space_3"
                 android:src="@drawable/ic_star"
                 android:tint="@color/mod_menu_text_secondary" />
 
@@ -151,7 +151,7 @@
                 android:id="@+id/mod_card_switch"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="@dimen/space_1"
                 android:contentDescription="@string/mod_status_disabled" />
 
             <!-- An action row's control (M3). Never shown on the same row as the switch. -->
@@ -159,8 +159,8 @@
                 android:id="@+id/mod_card_chevron"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:layout_marginStart="14dp"
-                android:layout_marginEnd="6dp"
+                android:layout_marginStart="@dimen/space_4"
+                android:layout_marginEnd="@dimen/space_2"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_chevron_right"
                 android:tint="@color/mod_menu_text_tertiary"
@@ -170,11 +170,11 @@
                 android:id="@+id/mod_card_config"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="@dimen/space_hairline"
                 android:background="@drawable/bg_vip_icon_button"
                 android:contentDescription="@string/vip_configure"
                 android:defaultFocusHighlightEnabled="false"
-                android:padding="13dp"
+                android:padding="@dimen/space_3"
                 android:src="@drawable/ic_settings"
                 android:tint="@color/mod_menu_text_secondary"
                 android:visibility="gone" />

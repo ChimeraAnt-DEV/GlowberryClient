@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/space_4">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,7 +21,7 @@
                 android:id="@+id/title_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="@dimen/space_3"
                 android:ellipsize="end"
                 android:fontFamily="@font/misans"
                 android:maxLines="1"
@@ -35,14 +35,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="@dimen/space_3"
                 android:background="@drawable/bg_search_box"
                 android:fontFamily="@font/misans"
                 android:hint="@string/search_options_hint"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:maxLines="1"
-                android:padding="10dp"
+                android:padding="@dimen/space_3"
                 android:textColor="@color/on_surface"
                 android:textColorHint="@color/on_surface"
                 android:textAppearance="@style/TextAppearance.Glowberry.Label" />
@@ -62,7 +62,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_3"
             android:layout_weight="1">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -71,7 +71,7 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:descendantFocusability="afterDescendants"
-                android:padding="4dp" />
+                android:padding="@dimen/space_1" />
 
             <ProgressBar
                 android:id="@+id/loading_progress"

@@ -5,20 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="56dp"
-    android:paddingHorizontal="4dp"
-    android:paddingVertical="8dp"
+    android:paddingHorizontal="@dimen/space_1"
+    android:paddingVertical="@dimen/space_2"
     android:gravity="center_vertical">
 
     <ImageView
         android:id="@+id/drag_handle"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="@dimen/space_3"
         android:src="@drawable/ic_drag_handle"
         android:contentDescription="@string/drag_to_reorder"
         android:alpha="0.6"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="4dp"/>
+        android:padding="@dimen/space_1"/>
 
     <LinearLayout
         android:layout_width="220dp"
@@ -52,11 +52,11 @@
             android:id="@+id/mod_kind"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:background="@drawable/bg_mod_kind_badge"
             android:fontFamily="@font/misans"
-            android:paddingHorizontal="7dp"
-            android:paddingVertical="2dp"
+            android:paddingHorizontal="@dimen/space_2"
+            android:paddingVertical="@dimen/space_hairline"
             android:textColor="@color/text_secondary"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:visibility="gone" />
@@ -65,11 +65,11 @@
             android:id="@+id/mod_failure_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:background="@drawable/bg_mod_failure_badge"
             android:fontFamily="@font/misans"
-            android:paddingHorizontal="7dp"
-            android:paddingVertical="2dp"
+            android:paddingHorizontal="@dimen/space_2"
+            android:paddingVertical="@dimen/space_hairline"
             android:text="@string/mod_load_failed_badge"
             android:textColor="?attr/colorOnErrorContainer"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
@@ -80,11 +80,11 @@
             android:id="@+id/mod_config_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:background="@drawable/bg_mod_page_badge"
             android:fontFamily="@font/misans"
-            android:paddingHorizontal="7dp"
-            android:paddingVertical="2dp"
+            android:paddingHorizontal="@dimen/space_2"
+            android:paddingVertical="@dimen/space_hairline"
             android:text="@string/mod_config_badge"
             android:textColor="@color/primary"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
@@ -95,11 +95,11 @@
             android:id="@+id/mod_verified_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:background="@drawable/bg_mod_verified_badge"
             android:fontFamily="@font/misans"
-            android:paddingHorizontal="7dp"
-            android:paddingVertical="2dp"
+            android:paddingHorizontal="@dimen/space_2"
+            android:paddingVertical="@dimen/space_hairline"
             android:text="@string/mod_verified_badge"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold"
@@ -109,7 +109,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="@dimen/space_8"
         android:layout_weight="1"
         android:orientation="horizontal">
 
@@ -128,7 +128,7 @@
             android:id="@+id/mod_version"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="@dimen/space_6"
             android:layout_weight="1"
             android:ellipsize="end"
             android:fontFamily="@font/misans"
@@ -142,5 +142,5 @@
         android:id="@+id/mod_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"/>
+        android:layout_marginStart="@dimen/space_3"/>
 </LinearLayout>

@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
-    android:layout_marginTop="3dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginBottom="3dp"
+    android:layout_marginStart="@dimen/space_1"
+    android:layout_marginTop="@dimen/space_1"
+    android:layout_marginEnd="@dimen/space_1"
+    android:layout_marginBottom="@dimen/space_1"
     android:defaultFocusHighlightEnabled="false"
     app:cardBackgroundColor="@color/mod_menu_bg_surface2"
     app:cardCornerRadius="@dimen/radius_chip"
@@ -30,10 +30,10 @@
             android:gravity="center_vertical"
             android:minHeight="54dp"
             android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="4dp">
+            android:paddingStart="@dimen/space_2"
+            android:paddingTop="@dimen/space_1"
+            android:paddingEnd="@dimen/space_2"
+            android:paddingBottom="@dimen/space_1">
 
             <ImageView
                 android:id="@+id/mod_card_icon"
@@ -43,7 +43,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="@dimen/space_2"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -57,7 +57,7 @@
                         android:id="@+id/mod_card_status_dot"
                         android:layout_width="7dp"
                         android:layout_height="7dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginEnd="@dimen/space_1"
                         android:background="@drawable/bg_mod_status_dot"
                         android:visibility="gone" />
 
@@ -76,7 +76,7 @@
                     android:id="@+id/mod_card_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
+                    android:layout_marginTop="@dimen/space_divider"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/mod_menu_text_secondary"
@@ -87,7 +87,7 @@
                     android:id="@+id/mod_card_reason"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
+                    android:layout_marginTop="@dimen/space_divider"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/mod_menu_text_secondary"
@@ -98,12 +98,12 @@
                     android:id="@+id/mod_card_unavailable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="@dimen/space_hairline"
                     android:background="@drawable/bg_mod_unavailable"
                     android:gravity="center"
                     android:minHeight="20dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
+                    android:paddingStart="@dimen/space_2"
+                    android:paddingEnd="@dimen/space_2"
                     android:text="@string/mod_unavailable_message"
                     android:textColor="@color/mod_menu_state_error"
                     android:textAppearance="@style/TextAppearance.Glowberry.Micro"
@@ -118,7 +118,7 @@
                 android:id="@+id/mod_card_switch"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="@dimen/space_1"
                 android:contentDescription="@string/mod_status_disabled" />
 
             <!-- M3: an action row's control. Never shown with the switch. -->
@@ -126,7 +126,7 @@
                 android:id="@+id/mod_card_chevron"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="@dimen/space_3"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_chevron_right"
                 android:tint="@color/mod_menu_text_tertiary"
@@ -136,10 +136,10 @@
                 android:id="@+id/mod_card_config"
                 android:layout_width="27dp"
                 android:layout_height="27dp"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="@dimen/space_hairline"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:defaultFocusHighlightEnabled="false"
-                android:padding="5dp"
+                android:padding="@dimen/space_1"
                 android:src="@drawable/ic_settings"
                 android:tint="@color/mod_menu_text_secondary" />
 
@@ -149,7 +149,7 @@
                 android:layout_height="27dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:defaultFocusHighlightEnabled="false"
-                android:padding="5dp"
+                android:padding="@dimen/space_1"
                 android:src="@drawable/ic_star"
                 android:tint="@color/mod_menu_text_secondary" />
 
