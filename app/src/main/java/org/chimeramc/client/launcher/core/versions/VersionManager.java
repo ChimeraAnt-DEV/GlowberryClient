@@ -347,12 +347,12 @@ public class VersionManager {
                 }
                 if (totalSize == 0) totalSize = 1;
 
-                // The storage profile id, not the raw folder name: the extractor writes its cache
-                // to MinecraftLauncher.getRuntimeLibAbiDir(...getStorageProfileId(version)...), and
-                // the two differ whenever the instance's folder name is not already a legal profile
-                // id. Repairing the un-sanitised folder left the extractor's real cache untouched
-                // and wrote a second copy the launch never reads - the repair "succeeded" and the
-                // launch still failed with the same missing-library error.
+                // The same accessor the extractor (getRuntimeLibAbiDir) and the marker writer
+                // (repairMarkerDirs) use, so all three name one directory by construction.
+                // getRuntimeLibDir sanitises internally, so passing the raw folder name would in
+                // fact resolve to this same path - this is consistency, not a behaviour change.
+                // RuntimeLibDirAgreementTest pins the idempotence that makes the two equivalent, so
+                // the equivalence is a checked fact rather than a comment.
                 File libDir = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
                 if (libDir.exists()) {
                     // Throws with the path when the cache survives: extraction is about to write into

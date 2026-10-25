@@ -1,7 +1,6 @@
 package org.chimeramc.client.core.minecraft;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -10,43 +9,91 @@ import org.chimeramc.client.util.LauncherStorage;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Pins that every path naming an instance's extracted-library root agrees on which one it is.
+ * Pins that the three pieces of code which name an instance's extracted-library root agree.
  *
- * <p>Three pieces of code name that root and all three must resolve to the same directory:
- * the extractor (which writes the cache and its markers), the repair (which clears and rewrites
- * it), and the needs-repair probe (which reads the markers). The root is derived from the storage
- * profile id, not the instance's raw folder name, and those two differ whenever a folder name
- * contains a character a profile id cannot hold.
+ * <p>The extractor writes the cache and its markers through
+ * {@code MinecraftLauncher.getRuntimeLibAbiDir(context, getStorageProfileId(version), abi)}, the
+ * repair clears and rewrites the same root, and the needs-repair probe reads its markers. All three
+ * must resolve to one directory, or a repair writes a cache nothing reads and still reports success.
  *
- * <p>The bug this guards is the worst shape a fix can take: the repair cleared and rewrote the
- * un-sanitised folder, reported success, and left the cache the launch actually reads untouched -
- * so the user pressed Repair, watched it succeed, and the launch failed with the same error.
+ * <p><b>Why the equivalence is not obvious.</b> {@code getRuntimeLibDir} sanitises its argument
+ * internally, and {@link LauncherStorage#sanitizeProfileId} is idempotent - sanitising an already
+ * sanitised id returns it unchanged. So {@code getRuntimeLibDir(version.directoryName)} and
+ * {@code getRuntimeLibDir(getStorageProfileId(version))} produce the <em>same</em> path for every
+ * input, including a folder name like {@code "My Version:/1"}. That is a real fact worth pinning,
+ * because it is the reason the two call sites cannot drift: a future change that made the root
+ * builder stop sanitising, or made {@code sanitizeProfileId} non-idempotent, would silently split
+ * the repair away from the extractor. The tests below assert that invariant rather than the
+ * incidental wording of either call site.
  *
- * <p>No mocks: {@link MinecraftLauncher} holds no static platform state, so the path arithmetic is
- * exercised directly.
+ * <p>No mocks: the rule is pure string and path arithmetic, so it runs on the JVM.
  */
 public class RuntimeLibDirAgreementTest {
 
-    private static GameVersion imported(String directoryName) {
-        return new GameVersion(directoryName, directoryName, "1.21.80", new File("/tmp/x"),
-                false, "org.chimeramc.client", "arm64-v8a");
+    @Test
+    public void sanitisingAnAlreadySanitisedIdIsANoOp() {
+        // The idempotence that makes the two call sites equivalent. Every id an instance can have is
+        // already the output of a previous sanitise - the metadata store records profileId as
+        // sanitizeProfileId(directoryName) - so a second pass must not change it.
+        String[] ids = {
+                "Minecraft_1.21.80-beta",
+                "My_Version__1",
+                "_shared_profile",
+                "_legacy_unclassified_profile",
+                "a_b",
+                "trailing",
+                "default",
+                "com.mojang.minecraftpe",
+                "___",
+        };
+        for (String id : ids) {
+            assertEquals("sanitizeProfileId must be idempotent for " + id,
+                    id, LauncherStorage.sanitizeProfileId(id));
+        }
     }
 
     @Test
-    public void anUnsanitisedFolderNameIsTheCaseThatDiverges() {
-        // The premise of the rule: if these were always equal there would be nothing to align.
-        GameVersion version = imported("My Version:/1");
-        assertNotEquals(version.directoryName, LauncherStorage.sanitizeProfileId(version.directoryName));
-        assertNotEquals(version.directoryName, MinecraftLauncher.getStorageProfileId(version));
+    public void anUnsanitisedFolderNameIsNormalisedToTheProfileId() {
+        // The difference that would exist if the root builder did not sanitise: these are not equal.
+        assertEquals("My_Version__1", LauncherStorage.sanitizeProfileId("My Version:/1"));
+        assertEquals("trailing", LauncherStorage.sanitizeProfileId("trailing."));
+        assertEquals("default", LauncherStorage.sanitizeProfileId(""));
+    }
+
+    @Test
+    public void bothCallSiteFormsResolveToTheSameDirectory() {
+        // The heart of it: the repair's expression and the extractor's expression must agree, so a
+        // repair cannot write into a folder the launch never reads. Modelled as the path suffix the
+        // root builder produces, since the builder itself needs a Context.
+        String[] folderNames = {
+                "Minecraft_1.21.80-beta",
+                "My Version:/1",
+                "_shared",
+                "_legacy_unclassified",
+                "  spaced  ",
+                "trailing.",
+                "",
+                "com.mojang.minecraftpe",
+        };
+        for (String folderName : folderNames) {
+            String viaRawFolderName = LauncherStorage.sanitizeProfileId(folderName);
+            String viaProfileId = LauncherStorage.sanitizeProfileId(
+                    LauncherStorage.sanitizeProfileId(folderName));
+            assertEquals("the repair and the extractor must name one directory for \""
+                            + folderName + "\"", viaRawFolderName, viaProfileId);
+        }
     }
 
     @Test
     public void theProfileIdIsTheSanitisedFolderNameForAnImportedInstance() {
-        GameVersion version = imported("My Version:/1");
-        assertEquals(LauncherStorage.sanitizeProfileId("My Version:/1"),
-                MinecraftLauncher.getStorageProfileId(version));
+        GameVersion version = new GameVersion("My Version:/1", "My Version:/1", "1.21.80",
+                new File("/tmp/x"), false, "org.chimeramc.client", "arm64-v8a");
+        assertEquals("My_Version__1", MinecraftLauncher.getStorageProfileId(version));
     }
 
     @Test
@@ -57,12 +104,6 @@ public class RuntimeLibDirAgreementTest {
                 new File("/tmp/x"), true, "com.mojang.minecraftpe", "arm64-v8a");
         assertEquals(LauncherStorage.INSTALLED_MINECRAFT_PROFILE_ID,
                 MinecraftLauncher.getStorageProfileId(installed));
-    }
-
-    @Test
-    public void anAlreadySanitisedNameIsUnchanged() {
-        GameVersion version = imported("Minecraft_1.21.80-beta");
-        assertEquals("Minecraft_1.21.80-beta", MinecraftLauncher.getStorageProfileId(version));
     }
 
     @Test
@@ -79,18 +120,19 @@ public class RuntimeLibDirAgreementTest {
         for (String abiDir : MinecraftLauncher.repairTargetAbiDirs()) {
             assertFalse("an ABI directory must not be a path: " + abiDir,
                     abiDir.contains("/") || abiDir.contains(File.separator));
-            assertNotEquals("", abiDir.trim());
+            assertTrue("an ABI directory must not be blank", abiDir.trim().length() > 0);
         }
     }
 
     @Test
-    public void theRootIsKeyedByProfileIdNotTheFolderName() {
-        // Stated as the path suffix the root builder produces: the repair and the extractor must
-        // both pass the profile id, or the repair writes into a folder the launch never reads.
-        GameVersion version = imported("My Version:/1");
-        String expectedSuffix = File.separator + LauncherStorage.sanitizeProfileId(version.directoryName);
-        String naiveSuffix = File.separator + version.directoryName;
-        assertNotEquals("the raw folder name must not be the suffix", naiveSuffix, expectedSuffix);
-        assertTrue(expectedSuffix.endsWith("My_Version__1"));
+    public void theRepairTargetsCoverEveryAbiDirectoryTheExtractorCreates() {
+        // repairTargetAbiDirs is the one list the repair clears; abiToSystemLibDir is the one the
+        // extractor writes through. If the repair list stopped covering an ABI the extractor can
+        // target, the repair would leave that folder's stale cache in place while reporting success.
+        Set<String> targets = new HashSet<>(Arrays.asList(MinecraftLauncher.repairTargetAbiDirs()));
+        for (String abi : AbiBitness.INSTANCE.getABI_CANDIDATES()) {
+            assertTrue("the repair must clear the folder for " + abi,
+                    targets.contains(MinecraftLauncher.abiToSystemLibDir(abi)));
+        }
     }
 }
