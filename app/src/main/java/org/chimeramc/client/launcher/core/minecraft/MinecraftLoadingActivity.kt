@@ -158,7 +158,17 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
                     updateProgress(100, getString(R.string.minecraft_loading_complete), getString(R.string.minecraft_loading_entering_game))
                     trace.milestone("Entering game")
                     appendLog("Entering Minecraft")
-                    showSkippedIncompatibleModsIfNeeded(preparedRuntime, gameIntent)
+                    // Starting the game activity is the last thing that can fail, and it failed
+                    // outside any guard: a throw from startActivity (a missing target, a
+                    // TransactionTooLarge, an OOM while the game activity inflated) unwound through
+                    // the main thread and killed the process, so the user saw the app vanish with
+                    // no message at all. It is contained here and reported through the same
+                    // cause-naming path every other launch failure uses.
+                    try {
+                        showSkippedIncompatibleModsIfNeeded(preparedRuntime, gameIntent)
+                    } catch (throwable: Throwable) {
+                        showFailure(throwable)
+                    }
                 }
             } catch (throwable: Throwable) {
                 mainHandler.post {
