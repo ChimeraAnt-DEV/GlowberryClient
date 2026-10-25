@@ -346,7 +346,11 @@ public class JavaBridgeActivity extends BaseActivity {
                 });
                 return;
             }
-            JavaPorter.Result result = porter.port(jar, outputDir);
+            // The loading overlay is only ever cleared from the post below, so an escaping throw
+            // (the CFR decompiler is memory-hungry and a large jar can exhaust the heap) left the
+            // spinner up forever with the Port button unusable. The failure is converted to a
+            // result the same post can render.
+            final JavaPorter.Result result = portSafely(porter, jar, outputDir);
             main.post(() -> {
                 if (isFinishing()) return;
                 showLoading(false);
@@ -361,6 +365,26 @@ public class JavaBridgeActivity extends BaseActivity {
                 showReviewDialog(result);
             });
         });
+    }
+
+    /**
+     * Runs the port, converting an escaping throw into a failure result.
+     *
+     * <p>The loading overlay is only cleared from the post that renders the result, so a throw
+     * escaping this call (the CFR decompiler is memory-hungry and a large jar can exhaust the
+     * heap) left the spinner up forever with the Port button unusable. The failure is named and
+     * returned as a result so the same post can render it.
+     */
+    private JavaPorter.Result portSafely(JavaPorter porter, File jar, File outputDir) {
+        try {
+            return porter.port(jar, outputDir);
+        } catch (Throwable t) {
+            String detail = t.getMessage();
+            if (detail == null || detail.trim().isEmpty()) {
+                detail = t.getClass().getSimpleName();
+            }
+            return JavaPorter.Result.failure(null, detail);
+        }
     }
 
     /**
@@ -426,10 +450,22 @@ public class JavaBridgeActivity extends BaseActivity {
 
     private void enablePortedMod(File packageFile) {
         executor.execute(() -> {
-            AntEggLoader.LoadResult load = AntEggLoader.loadMod(this, packageFile);
+            // The button's only feedback is the toast below, so an escaping throw left the press
+            // with no visible result at all. The failure is named instead.
+            final boolean loaded;
+            try {
+                loaded = AntEggLoader.loadMod(this, packageFile).success;
+            } catch (Throwable t) {
+                main.post(() -> {
+                    if (isFinishing()) return;
+                    Toast.makeText(this, R.string.javabridge_load_failed, Toast.LENGTH_LONG).show();
+                });
+                return;
+            }
+            final boolean success = loaded;
             main.post(() -> {
                 if (isFinishing()) return;
-                Toast.makeText(this, load.success ? R.string.javabridge_port_success
+                Toast.makeText(this, success ? R.string.javabridge_port_success
                         : R.string.javabridge_load_failed, Toast.LENGTH_LONG).show();
             });
         });
