@@ -302,4 +302,16 @@ public class ModrinthDetailActivity extends BaseActivity {
         }
         return String.valueOf(value);
     }
+
+    @Override
+    protected void onDestroy() {
+        // The importer owns a single-thread executor; without this its thread outlives the screen.
+        if (contentImporter != null) {
+            contentImporter.shutdown();
+            contentImporter = null;
+        }
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
+
 }

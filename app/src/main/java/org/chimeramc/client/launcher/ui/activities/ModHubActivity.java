@@ -493,4 +493,17 @@ public class ModHubActivity extends BaseActivity {
                 new File(gameDataDir, "minecraftWorlds")
         };
     }
+
+    @Override
+    protected void onDestroy() {
+        // The importer owns a single-thread executor; without this its thread outlives the screen
+        // and stays parked for the life of the process.
+        if (contentImporter != null) {
+            contentImporter.shutdown();
+            contentImporter = null;
+        }
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
+
 }

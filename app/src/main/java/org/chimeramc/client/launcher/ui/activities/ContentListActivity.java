@@ -103,6 +103,12 @@ public class ContentListActivity extends BaseActivity {
     private final java.util.Set<String> pingedServerKeys = new java.util.HashSet<>();
 
     private void showProgressDialog(String message) {
+        // Showing a dialog on a finishing Activity throws WindowManager.BadTokenException, which
+        // took the screen down instead of reporting whatever it was about to report. The operation
+        // still runs; only the dialog is skipped.
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
         if (progressDialog == null) {
             progressDialog = new org.chimeramc.client.ui.dialogs.LoadingDialog(this);
         }
@@ -1234,5 +1240,14 @@ public class ContentListActivity extends BaseActivity {
             pingExecutor.shutdownNow();
             pingExecutor = null;
         }
+        // The screenshots adapter owns a decode pool; without this its four worker threads outlive
+        // the screen and stay parked for the life of the process.
+        if (screenshotsAdapter != null) {
+            screenshotsAdapter.shutdown();
+            screenshotsAdapter = null;
+        }
+        // A dialog still attached to a destroyed Activity is the "Activity has leaked window"
+        // crash; it also trapped the user, because nothing could dismiss it once the owner was gone.
+        hideProgressDialog();
     }
 }

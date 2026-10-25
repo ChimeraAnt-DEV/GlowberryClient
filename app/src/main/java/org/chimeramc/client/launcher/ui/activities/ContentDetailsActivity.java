@@ -115,6 +115,11 @@ public class ContentDetailsActivity extends BaseActivity {
         }
         // The download executor is Activity-scoped; without this its thread outlives the screen.
         downloadExecutor.shutdownNow();
+        // The importer owns its own executor too; it was the one this screen never shut down.
+        if (contentImporter != null) {
+            contentImporter.shutdown();
+            contentImporter = null;
+        }
         super.onDestroy();
     }
 
