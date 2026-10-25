@@ -74,11 +74,19 @@ public class ApkInstaller {
                 lastPostedProgress = -1;
                 postProgress(0);
                 File metadataDir = LauncherStorage.getProfileMetadataDir(context, dirName);
-                if (metadataDir.exists() && !deleteDir(metadataDir))
+                // A failed delete used to `return` with no callback at all. The caller shows a
+                // modal progress dialog and only dismisses it from onSuccess/onError, so the
+                // dialog stayed on screen forever with no error and no way out - the user had to
+                // kill the launcher. Every abort path now reports a named cause.
+                if (metadataDir.exists() && !deleteDir(metadataDir)) {
+                    postError(context.getString(R.string.import_error_clear_failed));
                     return;
+                }
                 File externalDir = LauncherStorage.getVersionDir(context, dirName);
-                if (externalDir.exists() && !deleteDir(externalDir))
+                if (externalDir.exists() && !deleteDir(externalDir)) {
+                    postError(context.getString(R.string.import_error_clear_failed));
                     return;
+                }
                 postProgress(5);
 
                 File libTargetDir = MinecraftLauncher.getRuntimeLibDir(context, dirName);
@@ -87,7 +95,7 @@ public class ApkInstaller {
                 }
                 File baseDir = externalDir;
                 if (!baseDir.exists() && !baseDir.mkdirs()) {
-                    postError("Open base dir failed");
+                    postError(context.getString(R.string.import_error_create_dir));
                     return;
                 }
 
@@ -100,7 +108,7 @@ public class ApkInstaller {
 
                     try (InputStream rawInput = openInput(apkOrApksUri)) {
                         if (rawInput == null) {
-                            postError("Open apks failed");
+                            postError(context.getString(R.string.import_error_open_package));
                             return;
                         }
                         CountingInputStream countingInput = new CountingInputStream(rawInput);
@@ -151,7 +159,7 @@ public class ApkInstaller {
                         }
                     }
                     if (!foundBaseApk) {
-                        postError("No base.apk found in APKS bundle");
+                        postError(context.getString(R.string.import_error_no_base_apk));
                         return;
                     }
                 } else {
@@ -159,7 +167,7 @@ public class ApkInstaller {
                     try (InputStream is = openInput(apkOrApksUri);
                          OutputStream os = new FileOutputStream(dstApkFile)) {
                         if (is == null) {
-                            postError("Open apk failed");
+                            postError(context.getString(R.string.import_error_open_package));
                             return;
                         }
                         long[] copied = {0};
@@ -191,7 +199,13 @@ public class ApkInstaller {
                 postSuccess(versionName);
 
             } catch (Exception e) {
-                postError("Install error: " + e.getMessage());
+                // Name the cause instead of pasting the exception. "Install error: null" was a
+                // real report: an IOException with no message produced a toast with no
+                // information in it. UserFacingError classifies the failure (out of space,
+                // permission denied, damaged package, ...) into an actionable sentence; the
+                // classifier's own fallback keeps the raw text for the bug report.
+                postError(org.chimeramc.client.launcher.core.minecraft.UserFacingError
+                        .describe(context, e));
             } finally {
                 // A half-written version directory is not inert: the instance list treats any
                 // folder holding base.apk.chimera as an installed instance, so a failed import

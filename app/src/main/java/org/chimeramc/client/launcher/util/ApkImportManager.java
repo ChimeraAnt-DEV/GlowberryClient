@@ -73,7 +73,17 @@ public class ApkImportManager {
 
     /** Imports [apkUri] directly, using [versionName] instead of asking for it. */
     public void importUri(Uri apkUri, String versionName) {
-        if (apkUri == null) return;
+        if (apkUri == null) {
+            // Silent return left the modal progress dialog the caller just showed on screen with
+            // nothing driving it. Report instead, so every abort path closes the dialog.
+            if (importFailedListener != null) {
+                importFailedListener.onImportFailed(
+                        activity.getString(R.string.import_error_open_package), versionName);
+            } else {
+                Toast.makeText(activity, R.string.import_error_open_package, Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
         showProgress();
         ApkInstaller installer = new ApkInstaller(activity, importExecutor, new ApkInstaller.InstallCallback() {
             @Override
@@ -161,6 +171,7 @@ public class ApkImportManager {
                                 activity.runOnUiThread(() -> {
                                     if (released) return;
                                     dismissProgress();
+                                    if (activity.isFinishing() || activity.isDestroyed()) return;
                                     Toast.makeText(
                                             activity,
                                             activity.getString(R.string.install_done, versionName),
@@ -178,6 +189,10 @@ public class ApkImportManager {
                                 activity.runOnUiThread(() -> {
                                     if (released) return;
                                     dismissProgress();
+                                    if (activity.isFinishing() || activity.isDestroyed()) return;
+                                    // The named cause from the installer is shown as-is; the
+                                    // previous "Install error: <raw>" toast could read
+                                    // "Install error: null" and told the user nothing.
                                     Toast.makeText(activity, errorMsg, Toast.LENGTH_LONG).show();
                                 });
                             }

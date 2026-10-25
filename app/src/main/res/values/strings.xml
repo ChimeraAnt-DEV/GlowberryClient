@@ -129,6 +129,10 @@
     <string name="not_mc_apk">Not a Minecraft APK</string>
     <string name="not_apk_or_apks">Please select an APK or APKS file</string>
     <string name="import_error_32bit_only">This version only contains 32-bit (armeabi-v7a) libraries. The launcher only supports 64-bit (arm64) versions, so it cannot be installed.</string>
+    <string name="import_error_clear_failed">The launcher could not clear the existing files for this instance. Close any other app that may be using them, then try again. If it keeps failing, delete the instance from the Instances tab first.</string>
+    <string name="import_error_create_dir">The launcher could not create the folder for this instance. Free some storage space and check that GlowberryClient has file access in Android Settings, then try again.</string>
+    <string name="import_error_open_package">The selected package could not be opened for reading. It may have been moved or deleted since you picked it. Pick the file again and retry.</string>
+    <string name="import_error_no_base_apk">This bundle does not contain a base APK, so it is not a valid Minecraft package. Download it again from the source, or pick a different file.</string>
 
     <string name="not_found_version">No version found</string>
 
