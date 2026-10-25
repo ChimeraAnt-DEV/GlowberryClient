@@ -40,6 +40,12 @@ public class ContentManagementActivity extends BaseActivity {
     private org.chimeramc.client.ui.dialogs.LoadingDialog progressDialog;
 
     private void showProgressDialog(String message) {
+        // Showing a dialog on a finishing Activity throws WindowManager.BadTokenException, which
+        // took the screen down instead of reporting whatever it was about to report. The operation
+        // still runs; only the dialog is skipped.
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
         if (progressDialog == null) {
             progressDialog = new org.chimeramc.client.ui.dialogs.LoadingDialog(this);
         }
@@ -350,5 +356,8 @@ public class ContentManagementActivity extends BaseActivity {
         if (contentImporter != null) {
             contentImporter.shutdown();
         }
+        // A dialog still attached to a destroyed Activity is the "Activity has leaked window"
+        // crash, and it trapped the user because nothing could dismiss it once the owner was gone.
+        hideProgressDialog();
     }
 }
