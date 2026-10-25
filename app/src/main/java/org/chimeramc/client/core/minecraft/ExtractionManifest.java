@@ -1,6 +1,9 @@
 package org.chimeramc.client.core.minecraft;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -53,7 +56,8 @@ public final class ExtractionManifest {
      * @param imageGuardToken  the native-image guard token the files were prepared with
      * @param mode             {@code isolated} for an imported instance, {@code installed} otherwise
      * @param httpClientLoaded whether the version-gated HTTP client library was included
-     * @param apkFiles         the packages, in the order they were read
+     * @param apkFiles         the packages; the order is canonicalised, so a caller's collection
+     *                         order cannot change the text
      */
     public static String build(int extractorVersion,
                               String abi,
@@ -67,18 +71,40 @@ public final class ExtractionManifest {
         builder.append("token=").append(imageGuardToken).append('\n');
         builder.append("mode=").append(mode).append('\n');
         builder.append("http=").append(httpClientLoaded).append('\n');
-        if (apkFiles != null) {
-            for (ApkEntry entry : apkFiles) {
-                if (entry == null) continue;
-                builder.append("apk=")
-                        .append(entry.path)
-                        .append('|')
-                        .append(entry.length)
-                        .append('|')
-                        .append(entry.lastModified)
-                        .append('\n');
-            }
+        for (ApkEntry entry : canonical(apkFiles)) {
+            builder.append("apk=")
+                    .append(entry.path)
+                    .append('|')
+                    .append(entry.length)
+                    .append('|')
+                    .append(entry.lastModified)
+                    .append('\n');
         }
         return builder.toString();
+    }
+
+    /**
+     * The entries in a fixed order, with nulls dropped.
+     *
+     * <p>The manifest identifies a <em>set</em> of packages, and the two callers collect that set
+     * differently: the extractor sorts its list, while the repair walks the instance directory and
+     * takes the splits in whatever order the file system returns. Comparing the two by string
+     * equality made that ordering difference alone look like a changed cache - the repair's write
+     * was discarded and the package re-extracted, the exact waste the repair was meant to save.
+     * Canonicalising here rather than at each call site means no future caller can reintroduce it.
+     */
+    private static List<ApkEntry> canonical(List<ApkEntry> apkFiles) {
+        if (apkFiles == null || apkFiles.isEmpty()) return Collections.emptyList();
+        List<ApkEntry> entries = new ArrayList<>(apkFiles.size());
+        for (ApkEntry entry : apkFiles) {
+            if (entry != null) entries.add(entry);
+        }
+        Collections.sort(entries, new Comparator<ApkEntry>() {
+            @Override
+            public int compare(ApkEntry a, ApkEntry b) {
+                return a.path.compareTo(b.path);
+            }
+        });
+        return entries;
     }
 }

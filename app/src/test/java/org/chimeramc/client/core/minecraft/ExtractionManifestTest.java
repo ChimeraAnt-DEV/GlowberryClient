@@ -78,13 +78,26 @@ public class ExtractionManifestTest {
     }
 
     @Test
-    public void theApkOrderIsPreserved() {
-        // A reordered list is a different manifest on purpose: the packages were read in a
-        // different order, so the cache was built differently.
+    public void theApkOrderDoesNotChangeTheManifest() {
+        // The two callers collect the same set of packages in different orders: the extractor sorts
+        // its list, the repair walks the instance directory and takes the splits as the file system
+        // returns them. Comparing by string equality made that ordering difference alone look like a
+        // changed cache, so the repair's write was discarded and the package re-extracted - the
+        // exact waste the repair was meant to save. The order is canonicalised here, so the two
+        // callers cannot disagree.
         String reversed = ExtractionManifest.build(5, "arm64-v8a", "guard-token", "isolated", true,
                 Arrays.asList(APKS.get(1), APKS.get(0)));
-        assertNotEquals(sample(), reversed);
-        assertTrue(reversed.indexOf("config.arm64") < reversed.indexOf("base.apk.chimera"));
+        assertEquals(sample(), reversed);
+    }
+
+    @Test
+    public void theCanonicalOrderIsByPath() {
+        // Named so a future change to the sort key is a deliberate decision, not an accident: the
+        // manifest must be stable for a given set of packages, and path is the only field that
+        // identifies one.
+        String text = ExtractionManifest.build(5, "arm64-v8a", "guard-token", "isolated", true,
+                Arrays.asList(APKS.get(1), APKS.get(0)));
+        assertTrue(text.indexOf("base.apk.chimera") < text.indexOf("config.arm64"));
     }
 
     @Test
