@@ -44,6 +44,30 @@ public class WorldManager {
         this.executor = Executors.newSingleThreadExecutor();
     }
 
+    /**
+     * Submits world work, closing the race the bare {@code isShutdown()} check left open.
+     *
+     * <p>{@code if (executor.isShutdown()) return;} followed by {@code executor.execute(...)} is a
+     * check-then-act: {@link #shutdown()} can run between the two on another thread (the user backs
+     * out of the screen while a world operation is starting), and submitting to a shut-down executor
+     * throws {@link java.util.concurrent.RejectedExecutionException} on the calling - main - thread.
+     * The check is kept as a fast path so a shut-down manager still reports a cause, and the catch is
+     * what makes the race harmless.
+     */
+    private boolean submit(Runnable work, WorldOperationCallback callback) {
+        if (executor.isShutdown()) {
+            callback.onError("WorldManager has been shut down");
+            return false;
+        }
+        try {
+            executor.execute(work);
+            return true;
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            callback.onError("WorldManager has been shut down");
+            return false;
+        }
+    }
+
     public void setCurrentVersion(GameVersion version) {
         if (version != null && version.versionDir != null) {
             this.worldsDirectory = new File(
@@ -86,11 +110,7 @@ public class WorldManager {
     }
 
     public void importWorld(Uri worldUri, WorldOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("WorldManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 if (worldsDirectory == null) {
                     callback.onError("No version selected");
@@ -135,19 +155,18 @@ public class WorldManager {
                     }
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: these handlers are the only thing that answers
+                // the callback, and a world copy is a large allocation - an OutOfMemoryError
+                // skipped them, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to import world", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Import failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 
     public void exportWorld(WorldItem world, Uri exportUri, WorldOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("WorldManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 OutputStream outputStream = context.getContentResolver().openOutputStream(exportUri);
                 if (outputStream == null) {
@@ -162,19 +181,18 @@ public class WorldManager {
                     outputStream.close();
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: these handlers are the only thing that answers
+                // the callback, and a world copy is a large allocation - an OutOfMemoryError
+                // skipped them, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to export world", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Export failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 
     public void deleteWorld(WorldItem world, WorldOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("WorldManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 createBackup(world);
                 
@@ -184,28 +202,30 @@ public class WorldManager {
                     callback.onError("Failed to delete world");
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: these handlers are the only thing that answers
+                // the callback, and a world copy is a large allocation - an OutOfMemoryError
+                // skipped them, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to delete world", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Delete failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 
     public void backupWorld(WorldItem world, WorldOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("WorldManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 String backupPath = createBackup(world);
                 callback.onSuccess("Backup created: " + backupPath);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: these handlers are the only thing that answers
+                // the callback, and a world copy is a large allocation - an OutOfMemoryError
+                // skipped them, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to backup world", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Backup failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 
     private void extractZip(File zipFile, File targetDir, WorldOperationCallback callback) throws IOException {
@@ -379,11 +399,7 @@ public class WorldManager {
     }
 
     public void transferWorld(WorldItem world, File targetDirectory, WorldOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("WorldManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 if (targetDirectory == null) {
                     callback.onError("Target directory not available");
@@ -413,10 +429,13 @@ public class WorldManager {
 
                 callback.onSuccess("World transferred successfully");
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: these handlers are the only thing that answers
+                // the callback, and a world copy is a large allocation - an OutOfMemoryError
+                // skipped them, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to transfer world", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Transfer failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 }

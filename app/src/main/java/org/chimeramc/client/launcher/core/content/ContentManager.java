@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import org.chimeramc.client.core.versions.GameVersion;
+import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -126,6 +127,39 @@ public class ContentManager {
         }
     }
 
+    /**
+     * Runs a content operation (delete/add/import) on the refresh worker and always answers its
+     * callback.
+     *
+     * <p>Two things used to go wrong here and each one stranded the screen: submitting to a
+     * {@link #shutdown()} executor threw on the caller's thread, and a throw from the operation
+     * skipped the callback, so the dialog or row waiting on it never settled. A failure is
+     * marshalled to the main thread, where the callbacks and the LiveData they refresh expect to
+     * run.
+     */
+    private void runOperation(Runnable work, ContentOperationCallback callback) {
+        final android.os.Handler mainHandler =
+                new android.os.Handler(android.os.Looper.getMainLooper());
+        try {
+            refreshExecutor.execute(() -> {
+                try {
+                    work.run();
+                } catch (Throwable t) {
+                    Log.w(TAG, "Content operation failed", t);
+                    final String reason = UserFacingError.reason(context, t);
+                    mainHandler.post(() -> {
+                        setStatus(reason);
+                        if (callback != null) callback.onError(reason);
+                    });
+                }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            // The manager was shut down under the caller; answer the callback rather than leaving
+            // the screen waiting on a result that can never arrive.
+            if (callback != null) callback.onError("The content manager has been shut down");
+        }
+    }
+
     public LiveData<List<WorldItem>> getWorldsLiveData() {
         return worldsLiveData;
     }
@@ -165,9 +199,8 @@ public class ContentManager {
 
     public void deleteScreenshot(ScreenshotItem screenshot, ContentOperationCallback callback) {
         setStatus("Deleting screenshot...");
-        refreshExecutor.execute(() -> {
-            boolean success = screenshotManager.deleteScreenshot(screenshot);
-            if (success) {
+        runOperation(() -> {
+            if (screenshotManager.deleteScreenshot(screenshot)) {
                 refreshScreenshots();
                 setStatus("Screenshot deleted");
                 if (callback != null) callback.onSuccess("Screenshot deleted");
@@ -175,14 +208,13 @@ public class ContentManager {
                 setStatus("Failed to delete screenshot");
                 if (callback != null) callback.onError("Failed to delete screenshot");
             }
-        });
+        }, callback);
     }
 
     public void deleteServer(ServerItem server, ContentOperationCallback callback) {
         setStatus("Deleting server...");
-        refreshExecutor.execute(() -> {
-            boolean success = serverManager.deleteServer(server);
-            if (success) {
+        runOperation(() -> {
+            if (serverManager.deleteServer(server)) {
                 refreshServers();
                 setStatus("Server deleted");
                 if (callback != null) callback.onSuccess("Server deleted");
@@ -190,12 +222,12 @@ public class ContentManager {
                 setStatus("Failed to delete server");
                 if (callback != null) callback.onError("Failed to delete server");
             }
-        });
+        }, callback);
     }
 
     public void addServer(ServerItem server, ContentOperationCallback callback) {
         setStatus("Adding server...");
-        refreshExecutor.execute(() -> {
+        runOperation(() -> {
             ServerManager.AddResult result = serverManager.addServer(server);
             if (result == ServerManager.AddResult.ADDED) {
                 refreshServers();
@@ -211,7 +243,7 @@ public class ContentManager {
                 setStatus(message);
                 if (callback != null) callback.onError(message);
             }
-        });
+        }, callback);
     }
 
     public void shutdown() {

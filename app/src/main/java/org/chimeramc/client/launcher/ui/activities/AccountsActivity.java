@@ -62,6 +62,22 @@ public class AccountsActivity extends BaseActivity {
     private final AccountsAdapter adapter = new AccountsAdapter();
     private ActivityResultLauncher<Intent> loginLauncher;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    /**
+     * Submits account/avatar work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>The account list can hand a click through as the screen closes, and the avatar load is
+     * kicked off from a rebind. Submitting to a shut-down executor throws on the calling (main)
+     * thread, so the last click before leaving the screen could crash the app.
+     */
+    private void runOnExecutor(Runnable work) {
+        try {
+            executor.execute(work);
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            android.util.Log.w("AccountsActivity",
+                    "Account task dropped: the screen is gone", rejected);
+        }
+    }
     private LoadingDialog loadingDialog;
 
     @Override
@@ -117,7 +133,7 @@ public class AccountsActivity extends BaseActivity {
                 loadingDialog = org.chimeramc.client.util.DialogUtils.ensure(AccountsActivity.this, loadingDialog);
                 org.chimeramc.client.util.DialogUtils.showWithMessage(loadingDialog, getString(R.string.ms_login_auth_xbox_device));
 
-                executor.execute(() -> {
+                runOnExecutor(() -> {
                     try {
                         BedrockAuthManager authManager = MsftAuthManager.refreshAndAuth(account);
                         MsftAuthManager.saveAccountOrThrow(AccountsActivity.this, authManager);
@@ -130,7 +146,10 @@ public class AccountsActivity extends BaseActivity {
                             Toast.makeText(AccountsActivity.this, getString(R.string.ms_login_success, statusName), Toast.LENGTH_SHORT).show();
                             refreshUI();
                         });
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
+                        // Throwable, not Exception: this handler is the only thing that dismisses the
+                        // "signing in" dialog, so an Error escaping it left that dialog up forever
+                        // with no sign-in and no message.
                         runOnUiThread(() -> {
                             org.chimeramc.client.util.DialogUtils.dismissQuietly(loadingDialog);
                                 Toast.makeText(AccountsActivity.this, getString(R.string.ms_login_failed_detail, MsftAuthManager.describeError(e)), Toast.LENGTH_LONG).show();
@@ -240,7 +259,7 @@ public class AccountsActivity extends BaseActivity {
         }
         xboxAvatar.setImageDrawable(null);
         if (avatarProgress != null) avatarProgress.setVisibility(View.VISIBLE);
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 try (Response imgResp = avatarClient.newCall(new Request.Builder().url(url).build()).execute()) {
                     Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null) ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream()) : null;
@@ -251,7 +270,9 @@ public class AccountsActivity extends BaseActivity {
                         if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
                     });
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: decoding the avatar can exhaust the heap and that is an
+                // Error, which skipped this handler and left the avatar spinner turning forever.
                 runOnUiThread(() -> {
                     if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
                 });
