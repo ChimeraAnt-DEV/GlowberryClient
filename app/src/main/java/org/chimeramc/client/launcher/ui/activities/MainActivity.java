@@ -86,6 +86,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 
  import android.widget.Button;
@@ -2167,7 +2168,10 @@ import okhttp3.OkHttpClient;
         // the "duplicate Play" report. One flag guards every entry point.
         if (launchInProgress) return;
         launchInProgress = true;
-        binding.launchDock.launchButton.setEnabled(false);
+        // binding is nullable on this screen (resetLaunchButton guards it), so dereferencing it
+        // unguarded here threw on the UI thread when the launch was triggered from a path where the
+        // view had not been bound yet.
+        if (binding != null) binding.launchDock.launchButton.setEnabled(false);
         LaunchTrace trace = LaunchTrace.create(null);
         trace.milestone("Launch requested");
 
@@ -2180,13 +2184,61 @@ import okhttp3.OkHttpClient;
         // precedence still lives in LaunchReadiness, so the diagnostics screen and the wizard keep
         // reading the same states.
         final LaunchProbe.Source source = new AndroidLaunchProbe(this, version, trace);
-        launchProbeExecutor.execute(() -> {
-            final LaunchReadiness.Facts facts = LaunchProbe.gather(source);
-            uiHandler.post(() -> {
-                if (isFinishing() || isDestroyed()) return;
-                continueLaunchAfterProbe(version, trace, facts);
+        try {
+            launchProbeExecutor.execute(() -> {
+                final LaunchReadiness.Facts facts;
+                try {
+                    facts = LaunchProbe.gather(source);
+                } catch (Throwable throwable) {
+                    // A probe that throws must not leave the Play button disabled forever: the flag
+                    // was set and the button dimmed before the task was submitted, and nothing else
+                    // re-arms them. The failure is named through the same path every other launch
+                    // failure uses, then the control is released.
+                    trace.error("Launch preflight failed", throwable.getMessage());
+                    uiHandler.post(() -> reportLaunchFailure(throwable));
+                    return;
+                }
+                uiHandler.post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    // The decision path is state work on the UI thread, and a throw anywhere in it
+                    // (a dialog that cannot inflate, a launch intent that cannot be built) would
+                    // leave the button disabled with the flag still set - the same stuck control
+                    // the probe guard above prevents. Re-arming is the floor, not the whole answer.
+                    try {
+                        continueLaunchAfterProbe(version, trace, facts);
+                    } catch (Throwable throwable) {
+                        trace.error("Launch decision failed", throwable.getMessage());
+                        reportLaunchFailure(throwable);
+                    }
+                });
             });
-        });
+        } catch (RejectedExecutionException rejected) {
+            // The executor is torn down in onDestroy; a launch requested after that (a queued post
+            // from a finishing screen) must re-arm the button rather than leave it disabled.
+            trace.error("Launch preflight could not be scheduled", rejected.getMessage());
+            resetLaunchButton();
+        }
+    }
+
+    /**
+     * Names a failure that happened on a background step and re-arms the Play control.
+     *
+     * <p>Shared by the preflight gather and the decision that follows it: both run after the button
+     * has already been disabled, so both owe the user the cause and a usable control. The cause is
+     * classified rather than printed raw, for the same reason the other launch surfaces do it.
+     */
+    private void reportLaunchFailure(Throwable throwable) {
+        if (isFinishing() || isDestroyed()) return;
+        resetLaunchButton();
+        LaunchErrorDiagnosis.Cause cause = LaunchErrorDiagnosis.classify(throwable);
+        new CustomAlertDialog(this)
+                .setTitleText(getString(LaunchErrorDiagnosis.titleRes(cause)))
+                .setMessage(getString(LaunchErrorDiagnosis.messageRes(cause))
+                        + "\n\n" + getString(R.string.launch_error_cause_label) + " "
+                        + LaunchErrorDiagnosis.label(cause)
+                        + (throwable.getMessage() != null ? "\n" + throwable.getMessage() : ""))
+                .setPositiveButton(getString(R.string.dialog_positive_ok), null)
+                .show();
     }
 
     /**
