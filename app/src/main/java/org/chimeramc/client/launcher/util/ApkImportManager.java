@@ -16,6 +16,7 @@ import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.ui.dialogs.InstallProgressDialog;
 import org.chimeramc.client.ui.views.MainViewModel;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ApkImportManager {
@@ -24,6 +25,23 @@ public class ApkImportManager {
     private final InstallProgressDialog progressDialog;
     private OnImportCompleteListener importCompleteListener;
     private OnImportFailedListener importFailedListener;
+
+    /**
+     * One worker for every import this manager runs.
+     *
+     * <p>Each import used to build its own {@code Executors.newSingleThreadExecutor()} and hand it to
+     * a new {@code ApkInstaller}; nothing ever shut those down, so every import leaked a live thread
+     * (and its queue) for the life of the process. Imports are serialized anyway — the progress
+     * dialog is modal — so one reused pool is both cheaper and closer to the real concurrency.
+     */
+    private final ExecutorService importExecutor = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "apk-import");
+        thread.setDaemon(true);
+        return thread;
+    });
+
+    /** True once {@link #release()} has run, so a late result cannot touch a torn-down Activity. */
+    private volatile boolean released;
 
     public interface OnImportCompleteListener {
         void onImportComplete();
@@ -57,7 +75,7 @@ public class ApkImportManager {
     public void importUri(Uri apkUri, String versionName) {
         if (apkUri == null) return;
         showProgress();
-        ApkInstaller installer = new ApkInstaller(activity, Executors.newSingleThreadExecutor(), new ApkInstaller.InstallCallback() {
+        ApkInstaller installer = new ApkInstaller(activity, importExecutor, new ApkInstaller.InstallCallback() {
             @Override
             public void onProgress(int progress) {
                 activity.runOnUiThread(() -> progressDialog.setProgress(progress));
@@ -66,6 +84,7 @@ public class ApkImportManager {
             @Override
             public void onSuccess(String installedVersionName) {
                 activity.runOnUiThread(() -> {
+                    if (released) return;
                     dismissProgress();
                     if (activity.isFinishing() || activity.isDestroyed()) return;
                     Toast.makeText(
@@ -83,6 +102,7 @@ public class ApkImportManager {
             @Override
             public void onError(String errorMsg) {
                 activity.runOnUiThread(() -> {
+                    if (released) return;
                     dismissProgress();
                     if (activity.isFinishing() || activity.isDestroyed()) return;
                     // With a listener the caller owns the failure UI (it can offer a retry),
@@ -130,7 +150,7 @@ public class ApkImportManager {
                     @Override
                     public void onInstallClicked(String versionName) {
                         showProgress();
-                        ApkInstaller installer = new ApkInstaller(activity, Executors.newSingleThreadExecutor(), new ApkInstaller.InstallCallback() {
+                        ApkInstaller installer = new ApkInstaller(activity, importExecutor, new ApkInstaller.InstallCallback() {
                             @Override
                             public void onProgress(int progress) {
                                 activity.runOnUiThread(() -> progressDialog.setProgress(progress));
@@ -139,6 +159,7 @@ public class ApkImportManager {
                             @Override
                             public void onSuccess(String versionName) {
                                 activity.runOnUiThread(() -> {
+                                    if (released) return;
                                     dismissProgress();
                                     Toast.makeText(
                                             activity,
@@ -155,6 +176,7 @@ public class ApkImportManager {
                             @Override
                             public void onError(String errorMsg) {
                                 activity.runOnUiThread(() -> {
+                                    if (released) return;
                                     dismissProgress();
                                     Toast.makeText(activity, errorMsg, Toast.LENGTH_LONG).show();
                                 });
@@ -183,6 +205,30 @@ public class ApkImportManager {
         if (resultCode == Activity.RESULT_OK && data != null) {
             handleApkImportResult(data);
         }
+    }
+
+    /**
+     * Releases the import worker and dismisses the progress dialog.
+     *
+     * <p>Call from the owner's teardown (an Activity's {@code onDestroy}, a Fragment's
+     * {@code onDestroyView}). The manager is created per screen, so without this the reused pool
+     * would outlive the screen that owns it. Idempotent, and safe to call while an import is still
+     * running: the worker is interrupted and the callback's own {@code isFinishing()} guards stop it
+     * touching a torn-down Activity.
+     */
+    public void release() {
+        if (released) return;
+        released = true;
+        try {
+            dismissProgress();
+        } catch (Throwable ignored) {
+        }
+        importExecutor.shutdownNow();
+    }
+
+    /** Whether {@link #release()} has run; a late callback must not act on a released manager. */
+    public boolean isReleased() {
+        return released;
     }
 
     private String getFileName(Uri uri) {

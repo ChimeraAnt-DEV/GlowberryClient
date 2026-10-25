@@ -111,6 +111,21 @@ public class InstancesFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        // Both managers own a single-thread pool created for this view; without this they outlived
+        // the Fragment and leaked a thread per visit to the Library.
+        if (apkImportManager != null) {
+            apkImportManager.release();
+            apkImportManager = null;
+        }
+        if (backupManager != null) {
+            backupManager.close();
+            backupManager = null;
+        }
+        super.onDestroyView();
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 

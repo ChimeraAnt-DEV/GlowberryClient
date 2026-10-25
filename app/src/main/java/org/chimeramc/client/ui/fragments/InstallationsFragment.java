@@ -239,6 +239,11 @@ public class InstallationsFragment extends Fragment {
     public void onDestroyView() {
         if (fallback != null) fallback.release();
         if (browser != null) browser.destroy();
+        // The import manager owns a single-thread pool; without this it outlived the Fragment.
+        if (importManager != null) {
+            importManager.release();
+            importManager = null;
+        }
         super.onDestroyView();
     }
 

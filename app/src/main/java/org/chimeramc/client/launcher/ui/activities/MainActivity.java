@@ -2784,6 +2784,15 @@ import okhttp3.OkHttpClient;
         }
         unbindStorageMigrationService();
         dismissStorageMigrationDialog(null);
+        // Both managers own a single-thread pool; without this they outlived the Activity.
+        if (storageMigrationManager != null) {
+            storageMigrationManager.close();
+            storageMigrationManager = null;
+        }
+        if (apkImportManager != null) {
+            apkImportManager.release();
+            apkImportManager = null;
+        }
         storageMigrationExecutor.shutdownNow();
         launchProbeExecutor.shutdownNow();
         resourcepackExecutor.shutdownNow();
