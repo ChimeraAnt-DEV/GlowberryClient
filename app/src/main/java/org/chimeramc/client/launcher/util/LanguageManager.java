@@ -24,8 +24,24 @@ public class LanguageManager {
 
     public void applySavedLanguage() {
         SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
-        String tag = prefs.getString(LANGUAGE_KEY, Locale.getDefault().toLanguageTag());
+        String tag = normaliseLanguageTag(
+                prefs.getString(LANGUAGE_KEY, Locale.getDefault().toLanguageTag()));
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag));
+    }
+
+    /**
+     * Maps a stored language value to a real BCP-47 tag.
+     *
+     * <p>Indonesian was stored and shipped as {@code "idn"}, which is not a language code at all -
+     * {@code Locale.forLanguageTag("idn")} yields the pseudo-language "idn", so the request matched
+     * no resource folder and the app silently stayed in English however many times the user picked
+     * Indonesian. The code is {@code "id"}, and the resource folder is {@code values-id}. A stored
+     * {@code "idn"} is still translated rather than dropped, so a device that saved the old value
+     * lands on Indonesian instead of being reset to English.
+     */
+    static String normaliseLanguageTag(String tag) {
+        if (tag == null || tag.trim().isEmpty()) return Locale.getDefault().toLanguageTag();
+        return "idn".equalsIgnoreCase(tag.trim()) ? "id" : tag.trim();
     }
 
     public void setAppLanguage(String languageCode) {
@@ -66,7 +82,7 @@ public class LanguageManager {
                 setAppLanguage("hi");
                 return true;
             } else if (itemId == R.id.action_indonesian) {
-                setAppLanguage("idn");
+                setAppLanguage("id");
                 return true;
             } else if (itemId == R.id.action_japanese) {
                 setAppLanguage("ja");

@@ -312,7 +312,9 @@ public class SettingsActivity extends BaseActivity {
             case "zh", "zh-CN" -> 1;
             case "fr" -> 2;
             case "hi" -> 3;
-            case "idn" -> 4;
+            // "idn" is the value older builds stored; accepted so an existing selection still
+            // shows as Indonesian instead of falling back to English.
+            case "id", "idn" -> 4;
             case "ja" -> 5;
             case "pt" -> 6;
             case "ru" -> 7;
@@ -338,7 +340,7 @@ public class SettingsActivity extends BaseActivity {
                     case 1 -> "zh-CN";
                     case 2 -> "fr";
                     case 3 -> "hi";
-                    case 4 -> "idn";
+                    case 4 -> "id";
                     case 5 -> "ja";
                     case 6 -> "pt";
                     case 7 -> "ru";
