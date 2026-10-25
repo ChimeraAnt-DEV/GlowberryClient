@@ -865,7 +865,7 @@ import okhttp3.OkHttpClient;
             }
 
             @Override
-            public void onLaunchFailed(Exception e) {
+            public void onLaunchFailed(Throwable e) {
                 runOnUiThread(() -> {
                     // Same classifier as the dialog path: the cause is named, then the raw text.
                     LaunchErrorDiagnosis.Cause cause = LaunchErrorDiagnosis.classify(e);
@@ -1837,23 +1837,30 @@ import okhttp3.OkHttpClient;
         // the UI thread that ran on every onResume, so returning from any screen blocked the frame
         // while the video metadata was parsed. Gather both on a worker and paint when they arrive.
         if (antEggStatus == null && replayStatus == null) return;
-        launchStatsExecutor.execute(() -> {
-            final int antEggCount = countAntEggPacks();
-            final int replayCount = countReplayClips();
-            uiHandler.post(() -> {
-                if (isFinishing() || isDestroyed()) return;
-                if (antEggStatus != null) {
-                    antEggStatus.setText(antEggCount > 0
-                            ? getString(R.string.launch_antegg_status_ready, antEggCount)
-                            : getString(R.string.launch_antegg_status_none));
-                }
-                if (replayStatus != null) {
-                    replayStatus.setText(replayCount > 0
-                            ? getString(R.string.launch_replay_status_count, replayCount)
-                            : getString(R.string.launch_replay_status_none));
-                }
+        // onResume can run against an executor that onDestroy has already shut down, and an
+        // escaping RejectedExecutionException would take the Launch tab down with it. The statuses
+        // then simply keep their last painted value, which is the right degradation for a
+        // decorative line.
+        try {
+            launchStatsExecutor.execute(() -> {
+                final int antEggCount = countAntEggPacks();
+                final int replayCount = countReplayClips();
+                uiHandler.post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    if (antEggStatus != null) {
+                        antEggStatus.setText(antEggCount > 0
+                                ? getString(R.string.launch_antegg_status_ready, antEggCount)
+                                : getString(R.string.launch_antegg_status_none));
+                    }
+                    if (replayStatus != null) {
+                        replayStatus.setText(replayCount > 0
+                                ? getString(R.string.launch_replay_status_count, replayCount)
+                                : getString(R.string.launch_replay_status_none));
+                    }
+                });
             });
-        });
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {
+        }
     }
 
     /**
@@ -2297,14 +2304,17 @@ import okhttp3.OkHttpClient;
                 }
 
                 @Override
-                public void onLaunchFailed(Exception e) {
+                public void onLaunchFailed(Throwable e) {
                     trace.error("Launch failed before loading screen", e.getMessage());
                     runOnUiThread(() -> {
                         resetLaunchButton();
                     });
                 }
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // Throwable, not Exception: this builds the launch intent and hands it to the launcher,
+            // so a heap exhaustion is a real outcome here, and an escaping Error left the Play
+            // button disabled with no dialog at all.
             trace.error("Launch failed before activity start", e.getMessage());
             resetLaunchButton();
             // Name the cause instead of only appending the raw dlopen text. The raw message is

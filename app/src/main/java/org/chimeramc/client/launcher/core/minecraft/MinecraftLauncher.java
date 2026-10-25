@@ -30,7 +30,16 @@ public class MinecraftLauncher {
 
     public interface LaunchCallback {
         void onLaunchStarted();
-        void onLaunchFailed(Exception e);
+
+        /**
+         * The launch did not start.
+         *
+         * <p>{@link Throwable}, not {@code Exception}: a heap exhaustion while the launch is being
+         * prepared is a real outcome, and the callback is what resets the Play button. Typing this
+         * as {@code Exception} meant an {@code Error} could not be reported and the button stayed
+         * in its "launching" state with no message.
+         */
+        void onLaunchFailed(Throwable e);
     }
 
     public MinecraftLauncher(Context context) {
@@ -129,17 +138,29 @@ public class MinecraftLauncher {
                 try {
                     launchMinecraftActivity(sourceIntent, version, false);
                     notifyLaunchStarted(callback);
-                } catch (Exception e) {
+                } catch (Throwable e) {
+                    // Throwable, not Exception: preparing a launch allocates the storage paths and
+                    // builds the game intent, so a heap exhaustion here is a real outcome, and an
+                    // escaping Error skipped both the message and the callback - the Play button
+                    // simply did nothing. The classifier names whatever comes back.
                     Log.e(TAG, "Launch failed: " + e.getMessage(), e);
-                    showLaunchErrorOnUi("Launch failed: " + e.getMessage());
+                    showLaunchErrorOnUi(describe(e));
                     notifyLaunchFailed(callback, e);
                 }
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Log.e(TAG, "Launch failed: " + e.getMessage(), e);
-            showLaunchErrorOnUi("Launch failed: " + e.getMessage());
+            showLaunchErrorOnUi(describe(e));
             notifyLaunchFailed(callback, e);
         }
+    }
+
+    /** A message for the failure classifier, never empty. */
+    private static String describe(Throwable e) {
+        String message = e.getMessage();
+        return (message == null || message.trim().isEmpty())
+                ? e.getClass().getSimpleName()
+                : "Launch failed: " + message;
     }
 
     public static String getStorageProfileId(GameVersion version) {
@@ -210,7 +231,7 @@ public class MinecraftLauncher {
         }
     }
 
-    private void notifyLaunchFailed(LaunchCallback callback, Exception e) {
+    private void notifyLaunchFailed(LaunchCallback callback, Throwable e) {
         if (callback != null) {
             callback.onLaunchFailed(e);
         }
