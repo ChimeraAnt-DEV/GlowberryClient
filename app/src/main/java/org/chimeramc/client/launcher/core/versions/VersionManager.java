@@ -1204,33 +1204,35 @@ public class VersionManager {
     }
 
     /**
-     * Removes a file or directory tree, clearing the read-only attribute first.
+     * Removes a file or directory tree, making directories writable first.
      *
-     * <p>Extracted native libraries are deliberately made read-only once they are in the cache
-     * ({@code GamePackageManager.ensureReadOnly}), and the repair deletes that cache before
-     * re-extracting into it. A plain {@code delete()} on a read-only file fails on some storage
-     * configurations, and the failure was invisible: the return value was discarded, so the repair
-     * went on to open the same read-only file for writing and died with a bare "Permission denied"
-     * that named neither the file nor the reason. Making the file writable first, and reporting a
-     * tree that still could not be removed, turns that into a diagnosable failure.
+     * <p>Why directories and not files: on Linux and Android, {@code unlink} needs write permission
+     * on the <em>parent directory</em>, not on the file. A read-only file (which is what the
+     * extractor's {@code ensureReadOnly} produces) deletes fine; a read-only <em>directory</em>
+     * does not - every child fails with {@code EACCES}. The extractor only ever makes files
+     * read-only, so this is defence rather than a fix for a state the launcher creates today, but
+     * the cost of getting it wrong is high: the repair deletes the whole cache tree before
+     * re-extracting into it, so a directory that lost its write bit would strand the tree and the
+     * repair would then die opening the surviving files, reporting a bare "Permission denied" that
+     * named neither the file nor the reason. {@link #deleteDirOrThrow} turns a tree that still
+     * survives into a named failure.
      *
      * @return true when the path no longer exists
      */
     private boolean deleteDir(File file) {
         if (file == null || !file.exists()) return true;
         if (file.isDirectory()) {
+            // Before descending: without write permission on this directory, every child delete
+            // below fails, however the child's own mode is set.
+            try {
+                file.setWritable(true, true);
+            } catch (SecurityException ignored) {
+                // Fall through: the deletes below are the authority on whether it worked.
+            }
             File[] files = file.listFiles();
             if (files != null)
                 for (File c : files)
                     deleteDir(c);
-        } else {
-            // Only files carry the read-only attribute the extractor sets; a directory that will not
-            // delete is a real failure and is reported by the caller.
-            try {
-                file.setWritable(true, true);
-            } catch (SecurityException ignored) {
-                // Fall through: the delete below is the authority on whether it worked.
-            }
         }
         return file.delete();
     }
