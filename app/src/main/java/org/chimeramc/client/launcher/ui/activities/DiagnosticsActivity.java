@@ -23,6 +23,7 @@ import org.chimeramc.client.core.auth.MsftAccountStore;
 import org.chimeramc.client.core.cosmetics.AccountSkinCache;
 import org.chimeramc.client.core.cosmetics.AccountSkinService;
 import org.chimeramc.client.launcher.core.minecraft.AndroidLaunchProbe;
+import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure;
 import org.chimeramc.client.launcher.core.minecraft.LaunchProbe;
 import org.chimeramc.client.launcher.core.minecraft.LaunchReadiness;
 import org.chimeramc.client.core.versions.GameVersion;
@@ -91,6 +92,8 @@ public class DiagnosticsActivity extends BaseActivity {
         boolean renderHookLive;
         AccountDiagnostics.Snapshot account = new AccountDiagnostics.Snapshot();
         List<ModLoadDiagnostics.Record> modRecords = Collections.emptyList();
+        /** The last launch that died inside the game activity, or null when none is recorded. */
+        LastLaunchFailure.Report lastLaunchFailure;
     }
 
     @Override
@@ -206,6 +209,14 @@ public class DiagnosticsActivity extends BaseActivity {
         } catch (Throwable ignored) {
             out.modRecords = Collections.emptyList();
         }
+        // The last launch that died inside the game activity. Read here as well as announced on the
+        // Launch tab: the dialog is consumed once, so without this the report would be unreadable
+        // from the screen whose whole job is to explain a failed launch.
+        try {
+            out.lastLaunchFailure = LastLaunchFailure.read(this);
+        } catch (Throwable ignored) {
+            out.lastLaunchFailure = null;
+        }
         return out;
     }
 
@@ -239,6 +250,17 @@ public class DiagnosticsActivity extends BaseActivity {
         addRow(rows, R.string.diagnostics_field_launch_blocks,
                 getString(LaunchReadiness.blocksLaunch(state)
                         ? R.string.diagnostics_launch_blocked : R.string.diagnostics_launch_proceeds));
+
+        // The last launch that actually died, with its classified cause. The preflight above says
+        // whether a launch *would* be refused; this says what happened to the last one that ran, so
+        // a "it just closes" report has an answer on the same screen.
+        LastLaunchFailure.Report failure = current().lastLaunchFailure;
+        if (failure != null) {
+            addRow(rows, R.string.diagnostics_field_last_launch_failure,
+                    LastLaunchFailure.describe(failure));
+            addRow(rows, R.string.diagnostics_field_last_launch_failure_time,
+                    LastLaunchFailure.formatTimestamp(failure.recordedAtMs));
+        }
     }
 
     private GameVersion selectedVersion() {
@@ -560,6 +582,15 @@ public class DiagnosticsActivity extends BaseActivity {
         // paraphrase a dialog. The key is stable and non-translatable, which is the point.
         sb.append("Launch state: ").append(LaunchReadiness.key(data.readiness)).append("\n");
         sb.append("Launch blocked: ").append(LaunchReadiness.blocksLaunch(data.readiness) ? "yes" : "no").append("\n");
+        if (data.lastLaunchFailure != null) {
+            sb.append("Last launch failure: ")
+                    .append(LastLaunchFailure.describe(data.lastLaunchFailure)).append("\n");
+            sb.append("Last launch failure at: ")
+                    .append(LastLaunchFailure.formatTimestamp(data.lastLaunchFailure.recordedAtMs))
+                    .append("\n");
+        } else {
+            sb.append("Last launch failure: (none recorded)\n");
+        }
 
         sb.append("Extraction version: ")
                 .append(data.extractionCurrent ? "up to date" : "stale")

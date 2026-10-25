@@ -1316,6 +1316,50 @@ import okhttp3.OkHttpClient;
         if (launchPreview != null) launchPreview.startPreview();
         bindHeadPod();
         refreshLaunchToggles();
+        announcePendingLaunchFailure();
+    }
+
+    /**
+     * Reports a launch that died inside the game activity.
+     *
+     * <p>That failure cannot show a dialog where it happens: {@code MinecraftActivity} tears the
+     * launcher process down to restart it, so the Activity that would own the dialog is already
+     * gone. The cause is stored instead and named here, on the screen the user lands back on — the
+     * step that was missing, and the reason a failed launch used to look like the app simply
+     * closing.
+     *
+     * <p>Runs at the end of {@code onResume}, after the EULA and migration gates have returned, so
+     * the failure is never shown over a first-run or migration prompt. It consumes the stored
+     * report, so it is announced exactly once; the file is also mirrored into the Diagnostics
+     * report for as long as it exists.
+     */
+    private void announcePendingLaunchFailure() {
+        if (isFinishing() || isDestroyed()) return;
+        org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure.Report report =
+                org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
+                        .consumePending(this);
+        if (report == null) return;
+        org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis.Cause cause = report.cause();
+        String detail = org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
+                .detailOf(report);
+        StringBuilder message = new StringBuilder(
+                getString(org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
+                        .messageRes(cause)));
+        if (!detail.isEmpty()) {
+            message.append("\n\n").append(getString(R.string.launch_error_cause_label)).append(' ')
+                    .append(org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
+                            .label(cause))
+                    .append('\n').append(detail);
+        }
+        new CustomAlertDialog(this)
+                .setTitleText(getString(org.chimeramc.client.launcher.core.minecraft
+                        .LaunchErrorDiagnosis.titleRes(cause)))
+                .setMessage(message.toString())
+                .setPositiveButton(getString(R.string.diagnostics_title),
+                        v -> startActivity(new Intent(this,
+                                org.chimeramc.client.launcher.ui.activities.DiagnosticsActivity.class)))
+                .setNegativeButton(getString(R.string.dialog_positive_ok), null)
+                .show();
     }
 
     /**

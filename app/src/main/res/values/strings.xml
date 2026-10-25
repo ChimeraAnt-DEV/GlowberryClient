@@ -1500,6 +1500,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_section_readiness">Launch readiness</string>
     <string name="diagnostics_field_launch_state">State</string>
     <string name="diagnostics_field_launch_blocks">Effect</string>
+    <string name="diagnostics_field_last_launch_failure">Last launch failure</string>
+    <string name="diagnostics_field_last_launch_failure_time">Failed at</string>
     <string name="diagnostics_launch_blocked">Launch blocked</string>
     <string name="diagnostics_launch_proceeds">Launch proceeds</string>
     <string name="diagnostics_field_extraction_version">Extraction version</string>

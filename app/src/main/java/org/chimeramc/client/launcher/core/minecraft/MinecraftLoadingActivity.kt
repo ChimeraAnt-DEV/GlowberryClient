@@ -22,6 +22,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import org.chimeramc.client.R
+import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
 import org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
 import org.chimeramc.client.ui.activities.BaseActivity
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog
@@ -253,6 +254,10 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         appendLog(getString(R.string.launch_error_cause_label) + " " + LaunchErrorDiagnosis.label(cause))
         appendLog(causeLine)
         appendLog(message)
+        // The user is looking at the cause on this screen, so the launcher must not repeat it after
+        // the restart. The report is stored as announced and any earlier pending report is dropped:
+        // this screen is authoritative whenever it can be shown.
+        LastLaunchFailure.write(this, throwable, true)
         returnButton.visibility = View.VISIBLE
     }
 

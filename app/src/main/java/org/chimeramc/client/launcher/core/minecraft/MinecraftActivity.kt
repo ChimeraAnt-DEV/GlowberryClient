@@ -25,6 +25,7 @@ import com.mojang.minecraftpe.MainActivity
 import org.chimeramc.client.core.crash.CrashReporter
 import org.chimeramc.client.core.mods.ModManager
 import org.chimeramc.client.core.mods.ModSafeMode
+import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
 import org.levimc.launcher.core.mods.inbuilt.nativemod.PojavControlsMod
 import org.chimeramc.client.core.mods.inbuilt.overlay.InbuiltOverlayManager
 import org.chimeramc.client.launcher.controller.ControllerInputProcessor
@@ -250,15 +251,17 @@ class MinecraftActivity : MainActivity(), PojavControlsHost {
         // A failure before the game's own onCreate is attributed to the optifine items active
         // for this launch, so a bad hook is disabled rather than retried forever.
         org.chimeramc.client.core.minecraft.OptifineModeManager.onLaunchFailed(this)
-        try {
-            val logFile = File(getExternalFilesDir(null), "last_launch_failure.txt")
-            logFile.writeText(
-                "Time: ${java.util.Date()}\n" +
-                "Message: ${throwable?.message}\n" +
-                "Type: ${throwable?.javaClass?.name}\n" +
-                "Stack:\n${throwable?.stackTraceToString()}"
-            )
-        } catch (_: Throwable) {}
+        // This activity cannot show a dialog: it tears the launcher down to restart it, so by the
+        // time the failure is known the Activity that would own the dialog is gone. The report is
+        // therefore stored with its classified cause and announced=false, and the relaunched
+        // launcher shows it once. Writing the file without ever reading it back (the previous
+        // behaviour) left the user watching the app vanish with the cause sitting unread on disk.
+        LastLaunchFailure.write(this, throwable, false)
+        LaunchLog.append(this, "==== Launch failed; recorded for the launcher to report ====")
+        trace.error(
+            "Recorded launch failure for the launcher",
+            LastLaunchFailure.keyOf(LastLaunchFailure.read(this))
+        )
         MinecraftProcessRestarter.restartLauncherAfterMinecraftExit(this)
         finish()
     }
