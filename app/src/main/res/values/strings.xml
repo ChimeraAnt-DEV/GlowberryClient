@@ -2379,6 +2379,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="launch_failure_message_stale_libs">The extracted native libraries are from an older version of the launcher. They will be re-extracted automatically on the next launch. If the game still fails to start, run Repair installation in Settings \u2192 Diagnostics.</string>
     <string name="launch_failure_title_rules">Limited compatibility</string>
     <string name="launch_failure_message_rules">There are no hook definitions for this Minecraft build yet, so in-game overlays and cosmetics are disabled. The game itself will run normally.</string>
+    <string name="launch_failure_title_unexpected">Could not start the game</string>
+    <string name="launch_failure_message_unexpected">The launcher could not begin the launch and the cause was not one it recognises. Nothing was changed on your device. Reopen the launcher and try again; if it keeps happening, run Repair installation in Settings \u2192 Diagnostics.</string>
     <string name="launch_failure_title_not_installed">Minecraft not found</string>
     <string name="launch_failure_message_not_installed">Minecraft does not appear to be installed on this device. Import a Minecraft APK from the Library — a Google Play install cannot be launched by this launcher, because the game keeps its native library inside the installed app where the launcher cannot reach it.</string>
 

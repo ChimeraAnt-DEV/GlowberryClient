@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -58,6 +59,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class ContentListActivity extends BaseActivity {
+
+    private static final String TAG = "ContentListActivity";
 
     public static final String EXTRA_CONTENT_TYPE = "content_type";
     public static final String EXTRA_WORLDS_DIRECTORY = "worlds_directory";
@@ -479,11 +482,21 @@ public class ContentListActivity extends BaseActivity {
         ExecutorService executor = pingExecutor;
         for (org.chimeramc.client.core.content.ServerItem server : toPing) {
             executor.execute(() -> {
-                ServerPongInfo pong = RakNetPing.ping(server.ip, server.port, 3000);
-                boolean failed = pong == null;
+                // The row renders "checking" until a result arrives, so a throw here left that
+                // server showing a ping check that could never finish. A failure is reported as an
+                // offline result rather than as no result.
+                ServerPongInfo pong;
+                try {
+                    pong = RakNetPing.ping(server.ip, server.port, 3000);
+                } catch (Throwable t) {
+                    Log.w(TAG, "Server ping failed for " + server.ip + ":" + server.port, t);
+                    pong = null;
+                }
+                final ServerPongInfo result = pong;
+                boolean failed = result == null;
                 mainHandler.post(() -> {
                     if (serversAdapter != null) {
-                        serversAdapter.onPingResult(server, pong, failed);
+                        serversAdapter.onPingResult(server, result, failed);
                     }
                 });
             });
