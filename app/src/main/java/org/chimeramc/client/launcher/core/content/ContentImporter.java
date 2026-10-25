@@ -21,8 +21,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.chimeramc.client.R;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 
 public class ContentImporter {
@@ -52,98 +54,129 @@ public class ContentImporter {
 
     public void importContent(List<Uri> uris, File resourcePacksDir, File behaviorPacksDir, 
                               File skinPacksDir, File worldsDir, ImportCallback callback) {
-        executor.execute(() -> {
-            try {
-                ImportResult totalResult = new ImportResult();
-                StringBuilder errors = new StringBuilder();
+        // A caller that kept the importer past its owner's teardown, or reused a released one,
+        // would otherwise throw RejectedExecutionException on the UI thread and take the screen
+        // down instead of reporting why the import did not run.
+        if (executor.isShutdown()) {
+            reportImportFailure(callback, "the importer was already shut down");
+            return;
+        }
+        try {
+            executor.execute(() -> runImport(uris, resourcePacksDir, behaviorPacksDir, skinPacksDir,
+                    worldsDir, callback));
+        } catch (RejectedExecutionException e) {
+            reportImportFailure(callback, e.getMessage());
+        }
+    }
 
-                for (Uri uri : uris) {
-                    File tempFile = null;
-                    try {
-                        String fileName = getFileName(uri);
-                        if (fileName == null || fileName.isEmpty()) {
-                            fileName = "content.mcpack";
+    /**
+     * Reports an import that never started, in the same shape a failure inside the import uses.
+     *
+     * <p>Every caller shows a non-cancellable progress dialog and only dismisses it from the
+     * callback, so a request that is dropped without a callback leaves the dialog on screen with
+     * no message and no way out - the user has to kill the launcher.
+     */
+    private void reportImportFailure(ImportCallback callback, String detail) {
+        if (callback == null) return;
+        callback.onError(UserFacingError.shortReasonForText(
+                context, context.getString(R.string.import_failed), detail));
+    }
+
+    private void runImport(List<Uri> uris, File resourcePacksDir, File behaviorPacksDir,
+                           File skinPacksDir, File worldsDir, ImportCallback callback) {
+        try {
+            ImportResult totalResult = new ImportResult();
+            StringBuilder errors = new StringBuilder();
+
+            for (Uri uri : uris) {
+                File tempFile = null;
+                try {
+                    String fileName = getFileName(uri);
+                    if (fileName == null || fileName.isEmpty()) {
+                        fileName = "content.mcpack";
+                    }
+                    String lowerName = fileName.toLowerCase();
+                    Log.d(TAG, "Importing file: " + fileName);
+
+                    // try-with-resources, and the staged copy is removed in a finally. The
+                    // old code closed the stream and deleted the temp by hand, so a malformed
+                    // archive - which is exactly when the import helpers throw - skipped both
+                    // and left the descriptor open and a full copy of the pack in the cache.
+                    tempFile = new File(context.getCacheDir(), "temp_import_" + System.currentTimeMillis());
+                    try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+                        if (inputStream == null) {
+                            errors.append("Cannot open file: ").append(fileName).append("\n");
+                            continue;
                         }
-                        String lowerName = fileName.toLowerCase();
-                        Log.d(TAG, "Importing file: " + fileName);
+                        copyStreamToFile(inputStream, tempFile);
+                    }
 
-                        // try-with-resources, and the staged copy is removed in a finally. The
-                        // old code closed the stream and deleted the temp by hand, so a malformed
-                        // archive - which is exactly when the import helpers throw - skipped both
-                        // and left the descriptor open and a full copy of the pack in the cache.
-                        tempFile = new File(context.getCacheDir(), "temp_import_" + System.currentTimeMillis());
-                        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
-                            if (inputStream == null) {
-                                errors.append("Cannot open file: ").append(fileName).append("\n");
-                                continue;
-                            }
-                            copyStreamToFile(inputStream, tempFile);
-                        }
+                    ImportResult result = new ImportResult();
 
-                        ImportResult result = new ImportResult();
-
-                        if (lowerName.endsWith(".mcworld")) {
-                            importMcworld(tempFile, worldsDir, result);
-                        } else if (lowerName.endsWith(".mcaddon")) {
+                    if (lowerName.endsWith(".mcworld")) {
+                        importMcworld(tempFile, worldsDir, result);
+                    } else if (lowerName.endsWith(".mcaddon")) {
+                        importMcaddon(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
+                    } else if (lowerName.endsWith(".mcpack")) {
+                        importMcpack(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
+                    } else {
+                        importMcpack(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
+                        if (result.resourcePacksImported == 0 && result.behaviorPacksImported == 0 && result.skinPacksImported == 0) {
                             importMcaddon(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
-                        } else if (lowerName.endsWith(".mcpack")) {
-                            importMcpack(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
-                        } else {
-                            importMcpack(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
-                            if (result.resourcePacksImported == 0 && result.behaviorPacksImported == 0 && result.skinPacksImported == 0) {
-                                importMcaddon(tempFile, resourcePacksDir, behaviorPacksDir, skinPacksDir, result);
-                            }
-                            if (result.resourcePacksImported == 0 && result.behaviorPacksImported == 0 && 
-                                result.skinPacksImported == 0 && result.worldsImported == 0) {
-                                importMcworld(tempFile, worldsDir, result);
-                            }
                         }
-
-                        totalResult.resourcePacksImported += result.resourcePacksImported;
-                        totalResult.behaviorPacksImported += result.behaviorPacksImported;
-                        totalResult.skinPacksImported += result.skinPacksImported;
-                        totalResult.worldsImported += result.worldsImported;
-
-                    } catch (Exception e) {
-                        Log.e(TAG, "Import failed for uri: " + uri, e);
-                        errors.append("Failed for ").append(uri.getLastPathSegment()).append(": ").append(e.getMessage()).append("\n");
-                    } finally {
-                        if (tempFile != null) {
-                            //noinspection ResultOfMethodCallIgnored
-                            tempFile.delete();
+                        if (result.resourcePacksImported == 0 && result.behaviorPacksImported == 0 &&
+                            result.skinPacksImported == 0 && result.worldsImported == 0) {
+                            importMcworld(tempFile, worldsDir, result);
                         }
                     }
-                }
 
-                StringBuilder message = new StringBuilder();
-                if (totalResult.worldsImported > 0) {
-                    message.append("Worlds: ").append(totalResult.worldsImported).append(" ");
-                }
-                if (totalResult.resourcePacksImported > 0) {
-                    message.append("Resource Packs: ").append(totalResult.resourcePacksImported).append(" ");
-                }
-                if (totalResult.behaviorPacksImported > 0) {
-                    message.append("Behavior Packs: ").append(totalResult.behaviorPacksImported).append(" ");
-                }
-                if (totalResult.skinPacksImported > 0) {
-                    message.append("Skin Packs: ").append(totalResult.skinPacksImported).append(" ");
-                }
+                    totalResult.resourcePacksImported += result.resourcePacksImported;
+                    totalResult.behaviorPacksImported += result.behaviorPacksImported;
+                    totalResult.skinPacksImported += result.skinPacksImported;
+                    totalResult.worldsImported += result.worldsImported;
 
-                if (message.length() == 0) {
-                    callback.onError(errors.length() > 0 ? errors.toString().trim() : "No content was imported");
-                } else {
-                    String finalMessage = "Imported: " + message.toString().trim();
-                    if (errors.length() > 0) {
-                        finalMessage += "\nErrors:\n" + errors.toString().trim();
+                } catch (Exception e) {
+                    Log.e(TAG, "Import failed for uri: " + uri, e);
+                    errors.append("Failed for ").append(uri.getLastPathSegment()).append(": ").append(e.getMessage()).append("\n");
+                } finally {
+                    if (tempFile != null) {
+                        //noinspection ResultOfMethodCallIgnored
+                        tempFile.delete();
                     }
-                    callback.onSuccess(finalMessage);
                 }
-
-            } catch (Exception e) {
-                Log.e(TAG, "Import failed", e);
-                callback.onError(UserFacingError.shortReasonForText(context, "Import failed", e.getMessage()));
             }
-        });
+
+            StringBuilder message = new StringBuilder();
+            if (totalResult.worldsImported > 0) {
+                message.append("Worlds: ").append(totalResult.worldsImported).append(" ");
+            }
+            if (totalResult.resourcePacksImported > 0) {
+                message.append("Resource Packs: ").append(totalResult.resourcePacksImported).append(" ");
+            }
+            if (totalResult.behaviorPacksImported > 0) {
+                message.append("Behavior Packs: ").append(totalResult.behaviorPacksImported).append(" ");
+            }
+            if (totalResult.skinPacksImported > 0) {
+                message.append("Skin Packs: ").append(totalResult.skinPacksImported).append(" ");
+            }
+
+            if (message.length() == 0) {
+                callback.onError(errors.length() > 0 ? errors.toString().trim() : "No content was imported");
+            } else {
+                String finalMessage = "Imported: " + message.toString().trim();
+                if (errors.length() > 0) {
+                    finalMessage += "\nErrors:\n" + errors.toString().trim();
+                }
+                callback.onSuccess(finalMessage);
+            }
+        } catch (Throwable e) {
+            // Throwable, not Exception: an Error (an OOM on a large pack, a StackOverflow in the
+            // zip walk) used to escape the callback entirely, leaving the caller's non-cancellable
+            // progress dialog on screen with no message and no way out.
+            Log.e(TAG, "Import failed", e);
+            callback.onError(UserFacingError.shortReasonForText(
+                    context, context.getString(R.string.import_failed), e.getMessage()));
+        }
     }
 
     private void importMcworld(File zipFile, File worldsDir, ImportResult result) throws IOException {
