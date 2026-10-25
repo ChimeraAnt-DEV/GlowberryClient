@@ -2424,7 +2424,9 @@ a regression.
   / `setInbuiltModEnabled` / `ModLoadoutStore.apply`. **M9** `ModMenuOrdering.apply` (pure, persisted).
   **M10** failure badges + reason sheet.
 - **G1** `ExtractionCachePolicy` (native extraction version → wipe stale libs). **G2** "Repair
-  installation" in Diagnostics. **G3** `libc++_shared.so` provided by the launcher + ABI/SONAME gate.
+  installation" in Diagnostics. **G3** `libc++_shared.so` provided by the launcher, `ElfHeaderValidator`
+  (ABI gate) + `ElfLibraryReader`/`NativeLibraryLoadOrder` (multi-`.so` load order) wired into
+  `ModNativeLoader` and `AntEggLoader.loadNative`.
   **G4** `.antegg` dependency check (`AntEggLoader`). **G5** signature DB with fail-closed refusal.
   **G6** submodule-init check. **G8** `ModCrashAttribution` auto-disable after N crashes. **G9**
   `CosmeticsDiagnosticsReport` + dialog. **G10** upstream known-issues note (`cosmetics_known_issues_note`,

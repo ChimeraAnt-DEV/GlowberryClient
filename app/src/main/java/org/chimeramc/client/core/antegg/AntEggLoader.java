@@ -1,8 +1,10 @@
 package org.chimeramc.client.core.antegg;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
+import org.chimeramc.client.core.minecraft.ElfHeaderValidator;
 import org.chimeramc.client.core.mods.Mod;
 import org.chimeramc.client.core.mods.ModLoadDiagnostics;
 import org.chimeramc.client.core.mods.ModManager;
@@ -130,7 +132,7 @@ public final class AntEggLoader {
         }
 
         if (manifest.isNative()) {
-            return fail(context, manifest.name, loadNative(manifest, extracted.directory));
+            return loadNative(context, manifest, extracted.directory);
         }
         if (manifest.isScript()) {
             return fail(context, manifest.name, loadScript(manifest, extracted.directory));
@@ -139,10 +141,19 @@ public final class AntEggLoader {
                 LoadResult.fail("unsupported mod type: " + manifest.type));
     }
 
-    private static LoadResult loadNative(AntEggManifest manifest, File directory) {
+    private static LoadResult loadNative(Context context, AntEggManifest manifest, File directory) {
         File library = new File(directory, manifest.entryPoint);
         if (!library.isFile()) {
             return LoadResult.fail("native entry point is missing: " + manifest.entryPoint);
+        }
+        // Item G3: an .AntEgg native entry is held to the same ABI gate as an ordinary native mod,
+        // so a 32-bit module on this arm64-only build is named and refused rather than failing later
+        // inside the injector with a bare linker message.
+        String abiMismatch = ElfHeaderValidator.describeMismatch(
+                library, Build.SUPPORTED_64_BIT_ABIS.length > 0);
+        if (abiMismatch != null) {
+            return fail(context, manifest.name, "refusing to load: " + abiMismatch,
+                    ModLoadDiagnostics.KIND_INCOMPATIBLE);
         }
         Mod mod = new Mod(manifest.id(), library.getName(), manifest.entryPoint, manifest.name,
                 Collections.emptyList(), manifest.author, manifest.version, null, null,
