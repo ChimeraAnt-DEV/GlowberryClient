@@ -38,4 +38,26 @@ public class InbuiltModuleProviderTypeTest {
         assertEquals(false, "slider_int".equals(
                 InbuiltModuleProvider.schemaTypeFor(UnifiedMod.ConfigType.KEYBIND)));
     }
+
+    /**
+     * The Armor HUD's options are rendered from the combat config schema, so each one needs a
+     * description or the dialog shows a bare control with no explanation.
+     *
+     * <p>These four keys were the only combat-schema entries missing from
+     * {@code configDescriptionRes}, so the dialog silently omitted their descriptions while every
+     * other option had one.
+     */
+    @Test
+    public void everyArmorHudOptionHasADescription() {
+        assertEquals(true, InbuiltModuleProvider.configDescriptionRes("armor_hud_show_target") != 0);
+        assertEquals(true, InbuiltModuleProvider.configDescriptionRes("armor_hud_show_enchants") != 0);
+        assertEquals(true, InbuiltModuleProvider.configDescriptionRes("armor_hud_stacked") != 0);
+        assertEquals(true, InbuiltModuleProvider.configDescriptionRes("armor_hud_refresh_ms") != 0);
+    }
+
+    /** An unknown key must read as "no description", not as some other option's text. */
+    @Test
+    public void anUnknownKeyHasNoDescription() {
+        assertEquals(0, InbuiltModuleProvider.configDescriptionRes("not_a_real_config_key"));
+    }
 }

@@ -135,6 +135,26 @@ public class DiagnosticsActivity extends BaseActivity {
         }
     }
 
+    /**
+     * The ABI the launcher would extract and load for the selected version.
+     *
+     * <p>Distinct from {@link Build#SUPPORTED_ABIS} above: that is what the device offers, this is
+     * what the launch pipeline actually picks from the version's own APK. A launch that fails with
+     * "32-bit instead of 64-bit" is only diagnosable when both are visible. Never throws — a missing
+     * version or an unreadable package reads as "unknown" rather than a guessed ABI.
+     */
+    private String launchAbiLabel() {
+        try {
+            GameVersion version = selectedVersion();
+            if (version == null) return "unknown (no version selected)";
+            String abi = org.chimeramc.client.core.minecraft.GamePackageManager
+                    .getInstance(this, version).getLaunchAbi();
+            return abi != null && !abi.isEmpty() ? abi : "unknown";
+        } catch (Throwable t) {
+            return "unknown";
+        }
+    }
+
     // ---------------------------------------------------------------- sections
 
     private void renderAppRows() {
@@ -152,7 +172,10 @@ public class DiagnosticsActivity extends BaseActivity {
         // API 33+ and did not match the manifest's targetSdkVersion either.
         addRow(rows, R.string.diagnostics_field_sdk_build,
                 String.valueOf(getApplicationInfo().targetSdkVersion));
+        addRow(rows, R.string.diagnostics_field_min_sdk,
+                String.valueOf(getApplicationInfo().minSdkVersion));
         addRow(rows, R.string.diagnostics_field_abi, String.join(", ", Build.SUPPORTED_ABIS));
+        addRow(rows, R.string.diagnostics_field_launcher_abi, launchAbiLabel());
 
         GameVersion version = selectedVersion();
         if (version != null) {

@@ -827,6 +827,10 @@ public final class InbuiltModuleProvider {
      */
     static int configDescriptionRes(String key) {
         switch (key) {
+            case CFG_ARMOR_HUD_SHOW_TARGET: return R.string.mod_config_armor_hud_show_target_desc;
+            case CFG_ARMOR_HUD_SHOW_ENCHANTS: return R.string.mod_config_armor_hud_show_enchants_desc;
+            case CFG_ARMOR_HUD_STACKED: return R.string.mod_config_armor_hud_stacked_desc;
+            case CFG_ARMOR_HUD_REFRESH_MS: return R.string.mod_config_armor_hud_refresh_ms_desc;
             case CFG_HITREG_SENSITIVITY: return R.string.mod_config_hitreg_sensitivity_desc;
             case CFG_HITREG_SMOOTHING: return R.string.mod_config_hitreg_smoothing_desc;
             case CFG_HITREG_PREDICTION: return R.string.mod_config_hitreg_prediction_desc;
