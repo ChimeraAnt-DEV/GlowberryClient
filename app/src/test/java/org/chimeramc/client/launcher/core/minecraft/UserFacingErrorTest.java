@@ -200,4 +200,42 @@ public class UserFacingErrorTest {
     public void aNullCauseStillHasAShortPhrase() {
         assertTrue(UserFacingError.shortMessageRes(null) != 0);
     }
+
+    @Test
+    public void theRepairsAbiRefusalIsNotReportedAsASourceProblem() {
+        // The launcher's own repair raises this when a package's only native libraries are 32-bit.
+        // A bare IOException used to classify as BAD_RESPONSE, telling the user the download
+        // source's page layout had changed - sending them to retry a download that can never work
+        // on this 64-bit build.
+        IOException abiRefusal = new IOException(
+                "This build ships 32-bit native libraries only, and GlowberryClient runs as a "
+                        + "64-bit app, so its libraries cannot be loaded.");
+        assertEquals(UserFacingError.Cause.ABI_INCOMPATIBLE, UserFacingError.classify(abiRefusal));
+        assertNotEquals(UserFacingError.Cause.BAD_RESPONSE, UserFacingError.classify(abiRefusal));
+    }
+
+    @Test
+    public void aReadOnlyCacheIsAPermissionProblemNotARetry() {
+        // The repair's cache-clear failure. "Try again" is the wrong advice for a file the launcher
+        // is not allowed to rewrite; the permission wording points at storage access.
+        IOException readOnly = new IOException(
+                "Could not clear the extracted library cache at /data/x/arm64 (the files are in "
+                        + "use or the storage is read-only)");
+        assertEquals(UserFacingError.Cause.PERMISSION_DENIED, UserFacingError.classify(readOnly));
+    }
+
+    @Test
+    public void aPermissionFailureStillWinsOverTheReadOnlyWording() {
+        // "permission denied" is checked first and must keep winning, or a genuine EACCES that also
+        // happens to mention a read-only file would be reported under the wrong heading.
+        IOException denied = new IOException("Permission denied (the storage is read-only)");
+        assertEquals(UserFacingError.Cause.PERMISSION_DENIED, UserFacingError.classify(denied));
+    }
+
+    @Test
+    public void anOrdinaryIoFailureIsStillABadResponse() {
+        // The new rules must not swallow the generic fallback they sit in front of.
+        assertEquals(UserFacingError.Cause.BAD_RESPONSE,
+                UserFacingError.classify(new IOException("stream closed unexpectedly")));
+    }
 }

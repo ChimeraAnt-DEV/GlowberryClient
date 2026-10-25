@@ -355,7 +355,10 @@ public class VersionManager {
                 // launch still failed with the same missing-library error.
                 File libDir = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
                 if (libDir.exists()) {
-                    deleteDir(libDir);
+                    // Throws with the path when the cache survives: extraction is about to write into
+                    // these exact files, so a stale read-only tree must be a named failure, not a
+                    // "Permission denied" from a FileOutputStream that mentions neither.
+                    deleteDirOrThrow(libDir);
                 }
                 long[] progress = {0};
                 int[] lastPercent = {-1};
@@ -410,9 +413,12 @@ public class VersionManager {
                 if (cacheUsable) {
                     callback.onRepairCompleted(true);
                 } else {
+                    // Wording is load-bearing: UserFacingError classifies from the text, and the
+                    // phrase "ships 32-bit" is what routes this to the ABI cause (and its launch
+                    // screen wording) instead of the generic "bad response" a bare IOException got.
                     callback.onRepairFailed(new IOException(
-                            "The version's libraries could not be extracted: no ABI this device "
-                                    + "can load was found in its APK."));
+                            "This build ships 32-bit native libraries only, and GlowberryClient "
+                                    + "runs as a 64-bit app, so its libraries cannot be loaded."));
                 }
 
             } catch (Throwable e) {
@@ -1197,6 +1203,19 @@ public class VersionManager {
         }
     }
 
+    /**
+     * Removes a file or directory tree, clearing the read-only attribute first.
+     *
+     * <p>Extracted native libraries are deliberately made read-only once they are in the cache
+     * ({@code GamePackageManager.ensureReadOnly}), and the repair deletes that cache before
+     * re-extracting into it. A plain {@code delete()} on a read-only file fails on some storage
+     * configurations, and the failure was invisible: the return value was discarded, so the repair
+     * went on to open the same read-only file for writing and died with a bare "Permission denied"
+     * that named neither the file nor the reason. Making the file writable first, and reporting a
+     * tree that still could not be removed, turns that into a diagnosable failure.
+     *
+     * @return true when the path no longer exists
+     */
     private boolean deleteDir(File file) {
         if (file == null || !file.exists()) return true;
         if (file.isDirectory()) {
@@ -1204,8 +1223,24 @@ public class VersionManager {
             if (files != null)
                 for (File c : files)
                     deleteDir(c);
+        } else {
+            // Only files carry the read-only attribute the extractor sets; a directory that will not
+            // delete is a real failure and is reported by the caller.
+            try {
+                file.setWritable(true, true);
+            } catch (SecurityException ignored) {
+                // Fall through: the delete below is the authority on whether it worked.
+            }
         }
         return file.delete();
+    }
+
+    /** As {@link #deleteDir}, but names the path when the tree survives, for the repair path. */
+    private void deleteDirOrThrow(File dir) throws IOException {
+        if (!deleteDir(dir) && dir != null && dir.exists()) {
+            throw new IOException("Could not clear the extracted library cache at "
+                    + dir.getAbsolutePath() + " (the files are in use or the storage is read-only)");
+        }
     }
 
     private File getRuntimeLibDir(String dirName) {

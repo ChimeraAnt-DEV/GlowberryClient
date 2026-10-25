@@ -2437,6 +2437,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_short_permission_denied">storage permission denied</string>
     <string name="error_short_corrupt_package">the file is damaged or not a valid package</string>
     <string name="error_short_interrupted">the transfer was interrupted</string>
+    <string name="error_short_abi_incompatible">Unsupported 32-bit build</string>
     <string name="error_short_unknown">see the log for the exact error</string>
 
 </resources>
