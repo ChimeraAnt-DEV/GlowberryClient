@@ -61,7 +61,7 @@ public class VersionManager {
 
         void onRepairCompleted(boolean success);
 
-        void onRepairFailed(Exception e);
+        void onRepairFailed(Throwable e);
     }
 
     public interface OnDeleteVersionCallback {
@@ -390,7 +390,11 @@ public class VersionManager {
 
                 callback.onRepairCompleted(true);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that clears the repair
+                // dialog and releases the flow latch. Extraction streams a several-hundred-megabyte
+                // APK, so an OutOfMemoryError is realistic - and with the latch still set,
+                // attemptRepairLibs refused every later repair for the life of the process.
                 callback.onRepairFailed(e);
             }
         }).start();
@@ -907,7 +911,7 @@ public class VersionManager {
             }
 
             @Override
-            public void onRepairFailed(Exception e) {
+            public void onRepairFailed(Throwable e) {
                 activity.runOnUiThread(() -> {
                     libsRepairFlowActive = false;
                     Runnable showError = () -> {
@@ -965,7 +969,7 @@ public class VersionManager {
      * classifier names the cause (out of space, permission denied, damaged files) so the dialog
      * says what to do, and falls back to the exception's type when it has no text at all.
      */
-    private static String repairFailureMessage(android.content.Context context, Exception error) {
+    private static String repairFailureMessage(android.content.Context context, Throwable error) {
         if (error == null) return context.getString(R.string.error_reason_unknown);
         String reason = context.getString(
                 org.chimeramc.client.launcher.core.minecraft.UserFacingError.messageRes(
