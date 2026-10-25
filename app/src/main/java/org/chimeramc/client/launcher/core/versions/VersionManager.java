@@ -388,10 +388,26 @@ public class VersionManager {
 
                 callback.onRepairProgress(PROGRESS_FINALIZING);
                 writeVersionMetadata(apkFile, version, dataDirName);
+                // Record the rebuilt cache exactly as the extractor does. Without this the repair
+                // wrote libraries the next launch refused to trust - no marker, no manifest - so it
+                // wiped them and re-extracted the whole package, on the launch the user was waiting
+                // for. The markers make the repaired cache a cache hit.
+                boolean cacheUsable = GamePackageManager.writeExtractionMarkers(
+                        version, apkFiles, repairMarkerDirs(version));
                 loadAllVersions();
                 callback.onRepairProgress(PROGRESS_MAX);
 
-                callback.onRepairCompleted(true);
+                // Success means the cache is now usable, not merely that the copy loop finished.
+                // A package that ships no loadable ABI copies nothing markable, and reporting
+                // "Repair completed" for it sent the user back to a launch that failed for the
+                // reason the repair was supposed to fix. The failure message names the cause.
+                if (cacheUsable) {
+                    callback.onRepairCompleted(true);
+                } else {
+                    callback.onRepairFailed(new IOException(
+                            "The version's libraries could not be extracted: no ABI this device "
+                                    + "can load was found in its APK."));
+                }
 
             } catch (Throwable e) {
                 // Throwable, not Exception: this handler is the only thing that clears the repair
@@ -401,6 +417,23 @@ public class VersionManager {
                 callback.onRepairFailed(e);
             }
         }).start();
+    }
+
+    /**
+     * The ABI directories the repair just wrote into, as directories rather than names.
+     *
+     * <p>Every candidate rather than only the one this launch is predicted to use, for the same
+     * reason the repair clears every candidate: the extraction folder comes from the ABIs the APK
+     * ships while the launch ABI comes from the version's recorded label, and the two can name
+     * different directories.
+     */
+    private List<File> repairMarkerDirs(GameVersion version) {
+        File libRoot = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
+        List<File> dirs = new ArrayList<>();
+        for (String abiDir : MinecraftLauncher.repairTargetAbiDirs()) {
+            dirs.add(new File(libRoot, abiDir));
+        }
+        return dirs;
     }
 
     private void writeVersionMetadata(File apkFile, GameVersion version, String directoryName) throws IOException {
