@@ -9,7 +9,7 @@
     android:layout_marginBottom="3dp"
     android:defaultFocusHighlightEnabled="false"
     app:cardBackgroundColor="@color/mod_menu_bg_surface2"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="@dimen/radius_chip"
     app:cardElevation="0dp">
 
     <LinearLayout

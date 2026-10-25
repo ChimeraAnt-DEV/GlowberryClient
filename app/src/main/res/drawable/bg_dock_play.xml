@@ -9,5 +9,5 @@
         android:startColor="@color/ui_accent_500"
         android:endColor="@color/ui_accent_400"
         android:angle="0" />
-    <corners android:radius="14dp" />
+    <corners android:radius="@dimen/radius_large" />
 </shape>

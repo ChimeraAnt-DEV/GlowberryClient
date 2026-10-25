@@ -24,7 +24,7 @@
     android:defaultFocusHighlightEnabled="false"
     android:focusable="false"
     app:cardBackgroundColor="@color/mod_menu_bg_surface2"
-    app:cardCornerRadius="14dp"
+    app:cardCornerRadius="@dimen/radius_card"
     app:cardElevation="0dp"
     app:cardPreventCornerOverlap="true">
 
