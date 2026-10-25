@@ -37,6 +37,7 @@ import org.chimeramc.client.core.mods.inbuilt.ExternalModuleProvider;
 import org.chimeramc.client.core.mods.inbuilt.InbuiltModuleProvider;
 import org.chimeramc.client.core.mods.inbuilt.UnifiedMod;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
+import org.chimeramc.client.core.replay.ReplayControls;
 import org.chimeramc.client.core.replay.ReplayPanel;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.core.mods.pvp.PvpSectionPolicy;
@@ -3073,38 +3074,28 @@ public class ModMenuOverlay {
         }
     }
 
-    /** Controller handling for the Replay section, matching the VIP menu's bind hints. */
+    /**
+     * Controller handling for the Replay section.
+     *
+     * <p>Every binding the on-screen hint names is resolved through {@link ReplayControls} and
+     * applied by {@link ReplayPanel#handleControl}, so the in-game menu and the Library's Replay tab
+     * run one implementation and cannot drift. Only the cinematic-camera button is a menu-only
+     * extra, because the Library does not offer that route.
+     */
     private boolean handleReplayKey(int keyCode) {
+        ReplayControls.Action action = ReplayControls.forControllerKey(keyCode);
+        if (action != null) {
+            // Start is the transport play/pause only while a clip is open; otherwise it is not
+            // consumed here, so the caller can fall back to its own binding.
+            if (action == ReplayControls.Action.PLAY_PAUSE && !replayPanel.isPlayerOpen()) {
+                return false;
+            }
+            return replayPanel.handleControl(action);
+        }
         switch (keyCode) {
-            case android.view.KeyEvent.KEYCODE_BUTTON_L1:
-                replayPanel.cycleSelection(false);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_R1:
-                replayPanel.cycleSelection(true);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_A:
             case android.view.KeyEvent.KEYCODE_ENTER:
             case android.view.KeyEvent.KEYCODE_DPAD_CENTER:
                 replayPanel.playSelected();
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_X:
-                replayPanel.deleteSelected();
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_Y:
-                replayPanel.favoriteSelected();
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_START:
-                // While a clip is open, Start is the transport play/pause rather than a close.
-                if (replayPanel.isPlayerOpen() && replayPanel.togglePlayback()) return true;
-                return false;
-            case android.view.KeyEvent.KEYCODE_BUTTON_L2:
-                replayPanel.scrubPlayback(-0.1f);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_R2:
-                replayPanel.scrubPlayback(0.1f);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_SELECT:
-                replayPanel.stepPlaybackSpeed();
                 return true;
             case android.view.KeyEvent.KEYCODE_BUTTON_THUMBR:
                 replayPanel.cinematicSelected();

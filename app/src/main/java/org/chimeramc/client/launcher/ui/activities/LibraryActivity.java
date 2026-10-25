@@ -3,6 +3,7 @@ package org.chimeramc.client.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -148,6 +149,35 @@ public class LibraryActivity extends BaseActivity {
             tab.setTextColor(getColor(R.color.text_secondary));
             tab.setTypeface(tab.getTypeface(), android.graphics.Typeface.NORMAL);
         }
+    }
+
+    /**
+     * The Replay tab owns the controller keys the panel's hint names, so the host must not take
+     * them for tab switching. The other two tabs keep bumper navigation.
+     */
+    @Override
+    protected boolean shouldHandleNavKeys() {
+        return visibleTab() != TAB_REPLAY;
+    }
+
+    /**
+     * Forwards a hardware key press to the Replay fragment while it is showing.
+     *
+     * <p>The panel displays a controller hint on this screen, so without this forward the hint
+     * would advertise buttons that do nothing. Consumed presses do not reach the base handler, so a
+     * bumper cycles clips rather than switching top-level tabs.
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0
+                && visibleTab() == TAB_REPLAY) {
+            Fragment replay = getSupportFragmentManager().findFragmentByTag(TAG_REPLAY);
+            if (replay instanceof ReplayFragment
+                    && ((ReplayFragment) replay).handleHardwareKey(event.getKeyCode())) {
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
