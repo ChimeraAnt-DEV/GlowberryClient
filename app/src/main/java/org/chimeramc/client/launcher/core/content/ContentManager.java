@@ -1,6 +1,7 @@
 package org.chimeramc.client.core.content;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -8,11 +9,13 @@ import androidx.lifecycle.MutableLiveData;
 import org.chimeramc.client.core.versions.GameVersion;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ContentManager {
+    private static final String TAG = "ContentManager";
     private static ContentManager instance;
     
     private final Context context;
@@ -72,45 +75,55 @@ public class ContentManager {
     }
 
     public void refreshWorlds() {
-        refreshExecutor.execute(() -> {
-            List<WorldItem> worlds = worldManager.getWorlds();
-            worldsLiveData.postValue(worlds);
-        });
+        runRefresh(worldsLiveData, worldManager::getWorlds);
     }
 
     public void refreshResourcePacks() {
-        refreshExecutor.execute(() -> {
-            List<ResourcePackItem> resourcePacks = resourcePackManager.getResourcePacks();
-            resourcePacksLiveData.postValue(resourcePacks);
-        });
+        runRefresh(resourcePacksLiveData, resourcePackManager::getResourcePacks);
     }
 
     public void refreshBehaviorPacks() {
-        refreshExecutor.execute(() -> {
-            List<ResourcePackItem> behaviorPacks = resourcePackManager.getBehaviorPacks();
-            behaviorPacksLiveData.postValue(behaviorPacks);
-        });
+        runRefresh(behaviorPacksLiveData, resourcePackManager::getBehaviorPacks);
     }
 
     public void refreshSkinPacks() {
-        refreshExecutor.execute(() -> {
-            List<ResourcePackItem> skinPacks = resourcePackManager.getSkinPacks();
-            skinPacksLiveData.postValue(skinPacks);
-        });
+        runRefresh(skinPacksLiveData, resourcePackManager::getSkinPacks);
     }
 
     public void refreshScreenshots() {
-        refreshExecutor.execute(() -> {
-            List<ScreenshotItem> screenshots = screenshotManager.getScreenshots();
-            screenshotsLiveData.postValue(screenshots);
-        });
+        runRefresh(screenshotsLiveData, screenshotManager::getScreenshots);
     }
 
     public void refreshServers() {
-        refreshExecutor.execute(() -> {
-            List<ServerItem> servers = serverManager.getServers();
-            serversLiveData.postValue(servers);
-        });
+        runRefresh(serversLiveData, serverManager::getServers);
+    }
+
+    /**
+     * Runs one directory scan on the refresh worker and always publishes a result.
+     *
+     * <p>The screens clear their loading overlay from the LiveData observer, so a scan that threw
+     * without posting left that overlay up forever and the tab unusable - the failure was invisible
+     * because the only surface that would have reported it was the one that never got called. A
+     * failed scan now publishes an empty list (the same thing a genuinely empty directory
+     * produces), so the screen settles and the user sees an empty tab rather than a dead spinner.
+     */
+    private <T> void runRefresh(MutableLiveData<List<T>> target, java.util.concurrent.Callable<List<T>> scan) {
+        try {
+            refreshExecutor.execute(() -> {
+                List<T> result;
+                try {
+                    result = scan.call();
+                } catch (Throwable t) {
+                    Log.w(TAG, "Content refresh failed; publishing an empty result", t);
+                    result = new ArrayList<>();
+                }
+                target.postValue(result);
+            });
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            // The manager was shut down under the caller; settle the screen rather than leaving it
+            // waiting on a result that can never arrive.
+            target.postValue(new ArrayList<>());
+        }
     }
 
     public LiveData<List<WorldItem>> getWorldsLiveData() {

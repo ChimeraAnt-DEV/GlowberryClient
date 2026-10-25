@@ -2217,6 +2217,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="replay_action_delete">Delete</string>
     <string name="replay_action_favorite">Favorite</string>
     <string name="replay_action_unfavorite">Remove favorite</string>
+    <string name="replay_delete_failed">Could not delete the clip. Close any app that may be playing it, then try again.</string>
     <string name="replay_rename_failed">Could not rename the clip</string>
     <string name="replay_action_cancel">Cancel</string>
     <string name="replay_action_save">Save</string>
