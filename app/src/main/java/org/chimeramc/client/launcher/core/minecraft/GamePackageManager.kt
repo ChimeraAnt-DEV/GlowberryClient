@@ -1085,6 +1085,29 @@ class GamePackageManager private constructor(
          * True when the extraction cache for this version still holds the expected marker and
          * will be reused on the next launch instead of being wiped + re-extracted.
          */
+        /**
+         * True when an extraction has run for this version at all, whether or not it is current.
+         *
+         * <p>Distinct from [isExtractionCacheCurrent]: that answers "is the cache up to date", this
+         * answers "does a cache exist". The diagnostics screen needs both to tell "not extracted
+         * yet" (the launch will do it) from "extracted and damaged" (Repair is the fix), which is
+         * the same distinction the repair rule draws.
+         */
+        @JvmStatic
+        fun isExtractionAttempted(context: Context, version: GameVersion?): Boolean {
+            return try {
+                if (version == null) return false
+                val profileId = MinecraftLauncher.getStorageProfileId(version)
+                val dir = MinecraftLauncher.getRuntimeLibDir(context, profileId)
+                if (!dir.isDirectory) return false
+                MinecraftLauncher.repairTargetAbiDirs().any { abi ->
+                    File(dir, abi).isDirectory
+                }
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
         @JvmStatic
         fun isExtractionCacheCurrent(context: Context, version: GameVersion?): Boolean {
             return try {

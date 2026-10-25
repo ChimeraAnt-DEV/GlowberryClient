@@ -1511,6 +1511,10 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_launch_blocked">Launch blocked</string>
     <string name="diagnostics_launch_proceeds">Launch proceeds</string>
     <string name="diagnostics_field_extraction_version">Extraction version</string>
+    <string name="diagnostics_field_library_repair">Extracted libraries</string>
+    <string name="diagnostics_library_repair_needed">DAMAGED — a required library is missing; Repair installation will re-extract</string>
+    <string name="diagnostics_library_repair_ok">Complete</string>
+    <string name="diagnostics_library_repair_pending">Not extracted yet — the next launch extracts them</string>
     <string name="diagnostics_field_signature_rules_source">Signature rules source</string>
     <string name="diagnostics_field_signature_rules_revision">Signature rules revision</string>
     <string name="diagnostics_field_signature_rules_coverage">Signature rule coverage</string>

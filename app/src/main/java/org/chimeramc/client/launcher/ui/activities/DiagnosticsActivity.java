@@ -86,6 +86,10 @@ public class DiagnosticsActivity extends BaseActivity {
         LaunchReadiness.State readiness = LaunchReadiness.State.NO_VERSION_SELECTED;
         boolean extractionCurrent;
         int extractionExpected;
+        /** True when the cache is damaged (current marker, a required library gone). */
+        boolean libraryRepairNeeded;
+        /** True when an extraction has run at all for this build. */
+        boolean extractionAttempted;
         String rulesSource;
         int rulesRevision = -1;
         /** Non-null when the rule DB has no entry covering the selected build. */
@@ -185,6 +189,10 @@ public class DiagnosticsActivity extends BaseActivity {
         out.extractionExpected = GamePackageManager.calculateNativeExtractionVersion();
         out.extractionCurrent = out.version != null
                 && GamePackageManager.isExtractionCacheCurrent(this, out.version);
+        out.extractionAttempted = out.extractionCurrent
+                || GamePackageManager.isExtractionAttempted(this, out.version);
+        // The same flag the launch path and Repair read, so this row can never disagree with them.
+        out.libraryRepairNeeded = out.version != null && out.version.needsRepair;
         out.rulesSource = PreloaderSignatureRulesManager.getRulesSource(this);
         out.rulesRevision = PreloaderSignatureRulesManager.getRulesRevision(this);
         if (out.version != null && out.version.versionCode != null
@@ -346,6 +354,15 @@ public class DiagnosticsActivity extends BaseActivity {
                         ? getString(R.string.diagnostics_extraction_ok) + " (v" + data.extractionExpected + ")"
                         : getString(R.string.diagnostics_extraction_stale) + " (v" + data.extractionExpected + ")");
         addRow(rows, "Extractor", String.valueOf(GamePackageManager.extractorVersion()));
+        // Whether a library is missing from the cache the launch will load. This is the fact behind
+        // the repair prompt; showing it here is what makes a "failed to load a library" report
+        // diagnosable without reproducing the launch.
+        addRow(rows, R.string.diagnostics_field_library_repair,
+                data.libraryRepairNeeded
+                        ? getString(R.string.diagnostics_library_repair_needed)
+                        : data.extractionAttempted
+                                ? getString(R.string.diagnostics_library_repair_ok)
+                                : getString(R.string.diagnostics_library_repair_pending));
     }
 
     private void renderRulesRows() {
