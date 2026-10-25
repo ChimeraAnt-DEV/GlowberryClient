@@ -1,5 +1,6 @@
 package org.chimeramc.client.util;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -58,7 +59,10 @@ public class WorldBackupService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         }
-        executor.execute(this::runBackupNow);
+        if (!SafeExecutor.submit(executor, this::runBackupNow)) {
+            // onDestroy shut the pool down; the service is going away with it.
+            stopSelf(startId);
+        }
         return START_NOT_STICKY;
     }
 

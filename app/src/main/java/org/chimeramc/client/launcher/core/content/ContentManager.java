@@ -110,18 +110,16 @@ public class ContentManager {
      * produces), so the screen settles and the user sees an empty tab rather than a dead spinner.
      */
     private <T> void runRefresh(MutableLiveData<List<T>> target, java.util.concurrent.Callable<List<T>> scan) {
-        try {
-            refreshExecutor.execute(() -> {
-                List<T> result;
-                try {
-                    result = scan.call();
-                } catch (Throwable t) {
-                    Log.w(TAG, "Content refresh failed; publishing an empty result", t);
-                    result = new ArrayList<>();
-                }
-                target.postValue(result);
-            });
-        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+        if (!SafeExecutor.submit(refreshExecutor, () -> {
+            List<T> result;
+            try {
+                result = scan.call();
+            } catch (Throwable t) {
+                Log.w(TAG, "Content refresh failed; publishing an empty result", t);
+                result = new ArrayList<>();
+            }
+            target.postValue(result);
+        })) {
             // The manager was shut down under the caller; settle the screen rather than leaving it
             // waiting on a result that can never arrive.
             target.postValue(new ArrayList<>());

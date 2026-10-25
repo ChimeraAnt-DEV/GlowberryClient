@@ -1,5 +1,6 @@
 package org.chimeramc.client.core.content;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,7 +22,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.chimeramc.client.R;
@@ -55,17 +55,11 @@ public class ContentImporter {
     public void importContent(List<Uri> uris, File resourcePacksDir, File behaviorPacksDir, 
                               File skinPacksDir, File worldsDir, ImportCallback callback) {
         // A caller that kept the importer past its owner's teardown, or reused a released one,
-        // would otherwise throw RejectedExecutionException on the UI thread and take the screen
-        // down instead of reporting why the import did not run.
-        if (executor.isShutdown()) {
+        // would otherwise throw on the UI thread and take the screen down instead of reporting why
+        // the import did not run.
+        if (!SafeExecutor.submit(executor, () -> runImport(uris, resourcePacksDir, behaviorPacksDir,
+                skinPacksDir, worldsDir, callback))) {
             reportImportFailure(callback, "the importer was already shut down");
-            return;
-        }
-        try {
-            executor.execute(() -> runImport(uris, resourcePacksDir, behaviorPacksDir, skinPacksDir,
-                    worldsDir, callback));
-        } catch (RejectedExecutionException e) {
-            reportImportFailure(callback, e.getMessage());
         }
     }
 

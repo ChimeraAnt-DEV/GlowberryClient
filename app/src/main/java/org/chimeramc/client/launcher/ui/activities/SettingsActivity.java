@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import android.util.Log;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -59,6 +60,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class SettingsActivity extends BaseActivity {
+
+    private static final String TAG = "SettingsActivity";
 
     private PermissionsHandler permissionsHandler;
     private ActivityResultLauncher<Intent> permissionResultLauncher;
@@ -1350,8 +1353,28 @@ public class SettingsActivity extends BaseActivity {
             migrationCleanupButton.setEnabled(false);
         }
         AsyncTask.execute(() -> {
-            LauncherStorage.LegacyCleanupResult result = LauncherStorage.cleanupLegacyRoot(this);
+            // Throwable, not a bare call: this handler is the only thing that re-enables the Cleanup
+            // button and reports the outcome. A throw inside cleanupLegacyRoot left the button
+            // disabled forever with nothing said, and it walks and deletes a whole directory tree.
+            final LauncherStorage.LegacyCleanupResult result;
+            try {
+                result = LauncherStorage.cleanupLegacyRoot(this);
+            } catch (Throwable t) {
+                Log.e(TAG, "Legacy directory cleanup failed", t);
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    refreshMigrationCleanupUi();
+                    String message = getString(R.string.migration_cleanup_failed,
+                            UserFacingError.reason(this, t));
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                    if (migrationCleanupStatus != null) {
+                        migrationCleanupStatus.setText(message);
+                    }
+                });
+                return;
+            }
             runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
                 refreshMigrationCleanupUi();
                 if (result.success) {
                     String message = getString(
