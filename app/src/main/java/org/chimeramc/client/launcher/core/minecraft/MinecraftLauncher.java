@@ -61,6 +61,26 @@ public class MinecraftLauncher {
     }
 
     /**
+     * Every system-ABI directory the extractor can write into, as directory names.
+     *
+     * <p>One source of truth for the repair paths. The extraction folder is derived from the ABIs
+     * the version's APK actually ships ({@code GamePackageManager.getDeviceAbi}), while
+     * {@link #resolveLaunchAbi(GameVersion)} prefers the version's recorded {@code abiList} - and
+     * that label records what was extracted <em>last</em>, so the two can name different folders.
+     * A repair that cleared only the folder {@code resolveLaunchAbi} predicts would therefore leave
+     * the stale cache the extractor is about to reuse untouched, while reporting success. Clearing
+     * every candidate is what makes the repair cover the folder in use whichever one it is.
+     */
+    public static String[] repairTargetAbiDirs() {
+        return new String[]{
+                abiToSystemLibDir("arm64-v8a"),
+                abiToSystemLibDir("armeabi-v7a"),
+                abiToSystemLibDir("x86_64"),
+                abiToSystemLibDir("x86"),
+        };
+    }
+
+    /**
      * Resolves the ABI a version must be launched with, preferring the version's declared
      * ABI ({@code abiList}) over the device's primary ABI. The entire native-library
      * loading path (extraction folder + load path) derives from this value, so a

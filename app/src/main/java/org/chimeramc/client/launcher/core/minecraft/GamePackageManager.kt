@@ -1237,8 +1237,7 @@ class GamePackageManager private constructor(
                 // and that label is a record of what was extracted *last*, so it can name a
                 // different directory than the extractor will actually write to. Clearing every
                 // candidate is what makes the repair cover the folder in use whichever it is.
-                val abis = listOf("arm64", "arm", "x86_64", "x86")
-                for (abi in abis) {
+                for (abi in MinecraftLauncher.repairTargetAbiDirs()) {
                     val abiDir = File(dir, abi)
                     val versionFile = File(abiDir, "native_extraction_version")
                     val manifestFile = File(abiDir, ".extraction_manifest")
