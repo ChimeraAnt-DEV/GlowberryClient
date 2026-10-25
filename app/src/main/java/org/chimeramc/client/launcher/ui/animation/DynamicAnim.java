@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.PathInterpolator;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,7 @@ import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 
 import org.chimeramc.client.R;
+import org.chimeramc.client.ui.components.UiTokens;
 
 public final class DynamicAnim {
     private DynamicAnim() {}
@@ -26,6 +28,23 @@ public final class DynamicAnim {
     private static final long DIALOG_DISMISS_DURATION_MS = 160L;
     private static float globalSpeedMultiplier = 1.0f;
     private static boolean animationsEnabled = true;
+
+    /**
+     * The motion scheme in force (U6). Every animated surface here reads its duration, damping and
+     * stiffness from this one object rather than hard-coding a spring, so "Reduce motion" is a
+     * single switch instead of a hunt through the codebase.
+     *
+     * <p>Kept in step with {@link #animationsEnabled}: {@link UiTokens.motionScheme} derives it from
+     * the app's reduce-motion switch and the platform's "remove animations" setting, and
+     * {@link #enableAnimations}/{@link #disableAnimations} are the two entry points that set it.
+     * A plain static field, never synchronized, because it is only read on the UI thread.
+     */
+    private static UiTokens.Motion motion = UiTokens.Motion.EXPRESSIVE;
+
+    /** The scheme in force. Prefer this over a literal duration. */
+    public static UiTokens.Motion motionScheme() {
+        return motion;
+    }
 
     public static void setGlobalSpeedMultiplier(float multiplier) {
         globalSpeedMultiplier = Math.max(0.1f, multiplier);
@@ -37,10 +56,29 @@ public final class DynamicAnim {
 
     public static void enableAnimations() {
         animationsEnabled = true;
+        motion = UiTokens.Motion.EXPRESSIVE;
     }
 
     public static void disableAnimations() {
         animationsEnabled = false;
+        motion = UiTokens.Motion.REDUCED;
+    }
+
+    /**
+     * Selects the scheme from the app's reduce-motion switch and the platform's animation scale.
+     *
+     * <p>Callers pass both so this class does not have to reach for a Context on the animation path.
+     * The platform setting wins: a user who has told Android to remove animations must not get
+     * springs back because the app's own switch happens to be on.
+     */
+    public static void applyMotionScheme(boolean reduceMotion, boolean platformAnimationsOff) {
+        motion = UiTokens.motionScheme(reduceMotion, platformAnimationsOff);
+        animationsEnabled = motion != UiTokens.Motion.REDUCED;
+    }
+
+    /** The duration for a decorative transition, in the scheme currently in force. */
+    public static long motionDurationMs(long expressiveMs) {
+        return motion.linear ? motion.durationMs : scaled(expressiveMs);
     }
 
     public static boolean areAnimationsEnabled() {
@@ -49,42 +87,49 @@ public final class DynamicAnim {
 
     public static SpringAnimation springAlphaTo(View view, float target) {
         SpringAnimation anim = new SpringAnimation(view, DynamicAnimation.ALPHA, target);
-        anim.setSpring(new SpringForce(target)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW));
+        anim.setSpring(springFor(target, SpringForce.DAMPING_RATIO_NO_BOUNCY));
         return anim;
     }
 
     public static SpringAnimation springTranslationYTo(View view, float target) {
         SpringAnimation anim = new SpringAnimation(view, DynamicAnimation.TRANSLATION_Y, target);
-        anim.setSpring(new SpringForce(target)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW));
+        anim.setSpring(springFor(target, SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY));
         return anim;
     }
 
     public static SpringAnimation springTranslationXTo(View view, float target) {
         SpringAnimation anim = new SpringAnimation(view, DynamicAnimation.TRANSLATION_X, target);
-        anim.setSpring(new SpringForce(target)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW));
+        anim.setSpring(springFor(target, SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY));
         return anim;
     }
 
     public static SpringAnimation springScaleXTo(View view, float target) {
         SpringAnimation anim = new SpringAnimation(view, DynamicAnimation.SCALE_X, target);
-        anim.setSpring(new SpringForce(target)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW));
+        anim.setSpring(springFor(target, SpringForce.DAMPING_RATIO_NO_BOUNCY));
         return anim;
     }
 
     public static SpringAnimation springScaleYTo(View view, float target) {
         SpringAnimation anim = new SpringAnimation(view, DynamicAnimation.SCALE_Y, target);
-        anim.setSpring(new SpringForce(target)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW));
+        anim.setSpring(springFor(target, SpringForce.DAMPING_RATIO_NO_BOUNCY));
         return anim;
+    }
+
+    /**
+     * A spring for {@code target}, taken from the scheme in force (U6).
+     *
+     * <p>{@code expressiveDamping} is the damping this surface wants when motion is allowed; the
+     * reduced scheme overrides it with a non-bouncy ratio so the transition still happens but does
+     * not overshoot. Stiffness comes from the scheme too, so "Expressive" and "Reduce motion" are
+     * two different feels rather than the same spring at two durations.
+     */
+    private static SpringForce springFor(float target, float expressiveDamping) {
+        UiTokens.Motion scheme = motion;
+        float damping = scheme.linear ? SpringForce.DAMPING_RATIO_NO_BOUNCY : expressiveDamping;
+        float stiffness = scheme.stiffness > 0f ? scheme.stiffness : SpringForce.STIFFNESS_LOW;
+        return new SpringForce(target)
+                .setDampingRatio(damping)
+                .setStiffness(stiffness);
     }
 
     /** View tag marking a view that already carries the press listener. */
@@ -263,9 +308,18 @@ public final class DynamicAnim {
 
     /**
      * Dialog enter: alpha 0->1 and scale 0.94->1.
+     *
+     * <p>Under the reduced scheme the dialog is placed at its final state instead of springing, so
+     * the transition is a plain appearance rather than a travel-and-settle.
      */
     public static void animateDialogShow(View root) {
         if (root == null) return;
+        if (!animationsEnabled || motion.linear) {
+            root.setAlpha(1f);
+            root.setScaleX(1f);
+            root.setScaleY(1f);
+            return;
+        }
         root.setAlpha(0f);
         root.setScaleX(0.94f);
         root.setScaleY(0.94f);
@@ -287,8 +341,9 @@ public final class DynamicAnim {
                 .alpha(0f)
                 .scaleX(0.94f)
                 .scaleY(0.94f)
-                .setDuration(DIALOG_DISMISS_DURATION_MS)
-                .setInterpolator(new AccelerateInterpolator())
+                .setDuration(motionDurationMs(DIALOG_DISMISS_DURATION_MS))
+                .setInterpolator(motion.linear ? new LinearInterpolator()
+                        : new AccelerateInterpolator())
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -368,13 +423,21 @@ public final class DynamicAnim {
         view.setAlpha(0f);
         view.setScaleX(ARRIVAL_FROM_SCALE);
         view.setScaleY(ARRIVAL_FROM_SCALE);
+        // The reduced scheme keeps the appearance but drops the overshoot, so an arrival still
+        // reads as an arrival without the bounce (U6).
+        boolean overshoot = !motion.linear;
+        if (!overshoot) {
+            view.setScaleX(1f);
+            view.setScaleY(1f);
+        }
         view.animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
                 .setStartDelay(scaled(startDelayMs))
-                .setDuration(scaled(260L))
-                .setInterpolator(new OvershootInterpolator(1.6f))
+                .setDuration(motionDurationMs(260L))
+                .setInterpolator(overshoot ? new OvershootInterpolator(1.6f)
+                        : new LinearInterpolator())
                 .start();
     }
 
@@ -405,8 +468,9 @@ public final class DynamicAnim {
             return;
         }
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-        animator.setDuration(scaled(durationMs));
-        animator.setInterpolator(new PathInterpolator(0.22f, 1f, 0.36f, 1f));
+        animator.setDuration(motionDurationMs(durationMs));
+        animator.setInterpolator(motion.linear ? new LinearInterpolator()
+                : new PathInterpolator(0.22f, 1f, 0.36f, 1f));
         animator.addUpdateListener(animation -> {
             float t = (float) animation.getAnimatedValue();
             onValue.accept(Math.round(target * t));
