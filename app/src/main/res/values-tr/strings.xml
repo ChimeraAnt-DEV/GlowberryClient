@@ -515,7 +515,8 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="dialog_title_login_required">Oturum açma gerekli</string>
     <string name="dialog_message_login_required">Başlatıcı yönetimli giriş etkin, ancak oturum açılmamış. Oturum açmak için Hesaplar\'a gidin.</string>
     <string name="go_to_accounts">Hesaplar</string>
-    <string name="disable_launcher_login_and_continue">Kapat</string>
+    <string name="disable_launcher_login_and_continue">Devre dışı bırak ve devam et</string>
+    <string name="launcher_login_disabled_launching">Başlatıcı yönetimli oturum açma kapatıldı. Başlatılıyor…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Mevcut Hesap</string>

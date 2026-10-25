@@ -2206,7 +2206,8 @@ import okhttp3.OkHttpClient;
                     .setMessage(getString(message))
                     .setPositiveButton(getString(R.string.go_to_accounts),
                             v -> startActivity(new Intent(this, AccountsActivity.class)))
-                    .setNegativeButton(getString(R.string.disable_launcher_login_and_continue), null)
+                    .setNegativeButton(getString(R.string.disable_launcher_login_and_continue),
+                            v -> disableLauncherManagedLoginAndLaunch())
                     .show();
             return;
         }
@@ -2231,6 +2232,24 @@ import okhttp3.OkHttpClient;
                 .setMessage(getString(message))
                 .setPositiveButton(getString(R.string.dialog_positive_ok), null)
                 .show();
+    }
+
+    /**
+     * Turns off launcher-managed sign-in and re-runs the launch, which is what the dialog's second
+     * button says it does.
+     *
+     * <p>The button was wired to {@code null}, so choosing it only dismissed the dialog: the flag
+     * stayed on, the next launch was refused for exactly the same reason, and the user was left
+     * with a button whose label described an action it never performed. Disabling the requirement
+     * is the user's explicit decision here, so the flag is cleared and the preflight re-runs with
+     * the new state rather than making them press Play again.
+     */
+    private void disableLauncherManagedLoginAndLaunch() {
+        FeatureSettings.getInstance().setLauncherManagedMcLoginEnabled(false);
+        Toast.makeText(this, R.string.launcher_login_disabled_launching, Toast.LENGTH_SHORT).show();
+        // resetLaunchButton() already ran before the dialog was shown, so the Play button is armed
+        // again; re-running the launch picks up the cleared flag.
+        performActualLaunch();
     }
 
     private Intent createMinecraftLaunchIntent() {

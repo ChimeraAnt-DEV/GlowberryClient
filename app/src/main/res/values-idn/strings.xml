@@ -396,7 +396,8 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="dialog_title_login_required">Login diperlukan</string>
     <string name="dialog_message_login_required">Login yang dikelola oleh launcher diaktifkan, tetapi belum ada akun yang masuk. Buka Akun untuk masuk.</string>
     <string name="go_to_accounts">Akun</string>
-    <string name="disable_launcher_login_and_continue">Tutup</string>
+    <string name="disable_launcher_login_and_continue">Nonaktifkan dan lanjutkan</string>
+    <string name="launcher_login_disabled_launching">Login yang dikelola peluncur dinonaktifkan. Meluncurkan…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Akun Sekarang</string>

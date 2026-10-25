@@ -501,7 +501,8 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="dialog_title_login_required">Cần đăng nhập</string>
     <string name="dialog_message_login_required">Tính năng đăng nhập do launcher quản lý đã được bật, nhưng chưa có tài khoản nào được đăng nhập. Vui lòng vào mục Tài khoản để đăng nhập.</string>
     <string name="go_to_accounts">Tài khoản</string>
-    <string name="disable_launcher_login_and_continue">Đóng</string>
+    <string name="disable_launcher_login_and_continue">Tắt và tiếp tục</string>
+    <string name="launcher_login_disabled_launching">Đã tắt đăng nhập do trình khởi chạy quản lý. Đang khởi chạy…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Tài khoản hiện tại</string>

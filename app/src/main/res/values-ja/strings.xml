@@ -434,7 +434,8 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="dialog_title_login_required">サインインが必要です</string>
     <string name="dialog_message_login_required">ランチャー管理のログインが有効ですが、アカウントがサインインしていません。</string>
     <string name="go_to_accounts">アカウント</string>
-    <string name="disable_launcher_login_and_continue">閉じる</string>
+    <string name="disable_launcher_login_and_continue">無効にして続行</string>
+    <string name="launcher_login_disabled_launching">ランチャー管理のサインインを無効にしました。起動しています…</string>
 
     <string name="label_current_account">現在のアカウント</string>
     <string name="label_other_accounts">その他のアカウント</string>

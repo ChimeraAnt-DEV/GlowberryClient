@@ -434,7 +434,8 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
     <string name="dialog_title_login_required">Login necessário</string>
     <string name="dialog_message_login_required">O login está ativado, mas nenhuma conta está conectada. Vá em Contas para entrar.</string>
     <string name="go_to_accounts">Contas</string>
-    <string name="disable_launcher_login_and_continue">Fechar</string>
+    <string name="disable_launcher_login_and_continue">Desativar e continuar</string>
+    <string name="launcher_login_disabled_launching">Login gerenciado pelo launcher desativado. Iniciando…</string>
 
     <string name="label_current_account">Conta Atual</string>
     <string name="label_other_accounts">Outras Contas</string>

@@ -434,7 +434,8 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
     <string name="dialog_title_login_required">Se requiere inicio de sesión</string>
     <string name="dialog_message_login_required">El inicio de sesión gestionado está habilitado, pero no hay ninguna cuenta. Ve a Cuentas para iniciar sesión.</string>
     <string name="go_to_accounts">Cuentas</string>
-    <string name="disable_launcher_login_and_continue">Cerrar</string>
+    <string name="disable_launcher_login_and_continue">Desactivar y continuar</string>
+    <string name="launcher_login_disabled_launching">Inicio de sesión gestionado por el lanzador desactivado. Iniciando…</string>
 
     <string name="label_current_account">Cuenta Actual</string>
     <string name="label_other_accounts">Otras Cuentas</string>

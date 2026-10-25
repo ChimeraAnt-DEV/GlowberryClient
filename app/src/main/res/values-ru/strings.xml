@@ -391,7 +391,8 @@
     <string name="dialog_title_login_required">Требуется вход</string>
     <string name="dialog_message_login_required">Включён вход через лаунчер, но ни один аккаунт не авторизован. Перейдите в «Аккаунты», чтобы войти.</string>
     <string name="go_to_accounts">Аккаунты</string>
-    <string name="disable_launcher_login_and_continue">Закрыть</string>
+    <string name="disable_launcher_login_and_continue">Отключить и продолжить</string>
+    <string name="launcher_login_disabled_launching">Вход через лаунчер отключён. Запуск…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Текущий аккаунт</string>

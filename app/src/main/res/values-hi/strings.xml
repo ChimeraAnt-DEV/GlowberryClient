@@ -448,7 +448,8 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="dialog_title_login_required">साइन-इन आवश्यक है</string>
     <string name="dialog_message_login_required">लॉन्चर-प्रबंधित लॉगिन सक्षम है, लेकिन कोई खाता साइन इन नहीं है। साइन इन करने के लिए खातों में जाएं।</string>
     <string name="go_to_accounts">खाते</string>
-    <string name="disable_launcher_login_and_continue">बंद करें</string>
+    <string name="disable_launcher_login_and_continue">अक्षम करें और जारी रखें</string>
+    <string name="launcher_login_disabled_launching">लॉन्चर-प्रबंधित साइन-इन अक्षम। लॉन्च हो रहा है…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">वर्तमान खाता</string>

@@ -433,7 +433,8 @@
     <string name="dialog_title_login_required">需要登录</string>
     <string name="dialog_message_login_required">已开启使用启动器登录，但当前未登录。请前往账号管理登录后再启动。</string>
     <string name="go_to_accounts">账号管理</string>
-    <string name="disable_launcher_login_and_continue">关闭</string>
+    <string name="disable_launcher_login_and_continue">禁用并继续</string>
+    <string name="launcher_login_disabled_launching">已关闭启动器管理的登录，正在启动…</string>
     <string name="sign_in">登录</string>
     <string name="ms_account_subtitle_format">用户ID：%1$s • 更新：%2$s</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
