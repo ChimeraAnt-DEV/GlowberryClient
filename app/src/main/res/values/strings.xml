@@ -892,19 +892,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_menu_group_voice">Voice</string>
 
     <!-- Mod panel: pin/favourites and category tabs (section 2). -->
-    <string name="vip_pin_module">Pin to favorites</string>
-    <string name="vip_unpin_module">Remove from favorites</string>
-    <string name="vip_category_favorites">Favorites</string>
     <string name="vip_category_visuals">Visuals</string>
-    <string name="vip_category_pvp">PvP</string>
     <string name="vip_category_misc">Misc</string>
-    <string name="vip_category_all">All</string>
-    <string name="vip_nav_main">Main</string>
-    <string name="vip_nav_settings">Settings</string>
-    <string name="vip_nav_closet">Closet</string>
-    <string name="vip_nav_hud">HUD</string>
-    <string name="vip_nav_editor">Editor</string>
-    <string name="vip_favorites_empty">No favorite modules yet. Tap the star on a module to pin it here.</string>
 
     <!-- New visual / HUD / utility modules (mod-panel list). -->
     <string name="inbuilt_mod_fullbright">Fullbright</string>
@@ -982,20 +971,13 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="cosmetics_account_skin_status_ready">Account skin: ready — this is your own skin.</string>
     <string name="cosmetics_account_skin_fetching">Fetching your account skin…</string>
     <string name="cosmetics_account_skin_no_account">Sign in to a Microsoft account first.</string>
-    <string name="vip_tab_general">General</string>
     <string name="vip_tab_controller">Controller</string>
     <string name="vip_tab_keyboard">Keyboard</string>
     <string name="vip_mode_controller">Controller detected</string>
     <string name="vip_mode_keyboard">Keyboard &amp; mouse</string>
-    <string name="vip_close">Close</string>
-    <string name="vip_search_hint">Search modules…</string>
     <string name="vip_empty_no_controller">No controller detected. Connect a gamepad to configure it.</string>
-    <string name="vip_status_active">ACTIVE</string>
-    <string name="vip_status_off">OFF</string>
-    <string name="vip_status_unavailable">UNAVAILABLE</string>
     <string name="vip_configure">Configure</string>
     <string name="vip_live_preview">Live input</string>
-    <string name="vip_keyboard_profile">Keyboard profile</string>
     <string name="vip_keyboard_hint">Select a control to remap it</string>
     <string name="vip_controller_profiles">Profiles</string>
     <string name="vip_controller_active_profile">Active profile</string>
@@ -1003,8 +985,6 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="vip_dead_zone">Dead zone</string>
     <string name="vip_sensitivity">Sensitivity</string>
     <string name="vip_rumble">Rumble</string>
-    <string name="vip_on">On</string>
-    <string name="vip_off">Off</string>
 
     <string name="pack_changer_title">In-game packs</string>
     <string name="pack_changer_status">%1$d of %2$d resource packs active</string>
@@ -2194,7 +2174,6 @@ GlowberryClient must complete the migration before continuing.</string>
 
     <!-- Replay tab (shared by the touch Mod Menu and the VIP Mod Menu) -->
     <string name="nav_replay">Replay</string>
-    <string name="vip_tab_replay">Replay</string>
     <string name="replay_capture_channel">Replay recording</string>
     <string name="replay_capture_notification_title">Recording gameplay</string>
     <string name="replay_capture_notification_text">Chimera Replay is capturing your screen. Open the launcher to stop.</string>
