@@ -56,10 +56,9 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Top bar. Glass chrome matching the VIP Mod Menu: a logo tile, the title/subtitle
+            <!-- Top bar. Glass chrome: a logo tile, the title/subtitle
                  lockup, a live input-mode badge and the close button. It holds no navigation —
-                 the destinations live in the icon rail below, so the two screens read as the
-                 same menu. -->
+                 the destinations live in the icon rail below. -->
             <LinearLayout
                 android:id="@+id/mod_menu_topbar"
                 android:layout_width="match_parent"

@@ -2172,7 +2172,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="installations_challenge_hint">The download source is checking that this is a real browser. Complete the check above; the list loads automatically once it clears.</string>
     <string name="installations_challenge_cancelled">The browser check was not completed. Press Refresh to try again.</string>
 
-    <!-- Replay tab (shared by the touch Mod Menu and the VIP Mod Menu) -->
+    <!-- Replay tab (hosted by the one Mod Menu, and by the launcher-side Replay screen) -->
     <string name="nav_replay">Replay</string>
     <string name="replay_capture_channel">Replay recording</string>
     <string name="replay_capture_notification_title">Recording gameplay</string>

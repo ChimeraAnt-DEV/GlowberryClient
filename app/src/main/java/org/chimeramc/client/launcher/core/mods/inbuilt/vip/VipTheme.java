@@ -5,11 +5,12 @@ import android.content.Context;
 import org.chimeramc.client.ui.components.UiTokens;
 
 /**
- * The VIP Mod Menu's colour system.
+ * The Controller/Keyboard pages' colour system (formerly the "VIP Mod Menu" theme).
  *
  * <p>This used to be a separate four-tier violet ramp. It is now an adapter over {@link UiTokens}:
- * the VIP menu shares the one blueberry palette with the touch Mod Menu and the radial wheel, so the
- * two screens read as the same app. The accessors are kept so the VIP views compile unchanged.
+ * those pages share the one blueberry palette with the rest of the Mod Menu and the radial wheel, so
+ * the whole app reads as one product. The accessors are kept so the illustration views compile
+ * unchanged.
  */
 public final class VipTheme {
 

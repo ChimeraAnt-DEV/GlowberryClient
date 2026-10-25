@@ -5,7 +5,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 
 /**
- * The window chrome shared by both mod menus and the Closet: a rounded 16dp near-black panel with a
+ * The window chrome shared by the Mod Menu and the Closet: a rounded 16dp near-black panel with a
  * 1dp hairline and a shadow, a 48dp title bar with a hairline divider, and a centred layout rule.
  */
 public final class UiWindow {
