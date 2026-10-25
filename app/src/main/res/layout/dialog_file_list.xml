@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="16dp"
+    android:paddingTop="@dimen/space_4"
     style="@style/Widget.Chimera.Card">
 
     <TextView
@@ -11,18 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/curseforge_available_files"
-        android:textSize="20sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="@color/on_surface"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="@dimen/space_4"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_files"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
+        android:paddingBottom="@dimen/space_4"
         android:scrollbars="vertical" />
 
 </LinearLayout>

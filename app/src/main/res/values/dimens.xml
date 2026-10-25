@@ -6,9 +6,59 @@
     designed.
 -->
 <resources>
+    <!--
+        The one radius scale (U10): 8/12/16/28dp, mirroring UiTokens.RADIUS_*. A surface picks one
+        of the four; the card tokens below are aliases of them rather than values of their own, so a
+        card drawn in XML and one drawn in code (UiCard) round the same corner.
+    -->
+    <dimen name="radius_small">8dp</dimen>
+    <dimen name="radius_medium">12dp</dimen>
+    <dimen name="radius_large">16dp</dimen>
+    <dimen name="radius_xlarge">28dp</dimen>
+
+    <!--
+        Semantic aliases, mirroring UiTokens.RADIUS_*. A surface picks a role, not a number, so a
+        card drawn in XML and one drawn in code round the same corner. {@code radius_toggle} is the
+        pill: a radius at or above half the height is a stadium, and 999dp is the conventional way
+        to say "fully rounded" without depending on the view's height.
+    -->
+    <dimen name="radius_card">@dimen/radius_large</dimen>
+    <dimen name="radius_window">@dimen/radius_xlarge</dimen>
+    <dimen name="radius_chip">@dimen/radius_medium</dimen>
+    <dimen name="radius_button">@dimen/radius_large</dimen>
+    <dimen name="radius_field">@dimen/radius_small</dimen>
+    <dimen name="radius_toggle">999dp</dimen>
+
+    <!--
+        The small-shape family. The 8/12/16/28 scale describes surfaces — cards, fields, windows,
+        buttons. A tag, a badge and a small chip are a different family of shape: their radius is
+        bounded by a 16-24dp height, so a 12dp chip corner is most of the pill and reads as a
+        squashed capsule rather than a rounded rectangle. These three tokens are the named
+        exceptions, so a small shape names its role instead of carrying an anonymous number.
+    -->
+    <dimen name="radius_tag">4dp</dimen>
+    <dimen name="radius_badge">6dp</dimen>
+    <dimen name="radius_chip_small">10dp</dimen>
+
+    <!--
+        Decorative and stadium shapes, named so they are choices rather than leftovers.
+
+        - {@code radius_pill}: a chip, toggle or filter whose radius is its own height. It is a
+          stadium by construction; 999dp clamps to half the height, so it stays a pill at any size.
+        - {@code radius_circle}: an icon plate that must read as a circle.
+        - {@code radius_accent_bar}: the 3dp section marker and the nav indicator; a near-square
+          bar, so its radius is a rounding of a few dp rather than a corner.
+        - {@code radius_square}: a deliberately square popup, kept explicit so "0" is not mistaken
+          for an unset value.
+    -->
+    <dimen name="radius_pill">@dimen/radius_toggle</dimen>
+    <dimen name="radius_circle">24dp</dimen>
+    <dimen name="radius_accent_bar">2dp</dimen>
+    <dimen name="radius_square">0dp</dimen>
+
     <!-- Card geometry -->
-    <dimen name="chimera_card_radius">14dp</dimen>
-    <dimen name="chimera_card_radius_small">10dp</dimen>
+    <dimen name="chimera_card_radius">@dimen/radius_large</dimen>
+    <dimen name="chimera_card_radius_small">@dimen/radius_medium</dimen>
     <dimen name="chimera_card_border_width">1dp</dimen>
     <dimen name="chimera_card_elevation">2dp</dimen>
     <dimen name="chimera_card_elevation_glow">6dp</dimen>
@@ -41,6 +91,24 @@
     <dimen name="space_4">16dp</dimen>
     <dimen name="space_6">24dp</dimen>
     <dimen name="space_8">32dp</dimen>
+
+    <!--
+        Values that are deliberately not on the rhythm, named so they read as choices.
+
+        - {@code space_hairline} (2dp): the gap between a label and the value under it, and the
+          offset that makes a 1dp divider sit optically centred. A 4dp floor would loosen a tight
+          coupling that is the point of the pairing.
+        - {@code space_divider} (1dp): a divider's own optical offset. A divider is a line, not a
+          step, so it is not part of the rhythm at all.
+        - {@code space_align_inset} (52dp): the version row's start inset, which lines its text up
+          with the icon column above it. Snapping it would break that alignment.
+        - {@code space_dock_clearance} (168dp): how far the launch scroll's bottom padding reaches
+          past the docked Play control. It is a measured clearance, not a rhythm step.
+    -->
+    <dimen name="space_hairline">2dp</dimen>
+    <dimen name="space_divider">1dp</dimen>
+    <dimen name="space_align_inset">52dp</dimen>
+    <dimen name="space_dock_clearance">168dp</dimen>
 
     <!-- The 48dp minimum touch target (U6/U9), mirrored from UiTokens.MIN_TOUCH_TARGET. -->
     <dimen name="min_touch_target">48dp</dimen>

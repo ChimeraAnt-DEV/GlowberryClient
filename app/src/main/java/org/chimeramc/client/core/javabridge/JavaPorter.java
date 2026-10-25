@@ -66,7 +66,14 @@ public final class JavaPorter {
             return new Result(false, report, null, null, null, pattern, null);
         }
 
-        static Result failure(PortabilityReport report, String error) {
+        /**
+         * A failure result with the cause named.
+         *
+         * <p>Public so a caller that guards the port call itself (the activity converts a thrown
+         * {@code OutOfMemoryError} from the decompiler into a result rather than letting it escape
+         * and strand its loading overlay) can build the same shape.
+         */
+        public static Result failure(PortabilityReport report, String error) {
             return new Result(false, report, null, null, null, null, error);
         }
 

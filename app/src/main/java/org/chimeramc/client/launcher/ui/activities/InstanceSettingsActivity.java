@@ -533,6 +533,12 @@ public class InstanceSettingsActivity extends BaseActivity {
             autoSaveHandler.removeCallbacks(pendingNameSave);
             pendingNameSave = null;
         }
+        // The backup manager owns a single-thread pool created for this screen; without this it
+        // outlived the Activity.
+        if (backupManager != null) {
+            backupManager.close();
+            backupManager = null;
+        }
         super.onDestroy();
     }
 

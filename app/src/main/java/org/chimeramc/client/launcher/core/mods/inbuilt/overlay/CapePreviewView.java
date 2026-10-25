@@ -28,7 +28,6 @@ import org.chimeramc.client.core.cosmetics.PreviewCharacterScene;
 import org.chimeramc.client.core.cosmetics.PreviewPetScene;
 import org.chimeramc.client.core.cosmetics.PreviewRaster;
 import org.chimeramc.client.core.cosmetics.PreviewScene;
-import org.chimeramc.client.core.cosmetics.QuadDepthSorter;
 import org.chimeramc.client.core.cosmetics.SkinAlphaFilter;
 import org.chimeramc.client.core.cosmetics.SkinModel;
 import org.chimeramc.client.core.cosmetics.geometry.BedrockGeometry;
@@ -49,13 +48,12 @@ import java.util.List;
  * dropped by a normal test that uses the same transform as the projection, so a face is drawn
  * exactly when it points at the camera.
  *
- * <p>Faces are painter-sorted back to front. A single centroid-depth key over every face of every
- * box is not enough: two faces of different boxes can tie at some yaw, and a humanoid is full of
- * such pairs (head on torso, arm against torso), so the sort interleaves them and a hidden face
- * paints over a nearer one — the triangular holes the preview used to show. {@link QuadDepthSorter}
- * orders by the owning box first, which is exact for disjoint convex boxes, and uses the face's own
- * depth only to break ties within a box. Textured faces are drawn anti-aliased with bilinear
- * filtering, so the skin reads smoothly rather than as hard pixel blocks.
+ * <p>The scene is rasterised by {@link PreviewRaster}, which owns a per-pixel float z-buffer, so
+ * occlusion is exact: a nearer surface always wins and draw order does not matter. The old
+ * painter's-algorithm sort (a two-level box-then-face key) could interleave two boxes' faces at
+ * yaws where their centroids tie, which is what produced the triangular holes at box seams.
+ * Textured faces are drawn anti-aliased with bilinear filtering, so the skin reads smoothly
+ * rather than as hard pixel blocks.
  *
  * <p>The cape is a {@link CapeSimulator} cloth mesh, drawn behind the body, with the animated
  * Chimera mark crawling across it. The frame callback only runs while there is motion to show,

@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -135,14 +136,16 @@ public class WorldEditorActivity extends BaseActivity {
         binding.propertiesRecyclerView.setVisibility(View.GONE);
         binding.emptyText.setVisibility(View.GONE);
 
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 if (worldEditor.hasLevelDat()) {
                     worldEditor.loadLevelDat();
                 }
 
                 runOnUiThread(this::loadLevelDatProperties);
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that clears the spinner,
+                // and parsing a large level.dat can exhaust the heap.
                 runOnUiThread(() -> {
                     binding.loadingProgress.setVisibility(View.GONE);
                     binding.emptyText.setVisibility(View.VISIBLE);
@@ -195,7 +198,7 @@ public class WorldEditorActivity extends BaseActivity {
         binding.loadingProgress.setVisibility(View.VISIBLE);
         binding.saveButton.setEnabled(false);
 
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 worldEditor.saveLevelDat();
 
@@ -204,7 +207,9 @@ public class WorldEditorActivity extends BaseActivity {
                     hasUnsavedChanges = false;
                     Toast.makeText(this, R.string.world_saved, Toast.LENGTH_SHORT).show();
                 });
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that re-enables Save and
+                // clears the spinner.
                 runOnUiThread(() -> {
                     binding.loadingProgress.setVisibility(View.GONE);
                     binding.saveButton.setEnabled(true);
@@ -247,6 +252,19 @@ public class WorldEditorActivity extends BaseActivity {
         super.onDestroy();
         if (executor != null) {
             executor.shutdown();
+        }
+    }
+
+    /**
+     * Submits work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>Reachable from a button press, and a press that lands as the screen closes would otherwise
+     * throw {@link java.util.concurrent.RejectedExecutionException} on the main thread.
+     */
+    private void runOnExecutor(Runnable work) {
+        // A false return means the screen is gone; the log names the dropped task.
+        if (!SafeExecutor.submit(executor, work)) {
+            android.util.Log.w("WorldEditor", "Task dropped: the screen is gone");
         }
     }
 }

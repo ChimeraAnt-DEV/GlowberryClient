@@ -15,17 +15,38 @@
     android:background="@android:color/transparent"
     android:defaultFocusHighlightEnabled="false">
 
+    <!-- The blurred backdrop of the game behind the panel (M4). It is a sibling of the panel, not a
+         child, so the panel's own text is never blurred: on API 31+ the blur is a RenderEffect on
+         this layer, and below 31 a downscale/upscale blit is set as this layer's bitmap. It is
+         driven by the glass-intensity setting; with glass off it stays hidden and the panel draws
+         its opaque fill. -->
+    <ImageView
+        android:id="@+id/mod_menu_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:visibility="gone" />
+
+    <!-- The scrim over the backdrop, so the panel's text always has something to sit on. Its
+         opacity follows the glass intensity (less scrim when the glass is thick). -->
+    <View
+        android:id="@+id/mod_menu_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66070A0F" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/mod_menu_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_marginStart="22dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="22dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="@dimen/space_6"
+        android:layout_marginTop="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_6"
+        android:layout_marginBottom="@dimen/space_4"
         app:cardBackgroundColor="@color/mod_menu_bg_surface1"
-        app:cardCornerRadius="28dp"
+        app:cardCornerRadius="@dimen/radius_window"
         app:cardElevation="12dp"
         android:focusable="false"
         android:defaultFocusHighlightEnabled="false">
@@ -35,10 +56,9 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Top bar. Glass chrome matching the VIP Mod Menu: a logo tile, the title/subtitle
+            <!-- Top bar. Glass chrome: a logo tile, the title/subtitle
                  lockup, a live input-mode badge and the close button. It holds no navigation —
-                 the destinations live in the icon rail below, so the two screens read as the
-                 same menu. -->
+                 the destinations live in the icon rail below. -->
             <LinearLayout
                 android:id="@+id/mod_menu_topbar"
                 android:layout_width="match_parent"
@@ -46,8 +66,8 @@
                 android:background="@drawable/bg_vip_topbar"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="10dp">
+                android:paddingStart="@dimen/space_4"
+                android:paddingEnd="@dimen/space_3">
 
                 <FrameLayout
                     android:layout_width="34dp"
@@ -67,7 +87,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="@dimen/space_3"
                     android:orientation="vertical">
 
                     <TextView
@@ -77,7 +97,7 @@
                         android:letterSpacing="0.02"
                         android:text="@string/mod_menu_general"
                         android:textColor="@color/mod_menu_text_primary"
-                        android:textSize="15sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
@@ -87,7 +107,7 @@
                         android:letterSpacing="0.06"
                         android:text="@string/mod_menu_subtitle"
                         android:textColor="@color/mod_menu_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
 
                 <Space
@@ -101,26 +121,26 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_vip_status_off"
                     android:drawableStart="@drawable/ic_controller"
-                    android:drawablePadding="6dp"
+                    android:drawablePadding="@dimen/space_2"
                     android:drawableTint="@color/mod_menu_accent"
                     android:gravity="center_vertical"
-                    android:paddingStart="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="6dp"
+                    android:paddingStart="@dimen/space_3"
+                    android:paddingTop="@dimen/space_2"
+                    android:paddingEnd="@dimen/space_3"
+                    android:paddingBottom="@dimen/space_2"
                     android:text="@string/vip_mode_keyboard"
                     android:textColor="@color/mod_menu_text_secondary"
-                    android:textSize="10sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/btn_close_menu"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="@dimen/space_3"
                     android:background="@drawable/bg_vip_icon_button"
                     android:contentDescription="@string/cancel"
-                    android:padding="9dp"
+                    android:padding="@dimen/space_2"
                     android:src="@drawable/ic_close"
                     android:tint="@color/mod_menu_text_primary" />
             </LinearLayout>
@@ -149,8 +169,8 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:orientation="vertical"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp" />
+                        android:paddingTop="@dimen/space_2"
+                        android:paddingBottom="@dimen/space_2" />
                 </ScrollView>
 
                 <View
@@ -180,20 +200,20 @@
                         android:background="@color/mod_menu_bg_surface2"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="8dp">
+                        android:paddingStart="@dimen/space_3"
+                        android:paddingEnd="@dimen/space_2">
 
                         <LinearLayout
                             android:id="@+id/search_container"
                             android:layout_width="0dp"
                             android:layout_height="34dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/space_2"
                             android:layout_weight="1"
                             android:background="@drawable/bg_search_field"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="6dp">
+                            android:paddingStart="@dimen/space_3"
+                            android:paddingEnd="@dimen/space_2">
 
                             <ImageView
                                 android:layout_width="16dp"
@@ -205,7 +225,7 @@
                                 android:id="@+id/search_input"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
-                                android:layout_marginStart="6dp"
+                                android:layout_marginStart="@dimen/space_2"
                                 android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:hint="@string/mod_menu_search_hint"
@@ -214,7 +234,7 @@
                                 android:singleLine="true"
                                 android:textColor="@color/mod_menu_text_primary"
                                 android:textColorHint="@color/mod_menu_text_tertiary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <ImageButton
                                 android:id="@+id/btn_clear_search"
@@ -222,7 +242,7 @@
                                 android:layout_height="22dp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:contentDescription="@string/cancel"
-                                android:padding="3dp"
+                                android:padding="@dimen/space_1"
                                 android:src="@drawable/ic_close"
                                 android:tint="@color/mod_menu_text_secondary"
                                 android:visibility="gone" />
@@ -233,7 +253,7 @@
                             android:id="@+id/config_header"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="@dimen/space_2"
                             android:layout_weight="1"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
@@ -245,7 +265,7 @@
                                 android:layout_height="32dp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:contentDescription="@string/cancel"
-                                android:padding="6dp"
+                                android:padding="@dimen/space_2"
                                 android:src="@drawable/ic_arrow_back"
                                 android:tint="#FFFFFF" />
 
@@ -253,9 +273,9 @@
                                 android:id="@+id/config_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/space_2"
                                 android:textColor="#FFFFFF"
-                                android:textSize="14sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Body"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
@@ -279,40 +299,40 @@
                                 android:minHeight="24dp"
                                 android:background="@drawable/bg_search_field"
                                 android:gravity="center"
-                                android:paddingStart="8dp"
-                                android:paddingEnd="8dp"
+                                android:paddingStart="@dimen/space_2"
+                                android:paddingEnd="@dimen/space_2"
                                 android:text="@string/mod_stats_fps_placeholder"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/mod_stats_ping"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="24dp"
-                                android:layout_marginStart="6dp"
+                                android:layout_marginStart="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:gravity="center"
-                                android:paddingStart="8dp"
-                                android:paddingEnd="8dp"
+                                android:paddingStart="@dimen/space_2"
+                                android:paddingEnd="@dimen/space_2"
                                 android:text="@string/mod_stats_ping_placeholder"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/mod_stats_battery"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="24dp"
-                                android:layout_marginStart="6dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="@dimen/space_2"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:gravity="center"
-                                android:paddingStart="8dp"
-                                android:paddingEnd="8dp"
+                                android:paddingStart="@dimen/space_2"
+                                android:paddingEnd="@dimen/space_2"
                                 android:text="@string/mod_stats_battery_placeholder"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -330,24 +350,24 @@
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp">
+                            android:paddingStart="@dimen/space_3"
+                            android:paddingEnd="@dimen/space_3">
 
                             <TextView
                                 android:id="@+id/filter_all"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="58dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/filter_all"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -355,112 +375,112 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="72dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/mod_menu_favorites"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/filter_enabled"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="72dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/mod_menu_filter_enabled"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/filter_inbuilt"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="72dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/mod_menu_filter_inbuilt"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/filter_external"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="72dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/mod_menu_filter_external"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/filter_pvp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="58dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/mod_menu_filter_pvp"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/filter_visuals"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="72dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/vip_category_visuals"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/filter_misc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:minHeight="30dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/space_2"
                                 android:background="@drawable/bg_search_field"
                                 android:defaultFocusHighlightEnabled="false"
                                 android:gravity="center"
                                 android:minWidth="58dp"
-                                android:paddingStart="14dp"
-                                android:paddingEnd="14dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
                                 android:text="@string/vip_category_misc"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
                                 android:id="@+id/module_count_text"
@@ -469,7 +489,7 @@
                                 android:minHeight="30dp"
                                 android:gravity="center"
                                 android:textColor="@color/mod_menu_text_secondary"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                         </LinearLayout>
                     </HorizontalScrollView>
@@ -482,8 +502,8 @@
                         android:background="@color/mod_menu_bg_surface2"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="12dp"
+                        android:paddingStart="@dimen/space_3"
+                        android:paddingEnd="@dimen/space_3"
                         android:visibility="gone">
 
                         <TextView
@@ -494,15 +514,15 @@
                             android:background="@drawable/bg_search_field"
                             android:defaultFocusHighlightEnabled="false"
                             android:drawableEnd="@drawable/ic_arrow_down"
-                            android:drawablePadding="6dp"
+                            android:drawablePadding="@dimen/space_2"
                             android:drawableTint="@color/mod_menu_text_secondary"
                             android:gravity="center_vertical"
                             android:minWidth="94dp"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="10dp"
+                            android:paddingStart="@dimen/space_3"
+                            android:paddingEnd="@dimen/space_3"
                             android:text="@string/filter_all"
                             android:textColor="@color/mod_menu_accent"
-                            android:textSize="12sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                             android:textStyle="bold" />
 
                         <Space
@@ -517,7 +537,7 @@
                             android:minHeight="30dp"
                             android:gravity="center"
                             android:textColor="@color/mod_menu_text_secondary"
-                            android:textSize="11sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     </LinearLayout>
 
@@ -539,7 +559,7 @@
                             android:defaultFocusHighlightEnabled="false"
                             android:focusable="false"
                             android:clipToPadding="false"
-                            android:padding="14dp" />
+                            android:padding="@dimen/space_4" />
 
                         <LinearLayout
                             android:id="@+id/empty_state"
@@ -560,10 +580,10 @@
                                 android:id="@+id/empty_state_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/space_2"
                                 android:text="@string/mod_menu_no_mods"
                                 android:textColor="@color/mod_menu_text_tertiary"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                         </LinearLayout>
 
@@ -631,17 +651,17 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="@dimen/space_4">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:alpha="0.8"
                                 android:text="@string/mod_menu_general_settings"
                                 android:textAllCaps="true"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <!-- M6: the menu's own appearance settings. Presets plus four
@@ -652,86 +672,86 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
+                                android:layout_marginBottom="@dimen/space_2"
                                 android:alpha="0.8"
                                 android:text="@string/mod_menu_settings_appearance"
                                 android:textAllCaps="true"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/text_mod_setting_theme"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="2dp"
+                                android:layout_marginBottom="@dimen/space_hairline"
                                 android:text="@string/mod_menu_setting_theme"
                                 android:textColor="@color/mod_menu_text_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <LinearLayout
                                 android:id="@+id/group_mod_setting_theme"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:orientation="horizontal" />
 
                             <TextView
                                 android:id="@+id/text_mod_setting_glass"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="2dp"
+                                android:layout_marginBottom="@dimen/space_hairline"
                                 android:text="@string/mod_menu_setting_glass"
                                 android:textColor="@color/mod_menu_text_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <LinearLayout
                                 android:id="@+id/group_mod_setting_glass"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:orientation="horizontal" />
 
                             <TextView
                                 android:id="@+id/text_mod_setting_density"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="2dp"
+                                android:layout_marginBottom="@dimen/space_hairline"
                                 android:text="@string/mod_menu_setting_density"
                                 android:textColor="@color/mod_menu_text_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <LinearLayout
                                 android:id="@+id/group_mod_setting_density"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:orientation="horizontal" />
 
                             <TextView
                                 android:id="@+id/text_mod_setting_toggle_style"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="2dp"
+                                android:layout_marginBottom="@dimen/space_hairline"
                                 android:text="@string/mod_menu_setting_toggle_style"
                                 android:textColor="@color/mod_menu_text_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <LinearLayout
                                 android:id="@+id/group_mod_setting_toggle_style"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:orientation="horizontal" />
 
                             <TextView
                                 android:id="@+id/text_mod_setting_motion"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="2dp"
+                                android:layout_marginBottom="@dimen/space_hairline"
                                 android:text="@string/mod_menu_setting_motion"
                                 android:textColor="@color/mod_menu_text_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <LinearLayout
                                 android:id="@+id/group_mod_setting_motion"
@@ -742,16 +762,16 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginTop="@dimen/space_hairline"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:text="@string/mod_menu_setting_system_override"
                                 android:textColor="@color/mod_menu_text_tertiary"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -761,7 +781,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/mod_menu_setting_radius"
                                     android:textColor="@color/mod_menu_text_primary"
-                                    android:textSize="13sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                                 <SeekBar
                                     android:id="@+id/seekbar_mod_setting_radius"
@@ -780,14 +800,14 @@
                                     android:layout_height="wrap_content"
                                     android:gravity="end"
                                     android:textColor="@color/mod_menu_text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             </LinearLayout>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -797,7 +817,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/mod_menu_setting_blur_fps"
                                     android:textColor="@color/mod_menu_text_primary"
-                                    android:textSize="13sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                                 <SeekBar
                                     android:id="@+id/seekbar_mod_setting_blur_fps"
@@ -815,14 +835,14 @@
                                     android:layout_height="wrap_content"
                                     android:gravity="end"
                                     android:textColor="@color/mod_menu_text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             </LinearLayout>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -832,7 +852,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/mod_menu_setting_hud_opacity"
                                     android:textColor="@color/mod_menu_text_primary"
-                                    android:textSize="13sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                                 <SeekBar
                                     android:id="@+id/seekbar_mod_setting_hud_opacity"
@@ -850,7 +870,7 @@
                                     android:layout_height="wrap_content"
                                     android:gravity="end"
                                     android:textColor="@color/mod_menu_text_secondary"
-                                    android:textSize="12sp" />
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             </LinearLayout>
 
@@ -858,27 +878,27 @@
                                 android:id="@+id/text_mod_setting_accent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="2dp"
+                                android:layout_marginBottom="@dimen/space_hairline"
                                 android:text="@string/mod_menu_setting_accent"
                                 android:textColor="@color/mod_menu_text_primary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                             <LinearLayout
                                 android:id="@+id/group_mod_setting_accent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="16dp"
+                                android:layout_marginBottom="@dimen/space_4"
                                 android:orientation="horizontal" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
+                                android:layout_marginBottom="@dimen/space_2"
                                 android:alpha="0.8"
                                 android:text="@string/mod_menu_general_settings"
                                 android:textAllCaps="true"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <LinearLayout
@@ -888,7 +908,7 @@
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <ImageView
                                     android:layout_width="24dp"
@@ -899,7 +919,7 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:orientation="vertical">
 
@@ -908,16 +928,16 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_notifications"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
+                                        android:layout_marginTop="@dimen/space_hairline"
                                         android:text="@string/mod_menu_notifications_desc"
                                         android:textColor="@color/mod_menu_text_tertiary"
-                                        android:textSize="11sp" />
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 </LinearLayout>
 
@@ -934,11 +954,11 @@
                                 android:id="@+id/setting_pause_menu_only"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="@dimen/space_3"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <ImageView
                                     android:layout_width="24dp"
@@ -949,7 +969,7 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:orientation="vertical">
 
@@ -958,16 +978,16 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_pause_menu_only"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
+                                        android:layout_marginTop="@dimen/space_hairline"
                                         android:text="@string/mod_menu_pause_menu_only_desc"
                                         android:textColor="@color/mod_menu_text_tertiary"
-                                        android:textSize="11sp" />
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 </LinearLayout>
 
@@ -983,30 +1003,30 @@
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginBottom="16dp"
+                                android:layout_marginTop="@dimen/space_4"
+                                android:layout_marginBottom="@dimen/space_4"
                                 android:background="@color/mod_menu_bg_surface2" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:alpha="0.8"
                                 android:text="@string/mod_menu_appearance"
                                 android:textAllCaps="true"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <LinearLayout
                                 android:id="@+id/setting_compact_mod_menu"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <ImageView
                                     android:layout_width="24dp"
@@ -1017,7 +1037,7 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:orientation="vertical">
 
@@ -1026,16 +1046,16 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_compact"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
+                                        android:layout_marginTop="@dimen/space_hairline"
                                         android:text="@string/mod_menu_compact_desc"
                                         android:textColor="@color/mod_menu_text_tertiary"
-                                        android:textSize="11sp" />
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 </LinearLayout>
 
@@ -1054,7 +1074,7 @@
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:orientation="vertical"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -1071,11 +1091,11 @@
                                     <TextView
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="12dp"
+                                        android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:text="@string/mod_menu_opacity"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1084,7 +1104,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_default_percent"
                                         android:textColor="@color/mod_menu_accent"
-                                        android:textSize="12sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                         android:textStyle="bold" />
 
                                 </LinearLayout>
@@ -1093,7 +1113,7 @@
                                     android:id="@+id/seekbar_mod_menu_opacity"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:max="100"
                                     android:min="70"
                                     android:progress="100"
@@ -1108,10 +1128,10 @@
                                 android:id="@+id/setting_mod_menu_primary_opacity"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="@dimen/space_3"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:orientation="vertical"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -1129,11 +1149,11 @@
                                     <TextView
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="12dp"
+                                        android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:text="@string/mod_menu_primary_opacity"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1142,7 +1162,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_default_percent"
                                         android:textColor="@color/mod_menu_accent"
-                                        android:textSize="12sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                         android:textStyle="bold" />
 
                                 </LinearLayout>
@@ -1151,7 +1171,7 @@
                                     android:id="@+id/seekbar_mod_menu_primary_opacity"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:max="100"
                                     android:min="20"
                                     android:progress="100"
@@ -1164,10 +1184,10 @@
                                 android:id="@+id/setting_mod_menu_button_opacity"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="@dimen/space_3"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:orientation="vertical"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -1184,11 +1204,11 @@
                                     <TextView
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="12dp"
+                                        android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:text="@string/mod_menu_button_opacity"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1197,7 +1217,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_default_percent"
                                         android:textColor="@color/mod_menu_accent"
-                                        android:textSize="12sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                         android:textStyle="bold" />
 
                                 </LinearLayout>
@@ -1206,7 +1226,7 @@
                                     android:id="@+id/seekbar_mod_menu_button_opacity"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="8dp"
+                                    android:layout_marginTop="@dimen/space_2"
                                     android:max="100"
                                     android:min="0"
                                     android:progress="100"
@@ -1218,28 +1238,28 @@
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginBottom="16dp"
+                                android:layout_marginTop="@dimen/space_4"
+                                android:layout_marginBottom="@dimen/space_4"
                                 android:background="@color/mod_menu_bg_surface2" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
+                                android:layout_marginBottom="@dimen/space_1"
                                 android:alpha="0.8"
                                 android:text="@string/mod_menu_keybinds"
                                 android:textAllCaps="true"
                                 android:textColor="@color/mod_menu_accent"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:text="@string/mod_menu_keybinds_desc"
                                 android:textColor="@color/mod_menu_text_tertiary"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <LinearLayout
                                 android:id="@+id/setting_keyboard_bind"
@@ -1248,7 +1268,7 @@
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <ImageView
                                     android:layout_width="24dp"
@@ -1260,7 +1280,7 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:orientation="vertical">
 
@@ -1269,17 +1289,17 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_keyboard_bind"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
                                         android:id="@+id/text_keyboard_bind"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
+                                        android:layout_marginTop="@dimen/space_hairline"
                                         android:text="@string/mod_menu_bind_none"
                                         android:textColor="@color/mod_menu_text_tertiary"
-                                        android:textSize="11sp" />
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 </LinearLayout>
 
@@ -1289,11 +1309,11 @@
                                 android:id="@+id/setting_controller_bind"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="@dimen/space_3"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <ImageView
                                     android:layout_width="24dp"
@@ -1305,7 +1325,7 @@
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:orientation="vertical">
 
@@ -1314,17 +1334,17 @@
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_controller_bind"
                                         android:textColor="#FFFFFF"
-                                        android:textSize="13sp"
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
                                     <TextView
                                         android:id="@+id/text_controller_bind"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
+                                        android:layout_marginTop="@dimen/space_hairline"
                                         android:text="@string/mod_menu_bind_none"
                                         android:textColor="@color/mod_menu_text_tertiary"
-                                        android:textSize="11sp" />
+                                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                                 </LinearLayout>
 
@@ -1339,20 +1359,20 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginBottom="8dp"
+                                android:layout_marginTop="@dimen/space_4"
+                                android:layout_marginBottom="@dimen/space_2"
                                 android:text="@string/mod_menu_loadouts"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="@dimen/space_3"
                                 android:text="@string/mod_menu_loadouts_desc"
                                 android:textColor="@color/mod_menu_text_tertiary"
-                                android:textSize="11sp" />
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <LinearLayout
                                 android:id="@+id/loadout_chip_row"
@@ -1364,11 +1384,11 @@
                                 android:id="@+id/setting_save_loadout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="@dimen/space_3"
                                 android:background="@drawable/bg_mod_status_disabled"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="12dp">
+                                android:padding="@dimen/space_3">
 
                                 <ImageView
                                     android:layout_width="24dp"
@@ -1380,11 +1400,11 @@
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
+                                    android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:text="@string/mod_menu_loadout_save"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="13sp"
+                                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                     android:textStyle="bold" />
 
                             </LinearLayout>
@@ -1418,20 +1438,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/space_4"
         android:visibility="gone"
         app:cardBackgroundColor="@color/mod_menu_bg_surface1"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="@dimen/radius_card"
         app:cardElevation="10dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="12dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="8dp">
+            android:paddingStart="@dimen/space_3"
+            android:paddingTop="@dimen/space_2"
+            android:paddingEnd="@dimen/space_2"
+            android:paddingBottom="@dimen/space_2">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -1445,14 +1465,14 @@
                     android:layout_height="wrap_content"
                     android:minWidth="170dp"
                     android:minHeight="56dp"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginEnd="@dimen/space_3"
                     android:background="@drawable/bg_mod_status_enabled"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
+                    android:paddingStart="@dimen/space_3"
+                    android:paddingEnd="@dimen/space_3"
+                    android:paddingTop="@dimen/space_2"
+                    android:paddingBottom="@dimen/space_2"
                     android:clickable="true"
                     android:focusable="true"
                     android:contentDescription="@string/hud_editor_drag_description">
@@ -1460,7 +1480,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="@dimen/space_2"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_drag_handle"
                         android:tint="@color/mod_menu_accent" />
@@ -1476,16 +1496,16 @@
                             android:layout_height="wrap_content"
                             android:text="@string/mod_menu_hud_editor"
                             android:textColor="@color/mod_menu_text_primary"
-                            android:textSize="13sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Label"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="@dimen/space_hairline"
                             android:text="@string/hud_editor_drag_hint"
                             android:textColor="@color/mod_menu_accent"
-                            android:textSize="11sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -1494,10 +1514,10 @@
                     android:id="@+id/btn_hud_save"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="@dimen/space_2"
                     android:background="@drawable/bg_mod_status_disabled"
                     android:contentDescription="@string/save"
-                    android:padding="8dp"
+                    android:padding="@dimen/space_2"
                     android:src="@drawable/ic_check"
                     android:tint="@color/mod_menu_accent" />
 
@@ -1505,10 +1525,10 @@
                     android:id="@+id/btn_hud_reset"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="@dimen/space_2"
                     android:background="@drawable/bg_mod_status_disabled"
                     android:contentDescription="@string/reset"
-                    android:padding="8dp"
+                    android:padding="@dimen/space_2"
                     android:src="@drawable/ic_delete"
                     android:tint="@color/mod_menu_state_error" />
 
@@ -1518,7 +1538,7 @@
                     android:layout_height="36dp"
                     android:background="@drawable/bg_close_button"
                     android:contentDescription="@string/cancel"
-                    android:padding="8dp"
+                    android:padding="@dimen/space_2"
                     android:src="@drawable/ic_close"
                     android:tint="#FFFFFF" />
 
@@ -1527,7 +1547,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/space_2"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -1537,7 +1557,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/overlay_button_size"
                     android:textColor="@color/mod_menu_accent"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
 
                 <SeekBar

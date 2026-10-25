@@ -15,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.Chimera.Card"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/space_2"
             android:elevation="4dp"
-            android:padding="16dp"
+            android:padding="@dimen/space_4"
             android:orientation="vertical">
 
             <LinearLayout
@@ -32,7 +32,7 @@
                     android:layout_height="64dp"
                     android:src="@drawable/ic_minecraft_cube"
                     android:scaleType="centerCrop"
-                    android:layout_marginEnd="16dp"/>
+                    android:layout_marginEnd="@dimen/space_4"/>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -46,7 +46,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="22sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Display"
                         android:textStyle="bold"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -58,7 +58,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/text_secondary"
-                        android:textSize="14sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body"
                         tools:text="by RobertGamer69"/>
                 </LinearLayout>
             </LinearLayout>
@@ -67,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:gravity="center_vertical">
 
                 <com.google.android.material.button.MaterialButton
@@ -76,9 +76,9 @@
                     android:layout_height="wrap_content"
                     android:minHeight="48dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="@dimen/space_2"
                     android:text="@string/install"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:textStyle="bold"
                     android:backgroundTint="@color/primary"
                     android:textColor="@android:color/white"
@@ -95,7 +95,7 @@
                     android:minHeight="48dp"
                     android:layout_weight="1"
                     android:text="@string/website"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Body"
                     android:textStyle="bold"
                     android:textColor="@color/on_surface"
                     app:strokeColor="@color/on_surface"
@@ -112,32 +112,32 @@
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:visibility="gone"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="@dimen/space_2"/>
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.Chimera.Card"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginHorizontal="@dimen/space_2"
+            android:layout_marginBottom="@dimen/space_2"
             android:elevation="2dp">
             
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/space_4">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/description"
-                    android:textSize="20sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold"
                     android:textColor="@color/on_surface"
                     android:fontFamily="@font/misans"
-                    android:layout_marginBottom="12dp"/>
+                    android:layout_marginBottom="@dimen/space_3"/>
 
                 <WebView
                     android:id="@+id/detail_summary"

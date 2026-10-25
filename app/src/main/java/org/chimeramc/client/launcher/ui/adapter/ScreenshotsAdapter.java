@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.adapter;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -67,7 +68,7 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsAdapter.
         holder.imageView.setImageBitmap(null);
         holder.imageView.setTag(screenshot.file.getAbsolutePath());
 
-        imageLoaderExecutor.execute(() -> {
+        runOnImageLoader(() -> {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 4;
             Bitmap bitmap = BitmapFactory.decodeFile(screenshot.file.getAbsolutePath(), options);
@@ -101,6 +102,18 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsAdapter.
     @Override
     public int getItemCount() {
         return screenshots == null ? 0 : screenshots.size();
+    }
+
+    /**
+     * Submits a thumbnail decode, tolerating a pool the host has shut down.
+     *
+     * <p>{@link #shutdown()} runs from the host's {@code onDestroyView}, but a RecyclerView can still
+     * dispatch a bind while the view is being torn down; a submit that raced it would throw on the
+     * main thread. A dropped decode just leaves the placeholder in place.
+     */
+    private void runOnImageLoader(Runnable work) {
+        // A false return means the view is gone; the thumbnail is no longer needed.
+        SafeExecutor.submit(imageLoaderExecutor, work);
     }
 
     public void shutdown() {

@@ -38,6 +38,35 @@ public final class ModMenuPalette {
     /** 0.5dp dividers and glass hairlines. */
     public static final int BORDER_HAIRLINE = 0xFF1E2A38;
 
+    // --- The theme presets' surfaces (M6) ------------------------------------------------------
+
+    /**
+     * The True Black preset's surfaces.
+     *
+     * <p>This is the one place pure black is correct: the preset exists precisely so an OLED panel
+     * can switch the pixels off, which is the whole point of choosing it. The default navy set
+     * still avoids {@code #000000}, because on an LCD "OLED harsh" is a defect, not a feature.
+     */
+    public static final int BLACK_BG_BASE = 0xFF000000;
+    public static final int BLACK_BG_SURFACE_1 = 0xFF000000;
+    public static final int BLACK_BG_SURFACE_2 = 0xFF0A0A0A;
+    public static final int BLACK_BG_SURFACE_3 = 0xFF141414;
+
+    /**
+     * The light surfaces for the Follow System preset on a light device.
+     *
+     * <p>Follow System has to resolve to something real on both sides: a "system" preset that only
+     * ever produced the dark set would be a lie, and the menu is drawn over a game that may be in
+     * any lighting.
+     */
+    public static final int LIGHT_BG_BASE = 0xFFF2F5FA;
+    public static final int LIGHT_BG_SURFACE_1 = 0xFFFFFFFF;
+    public static final int LIGHT_BG_SURFACE_2 = 0xFFFFFFFF;
+    public static final int LIGHT_BG_SURFACE_3 = 0xFFE7ECF4;
+    public static final int LIGHT_TEXT_PRIMARY = 0xFF0F141B;
+    public static final int LIGHT_TEXT_SECONDARY = 0xFF47566A;
+    public static final int LIGHT_TEXT_TERTIARY = 0xFF6C7A8B;
+
     /** Module names. */
     public static final int TEXT_PRIMARY = 0xFFE8EEF6;
     /** Descriptions and values. */
@@ -111,6 +140,26 @@ public final class ModMenuPalette {
                 | (clampChannel(g) << 8) | clampChannel(b);
     }
 
+    /** The same colour at a new alpha (0..255), keeping its channels. */
+    public static int withAlpha(int color, int alpha) {
+        return (clampChannel(alpha) << 24) | (color & 0x00FFFFFF);
+    }
+
+    /**
+     * The panel's fill for a glass intensity (M4).
+     *
+     * <p>Reuses the wheel's own regular tier — the same fill alpha and the same white tint — so the
+     * Mod Menu panel and the radial wheel are the same material rather than two similar ones. A
+     * solid intensity returns the opaque surface: with no blur behind it, a translucent panel would
+     * just show the game through the menu's own text.
+     */
+    public static int panelFill(Scheme scheme, ModMenuSettings.GlassIntensity glass) {
+        if (scheme == null) return BG_SURFACE_1;
+        if (glass == null || glass == ModMenuSettings.GlassIntensity.OFF) return scheme.surface1;
+        int base = withAlpha(scheme.surface1, RadialWheelMaterial.REGULAR_FILL_ALPHA);
+        return blend(base, 0xFFFFFFFF, RadialWheelMaterial.REGULAR_TINT);
+    }
+
     private static int clampChannel(int value) {
         return Math.max(0, Math.min(255, value));
     }
@@ -155,6 +204,66 @@ public final class ModMenuPalette {
             default:
                 return TINT_FULL;
         }
+    }
+
+    /**
+     * The surface and text set a theme preset resolves to (M6).
+     *
+     * <p>Pure so the three presets are testable without a device: the theme was previously stored
+     * and shown in the settings tab but never read, so choosing True Black or Follow System changed
+     * nothing on screen. Resolving here — rather than branching at each call site — is what makes
+     * the preset a single decision.
+     */
+    public static final class Scheme {
+        public final int base;
+        public final int surface1;
+        public final int surface2;
+        public final int surface3;
+        public final int textPrimary;
+        public final int textSecondary;
+        public final int textTertiary;
+        /** True when the scheme is light, so a caller can pick light-appropriate strokes. */
+        public final boolean light;
+
+        Scheme(int base, int surface1, int surface2, int surface3, int textPrimary,
+               int textSecondary, int textTertiary, boolean light) {
+            this.base = base;
+            this.surface1 = surface1;
+            this.surface2 = surface2;
+            this.surface3 = surface3;
+            this.textPrimary = textPrimary;
+            this.textSecondary = textSecondary;
+            this.textTertiary = textTertiary;
+            this.light = light;
+        }
+    }
+
+    /** The dark-navy scheme, the default (M1). */
+    public static final Scheme NAVY_SCHEME = new Scheme(BG_BASE, BG_SURFACE_1, BG_SURFACE_2,
+            BG_SURFACE_3, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, false);
+
+    /** The True Black scheme for OLED panels. */
+    public static final Scheme BLACK_SCHEME = new Scheme(BLACK_BG_BASE, BLACK_BG_SURFACE_1,
+            BLACK_BG_SURFACE_2, BLACK_BG_SURFACE_3, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY,
+            false);
+
+    /** The light scheme. */
+    public static final Scheme LIGHT_SCHEME = new Scheme(LIGHT_BG_BASE, LIGHT_BG_SURFACE_1,
+            LIGHT_BG_SURFACE_2, LIGHT_BG_SURFACE_3, LIGHT_TEXT_PRIMARY, LIGHT_TEXT_SECONDARY,
+            LIGHT_TEXT_TERTIARY, true);
+
+    /**
+     * Resolves a theme preset to its scheme (M6).
+     *
+     * @param systemIsDark whether the platform is currently in dark mode, which only matters for
+     *                     {@link ModMenuSettings.Theme#SYSTEM}
+     */
+    public static Scheme schemeFor(ModMenuSettings.Theme theme, boolean systemIsDark) {
+        if (theme == ModMenuSettings.Theme.TRUE_BLACK) return BLACK_SCHEME;
+        if (theme == ModMenuSettings.Theme.SYSTEM) {
+            return systemIsDark ? NAVY_SCHEME : LIGHT_SCHEME;
+        }
+        return NAVY_SCHEME;
     }
 
     /**

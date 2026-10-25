@@ -26,7 +26,9 @@ public final class ReplayControls {
         CYCLE_NEXT,
         PLAY_PAUSE,
         SCRUB_BACK,
-        SCRUB_FORWARD
+        SCRUB_FORWARD,
+        /** Steps the playback speed of the open clip. */
+        SPEED
     }
 
     private ReplayControls() {
@@ -36,8 +38,9 @@ public final class ReplayControls {
      * The action for a controller button.
      *
      * <p>Deliberately narrow: the D-pad is left to the shared grid navigation, so the Replay tab
-     * does not fight the module grid for the same keys. Only the face buttons and the bumpers
-     * carry a Replay action.
+     * does not fight the module grid for the same keys. Only the face buttons, the bumpers, the
+     * triggers and Start carry a Replay action — exactly the set the on-screen controller hint
+     * names, so the hint cannot advertise a button that does nothing.
      */
     public static Action forControllerKey(int keyCode) {
         switch (keyCode) {
@@ -53,6 +56,12 @@ public final class ReplayControls {
                 return Action.CYCLE_NEXT;
             case KeyEvent.KEYCODE_BUTTON_START:
                 return Action.PLAY_PAUSE;
+            case KeyEvent.KEYCODE_BUTTON_L2:
+                return Action.SCRUB_BACK;
+            case KeyEvent.KEYCODE_BUTTON_R2:
+                return Action.SCRUB_FORWARD;
+            case KeyEvent.KEYCODE_BUTTON_SELECT:
+                return Action.SPEED;
             default:
                 return null;
         }

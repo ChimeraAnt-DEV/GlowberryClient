@@ -40,7 +40,7 @@
 
     <!-- About -->
     <string name="about_title">About</string>
-    <string name="copyright">©2024–2026 GlowberryClient. All rights reserved.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Licensed under the Apache License 2.0.</string>
     <string name="font_license">This app uses the Misans font.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Quick Actions</string>
@@ -129,6 +129,11 @@
     <string name="not_mc_apk">Not a Minecraft APK</string>
     <string name="not_apk_or_apks">Please select an APK or APKS file</string>
     <string name="import_error_32bit_only">This version only contains 32-bit (armeabi-v7a) libraries. The launcher only supports 64-bit (arm64) versions, so it cannot be installed.</string>
+    <string name="import_error_clear_failed">The launcher could not clear the existing files for this instance. Close any other app that may be using them, then try again. If it keeps failing, delete the instance from the Instances tab first.</string>
+    <string name="import_error_create_dir">The launcher could not create the folder for this instance. Free some storage space and check that GlowberryClient has file access in Android Settings, then try again.</string>
+    <string name="import_error_cancelled">The import was cancelled because the screen was closed before it could start. Open the import again from a screen you will keep on screen while it runs.</string>
+    <string name="import_error_open_package">The selected package could not be opened for reading. It may have been moved or deleted since you picked it. Pick the file again and retry.</string>
+    <string name="import_error_no_base_apk">This bundle does not contain a base APK, so it is not a valid Minecraft package. Download it again from the source, or pick a different file.</string>
 
     <string name="not_found_version">No version found</string>
 
@@ -652,7 +657,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="dialog_title_login_required">Sign-in required</string>
     <string name="dialog_message_login_required">Launcher-managed login is enabled, but no account is signed in. Go to Accounts to sign in.</string>
     <string name="go_to_accounts">Accounts</string>
-    <string name="disable_launcher_login_and_continue">Close</string>
+    <string name="disable_launcher_login_and_continue">Disable and continue</string>
+    <string name="launcher_login_disabled_launching">Launcher-managed sign-in disabled. Launching…</string>
 
     <string name="ms_feature_disabled_title">Feature Disabled</string>
     <string name="ms_feature_disabled_desc">Please enable \'Sign in to Minecraft with GlowberryClient\' in Settings to manage Microsoft accounts.</string>
@@ -892,19 +898,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_menu_group_voice">Voice</string>
 
     <!-- Mod panel: pin/favourites and category tabs (section 2). -->
-    <string name="vip_pin_module">Pin to favorites</string>
-    <string name="vip_unpin_module">Remove from favorites</string>
-    <string name="vip_category_favorites">Favorites</string>
     <string name="vip_category_visuals">Visuals</string>
-    <string name="vip_category_pvp">PvP</string>
     <string name="vip_category_misc">Misc</string>
-    <string name="vip_category_all">All</string>
-    <string name="vip_nav_main">Main</string>
-    <string name="vip_nav_settings">Settings</string>
-    <string name="vip_nav_closet">Closet</string>
-    <string name="vip_nav_hud">HUD</string>
-    <string name="vip_nav_editor">Editor</string>
-    <string name="vip_favorites_empty">No favorite modules yet. Tap the star on a module to pin it here.</string>
 
     <!-- New visual / HUD / utility modules (mod-panel list). -->
     <string name="inbuilt_mod_fullbright">Fullbright</string>
@@ -982,20 +977,13 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="cosmetics_account_skin_status_ready">Account skin: ready — this is your own skin.</string>
     <string name="cosmetics_account_skin_fetching">Fetching your account skin…</string>
     <string name="cosmetics_account_skin_no_account">Sign in to a Microsoft account first.</string>
-    <string name="vip_tab_general">General</string>
     <string name="vip_tab_controller">Controller</string>
     <string name="vip_tab_keyboard">Keyboard</string>
     <string name="vip_mode_controller">Controller detected</string>
     <string name="vip_mode_keyboard">Keyboard &amp; mouse</string>
-    <string name="vip_close">Close</string>
-    <string name="vip_search_hint">Search modules…</string>
     <string name="vip_empty_no_controller">No controller detected. Connect a gamepad to configure it.</string>
-    <string name="vip_status_active">ACTIVE</string>
-    <string name="vip_status_off">OFF</string>
-    <string name="vip_status_unavailable">UNAVAILABLE</string>
     <string name="vip_configure">Configure</string>
     <string name="vip_live_preview">Live input</string>
-    <string name="vip_keyboard_profile">Keyboard profile</string>
     <string name="vip_keyboard_hint">Select a control to remap it</string>
     <string name="vip_controller_profiles">Profiles</string>
     <string name="vip_controller_active_profile">Active profile</string>
@@ -1003,8 +991,6 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="vip_dead_zone">Dead zone</string>
     <string name="vip_sensitivity">Sensitivity</string>
     <string name="vip_rumble">Rumble</string>
-    <string name="vip_on">On</string>
-    <string name="vip_off">Off</string>
 
     <string name="pack_changer_title">In-game packs</string>
     <string name="pack_changer_status">%1$d of %2$d resource packs active</string>
@@ -1485,6 +1471,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_repair_desc">Wipe and re-extract the native library cache for the selected version. Fixes stale or corrupted extracted libraries that fail to dlopen.</string>
     <string name="diagnostics_repair_confirm_title">Repair native libraries?</string>
     <string name="diagnostics_repair_confirm_message">This wipes the extracted library cache for this version and re-extracts everything from the APK. Installed worlds, settings and mods are not touched.</string>
+    <string name="diagnostics_repair_failed">Repair could not be started. Nothing was changed. Reopen the launcher and try again.</string>
     <string name="diagnostics_repair_started">Repair started — re-extracting native libraries…</string>
     <string name="diagnostics_no_version">No version selected.</string>
     <string name="diagnostics_section_app">Application</string>
@@ -1519,9 +1506,15 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_section_readiness">Launch readiness</string>
     <string name="diagnostics_field_launch_state">State</string>
     <string name="diagnostics_field_launch_blocks">Effect</string>
+    <string name="diagnostics_field_last_launch_failure">Last launch failure</string>
+    <string name="diagnostics_field_last_launch_failure_time">Failed at</string>
     <string name="diagnostics_launch_blocked">Launch blocked</string>
     <string name="diagnostics_launch_proceeds">Launch proceeds</string>
     <string name="diagnostics_field_extraction_version">Extraction version</string>
+    <string name="diagnostics_field_library_repair">Extracted libraries</string>
+    <string name="diagnostics_library_repair_needed">DAMAGED — a required library is missing; Repair installation will re-extract</string>
+    <string name="diagnostics_library_repair_ok">Complete</string>
+    <string name="diagnostics_library_repair_pending">Not extracted yet — the next launch extracts them</string>
     <string name="diagnostics_field_signature_rules_source">Signature rules source</string>
     <string name="diagnostics_field_signature_rules_revision">Signature rules revision</string>
     <string name="diagnostics_field_signature_rules_coverage">Signature rule coverage</string>
@@ -1651,7 +1644,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="haptic_feedback">Haptic Feedback</string>
     <string name="haptic_feedback_desc">Vibrate briefly on presses and toggles. Confirming an action and deleting a profile feel different. Turn off to silence all touch vibration.</string>
     <string name="dynamic_color">Match Wallpaper Colors</string>
-    <string name="dynamic_color_desc">Tint the app with colors derived from your wallpaper (Android 12+). Your custom accent color still wins where you set one.</string>
+    <string name="dynamic_color_desc">Tint the app with colors derived from your wallpaper (Android 12+). This is the only accent source: the launcher no longer has a separate custom accent setting.</string>
     <string name="reset_to_defaults">Reset to Defaults</string>
     <string name="reset_settings_confirm">Reset all customization settings to default values?</string>
     <string name="settings_reset">Settings Reset</string>
@@ -2192,9 +2185,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="installations_challenge_hint">The download source is checking that this is a real browser. Complete the check above; the list loads automatically once it clears.</string>
     <string name="installations_challenge_cancelled">The browser check was not completed. Press Refresh to try again.</string>
 
-    <!-- Replay tab (shared by the touch Mod Menu and the VIP Mod Menu) -->
+    <!-- Replay tab (hosted by the one Mod Menu, and by the launcher-side Replay screen) -->
     <string name="nav_replay">Replay</string>
-    <string name="vip_tab_replay">Replay</string>
     <string name="replay_capture_channel">Replay recording</string>
     <string name="replay_capture_notification_title">Recording gameplay</string>
     <string name="replay_capture_notification_text">Chimera Replay is capturing your screen. Open the launcher to stop.</string>
@@ -2230,6 +2222,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="replay_action_delete">Delete</string>
     <string name="replay_action_favorite">Favorite</string>
     <string name="replay_action_unfavorite">Remove favorite</string>
+    <string name="replay_delete_failed">Could not delete the clip. Close any app that may be playing it, then try again.</string>
     <string name="replay_rename_failed">Could not rename the clip</string>
     <string name="replay_action_cancel">Cancel</string>
     <string name="replay_action_save">Save</string>
@@ -2391,6 +2384,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="launch_failure_message_stale_libs">The extracted native libraries are from an older version of the launcher. They will be re-extracted automatically on the next launch. If the game still fails to start, run Repair installation in Settings \u2192 Diagnostics.</string>
     <string name="launch_failure_title_rules">Limited compatibility</string>
     <string name="launch_failure_message_rules">There are no hook definitions for this Minecraft build yet, so in-game overlays and cosmetics are disabled. The game itself will run normally.</string>
+    <string name="launch_failure_title_unexpected">Could not start the game</string>
+    <string name="launch_failure_message_unexpected">The launcher could not begin the launch and the cause was not one it recognises. Nothing was changed on your device. Reopen the launcher and try again; if it keeps happening, run Repair installation in Settings \u2192 Diagnostics.</string>
     <string name="launch_failure_title_not_installed">Minecraft not found</string>
     <string name="launch_failure_message_not_installed">Minecraft does not appear to be installed on this device. Import a Minecraft APK from the Library — a Google Play install cannot be launched by this launcher, because the game keeps its native library inside the installed app where the launcher cannot reach it.</string>
 
@@ -2420,6 +2415,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_reason_server_refused">The download source refused the request. It sometimes asks for a browser check before it will serve a file; complete the check in the browser panel, then try again.</string>
     <string name="error_reason_server_error">The download server reported an internal error. This is a problem on the server, not on your device. Try again in a few minutes.</string>
     <string name="error_reason_bad_response">The download source answered, but the launcher could not read a usable download link from it. The source may have changed its page layout. Try Refresh, and report it if it keeps happening.</string>
+    <string name="error_reason_out_of_memory">The launcher ran out of memory while handling this file. Close other apps and try again; if it keeps happening, the package may be larger than this device can import.</string>
     <string name="error_reason_out_of_space">There is not enough free storage to finish this. Free some space — the launcher needs room for the downloaded package and for the files it extracts from it — then try again.</string>
     <string name="error_reason_permission_denied">The launcher is not allowed to read or write that location. Grant storage access to GlowberryClient in Android Settings, then try again.</string>
     <string name="error_reason_corrupt_package">The downloaded file is damaged or is not a valid Minecraft package. Delete it and download it again; if it fails the same way, the source is serving a broken file.</string>
@@ -2436,10 +2432,12 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_short_server_refused">the source refused the request</string>
     <string name="error_short_server_error">the server reported an internal error</string>
     <string name="error_short_bad_response">the source returned something unreadable</string>
+    <string name="error_short_out_of_memory">the launcher ran out of memory</string>
     <string name="error_short_out_of_space">not enough free storage</string>
     <string name="error_short_permission_denied">storage permission denied</string>
     <string name="error_short_corrupt_package">the file is damaged or not a valid package</string>
     <string name="error_short_interrupted">the transfer was interrupted</string>
+    <string name="error_short_abi_incompatible">Unsupported 32-bit build</string>
     <string name="error_short_unknown">see the log for the exact error</string>
 
 </resources>

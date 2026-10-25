@@ -11,6 +11,17 @@
     android:focusable="false"
     android:defaultFocusHighlightEnabled="false">
 
+    <!-- The blurred backdrop layer (R3). Drawn behind the wheel and given one RenderEffect on
+         API 31+, where it is the only correct place for the blur: a RenderEffect on the wheel
+         itself would blur the wheel's own sectors and labels. GONE until a capture arrives. -->
+    <ImageView
+        android:id="@+id/radial_backdrop_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:visibility="gone" />
+
     <org.chimeramc.client.core.mods.inbuilt.overlay.RadialMenuView
         android:id="@+id/radial_menu_view"
         android:layout_width="match_parent"

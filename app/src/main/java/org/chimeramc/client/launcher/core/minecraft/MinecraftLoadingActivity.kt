@@ -22,12 +22,13 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import org.chimeramc.client.R
+import org.chimeramc.client.core.minecraft.LaunchLogBuffer
+import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
 import org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
 import org.chimeramc.client.ui.activities.BaseActivity
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog
 import org.chimeramc.client.util.PersonalizationManager
 import java.text.SimpleDateFormat
-import java.util.ArrayDeque
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -48,6 +49,7 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
     @Volatile
     private var returningToLauncher = false
     private var preparingStarted = false
+    private var firstFrameFallback: Runnable? = null
     private var enteringGame = false
     private var progressAnimator: ValueAnimator? = null
     private var currentProgress = 0
@@ -56,7 +58,9 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
     private var statusRenderScheduled = false
     private var lastRenderedStatus: String? = null
     private var lastRenderedDetail: String? = null
-    private val visibleLogMessages = ArrayDeque<String>()
+    // The cap and the render live in a pure, tested class; the view is assigned its whole output
+    // so the two can never disagree about how many lines exist.
+    private val launchLog = LaunchLogBuffer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,14 +125,21 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
                 return true
             }
         })
-        content.postDelayed({
+        // Held so onDestroy can cancel it. View.postDelayed goes through the ViewRootImpl handler,
+        // not the one this activity owns, so mainHandler.removeCallbacksAndMessages in onDestroy
+        // does not reach it - a screen destroyed inside the fallback window would still fire it and
+        // submit to the executor after it was shut down.
+        firstFrameFallback = Runnable {
             hideSystemUi()
             startPreparingOnce("loading first frame fallback")
-        }, FIRST_FRAME_FALLBACK_MS)
+        }
+        content.postDelayed(firstFrameFallback!!, FIRST_FRAME_FALLBACK_MS)
     }
 
     private fun startPreparingOnce(reason: String) {
-        if (preparingStarted) return
+        // A late first-frame callback (or the fallback) can arrive after the screen is gone; the
+        // preparation must not start then, and must never submit to a shut-down executor.
+        if (preparingStarted || isFinishing || isDestroyed) return
         preparingStarted = true
         trace.milestone("Runtime preparation continuing")
         appendLog("Preparing game")
@@ -145,25 +156,48 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
     }
 
     private fun startPreparing() {
-        executor.execute {
-            try {
-                val gameIntent = Intent(intent).apply {
-                    setClass(this@MinecraftLoadingActivity, MinecraftActivity::class.java)
-                }
-                val preparedRuntime = MinecraftRuntimePreparer.prepare(this, gameIntent, this)
-                MinecraftLaunchSession.setPreparedRuntime(preparedRuntime)
+        if (executor.isShutdown || executor.isTerminated) return
+        try {
+            executor.execute { prepareAndEnterGame() }
+        } catch (rejected: java.util.concurrent.RejectedExecutionException) {
+            // The screen was destroyed between the check and the submit; there is nobody left to
+            // report to and nothing to launch.
+            trace.error("Runtime preparation could not be scheduled", rejected.message)
+        }
+    }
 
-                mainHandler.post {
-                    if (returningToLauncher || isFinishing || isDestroyed) return@post
-                    updateProgress(100, getString(R.string.minecraft_loading_complete), getString(R.string.minecraft_loading_entering_game))
-                    trace.milestone("Entering game")
-                    appendLog("Entering Minecraft")
+    private fun prepareAndEnterGame() {
+        try {
+            val gameIntent = Intent(intent).apply {
+                setClass(this@MinecraftLoadingActivity, MinecraftActivity::class.java)
+            }
+            val preparedRuntime = MinecraftRuntimePreparer.prepare(this, gameIntent, this)
+            MinecraftLaunchSession.setPreparedRuntime(preparedRuntime)
+
+            mainHandler.post {
+                if (returningToLauncher || isFinishing || isDestroyed) return@post
+                updateProgress(
+                    100,
+                    getString(R.string.minecraft_loading_complete),
+                    getString(R.string.minecraft_loading_entering_game)
+                )
+                trace.milestone("Entering game")
+                appendLog("Entering Minecraft")
+                // Starting the game activity is the last thing that can fail, and it failed
+                // outside any guard: a throw from startActivity (a missing target, a
+                // TransactionTooLarge, an OOM while the game activity inflated) unwound through
+                // the main thread and killed the process, so the user saw the app vanish with
+                // no message at all. It is contained here and reported through the same
+                // cause-naming path every other launch failure uses.
+                try {
                     showSkippedIncompatibleModsIfNeeded(preparedRuntime, gameIntent)
-                }
-            } catch (throwable: Throwable) {
-                mainHandler.post {
+                } catch (throwable: Throwable) {
                     showFailure(throwable)
                 }
+            }
+        } catch (throwable: Throwable) {
+            mainHandler.post {
+                showFailure(throwable)
             }
         }
     }
@@ -206,10 +240,7 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         if (message == lastLogMessage) return
         val timestamp = timeFormat.format(Date())
         lastLogMessage = message
-        visibleLogMessages.addLast("[$timestamp] ${trace.formatForUi(message)}")
-        while (visibleLogMessages.size > MAX_VISIBLE_LOG_LINES) {
-            visibleLogMessages.removeFirst()
-        }
+        launchLog.add("[$timestamp] ${trace.formatForUi(message)}")
         scheduleLogRender()
     }
 
@@ -219,11 +250,12 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         mainHandler.postDelayed({
             logRenderScheduled = false
             if (isFinishing || isDestroyed) return@postDelayed
-            logView.append(visibleLogMessages.removeFirst())
-            for (message in visibleLogMessages) {
-                logView.append("\n$message")
-            }
-            visibleLogMessages.clear()
+            // The buffer mirrors what should be on screen, so it is re-rendered wholesale. Appending
+            // only the newly arrived lines treated it as a delta queue, which left the line cap
+            // bounding the *buffer* and not the view: the TextView accumulated every line of the
+            // whole launch with no ceiling, so a slow extraction grew it into a long-layout,
+            // high-memory scroll that also duplicated lines when a render drained the queue.
+            logView.text = launchLog.render()
             logScroll.post { logScroll.fullScroll(ScrollView.FOCUS_DOWN) }
         }, LOG_RENDER_DEBOUNCE_MS)
     }
@@ -243,6 +275,10 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         appendLog(getString(R.string.launch_error_cause_label) + " " + LaunchErrorDiagnosis.label(cause))
         appendLog(causeLine)
         appendLog(message)
+        // The user is looking at the cause on this screen, so the launcher must not repeat it after
+        // the restart. The report is stored as announced and any earlier pending report is dropped:
+        // this screen is authoritative whenever it can be shown.
+        LastLaunchFailure.write(this, throwable, true)
         returnButton.visibility = View.VISIBLE
     }
 
@@ -312,10 +348,24 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
 
     private fun transitionToGame(gameIntent: Intent) {
         if (enteringGame) return
-        enteringGame = true
-
+        // The guards run before the latch is set. Setting it first meant a call that arrived while
+        // the screen was finishing latched `enteringGame` and returned without starting anything,
+        // so the retry from the incompatible-mods dialog could never transition: the game simply
+        // never opened.
         if (returningToLauncher || isFinishing || isDestroyed) return
-        startActivity(gameIntent)
+        enteringGame = true
+        // Starting the game is the last step and the only one that was unguarded on this path: the
+        // dialog button calls straight into here with no enclosing try, so a throw from
+        // startActivity (a missing target, TransactionTooLarge, an OOM while the game activity
+        // inflates) unwound through the main thread and killed the process. Contained and named
+        // through the same path every other launch failure uses.
+        try {
+            startActivity(gameIntent)
+        } catch (throwable: Throwable) {
+            enteringGame = false
+            showFailure(throwable)
+            return
+        }
         finish()
         overridePendingTransition(0, 0)  // no animation, test only
     }
@@ -361,6 +411,10 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
 
     override fun onDestroy() {
         mainHandler.removeCallbacksAndMessages(null)
+        // The first-frame fallback is posted through the decor view's handler, so it has to be
+        // cancelled explicitly or it fires into a destroyed screen.
+        firstFrameFallback?.let { window.decorView.removeCallbacks(it) }
+        firstFrameFallback = null
         progressAnimator?.cancel()
         executor.shutdownNow()
         super.onDestroy()
@@ -402,6 +456,5 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         private const val LOG_RENDER_DEBOUNCE_MS = 200L
         private const val STATUS_RENDER_DEBOUNCE_MS = 100L
         private const val TRACK_ALPHA = 42
-        private const val MAX_VISIBLE_LOG_LINES = 48
     }
 }

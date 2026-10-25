@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="10dp">
+    android:paddingTop="@dimen/space_3">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,25 +25,25 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/on_surface"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/optifine_item_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="@dimen/space_divider"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/text_secondary_light"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <TextView
                 android:id="@+id/optifine_item_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/space_hairline"
                 android:fontFamily="@font/misans"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -58,7 +58,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/space_3"
         android:background="@color/divider"
         android:alpha="0.2" />
 </LinearLayout>

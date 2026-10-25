@@ -378,16 +378,17 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
-    public void updateMods(List<UnifiedMod> mods, Set<String> favoriteKeys) {
-        updateMods(mods, favoriteKeys, java.util.Collections.emptyList());
-    }
-
     /**
      * Replaces the list with the modules and the one-shot actions for the current section (M3).
      *
      * <p>Actions are appended after the modules under their own {@code ACTIONS} header, never mixed
      * into a module's section: a switch and a chevron must not sit in the same run, because that is
      * exactly the "is this a toggle or a button?" ambiguity the split removes.
+     *
+     * <p>There is deliberately no module-list-only overload. One existed and the density toggle
+     * called it, which silently dropped the ACTIONS block until the next filter change; making the
+     * action list a required argument means a caller cannot rebuild the list without deciding what
+     * happens to the actions.
      */
     public void updateMods(List<UnifiedMod> mods, Set<String> favoriteKeys,
                            List<ModMenuAction> sectionActions) {
@@ -618,6 +619,11 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             modHolder.switchView.setChecked(isEnabled && !rowState.isBroken(), false);
             modHolder.switchView.setReducedMotion(settings != null
                     && settings.effectiveMotion(false, false) == ModMenuSettings.Motion.REDUCED);
+            // M6: the toggle-style setting reaches the control, so choosing the checkbox variant
+            // actually draws a checkbox rather than leaving the stored preference inert.
+            if (settings != null) {
+                modHolder.switchView.setToggleStyle(settings.toggleStyle());
+            }
             modHolder.switchView.setOnCheckedChangeListener(null);
             modHolder.switchView.setOnCheckedChangeListener(checked -> {
                 if (!rowState.isInteractive()) {
@@ -913,6 +919,37 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    /**
+     * Applies the density's row height to a card's row (M6).
+     *
+     * <p>The row is found from the switch rather than by child index: the card's first child is the
+     * accent strip, so an index walk reached a 2dp view and did nothing. The row's own
+     * {@code minHeight} is what the layout pins, so the setting goes on {@code minimumHeight} — the
+     * row keeps {@code wrap_content} and a taller label still grows it rather than being clipped.
+     */
+    private void applyRowHeight(android.view.View card, int rowHeightDp) {
+        android.view.View row = findRowContainer(card);
+        if (row == null) return;
+        float density = card.getResources().getDisplayMetrics().density;
+        int target = (int) (rowHeightDp * density);
+        // Never shrink below what the content already needs.
+        if (row.getMinimumHeight() != target) row.setMinimumHeight(target);
+    }
+
+    /**
+     * The row container inside a card, located through the switch (M6).
+     *
+     * <p>Returns the switch's parent, which is the horizontal row holding the icon, the text column
+     * and the controls. Null when the card has no switch (an action row), in which case there is
+     * nothing to size.
+     */
+    private android.view.View findRowContainer(android.view.View card) {
+        android.view.View switchView = card.findViewById(R.id.mod_card_switch);
+        if (switchView == null) return null;
+        android.view.ViewParent parent = switchView.getParent();
+        return parent instanceof android.view.View ? (android.view.View) parent : null;
+    }
+
     /** The adapter holds no Context; the attached RecyclerView supplies one. */
     private android.content.Context holderContext() {
         return recycler != null ? recycler.getContext() : null;
@@ -924,13 +961,20 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.itemView.setEnabled(available);
         holder.itemView.setClickable(available);
         holder.icon.setAlpha(!available ? 0.5f : (enabled ? 1f : 0.8f));
-        holder.name.setTextColor(!available ? ModMenuPalette.TEXT_TERTIARY
-                : (enabled ? ModMenuPalette.TEXT_PRIMARY : ModMenuPalette.blend(
-                ModMenuPalette.TEXT_PRIMARY, ModMenuPalette.TEXT_SECONDARY, 0.4f)));
+        holder.name.setTextColor(!available ? theme.textTertiary()
+                : (enabled ? theme.textPrimary() : ModMenuPalette.blend(
+                theme.textPrimary(), theme.textSecondary(), 0.4f)));
         
         if (holder.itemView instanceof androidx.cardview.widget.CardView) {
             androidx.cardview.widget.CardView cv = (androidx.cardview.widget.CardView) holder.itemView;
-            
+
+            // M6: the corner-radius slider and the density both reach the row here. The radius was
+            // stored and displayed but the card's radius came from the layout's fixed dp, so the
+            // slider moved nothing.
+            float density = holder.itemView.getResources().getDisplayMetrics().density;
+            cv.setRadius(theme.cornerRadiusDp() * density);
+            applyRowHeight(cv, theme.rowHeightDp());
+
             if (!available) {
                 cv.setCardBackgroundColor(theme.cardSurface());
                 cv.setCardElevation(0f);

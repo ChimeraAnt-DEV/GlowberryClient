@@ -83,6 +83,9 @@ public class LogcatOverlay extends FrameLayout {
     private int pendingHistoryTrimLines = 0;
 
     private final ArrayBlockingQueue<String> pendingLines = new ArrayBlockingQueue<>(8192);
+    // Both are recreated by start() and torn down by stop(), so the overlay parks no threads while
+    // it is hidden. The filter pool was created once in the field initialiser and never shut down,
+    // so it outlived every hide.
     private ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
     private ExecutorService filterExecutor = Executors.newSingleThreadExecutor();
     private volatile boolean renderLoopStarted = false;
@@ -407,6 +410,11 @@ public class LogcatOverlay extends FrameLayout {
         if (ioExecutor.isShutdown() || ioExecutor.isTerminated()) {
             ioExecutor = Executors.newSingleThreadExecutor();
         }
+        // The filter pool is torn down by stop(), so it must be rebuilt on show too or the next
+        // filter change submits to a terminated executor and throws on the UI thread.
+        if (filterExecutor.isShutdown() || filterExecutor.isTerminated()) {
+            filterExecutor = Executors.newSingleThreadExecutor();
+        }
         startBackgroundRenderLoop();
         startReader();
     }
@@ -417,6 +425,7 @@ public class LogcatOverlay extends FrameLayout {
         // Clear any pending lines so nothing gets appended after disable
         pendingLines.clear();
         ioExecutor.shutdownNow();
+        filterExecutor.shutdownNow();
         renderLoopStarted = false;
     }
 
@@ -502,38 +511,44 @@ public class LogcatOverlay extends FrameLayout {
             if (ln.isEmpty()) continue;
             items.add(colorizeLine(ln));
         }
-        int startPos = logAdapter.getItemCount();
         logAdapter.addAll(items);
         if (autoScroll) smoothScrollToBottom();
     }
 
     private void scheduleFilterRefresh() {
-        filterExecutor.submit(() -> {
-            List<String> snapshot;
-            synchronized (logBuffer) { snapshot = new ArrayList<>(logBuffer); }
-            List<CharSequence> items = new ArrayList<>();
-            for (String ln : snapshot) {
-                if (passesFilter(ln)) {
-                    items.add(colorizeLine(ln));
-                }
-            }
-            mainHandler.post(() -> {
-                boolean wasAtBottom = isAtBottom();
-                int firstPos = layoutManager.findFirstVisibleItemPosition();
-                View firstView = layoutManager.findViewByPosition(firstPos);
-                int offset = (firstView == null) ? 0 : firstView.getTop();
-
-                logAdapter.setItems(items);
-
-                recyclerView.post(() -> {
-                    if (wasAtBottom && autoScroll) {
-                        smoothScrollToBottom();
-                    } else if (firstPos >= 0) {
-                        layoutManager.scrollToPositionWithOffset(Math.min(firstPos, Math.max(0, logAdapter.getItemCount()-1)), offset);
+        // A filter change can arrive after the overlay was hidden (a pending text-watcher callback,
+        // or a level chip closing), and submitting to a shut-down pool throws on the UI thread.
+        if (filterExecutor.isShutdown() || filterExecutor.isTerminated()) return;
+        try {
+            filterExecutor.submit(() -> {
+                List<String> snapshot;
+                synchronized (logBuffer) { snapshot = new ArrayList<>(logBuffer); }
+                List<CharSequence> items = new ArrayList<>();
+                for (String ln : snapshot) {
+                    if (passesFilter(ln)) {
+                        items.add(colorizeLine(ln));
                     }
+                }
+                mainHandler.post(() -> {
+                    boolean wasAtBottom = isAtBottom();
+                    int firstPos = layoutManager.findFirstVisibleItemPosition();
+                    View firstView = layoutManager.findViewByPosition(firstPos);
+                    int offset = (firstView == null) ? 0 : firstView.getTop();
+
+                    logAdapter.setItems(items);
+
+                    recyclerView.post(() -> {
+                        if (wasAtBottom && autoScroll) {
+                            smoothScrollToBottom();
+                        } else if (firstPos >= 0) {
+                            layoutManager.scrollToPositionWithOffset(Math.min(firstPos, Math.max(0, logAdapter.getItemCount()-1)), offset);
+                        }
+                    });
                 });
             });
-        });
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {
+            // The overlay was hidden between the check and the submit; nothing to refresh.
+        }
     }
 
     private boolean passesFilter(@NonNull String line) {
@@ -687,9 +702,17 @@ public class LogcatOverlay extends FrameLayout {
 
         void addAll(@NonNull List<CharSequence> more) {
             if (more.isEmpty()) return;
-            int start = items.size();
             items.addAll(more);
-            notifyItemRangeInserted(start, more.size());
+            // The adapter is the view, so it needs the same ceiling the ring buffer has: without
+            // this the list grew to every line the overlay had ever shown (the buffer capped itself
+            // and the view kept appending), so a long session with the overlay open turned into an
+            // unbounded RecyclerView whose every insert got slower.
+            int excess = items.size() - MAX_BUFFER_LINES;
+            if (excess > 0) {
+                items.subList(0, excess).clear();
+                notifyItemRangeRemoved(0, excess);
+            }
+            notifyItemRangeInserted(items.size() - more.size(), more.size());
         }
 
         void setItems(@NonNull List<CharSequence> newItems) {

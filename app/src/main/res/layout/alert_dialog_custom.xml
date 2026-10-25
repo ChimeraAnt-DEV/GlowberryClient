@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="@dimen/space_6"
     style="@style/Widget.Chimera.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/tv_title"
-        android:textSize="18sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -19,12 +19,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/space_3"
         android:fillViewport="true">
 
         <TextView
             android:id="@+id/tv_message"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="40dp" />
@@ -35,14 +35,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/space_3"
         android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/custom_view_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/space_3"
         android:orientation="vertical"
         android:visibility="gone" />
 
@@ -51,7 +51,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/space_6"
         android:gravity="end">
 
         <Button
@@ -61,12 +61,12 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
+            android:paddingStart="@dimen/space_3"
+            android:paddingEnd="@dimen/space_3" />
 
         <View
             android:id="@+id/btn_spacing_neg_neu"
@@ -80,12 +80,12 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:paddingStart="@dimen/space_3"
+            android:paddingEnd="@dimen/space_3"
             android:visibility="gone" />
 
         <View
@@ -99,12 +99,12 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:ellipsize="end"
             android:maxLines="1"
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="?attr/colorOnPrimary"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
+            android:paddingStart="@dimen/space_3"
+            android:paddingEnd="@dimen/space_3" />
     </LinearLayout>
 </LinearLayout>

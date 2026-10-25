@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import org.chimeramc.client.R;
+import org.chimeramc.client.core.replay.ReplayControls;
 import org.chimeramc.client.core.replay.ReplayPanel;
 
 /**
@@ -21,6 +22,11 @@ import org.chimeramc.client.core.replay.ReplayPanel;
  * a live recorder listener, so it is disposed in {@link #onDestroyView()} rather than merely
  * dropped, and {@code onShown}/{@code onHidden} bracket its live refresh around this fragment's
  * visibility.
+ *
+ * <p>It is also a controller host: the panel shows a controller hint here, so the keys that hint
+ * names must actually do something. {@link #handleHardwareKey(int)} resolves them through the
+ * shared {@link ReplayControls} table and applies them with {@link ReplayPanel#handleControl}, so
+ * the Library behaves exactly like the in-game menu rather than showing buttons that do nothing.
  */
 public class ReplayFragment extends Fragment {
 
@@ -37,6 +43,22 @@ public class ReplayFragment extends Fragment {
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         replayPanel.setGamepadDetected(hasConnectedGamepad());
         return root;
+    }
+
+    /**
+     * Applies a hardware key press to the Replay panel.
+     *
+     * <p>Controller buttons are tried first, then keyboard keys, so both a pad and a physical
+     * keyboard drive the same actions. Nothing is consumed unless an action actually applied, so a
+     * key this fragment does not own still reaches the host.
+     *
+     * @return true when the press was used and must not fall through.
+     */
+    public boolean handleHardwareKey(int keyCode) {
+        if (replayPanel == null) return false;
+        ReplayControls.Action action = ReplayControls.forControllerKey(keyCode);
+        if (action == null) action = ReplayControls.forKeyboardKey(keyCode);
+        return action != null && replayPanel.handleControl(action);
     }
 
     @Override

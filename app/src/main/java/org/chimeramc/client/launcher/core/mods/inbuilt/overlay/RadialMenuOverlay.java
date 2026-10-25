@@ -279,12 +279,14 @@ public class RadialMenuOverlay {
             public RadialWheelMaterial.Env env() {
                 return buildMaterialEnv(activity);
             }
-
-            @Override
-            public android.view.Window window() {
-                return activity.getWindow();
-            }
         });
+        // R3: the backdrop is shown on its own layer behind the wheel and blurred there. The layer
+        // is what the RenderEffect is applied to on API 31+, because a RenderEffect on the wheel
+        // itself would blur the wheel's sectors and labels.
+        View backdrop = overlayView.findViewById(R.id.radial_backdrop_layer);
+        if (backdrop instanceof android.widget.ImageView) {
+            menuView.setBackdropLayer((android.widget.ImageView) backdrop);
+        }
         backdropCapture = new WheelBackdropCapture();
         startBackdropRefreshLoop();
         // A pad-opened wheel enters controller-cursor mode: the cursor appears at the hub and the
@@ -526,14 +528,15 @@ public class RadialMenuOverlay {
     private void detachQuietly() {
         View view = overlayView;
         overlayView = null;
-        // Release the backdrop capture and clear the window blur so nothing is left on the game's
-        // window after the wheel closes (R3/R12).
+        // Release the backdrop capture and clear the wheel's backdrop layer so nothing is left
+        // pointing at a recycled bitmap after the wheel closes (R3/R12).
         if (backdropCapture != null) {
             backdropCapture.release();
             backdropCapture = null;
         }
-        if (activity != null && activity.getWindow() != null) {
-            new WheelGlassRenderer().clearWindowBlur(activity.getWindow());
+        RadialMenuView wheel = menuView;
+        if (wheel != null) {
+            wheel.releaseBackdropLayer();
         }
         if (view == null) return;
         try {

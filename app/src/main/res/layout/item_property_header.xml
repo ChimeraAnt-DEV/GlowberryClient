@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="8dp"
-    android:paddingTop="16dp"
-    android:paddingBottom="8dp">
+    android:paddingHorizontal="@dimen/space_2"
+    android:paddingTop="@dimen/space_4"
+    android:paddingBottom="@dimen/space_2">
 
     <TextView
         android:id="@+id/header_text"
@@ -13,7 +13,7 @@
         android:fontFamily="@font/misans"
         android:text="@string/category"
         android:textColor="@color/primary"
-        android:textSize="13sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Label"
         android:textStyle="bold" />
 
 </LinearLayout>

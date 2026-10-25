@@ -23,7 +23,7 @@
 
     <!-- About -->
     <string name="about_title">アプリについて</string>
-    <string name="copyright">©2024–2026 GlowberryClient. All rights reserved.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Apache License 2.0 の下でライセンスされています。</string>
     <string name="font_license">このアプリは Misans フォントを使用しています。</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">クイックアクション</string>
@@ -434,7 +434,8 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="dialog_title_login_required">サインインが必要です</string>
     <string name="dialog_message_login_required">ランチャー管理のログインが有効ですが、アカウントがサインインしていません。</string>
     <string name="go_to_accounts">アカウント</string>
-    <string name="disable_launcher_login_and_continue">閉じる</string>
+    <string name="disable_launcher_login_and_continue">無効にして続行</string>
+    <string name="launcher_login_disabled_launching">ランチャー管理のサインインを無効にしました。起動しています…</string>
 
     <string name="label_current_account">現在のアカウント</string>
     <string name="label_other_accounts">その他のアカウント</string>
@@ -665,10 +666,6 @@ GlowberryClient を続行するには移行を完了する必要があります�
         <item>外部の SO モジュールをロードして、Minecraft の機能とパフォーマンスを向上させます。</item>
     </string-array>
 
-    <string name="theme_color_title">テーマの色</string>
-    <string name="theme_color_desc">アプリのプライマリアクセントカラー</string>
-    <string name="preset_colors">プリセットカラー</string>
-    <string name="more_colors">その他の色</string>
     <string name="bg_image_title">背景画像</string>
     <string name="bg_image_desc">背景として使用する画像を選択してください</string>
     <string name="bg_image_none">画像が選択されていません</string>
@@ -854,7 +851,6 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="pagination_page_of">%1$d / %2$s ページ</string>
     <string name="pagination_page_one">1 ページ</string>
     <string name="logcat_filter_all">すべて</string>
-    <string name="invalid_color_format">色の形式が無効です</string>
     <string name="world_directory_not_found">ワールドディレクトリが見つかりません</string>
     <string name="worlds_directory_unavailable">ワールドディレクトリを利用できません</string>
     <string name="delete_screenshot_confirm">このスクリーンショットを削除してもよろしいですか？</string>
@@ -881,8 +877,6 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="resource_pack_description_placeholder">パックの説明がここに表示されます</string>
     <string name="mod_name_placeholder">Mod 名</string>
     <string name="mod_load_order_placeholder">読み込み順: 1</string>
-    <string name="custom_color_hex_rgb">カスタムカラー (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB または R,G,B</string>
     <string name="screenshot_name_placeholder">スクリーンショット名</string>
     <string name="screenshot_date_placeholder">日時: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Minecraft 風の画面ボタンを作成し、それぞれにキーボードの1キーだけを割り当てます。マクロ、キーシーケンス、自動リピート、オートクリックは実行されません。</string>

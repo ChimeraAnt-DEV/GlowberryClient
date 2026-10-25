@@ -19,7 +19,7 @@
 
     <!-- О приложении -->
     <string name="about_title">О приложении</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Все права защищены.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Лицензировано по лицензии Apache 2.0.</string>
     <string name="font_license">Это приложение использует шрифт Misans.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Быстрые действия</string>
@@ -391,7 +391,8 @@
     <string name="dialog_title_login_required">Требуется вход</string>
     <string name="dialog_message_login_required">Включён вход через лаунчер, но ни один аккаунт не авторизован. Перейдите в «Аккаунты», чтобы войти.</string>
     <string name="go_to_accounts">Аккаунты</string>
-    <string name="disable_launcher_login_and_continue">Закрыть</string>
+    <string name="disable_launcher_login_and_continue">Отключить и продолжить</string>
+    <string name="launcher_login_disabled_launching">Вход через лаунчер отключён. Запуск…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Текущий аккаунт</string>
@@ -690,10 +691,6 @@
         <item>CurseForge позволяет просматривать и загружать контент сообщества напрямую.</item>
         <item>Загружайте внешние нативные SO-модули, чтобы расширять или улучшать возможности и производительность Minecraft.</item>
     </string-array>
-    <string name="theme_color_title">Цвет темы</string>
-    <string name="theme_color_desc">Основной акцентный цвет приложения</string>
-    <string name="preset_colors">ГОТОВЫЕ ЦВЕТА</string>
-    <string name="more_colors">ДРУГИЕ ЦВЕТА</string>
     <string name="bg_image_title">Фоновое изображение</string>
     <string name="bg_image_desc">Выберите изображение для фона</string>
     <string name="bg_image_none">Изображение не выбрано</string>
@@ -888,7 +885,6 @@
     <string name="pagination_page_of">Страница %1$d из %2$s</string>
     <string name="pagination_page_one">Страница 1</string>
     <string name="logcat_filter_all">ВСЕ</string>
-    <string name="invalid_color_format">Неверный формат цвета</string>
     <string name="world_directory_not_found">Папка мира не найдена</string>
     <string name="worlds_directory_unavailable">Папка миров недоступна</string>
     <string name="delete_screenshot_confirm">Вы уверены, что хотите удалить этот снимок экрана?</string>
@@ -915,8 +911,6 @@
     <string name="resource_pack_description_placeholder">Описание пакета отображается здесь</string>
     <string name="mod_name_placeholder">Название мода</string>
     <string name="mod_load_order_placeholder">Порядок загрузки: 1</string>
-    <string name="custom_color_hex_rgb">Пользовательский цвет (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB или R,G,B</string>
     <string name="screenshot_name_placeholder">Название снимка экрана</string>
     <string name="screenshot_date_placeholder">Дата: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Создавайте экранные кнопки в стиле Minecraft, каждая из которых назначена ровно на одну клавишу клавиатуры. Кнопки никогда не выполняют макросы, последовательности клавиш, автоматические повторы или автоклик.</string>

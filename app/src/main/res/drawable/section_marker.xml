@@ -15,7 +15,7 @@
                 android:startColor="@color/brand_primary_24"
                 android:endColor="@color/brand_primary_10"
                 android:type="linear" />
-            <corners android:radius="7dp" />
+            <corners android:radius="@dimen/radius_badge" />
             <size
                 android:width="14dp"
                 android:height="28dp" />
@@ -32,7 +32,7 @@
                 android:startColor="@color/accent_violet"
                 android:endColor="@color/secondary"
                 android:type="linear" />
-            <corners android:radius="5dp" />
+            <corners android:radius="@dimen/radius_badge" />
         </shape>
     </item>
     <!-- A tight bright core so the chip catches light rather than reading as flat paint. -->
@@ -47,7 +47,7 @@
                 android:startColor="@color/brand_primary_67"
                 android:endColor="@android:color/transparent"
                 android:type="linear" />
-            <corners android:radius="3dp" />
+            <corners android:radius="@dimen/radius_badge" />
         </shape>
     </item>
 </layer-list>

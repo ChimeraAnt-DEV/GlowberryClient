@@ -8,5 +8,5 @@
     <size
         android:width="3dp"
         android:height="16dp" />
-    <corners android:radius="1.5dp" />
+    <corners android:radius="@dimen/radius_accent_bar" />
 </shape>

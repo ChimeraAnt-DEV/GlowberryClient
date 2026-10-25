@@ -19,9 +19,9 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="24dp">
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingTop="@dimen/space_4"
+        android:paddingBottom="@dimen/space_6">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,35 +34,35 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/javabridge_title"
                 android:textColor="@color/on_surface"
-                android:textSize="24sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/space_hairline"
                 android:fontFamily="@font/misans"
                 android:text="@string/javabridge_subtitle"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <!-- Honest scope: this rewrites mods, it does not run Java Edition. -->
             <TextView
                 android:id="@+id/javabridge_scope_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/space_3"
                 android:background="@drawable/bg_diagnostics_banner"
                 android:fontFamily="@font/misans"
-                android:padding="10dp"
+                android:padding="@dimen/space_3"
                 android:text="@string/javabridge_scope_note"
                 android:textColor="@color/on_surface"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/space_3"
                 android:orientation="horizontal">
 
                 <Button
@@ -78,7 +78,7 @@
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/space_2"
                     android:layout_weight="1"
                     android:minHeight="48dp"
                     android:text="@string/javabridge_setup" />
@@ -90,7 +90,7 @@
                 style="@style/Widget.Chimera.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="18sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold"
                     tools:text="Cool Mod" />
 
@@ -109,10 +109,10 @@
                     android:id="@+id/javabridge_mod_meta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="@dimen/space_hairline"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     tools:text="Fabric \u00b7 1.2.0 \u00b7 by Alice" />
 
                 <!-- Portability score pill. -->
@@ -120,13 +120,13 @@
                     android:id="@+id/javabridge_score"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:background="@drawable/bg_mod_page_badge"
                     android:fontFamily="@font/misans"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="@dimen/space_3"
+                    android:paddingVertical="@dimen/space_1"
                     android:textColor="@color/primary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold"
                     tools:text="Portability: High" />
 
@@ -134,102 +134,102 @@
                     android:id="@+id/javabridge_summary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     tools:text="This is a small, data-driven mod." />
 
                 <TextView
                     android:id="@+id/javabridge_reimplementation_warning"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:background="@drawable/bg_diagnostics_banner"
                     android:fontFamily="@font/misans"
-                    android:padding="10dp"
+                    android:padding="@dimen/space_3"
                     android:text="@string/javabridge_reimplementation_warning"
                     android:textColor="@color/on_surface"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_what_ported"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:id="@+id/javabridge_kept_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:orientation="vertical" />
 
                 <TextView
                     android:id="@+id/javabridge_partial_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_what_partial"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:id="@+id/javabridge_partial_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:orientation="vertical" />
 
                 <TextView
                     android:id="@+id/javabridge_dropped_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_what_dropped"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:id="@+id/javabridge_dropped_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:orientation="vertical" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_mapped_apis"
                     android:textColor="@color/on_surface"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/javabridge_mapped_apis"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     tools:text="Item.Settings \u2192 AntEggItemDef\nRegistry.register \u2192 AntEggRegistry.register" />
 
                 <Button
                     android:id="@+id/javabridge_port_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:minHeight="48dp"
                     android:text="@string/javabridge_port_button" />
             </LinearLayout>
@@ -240,7 +240,7 @@
                 style="@style/Widget.Chimera.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="gone">
@@ -249,11 +249,11 @@
                     android:id="@+id/javabridge_loading_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="@dimen/space_3"
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_inspecting"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                 <View
                     android:layout_width="180dp"
@@ -263,13 +263,13 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="12dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:background="@drawable/bg_skeleton_bar" />
 
                 <View
                     android:layout_width="240dp"
                     android:layout_height="12dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/bg_skeleton_bar" />
             </LinearLayout>
 
@@ -279,10 +279,10 @@
                 style="@style/Widget.Chimera.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:paddingVertical="28dp">
+                android:paddingVertical="@dimen/space_8">
 
                 <ImageView
                     android:layout_width="72dp"
@@ -295,23 +295,23 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:fontFamily="@font/misans"
                     android:text="@string/javabridge_empty_title"
                     android:textColor="@color/on_surface"
-                    android:textSize="15sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"
                     android:gravity="center"
-                    android:paddingHorizontal="24dp"
+                    android:paddingHorizontal="@dimen/space_6"
                     android:text="@string/javabridge_empty_body"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

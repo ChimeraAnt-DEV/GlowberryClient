@@ -18,7 +18,7 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     app:cardBackgroundColor="@color/glass_panel_bg"
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="@dimen/radius_card"
     app:strokeColor="@color/glass_panel_stroke"
     app:strokeWidth="1dp"
     app:cardElevation="0dp">
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="@dimen/space_4">
 
         <!-- Left: live 3D player preview (skin + cape + hat + pet). -->
         <org.chimeramc.client.core.mods.inbuilt.overlay.CapePreviewView
@@ -41,7 +41,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/space_4"
             android:layout_weight="6"
             android:orientation="vertical"
             android:gravity="center_vertical">
@@ -60,7 +60,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/last_played_title"
                     android:textColor="@color/dock_text_secondary"
-                    android:textSize="11sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
 
                 <TextView
@@ -68,20 +68,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minHeight="22dp"
-                    android:paddingHorizontal="10dp"
+                    android:paddingHorizontal="@dimen/space_3"
                     android:gravity="center"
                     android:background="@drawable/bg_release_tag"
                     android:fontFamily="@font/misans"
                     android:text="@string/last_played_tap"
                     android:textColor="@color/on_hero_card"
-                    android:textSize="10sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/space_3"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -90,7 +90,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_minecraft_cube"
-                    android:padding="5dp"
+                    android:padding="@dimen/space_1"
                     android:background="@drawable/icon_circle_bg"
                     android:scaleType="centerCrop" />
 
@@ -98,7 +98,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="@dimen/space_3"
                     android:orientation="vertical">
 
                     <TextView
@@ -110,13 +110,13 @@
                         android:ellipsize="end"
                         android:text="@string/not_found_version"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="18sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginTop="@dimen/space_1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -126,20 +126,20 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/dock_text_secondary"
-                            android:textSize="12sp" />
+                            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                         <TextView
                             android:id="@+id/last_played_abi_badge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="18dp"
-                            android:layout_marginStart="6dp"
-                            android:paddingHorizontal="6dp"
+                            android:layout_marginStart="@dimen/space_2"
+                            android:paddingHorizontal="@dimen/space_2"
                             android:gravity="center"
                             android:background="@drawable/bg_alpha_chip"
                             android:fontFamily="@font/misans"
                             android:textColor="@color/primary"
-                            android:textSize="9sp"
+                            android:textAppearance="@style/TextAppearance.Glowberry.Micro"
                             android:textStyle="bold"
                             android:visibility="gone" />
                     </LinearLayout>
@@ -149,7 +149,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -164,24 +164,24 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="17sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
+                        android:layout_marginTop="@dimen/space_divider"
                         android:fontFamily="@font/misans"
                         android:text="@string/stat_instances"
                         android:textColor="@color/dock_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="14dp"
-                    android:layout_marginEnd="14dp"
+                    android:layout_marginStart="@dimen/space_4"
+                    android:layout_marginEnd="@dimen/space_4"
                     android:background="@color/glass_panel_stroke" />
 
                 <LinearLayout
@@ -196,24 +196,24 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="17sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
+                        android:layout_marginTop="@dimen/space_divider"
                         android:fontFamily="@font/misans"
                         android:text="@string/stat_mods"
                         android:textColor="@color/dock_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="14dp"
-                    android:layout_marginEnd="14dp"
+                    android:layout_marginStart="@dimen/space_4"
+                    android:layout_marginEnd="@dimen/space_4"
                     android:background="@color/glass_panel_stroke" />
 
                 <LinearLayout
@@ -228,17 +228,17 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/dock_text_primary"
-                        android:textSize="17sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Title"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
+                        android:layout_marginTop="@dimen/space_divider"
                         android:fontFamily="@font/misans"
                         android:text="@string/stat_playtime"
                         android:textColor="@color/dock_text_secondary"
-                        android:textSize="10sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -1,11 +1,15 @@
 package org.chimeramc.client.launcher.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -21,6 +25,7 @@ import org.chimeramc.client.core.auth.MsftAccountStore;
 import org.chimeramc.client.core.cosmetics.AccountSkinCache;
 import org.chimeramc.client.core.cosmetics.AccountSkinService;
 import org.chimeramc.client.launcher.core.minecraft.AndroidLaunchProbe;
+import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure;
 import org.chimeramc.client.launcher.core.minecraft.LaunchProbe;
 import org.chimeramc.client.launcher.core.minecraft.LaunchReadiness;
 import org.chimeramc.client.core.versions.GameVersion;
@@ -33,7 +38,11 @@ import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.util.PersonalizationManager;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * In-app diagnostics (U16) plus the "Repair installation" action (G2).
@@ -42,12 +51,58 @@ import java.util.Locale;
  * reads the same live state the pipeline uses — app/preloader versions, extraction version, signature
  * rule source+revision, native render hook, and the persisted mod-load failure store — and renders it
  * as shareable plain text. Every unknown reading renders as "unknown", never as a made-up number.
+ *
+ * <p>Every reading is I/O: stat and hash the instance's package, open the APK(s) to read their ABI
+ * tables, read and parse the signature-rule file, read the account and mod stores. Reading them on
+ * the UI thread froze the screen — and, worse, an earlier version asked
+ * {@code GamePackageManager.getInstance()} for the launch ABI, whose `init` block runs the entire
+ * native-library extraction. The screen therefore gathers a {@link Snapshot} on a background thread
+ * and only paints it on the UI thread; nothing on the paint path touches the disk.
  */
 public class DiagnosticsActivity extends BaseActivity {
+
+    private static final String TAG = "DiagnosticsActivity";
 
     private VersionManager versionManager;
     private PersonalizationManager personalizationManager;
     private TextView repairStatus;
+
+    /** Runs the read-only probes. A single thread, so two taps cannot overlap two gathers. */
+    private final ExecutorService probeExecutor = Executors.newSingleThreadExecutor();
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
+    /** The most recently gathered reading. Written on the UI thread only, so the paint path is safe. */
+    private Snapshot snapshot;
+
+    /**
+     * Everything the screen renders, gathered off the UI thread.
+     *
+     * <p>A plain field bag rather than a builder: the screen is the only consumer, and the point of
+     * the type is that the gather and the paint cannot be interleaved by accident.
+     */
+    private static final class Snapshot {
+        GameVersion version;
+        String launchAbi;
+        LaunchReadiness.State readiness = LaunchReadiness.State.NO_VERSION_SELECTED;
+        boolean extractionCurrent;
+        int extractionExpected;
+        /** True when the cache is damaged (current marker, a required library gone). */
+        boolean libraryRepairNeeded;
+        /** True when an extraction has run at all for this build. */
+        boolean extractionAttempted;
+        String rulesSource;
+        int rulesRevision = -1;
+        /** Non-null when the rule DB has no entry covering the selected build. */
+        String coverageFailure;
+        boolean nativeLoaded;
+        boolean skinSeam;
+        /** Whether the preloader's player-render hook is live (read once, off the UI thread). */
+        boolean renderHookLive;
+        AccountDiagnostics.Snapshot account = new AccountDiagnostics.Snapshot();
+        List<ModLoadDiagnostics.Record> modRecords = Collections.emptyList();
+        /** The last launch that died inside the game activity, or null when none is recorded. */
+        LastLaunchFailure.Report lastLaunchFailure;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +145,26 @@ public class DiagnosticsActivity extends BaseActivity {
         }
     }
 
+    /**
+     * Re-reads every probe and repaints.
+     *
+     * <p>The gather is disk and JNI work, so it runs on {@link #probeExecutor}; only the paint runs
+     * here. Running it inline made the screen freeze for as long as the package hashes and APK scans
+     * took, which on a cold cache is long enough for the system to call it an ANR.
+     */
     private void refresh() {
+        // onDestroy shuts the probe pool down; a refresh tap that races it is simply dropped.
+        runProbe(() -> {
+            Snapshot gathered = gatherSnapshot();
+            uiHandler.post(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                snapshot = gathered;
+                renderAll();
+            });
+        });
+    }
+
+    private void renderAll() {
         renderAppRows();
         renderReadinessRows();
         renderLibRows();
@@ -98,6 +172,74 @@ public class DiagnosticsActivity extends BaseActivity {
         renderNativeRows();
         renderAccountRows();
         renderModRows();
+    }
+
+    /** Reads every fact the screen shows. Never throws: a failed read degrades to "unknown". */
+    private Snapshot gatherSnapshot() {
+        Snapshot out = new Snapshot();
+        out.version = selectedVersion();
+        out.launchAbi = readLaunchAbi(out.version);
+        try {
+            LaunchReadiness.Facts facts = LaunchProbe.gather(
+                    new AndroidLaunchProbe(this, out.version, null));
+            out.readiness = LaunchReadiness.evaluate(facts);
+        } catch (Throwable ignored) {
+            out.readiness = LaunchReadiness.State.NO_VERSION_SELECTED;
+        }
+        out.extractionExpected = GamePackageManager.calculateNativeExtractionVersion();
+        out.extractionCurrent = out.version != null
+                && GamePackageManager.isExtractionCacheCurrent(this, out.version);
+        out.extractionAttempted = out.extractionCurrent
+                || GamePackageManager.isExtractionAttempted(this, out.version);
+        // The same flag the launch path and Repair read, so this row can never disagree with them.
+        out.libraryRepairNeeded = out.version != null && out.version.needsRepair;
+        out.rulesSource = PreloaderSignatureRulesManager.getRulesSource(this);
+        out.rulesRevision = PreloaderSignatureRulesManager.getRulesRevision(this);
+        if (out.version != null && out.version.versionCode != null
+                && !out.version.versionCode.isEmpty()) {
+            out.coverageFailure = PreloaderSignatureRulesManager
+                    .describeCoverageFailure(this, out.version.versionCode);
+        }
+        try {
+            out.nativeLoaded = PreloaderInput.readRenderDiagnostics() != null;
+        } catch (Throwable ignored) {
+            out.nativeLoaded = false;
+        }
+        try {
+            out.renderHookLive = out.nativeLoaded && PreloaderInput.nativeIsPlayerRenderHookLive();
+        } catch (Throwable ignored) {
+            out.renderHookLive = false;
+        }
+        try {
+            out.skinSeam = out.nativeLoaded && PreloaderInput.nativeHasCapturedSkin();
+        } catch (Throwable ignored) {
+            out.skinSeam = false;
+        }
+        out.account = readAccountSnapshot();
+        try {
+            List<ModLoadDiagnostics.Record> records = ModLoadDiagnostics.getAll(this);
+            out.modRecords = records != null ? records : Collections.<ModLoadDiagnostics.Record>emptyList();
+        } catch (Throwable ignored) {
+            out.modRecords = Collections.emptyList();
+        }
+        // The last launch that died inside the game activity. Read here as well as announced on the
+        // Launch tab: the dialog is consumed once, so without this the report would be unreadable
+        // from the screen whose whole job is to explain a failed launch.
+        try {
+            out.lastLaunchFailure = LastLaunchFailure.read(this);
+        } catch (Throwable ignored) {
+            out.lastLaunchFailure = null;
+        }
+        return out;
+    }
+
+    private Snapshot current() {
+        if (snapshot == null) {
+            // The first gather is still in flight. Painting an empty snapshot would show "unknown"
+            // for everything, which reads as a broken install; the rows are simply not there yet.
+            return new Snapshot();
+        }
+        return snapshot;
     }
 
     /**
@@ -112,19 +254,26 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
-        GameVersion version = selectedVersion();
-        // Use the launch path's own probe rather than re-deriving the facts here. The two copies
-        // had already drifted: this screen judged "game files present" by looking for
-        // base.apk.chimera, which an installed (Play Store) instance never has, so it reported a
-        // launchable install as missing its files. One probe means the diagnostics screen and the
-        // Play button cannot disagree about why a launch would be refused.
-        LaunchReadiness.Facts facts = LaunchProbe.gather(
-                new AndroidLaunchProbe(this, version, null));
-        LaunchReadiness.State state = LaunchReadiness.evaluate(facts);
+        // The same LaunchReadiness evaluation the Play button uses, so the diagnostics screen and the
+        // launch preflight cannot disagree about why a launch would be refused. The state key is
+        // shown verbatim (not a translated sentence) because it is what a bug report should quote.
+        // The facts were gathered off the UI thread (see gatherSnapshot).
+        LaunchReadiness.State state = current().readiness;
         addRow(rows, R.string.diagnostics_field_launch_state, LaunchReadiness.key(state));
         addRow(rows, R.string.diagnostics_field_launch_blocks,
                 getString(LaunchReadiness.blocksLaunch(state)
                         ? R.string.diagnostics_launch_blocked : R.string.diagnostics_launch_proceeds));
+
+        // The last launch that actually died, with its classified cause. The preflight above says
+        // whether a launch *would* be refused; this says what happened to the last one that ran, so
+        // a "it just closes" report has an answer on the same screen.
+        LastLaunchFailure.Report failure = current().lastLaunchFailure;
+        if (failure != null) {
+            addRow(rows, R.string.diagnostics_field_last_launch_failure,
+                    LastLaunchFailure.describe(failure));
+            addRow(rows, R.string.diagnostics_field_last_launch_failure_time,
+                    LastLaunchFailure.formatTimestamp(failure.recordedAtMs));
+        }
     }
 
     private GameVersion selectedVersion() {
@@ -135,6 +284,30 @@ public class DiagnosticsActivity extends BaseActivity {
         }
     }
 
+    /**
+     * The ABI the launcher would extract and load for [version].
+     *
+     * <p>Distinct from {@link Build#SUPPORTED_ABIS} above: that is what the device offers, this is
+     * what the launch pipeline actually picks from the version's own APK. A launch that fails with
+     * "32-bit instead of 64-bit" is only diagnosable when both are visible. Never throws — a missing
+     * version or an unreadable package reads as "unknown" rather than a guessed ABI.
+     *
+     * <p>Read through {@link GamePackageManager#resolveLaunchAbi}, not
+     * {@code GamePackageManager.getInstance(...).getLaunchAbi()}: the factory's `init` block runs the
+     * whole native-library extraction and builds an AssetManager, so asking it this one question
+     * performed the entire launch preparation — on the UI thread, from a read-only screen. That is
+     * the same defect the launch preflight was fixed for.
+     */
+    private String readLaunchAbi(GameVersion version) {
+        try {
+            if (version == null) return "unknown (no version selected)";
+            String abi = GamePackageManager.resolveLaunchAbi(this, version);
+            return abi != null && !abi.isEmpty() ? abi : "unknown";
+        } catch (Throwable t) {
+            return "unknown";
+        }
+    }
+
     // ---------------------------------------------------------------- sections
 
     private void renderAppRows() {
@@ -142,6 +315,7 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
+        Snapshot data = current();
         addRow(rows, R.string.diagnostics_field_app_version, BuildConfig.VERSION_NAME
                 + " (" + BuildConfig.VERSION_CODE + ")");
         addRow(rows, R.string.diagnostics_field_android_version, Build.VERSION.RELEASE
@@ -152,9 +326,13 @@ public class DiagnosticsActivity extends BaseActivity {
         // API 33+ and did not match the manifest's targetSdkVersion either.
         addRow(rows, R.string.diagnostics_field_sdk_build,
                 String.valueOf(getApplicationInfo().targetSdkVersion));
+        addRow(rows, R.string.diagnostics_field_min_sdk,
+                String.valueOf(getApplicationInfo().minSdkVersion));
         addRow(rows, R.string.diagnostics_field_abi, String.join(", ", Build.SUPPORTED_ABIS));
+        addRow(rows, R.string.diagnostics_field_launcher_abi,
+                data.launchAbi != null ? data.launchAbi : "unknown");
 
-        GameVersion version = selectedVersion();
+        GameVersion version = data.version;
         if (version != null) {
             addRow(rows, R.string.diagnostics_field_selected_version, version.directoryName
                     + " (" + (version.versionCode != null ? version.versionCode : "?") + ")");
@@ -166,18 +344,25 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
-        GameVersion version = selectedVersion();
-        if (version == null) {
+        Snapshot data = current();
+        if (data.version == null) {
             addRow(rows, R.string.diagnostics_field_extraction_version, getString(R.string.diagnostics_no_version));
             return;
         }
-        boolean current = GamePackageManager.isExtractionCacheCurrent(this, version);
-        int expected = GamePackageManager.calculateNativeExtractionVersion();
         addRow(rows, R.string.diagnostics_field_extraction_version,
-                current
-                        ? getString(R.string.diagnostics_extraction_ok) + " (v" + expected + ")"
-                        : getString(R.string.diagnostics_extraction_stale) + " (v" + expected + ")");
+                data.extractionCurrent
+                        ? getString(R.string.diagnostics_extraction_ok) + " (v" + data.extractionExpected + ")"
+                        : getString(R.string.diagnostics_extraction_stale) + " (v" + data.extractionExpected + ")");
         addRow(rows, "Extractor", String.valueOf(GamePackageManager.extractorVersion()));
+        // Whether a library is missing from the cache the launch will load. This is the fact behind
+        // the repair prompt; showing it here is what makes a "failed to load a library" report
+        // diagnosable without reproducing the launch.
+        addRow(rows, R.string.diagnostics_field_library_repair,
+                data.libraryRepairNeeded
+                        ? getString(R.string.diagnostics_library_repair_needed)
+                        : data.extractionAttempted
+                                ? getString(R.string.diagnostics_library_repair_ok)
+                                : getString(R.string.diagnostics_library_repair_pending));
     }
 
     private void renderRulesRows() {
@@ -185,29 +370,26 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
-        String source = PreloaderSignatureRulesManager.getRulesSource(this);
+        Snapshot data = current();
         String sourceLabel;
-        if (source == null) {
+        if (data.rulesSource == null) {
             sourceLabel = getString(R.string.diagnostics_rules_unknown);
-        } else if ("remote".equals(source)) {
+        } else if ("remote".equals(data.rulesSource)) {
             sourceLabel = getString(R.string.diagnostics_rules_remote);
         } else {
             sourceLabel = getString(R.string.diagnostics_rules_bundled);
         }
         addRow(rows, R.string.diagnostics_field_signature_rules_source, sourceLabel);
 
-        int revision = PreloaderSignatureRulesManager.getRulesRevision(this);
         addRow(rows, R.string.diagnostics_field_signature_rules_revision,
-                revision < 0 ? "?" : String.valueOf(revision));
+                data.rulesRevision < 0 ? "?" : String.valueOf(data.rulesRevision));
 
         // G5: fail-closed coverage visibility. When the rule DB has no entry for the selected
         // build, every byte-pattern hook is off; the report must say that explicitly.
-        GameVersion version = selectedVersion();
-        if (version != null && version.versionCode != null && !version.versionCode.isEmpty()) {
-            String failure = PreloaderSignatureRulesManager
-                    .describeCoverageFailure(this, version.versionCode);
+        if (data.version != null && data.version.versionCode != null
+                && !data.version.versionCode.isEmpty()) {
             addRow(rows, R.string.diagnostics_field_signature_rules_coverage,
-                    failure == null ? getString(R.string.diagnostics_rules_covers_build)
+                    data.coverageFailure == null ? getString(R.string.diagnostics_rules_covers_build)
                             : getString(R.string.diagnostics_rules_no_coverage));
         }
     }
@@ -217,19 +399,14 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
-        boolean nativeLoaded = isNativeLoaded();
+        Snapshot data = current();
         addRow(rows, R.string.diagnostics_field_cosmetics_hook,
-                nativeLoaded && PreloaderInput.nativeIsPlayerRenderHookLive()
+                data.renderHookLive
                         ? getString(R.string.diagnostics_hook_live)
                         : getString(R.string.diagnostics_hook_inactive));
-
-        boolean hasSkinSeam = false;
-        try {
-            hasSkinSeam = nativeLoaded && PreloaderInput.nativeHasCapturedSkin();
-        } catch (Throwable ignored) {}
         addRow(rows, R.string.diagnostics_field_skin_seam,
-                hasSkinSeam ? getString(R.string.diagnostics_hook_live)
-                            : getString(R.string.diagnostics_hook_inactive));
+                data.skinSeam ? getString(R.string.diagnostics_hook_live)
+                              : getString(R.string.diagnostics_hook_inactive));
     }
 
     /**
@@ -245,7 +422,7 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
-        AccountDiagnostics.Snapshot snapshot = readAccountSnapshot();
+        AccountDiagnostics.Snapshot snapshot = current().account;
         if (!snapshot.signedIn) {
             addRow(rows, R.string.diagnostics_field_account_signed_in,
                     getString(R.string.diagnostics_no));
@@ -309,7 +486,7 @@ public class DiagnosticsActivity extends BaseActivity {
         if (rows == null) return;
         rows.removeAllViews();
 
-        java.util.List<ModLoadDiagnostics.Record> records = ModLoadDiagnostics.getAll(this);
+        java.util.List<ModLoadDiagnostics.Record> records = current().modRecords;
         if (records.isEmpty()) {
             TextView empty = new TextView(this);
             empty.setText(R.string.diagnostics_no_mod_errors);
@@ -322,14 +499,6 @@ public class DiagnosticsActivity extends BaseActivity {
         for (ModLoadDiagnostics.Record record : records) {
             addRow(rows, record.modName != null ? record.modName : (record.modId != null ? record.modId : "?"),
                     record.reason != null ? record.reason : "?");
-        }
-    }
-
-    private boolean isNativeLoaded() {
-        try {
-            return PreloaderInput.readRenderDiagnostics() != null;
-        } catch (Throwable t) {
-            return false;
         }
     }
 
@@ -379,10 +548,20 @@ public class DiagnosticsActivity extends BaseActivity {
     }
 
     private void runRepair(GameVersion version) {
+        // Repair is two steps and neither was guarded: the marker invalidation deletes files and
+        // attemptRepairLibs rewrites the instance's libraries. A throw from either unwound through
+        // the dialog's click handler, so the toast still said the repair had started and nothing
+        // said it had failed - the user was told the opposite of what happened.
+        try {
+            GamePackageManager.invalidateExtractionCache(this, version);
+            VersionManager.attemptRepairLibs(this, version);
+        } catch (Throwable t) {
+            Log.e(TAG, "Repair installation failed", t);
+            Toast.makeText(this, R.string.diagnostics_repair_failed, Toast.LENGTH_LONG).show();
+            return;
+        }
         Toast.makeText(this, R.string.diagnostics_repair_started, Toast.LENGTH_SHORT).show();
-        // Invalidate the extraction marker + manifest and let the normal launch re-extract.
-        GamePackageManager.invalidateExtractionCache(this, version);
-        VersionManager.attemptRepairLibs(this, version);
+        refresh();
     }
 
     private void copyReport() {
@@ -403,7 +582,16 @@ public class DiagnosticsActivity extends BaseActivity {
         startActivity(Intent.createChooser(intent, getString(R.string.diagnostics_share_title)));
     }
 
+    /**
+     * Builds the shareable report from the already-gathered {@link Snapshot}.
+     *
+     * <p>It deliberately reads no device state of its own. It used to re-run every probe — including
+     * the package hash and the APK ABI scan — on the UI thread from the Copy/Share handlers, so
+     * copying the report froze the screen for exactly as long as the refresh had. Everything the
+     * report needs is already in the snapshot.
+     */
     private String buildReport() {
+        Snapshot data = current();
         StringBuilder sb = new StringBuilder();
         sb.append("GlowberryClient Diagnostics\n");
         sb.append("===========================\n\n");
@@ -412,28 +600,44 @@ public class DiagnosticsActivity extends BaseActivity {
         sb.append("Device: ").append(Build.MANUFACTURER).append(" ").append(Build.MODEL).append("\n");
         sb.append("Target SDK: ").append(getApplicationInfo().targetSdkVersion).append("\n");
         sb.append("ABIs: ").append(String.join(", ", Build.SUPPORTED_ABIS)).append("\n");
+        sb.append("Launch ABI: ").append(data.launchAbi != null ? data.launchAbi : "unknown").append("\n");
 
-        GameVersion version = selectedVersion();
+        GameVersion version = data.version;
         if (version != null) {
             sb.append("Selected version: ").append(version.directoryName)
                     .append(" (").append(version.versionCode).append(")\n");
+        } else {
+            sb.append("Selected version: (none)\n");
         }
 
-        boolean extractionCurrent = version != null && GamePackageManager.isExtractionCacheCurrent(this, version);
-        sb.append("Extraction version: ")
-                .append(extractionCurrent ? "up to date" : "stale")
-                .append(" (expected ").append(GamePackageManager.calculateNativeExtractionVersion()).append(")\n");
+        // The launch state, so a report says why a launch is refused without the reporter having to
+        // paraphrase a dialog. The key is stable and non-translatable, which is the point.
+        sb.append("Launch state: ").append(LaunchReadiness.key(data.readiness)).append("\n");
+        sb.append("Launch blocked: ").append(LaunchReadiness.blocksLaunch(data.readiness) ? "yes" : "no").append("\n");
+        if (data.lastLaunchFailure != null) {
+            sb.append("Last launch failure: ")
+                    .append(LastLaunchFailure.describe(data.lastLaunchFailure)).append("\n");
+            sb.append("Last launch failure at: ")
+                    .append(LastLaunchFailure.formatTimestamp(data.lastLaunchFailure.recordedAtMs))
+                    .append("\n");
+        } else {
+            sb.append("Last launch failure: (none recorded)\n");
+        }
 
-        String source = PreloaderSignatureRulesManager.getRulesSource(this);
-        sb.append("Signature rules source: ").append(source != null ? source : "unknown").append("\n");
-        sb.append("Signature rules revision: ").append(PreloaderSignatureRulesManager.getRulesRevision(this)).append("\n");
+        sb.append("Extraction version: ")
+                .append(data.extractionCurrent ? "up to date" : "stale")
+                .append(" (expected ").append(data.extractionExpected).append(")\n");
+
+        sb.append("Signature rules source: ")
+                .append(data.rulesSource != null ? data.rulesSource : "unknown").append("\n");
+        sb.append("Signature rules revision: ").append(data.rulesRevision).append("\n");
         if (version != null && version.versionCode != null && !version.versionCode.isEmpty()) {
             sb.append("Signature rule coverage: ")
-                    .append(PreloaderSignatureRulesManager.describeCoverageFailure(this, version.versionCode) == null
+                    .append(data.coverageFailure == null
                             ? "covered" : "NOT COVERED (byte-pattern hooks disabled)").append("\n");
         }
 
-        AccountDiagnostics.Snapshot account = readAccountSnapshot();
+        AccountDiagnostics.Snapshot account = data.account;
         sb.append("\nAccount:\n");
         sb.append("  Signed in: ").append(account.signedIn ? "yes" : "no").append("\n");
         if (account.signedIn) {
@@ -451,19 +655,19 @@ public class DiagnosticsActivity extends BaseActivity {
                     .append("\n");
         }
 
-        boolean nativeLoaded = isNativeLoaded();
-        sb.append("Native library loaded: ").append(nativeLoaded ? "yes" : "no").append("\n");
-        if (nativeLoaded) {
+        sb.append("\nNative library loaded: ").append(data.nativeLoaded ? "yes" : "no").append("\n");
+        if (data.nativeLoaded) {
             sb.append("Cosmetics render hook: ")
-                    .append(PreloaderInput.nativeIsPlayerRenderHookLive() ? "live" : "inactive").append("\n");
+                    .append(data.renderHookLive ? "live" : "inactive").append("\n");
+            sb.append("Skin capture seam: ")
+                    .append(data.skinSeam ? "live" : "inactive").append("\n");
         }
 
         sb.append("\nMod load errors:\n");
-        java.util.List<ModLoadDiagnostics.Record> records = ModLoadDiagnostics.getAll(this);
-        if (records.isEmpty()) {
+        if (data.modRecords.isEmpty()) {
             sb.append("  (none)\n");
         } else {
-            for (ModLoadDiagnostics.Record r : records) {
+            for (ModLoadDiagnostics.Record r : data.modRecords) {
                 String name = r.modName != null ? r.modName : (r.modId != null ? r.modId : "?");
                 sb.append("  - ").append(name).append(": ").append(r.reason != null ? r.reason : "?").append("\n");
             }
@@ -472,5 +676,25 @@ public class DiagnosticsActivity extends BaseActivity {
         sb.append("\n");
         sb.append(Locale.getDefault().toString()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * Submits a probe gather, tolerating a pool {@link #onDestroy()} has shut down.
+     *
+     * <p>Refresh is a button, so a tap that lands as the screen closes would otherwise throw
+     * {@link java.util.concurrent.RejectedExecutionException} on the main thread.
+     */
+    private void runProbe(Runnable work) {
+        // A false return means the screen is going away; there is nothing to render.
+        SafeExecutor.submit(probeExecutor, work);
+    }
+
+    @Override
+    protected void onDestroy() {
+        // The gather touches the disk; leaving the thread alive after the screen is gone would let a
+        // late read post into a destroyed Activity.
+        probeExecutor.shutdownNow();
+        uiHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 }

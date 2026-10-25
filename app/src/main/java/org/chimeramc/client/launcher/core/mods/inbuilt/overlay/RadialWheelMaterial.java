@@ -332,6 +332,28 @@ public final class RadialWheelMaterial {
     }
 
     /**
+     * Which blur mechanism is available at an API level (R12).
+     *
+     * <p>This is the one place the two routes are chosen, so the renderer cannot decide one way for
+     * the layer and another way for the canvas. {@code RenderEffect} arrives at API 31; below that
+     * the only mechanism is the downscale/upscale stack blur.
+     */
+    public enum BlurRoute {
+        /** Nothing to blur: a solid tier, or no capture. */
+        NONE,
+        /** API 28-30: the canvas stack blur. */
+        STACK,
+        /** API 31+: a {@code RenderEffect} on the backdrop layer. */
+        RENDER_EFFECT
+    }
+
+    /** The blur route for an API level and a resolved material (R12). */
+    public static BlurRoute blurRoute(int apiLevel, Resolved material) {
+        if (material == null || !material.blurs()) return BlurRoute.NONE;
+        return apiLevel >= API_RENDER_EFFECT ? BlurRoute.RENDER_EFFECT : BlurRoute.STACK;
+    }
+
+    /**
      * Whether a label at {@code textColor} is legible over {@code backdropColor} (R9).
      */
     public static boolean meetsContrast(int textColor, int backdropColor) {

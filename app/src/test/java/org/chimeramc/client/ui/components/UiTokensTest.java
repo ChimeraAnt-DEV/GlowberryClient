@@ -5,6 +5,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Pins the shared UI tokens: the exact palette values, the contrast ratios the spec requires
  * (text.primary on bg.surface &gt;= 7:1, text.secondary &gt;= 4.5:1) and the toggle state machine.
@@ -190,5 +198,97 @@ public class UiTokensTest {
         float[] narrow = UiWindow.boundsArray(400, 800, 1f);
         assertEquals(400 * 0.66f, narrow[2] - narrow[0], 0.5f);
         assertEquals(800 * 0.78f, narrow[3] - narrow[1], 0.5f);
+    }
+
+    @Test
+    public void windowTitleBarAndContentTileTheWindowWithoutOverlap() {
+        float[] window = UiWindow.boundsArray(1200, 800, 1f);
+        float[] bar = UiWindow.titleBarArray(window[0], window[1], window[2], window[3], 1f);
+        float[] content = UiWindow.contentArray(window[0], window[1], window[2], window[3], 1f);
+        assertEquals(UiTokens.TITLEBAR_HEIGHT, bar[3] - bar[1], 0.5f);
+        assertEquals(window[0], bar[0], 0.5f);
+        assertEquals(window[2], bar[2], 0.5f);
+        // The content starts exactly where the bar ends and reaches the window's bottom.
+        assertEquals(bar[3], content[1], 0.5f);
+        assertEquals(window[3], content[3], 0.5f);
+    }
+
+    @Test
+    public void searchFieldClearButtonSitsInsideTheField() {
+        float[] clear = UiSearchField.clearBoundsArray(0f, 0f, 200f, UiSearchField.HEIGHT_DP, 1f);
+        assertTrue("the clear button must be inside the field horizontally",
+                clear[0] >= 0f && clear[2] <= 200f);
+        assertTrue("the clear button must be inside the field vertically",
+                clear[1] >= 0f && clear[3] <= UiSearchField.HEIGHT_DP);
+        assertTrue(clear[2] - clear[0] > 0f && clear[3] - clear[1] > 0f);
+    }
+
+    @Test
+    public void railButtonsStackDownTheColumnWithoutOverlap() {
+        float density = 1f;
+        float[] first = UiRailButton.boundsArray(0f, 0f, density, 0);
+        float[] second = UiRailButton.boundsArray(0f, 0f, density, 1);
+        assertEquals(UiTokens.RAIL_BUTTON, first[2] - first[0], 0.5f);
+        assertEquals(UiTokens.RAIL_BUTTON, first[3] - first[1], 0.5f);
+        assertTrue("the second button must sit below the first", second[1] > first[3]);
+        // The button is centred in the rail column.
+        assertEquals((UiTokens.RAIL_WIDTH - UiTokens.RAIL_BUTTON) / 2f, first[0], 0.5f);
+    }
+
+    @Test
+    public void aSelectedRailButtonDrawsItsIconInWhiteAndAnUnselectedOneInSecondary() {
+        assertEquals(0xFFFFFFFF, UiRailButton.iconColor(UiTokens.ACCENT_500, true));
+        assertEquals(UiTokens.TEXT_SECONDARY, UiRailButton.iconColor(UiTokens.ACCENT_500, false));
+    }
+
+    @Test
+    public void theCardAndButtonRadiiComeFromTheScaleNotABespokeValue() {
+        // The two surface helpers take their radius as a parameter, and every caller in the app
+        // passes a scale token. Pinning the mapping here is what keeps a caller from inventing a
+        // radius: UiCard draws at RADIUS_CARD and UiButton at RADIUS_BUTTON.
+        assertEquals(UiTokens.RADIUS_LARGE, UiTokens.RADIUS_CARD);
+        assertEquals(UiTokens.RADIUS_LARGE, UiTokens.RADIUS_BUTTON);
+    }
+
+    /**
+     * The XML card tokens must be the same four scale values, not a fifth and sixth radius.
+     *
+     * <p>This is the half that drifted: {@code UiTokens} declared 8/12/16/28 and AGENTS.md called the
+     * scale closed, while {@code dimens.xml} kept a 14dp card and a 10dp small card that every shared
+     * card drawable read. A card drawn in XML and one drawn in code (UiCard, at RADIUS_CARD = 16)
+     * therefore rounded a visibly different corner. The test reads the real resource file so a future
+     * literal cannot slip back in unnoticed.
+     */
+    @Test
+    public void theXmlRadiusTokensAreTheSameScaleAsTheCode() throws IOException {
+        String dimens = readResource("app/src/main/res/values/dimens.xml");
+        assertEquals(UiTokens.RADIUS_SMALL + "dp", dimenValue(dimens, "radius_small"));
+        assertEquals(UiTokens.RADIUS_MEDIUM + "dp", dimenValue(dimens, "radius_medium"));
+        assertEquals(UiTokens.RADIUS_LARGE + "dp", dimenValue(dimens, "radius_large"));
+        assertEquals(UiTokens.RADIUS_XLARGE + "dp", dimenValue(dimens, "radius_xlarge"));
+
+        // The card tokens alias the scale rather than restating a value.
+        assertEquals("@dimen/radius_large", dimenValue(dimens, "chimera_card_radius"));
+        assertEquals("@dimen/radius_medium", dimenValue(dimens, "chimera_card_radius_small"));
+    }
+
+    private static String dimenValue(String xml, String name) {
+        Matcher m = Pattern.compile(
+                "<dimen name=\"" + Pattern.quote(name) + "\">([^<]+)</dimen>").matcher(xml);
+        assertTrue("dimen " + name + " is missing from dimens.xml", m.find());
+        return m.group(1).trim();
+    }
+
+    private static String readResource(String relativePath) throws IOException {
+        Path dir = Paths.get("").toAbsolutePath();
+        for (int i = 0; i < 6 && dir != null; i++) {
+            Path candidate = dir.resolve(relativePath);
+            if (Files.isRegularFile(candidate)) {
+                return new String(Files.readAllBytes(candidate), StandardCharsets.UTF_8);
+            }
+            dir = dir.getParent();
+        }
+        throw new IllegalStateException("could not find " + relativePath + " from "
+                + Paths.get("").toAbsolutePath());
     }
 }

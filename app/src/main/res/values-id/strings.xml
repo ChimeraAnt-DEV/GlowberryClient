@@ -19,7 +19,7 @@
 
     <!-- About -->
     <string name="about_title">Tentang</string>
-    <string name="copyright">©2024–2026 GlowberryClient. All rights reserved.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Berlisensi Apache 2.0.</string>
     <string name="font_license">Aplikasi ini menggunakan font Misans..</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Tindakan Cepat</string>
@@ -396,7 +396,8 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="dialog_title_login_required">Login diperlukan</string>
     <string name="dialog_message_login_required">Login yang dikelola oleh launcher diaktifkan, tetapi belum ada akun yang masuk. Buka Akun untuk masuk.</string>
     <string name="go_to_accounts">Akun</string>
-    <string name="disable_launcher_login_and_continue">Tutup</string>
+    <string name="disable_launcher_login_and_continue">Nonaktifkan dan lanjutkan</string>
+    <string name="launcher_login_disabled_launching">Login yang dikelola peluncur dinonaktifkan. Meluncurkan…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Akun Sekarang</string>
@@ -689,10 +690,6 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
         <item>CurseForge memungkinkan Anda menjelajahi dan mengunduh konten komunitas secara langsung.</item>
         <item>Muat modul SO native eksternal untuk memperluas atau meningkatkan fitur dan performa Minecraft.</item>
     </string-array>
-    <string name="theme_color_title">Warna Tema</string>
-    <string name="theme_color_desc">Warna aksen utama aplikasi</string>
-    <string name="preset_colors">WARNA PRESET</string>
-    <string name="more_colors">WARNA LAINNYA</string>
     <string name="bg_image_title">Gambar Latar Belakang</string>
     <string name="bg_image_desc">Pilih gambar untuk digunakan sebagai latar belakang</string>
     <string name="bg_image_none">Tidak ada gambar yang dipilih</string>
@@ -881,7 +878,6 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="pagination_page_of">Halaman %1$d dari %2$s</string>
     <string name="pagination_page_one">Halaman 1</string>
     <string name="logcat_filter_all">SEMUA</string>
-    <string name="invalid_color_format">Format warna tidak valid</string>
     <string name="world_directory_not_found">Direktori dunia tidak ditemukan</string>
     <string name="worlds_directory_unavailable">Direktori dunia tidak tersedia</string>
     <string name="delete_screenshot_confirm">Yakin ingin menghapus tangkapan layar ini?</string>
@@ -908,8 +904,6 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="resource_pack_description_placeholder">Deskripsi paket ditampilkan di sini</string>
     <string name="mod_name_placeholder">Nama Mod</string>
     <string name="mod_load_order_placeholder">Urutan muat: 1</string>
-    <string name="custom_color_hex_rgb">Warna Kustom (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB atau R,G,B</string>
     <string name="screenshot_name_placeholder">Nama Tangkapan Layar</string>
     <string name="screenshot_date_placeholder">Tanggal: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Buat tombol layar bergaya Minecraft yang masing-masing dipetakan ke tepat satu tombol keyboard. Tombol tidak pernah menjalankan makro, urutan tombol, pengulangan otomatis, atau autoclick.</string>

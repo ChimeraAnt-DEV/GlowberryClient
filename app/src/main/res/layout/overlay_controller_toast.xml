@@ -11,9 +11,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingStart="12dp"
-    android:paddingEnd="16dp"
-    android:paddingVertical="10dp"
+    android:paddingStart="@dimen/space_3"
+    android:paddingEnd="@dimen/space_4"
+    android:paddingVertical="@dimen/space_3"
     android:background="@drawable/bg_controller_toast">
 
     <ImageView
@@ -28,7 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/space_3"
         android:orientation="vertical">
 
         <TextView
@@ -39,20 +39,20 @@
             android:maxLines="1"
             android:ellipsize="end"
             android:textColor="@color/on_surface"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/controller_toast_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="@dimen/space_divider"
             android:fontFamily="@font/misans"
             android:maxLines="2"
             android:ellipsize="end"
             android:text="@string/controller_detected_message"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     </LinearLayout>
 
@@ -60,15 +60,15 @@
         android:id="@+id/controller_toast_chip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="@dimen/space_3"
         android:background="@drawable/bg_controller_toast_chip"
         android:fontFamily="@font/misans"
-        android:paddingHorizontal="9dp"
-        android:paddingVertical="3dp"
+        android:paddingHorizontal="@dimen/space_2"
+        android:paddingVertical="@dimen/space_1"
         android:maxLines="1"
         android:ellipsize="end"
         android:textColor="@color/on_primary"
-        android:textSize="11sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold"
         android:visibility="gone" />
 

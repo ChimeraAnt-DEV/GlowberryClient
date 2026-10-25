@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="4dp">
+        android:padding="@dimen/space_1">
 
         <TextView
             android:layout_width="match_parent"
@@ -21,12 +21,12 @@
             android:fontFamily="@font/misans"
             android:text="@string/skins_import_preview_title"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/space_2"
             android:minHeight="120dp">
 
             <ImageView
@@ -49,17 +49,17 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_3"
             android:fontFamily="@font/misans"
             android:text="@string/skins_arm_model_title"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <RadioGroup
             android:id="@+id/skin_import_arm_model"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/space_1"
             android:orientation="horizontal">
 
             <RadioButton
@@ -74,7 +74,7 @@
                 android:id="@+id/skin_import_arm_slim"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/space_4"
                 android:fontFamily="@font/misans"
                 android:text="@string/skins_arm_slim" />
         </RadioGroup>
@@ -83,7 +83,7 @@
             android:id="@+id/skin_import_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/space_2"
             android:hint="@string/skins_name_hint"
             android:fontFamily="@font/misans"
             android:inputType="text"

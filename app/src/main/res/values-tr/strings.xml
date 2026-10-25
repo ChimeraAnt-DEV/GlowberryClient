@@ -22,7 +22,7 @@
 
     <!-- About -->
     <string name="about_title">Hakkında</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Tüm hakları saklıdır.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Apache 2.0 Lisansı ile lisanslanmıştır.</string>
     <string name="font_license">Bu uygulama Misans yazı tipini kullanmaktadır.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Hızlı İşlemler</string>
@@ -515,7 +515,8 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="dialog_title_login_required">Oturum açma gerekli</string>
     <string name="dialog_message_login_required">Başlatıcı yönetimli giriş etkin, ancak oturum açılmamış. Oturum açmak için Hesaplar\'a gidin.</string>
     <string name="go_to_accounts">Hesaplar</string>
-    <string name="disable_launcher_login_and_continue">Kapat</string>
+    <string name="disable_launcher_login_and_continue">Devre dışı bırak ve devam et</string>
+    <string name="launcher_login_disabled_launching">Başlatıcı yönetimli oturum açma kapatıldı. Başlatılıyor…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Mevcut Hesap</string>
@@ -760,10 +761,6 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
         <item>Minecraft özelliklerini ve performansını genişletmek veya geliştirmek için mod içe aktarın.</item>
     </string-array>
 
-    <string name="theme_color_title">Tema Rengi</string>
-    <string name="theme_color_desc">Uygulamanın birincil vurgu rengi</string>
-    <string name="preset_colors">HAZIR RENKLER</string>
-    <string name="more_colors">DAHA FAZLA RENK</string>
     <string name="bg_image_title">Arka Plan Görseli</string>
     <string name="bg_image_desc">Arka plan olarak kullanılacak bir görsel seçin</string>
     <string name="bg_image_none">Görsel seçilmedi</string>
@@ -884,7 +881,6 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="pagination_page_of">Sayfa %1$d / %2$s</string>
     <string name="pagination_page_one">Sayfa 1</string>
     <string name="logcat_filter_all">TÜMÜ</string>
-    <string name="invalid_color_format">Geçersiz renk biçimi</string>
     <string name="world_directory_not_found">Dünya dizini bulunamadı</string>
     <string name="worlds_directory_unavailable">Dünyalar dizini kullanılamıyor</string>
     <string name="delete_screenshot_confirm">Bu ekran görüntüsünü silmek istediğinizden emin misiniz?</string>
@@ -911,8 +907,6 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="resource_pack_description_placeholder">Paket açıklaması burada görünür</string>
     <string name="mod_name_placeholder">Mod Adı</string>
     <string name="mod_load_order_placeholder">Yükleme sırası: 1</string>
-    <string name="custom_color_hex_rgb">Özel Renk (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB veya R,G,B</string>
     <string name="screenshot_name_placeholder">Ekran Görüntüsü Adı</string>
     <string name="screenshot_date_placeholder">Tarih: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Her biri tam olarak bir klavye tuşuna eşlenen Minecraft tarzı ekran düğmeleri oluşturun. Düğmeler makro, tuş dizisi, otomatik tekrar veya otomatik tıklama çalıştırmaz.</string>

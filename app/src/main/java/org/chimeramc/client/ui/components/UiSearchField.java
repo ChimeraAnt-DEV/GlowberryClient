@@ -17,10 +17,23 @@ public final class UiSearchField {
 
     /** The clear (x) button's bounds within the field. */
     public static RectF clearBounds(RectF field, float density) {
+        float[] b = clearBoundsArray(field.left, field.top, field.right, field.bottom, density);
+        return new RectF(b[0], b[1], b[2], b[3]);
+    }
+
+    /**
+     * The clear button's bounds as {@code {left, top, right, bottom}}, pure and device-free.
+     *
+     * <p>The array form is what the JVM test can exercise: {@code android.graphics.RectF} is not on
+     * the unit-test classpath. {@link #clearBounds} delegates here, so there is one definition.
+     */
+    public static float[] clearBoundsArray(float fieldLeft, float fieldTop, float fieldRight,
+                                           float fieldBottom, float density) {
         float size = 20f * density;
-        float right = field.right - 8f * density;
-        float top = field.centerY() - size / 2f;
-        return new RectF(right - size, top, right, top + size);
+        float right = fieldRight - 8f * density;
+        float cy = (fieldTop + fieldBottom) / 2f;
+        float top = cy - size / 2f;
+        return new float[]{right - size, top, right, top + size};
     }
 
     /** Draws the field background, the leading icon and the trailing clear icon. */

@@ -33,8 +33,9 @@ public class ThemeManager {
      * activity that has already inflated its views would keep the old colors. The activity is
      * recreated when the toggle flips, so the overlay is added or dropped cleanly.
      *
-     * A custom accent color still wins: {@link PersonalizationManager} tints views on top of
-     * whichever palette is active, which is what the setting's description promises.
+     * The accent always comes from the active theme (dynamic color when enabled, otherwise the
+     * brand fallback). There is no separate custom-accent setting any more (U7), so this only
+     * re-tints views whose colour was resolved before the theme was applied.
      */
     public static void applyDynamicColors(Activity activity) {
         if (activity == null) return;

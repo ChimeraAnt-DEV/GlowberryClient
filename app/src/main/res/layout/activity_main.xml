@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp"
+                android:padding="@dimen/space_4"
                 android:background="@drawable/gradient_header"
                 app:layout_collapseMode="parallax">
 
@@ -43,7 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/glass_card"
-                    android:padding="10dp"
+                    android:padding="@dimen/space_3"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -58,11 +58,11 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="@dimen/space_3"
                         android:text="@string/not_signed_in"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <Button
                         android:id="@+id/header_sign_in_button"
@@ -72,13 +72,13 @@
                         android:minHeight="38dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="@dimen/space_4"
+                        android:paddingVertical="@dimen/space_2"
                         android:background="@drawable/button_accent"
                         android:fontFamily="@font/misans"
                         android:text="@string/sign_in"
                         android:textColor="@color/on_header_gradient"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textStyle="bold"
                         android:lineSpacingExtra="0dp"
                         android:includeFontPadding="true"
@@ -93,14 +93,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="168dp"
+        android:paddingBottom="@dimen/space_dock_clearance"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="14dp"
-            android:paddingTop="14dp">
+            android:paddingHorizontal="@dimen/space_4"
+            android:paddingTop="@dimen/space_4">
 
             <LinearLayout
                 android:id="@+id/launch_content_column"
@@ -133,8 +133,8 @@
                     android:id="@+id/section_quick"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginTop="@dimen/space_4"
+                    android:layout_marginBottom="@dimen/space_3" />
 
                 <!-- Quick-toggle cards: AntEgg packs, Voice, Replays, each with a live status. -->
                 <include
@@ -148,18 +148,18 @@
                     android:id="@+id/section_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginTop="@dimen/space_4"
+                    android:layout_marginBottom="@dimen/space_3" />
 
                 <LinearLayout
                     android:id="@+id/contentWorldsRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -167,7 +167,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_minecraft_cube"
                         app:tint="@color/primary" />
@@ -179,19 +179,19 @@
                         android:text="@string/worlds_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/contentWorldsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -202,11 +202,11 @@
                     android:id="@+id/contentResourcePacksRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -214,7 +214,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_content"
                         app:tint="@color/accent_sky" />
@@ -226,19 +226,19 @@
                         android:text="@string/resource_packs"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/contentResourcePacksCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -249,11 +249,11 @@
                     android:id="@+id/contentBehaviorPacksRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -261,7 +261,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_behavior"
                         app:tint="@color/secondary" />
@@ -273,19 +273,19 @@
                         android:text="@string/behavior_packs"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <TextView
                         android:id="@+id/contentBehaviorPacksCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -298,18 +298,18 @@
                     android:id="@+id/section_more"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginTop="@dimen/space_4"
+                    android:layout_marginBottom="@dimen/space_3" />
 
                 <LinearLayout
                     android:id="@+id/miscCurseforgeRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -317,7 +317,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_qa_curseforge"
                         app:tint="@color/accent_violet" />
@@ -329,12 +329,12 @@
                         android:text="@string/curseforge_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -345,11 +345,11 @@
                     android:id="@+id/miscModHubRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -357,7 +357,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_plugin"
                         app:tint="@color/accent_sky" />
@@ -369,12 +369,12 @@
                         android:text="@string/mod_hub_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -385,11 +385,11 @@
                     android:id="@+id/miscDiscordRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -397,7 +397,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_discord"
                         app:tint="@color/accent_sky" />
@@ -409,12 +409,12 @@
                         android:text="@string/discord_join"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -425,11 +425,11 @@
                     android:id="@+id/miscAccountsRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -437,7 +437,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_qa_account"
                         app:tint="@color/secondary" />
@@ -449,12 +449,12 @@
                         android:text="@string/accounts_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -465,11 +465,11 @@
                     android:id="@+id/miscQuickLaunchRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/space_2"
                     android:background="@drawable/glass_card"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_4"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -477,7 +477,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginEnd="@dimen/space_3"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_qa_launch"
                         app:tint="@color/primary" />
@@ -489,12 +489,12 @@
                         android:text="@string/quick_launch"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_2"
                         android:alpha="0.7"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
@@ -505,10 +505,10 @@
                     android:id="@+id/tipText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/space_4"
                     android:gravity="center"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
@@ -518,8 +518,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="16dp">
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingBottom="@dimen/space_4">
 
         <!-- The quick dock: Mods, Cosmetics and the radial wheel, one tap away. -->
         <include
@@ -527,7 +527,7 @@
             android:id="@+id/launch_quickdock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/space_3"
             app:layout_constraintBottom_toTopOf="@id/launch_dock"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

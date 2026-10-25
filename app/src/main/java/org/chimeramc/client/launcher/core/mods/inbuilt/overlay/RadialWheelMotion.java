@@ -186,4 +186,22 @@ public final class RadialWheelMotion {
         }
         return MIN_SEGMENTS;
     }
+
+    /**
+     * The segment count a wheel actually draws and hit-tests for a given entry count (R1).
+     *
+     * <p>The entry count is capped at {@link #MAX_SEGMENTS}, then reduced further if the screen is
+     * too small to give every segment a 48dp target — R1 requires the wheel to drop segments rather
+     * than draw targets the player cannot hit. A one-entry wheel is a ring and is never reduced.
+     *
+     * <p>This is the single rule the draw path and the hit test both read. When they compute the
+     * count separately, a tap lands on the wrong sector, and that is a defect a screenshot cannot
+     * catch.
+     */
+    public static int segmentsFor(int entryCount, float outerRadiusPx, float density) {
+        if (entryCount <= 1) return Math.max(0, entryCount);
+        int requested = clampSegments(entryCount);
+        int fits = maxSegmentsForRadius(outerRadiusPx, density);
+        return Math.max(MIN_SEGMENTS, Math.min(requested, fits));
+    }
 }

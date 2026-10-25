@@ -1,5 +1,8 @@
 package org.chimeramc.client.ui.views;
 
+import org.chimeramc.client.util.SafeExecutor;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -9,12 +12,16 @@ import org.chimeramc.client.core.mods.Mod;
 import org.chimeramc.client.core.mods.ModManager;
 import org.chimeramc.client.core.versions.GameVersion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MainViewModel extends ViewModel {
+
+    private static final String TAG = "MainViewModel";
+
     private final ModManager modManager;
     private final MutableLiveData<List<Mod>> modsLiveData = new MutableLiveData<>();
     private final ExecutorService modsExecutor = Executors.newSingleThreadExecutor();
@@ -35,14 +42,32 @@ public class MainViewModel extends ViewModel {
         loadMods(true);
     }
 
+    /**
+     * Reads the instance's mod list on the worker and publishes it.
+     *
+     * <p>The Mods tab and the hero card's "N active" stat are both driven by this LiveData, so a
+     * discovery failure that skipped {@code postValue} left both showing the previous instance's
+     * list with nothing to say why. A failure now publishes an empty list, which is the same thing
+     * an instance with no mods produces, so the UI always reflects a completed read.
+     */
     private void loadMods(boolean invalidateCache) {
         long generation = refreshGeneration.incrementAndGet();
-        modsExecutor.execute(() -> {
-            List<Mod> mods = invalidateCache ? modManager.reloadMods() : modManager.getMods();
+        // onCleared shuts this pool down. A load queued from a late observer is dropped, and the
+        // observer is settled with an empty list rather than left on a value that cannot arrive.
+        if (!runOnModsExecutor(() -> {
+            List<Mod> mods;
+            try {
+                mods = invalidateCache ? modManager.reloadMods() : modManager.getMods();
+            } catch (Throwable t) {
+                Log.w(TAG, "Mod discovery failed; publishing an empty list", t);
+                mods = new ArrayList<>();
+            }
             if (generation == refreshGeneration.get()) {
                 modsLiveData.postValue(mods);
             }
-        });
+        })) {
+            modsLiveData.postValue(new ArrayList<>());
+        }
     }
 
     public void removeMod(Mod mod) {
@@ -68,6 +93,17 @@ public class MainViewModel extends ViewModel {
             modManager.reorderMods(reorderedMods);
             refreshMods();
         }).start();
+    }
+
+    /**
+     * Submits a mod load, tolerating a pool {@link #onCleared()} has shut down.
+     *
+     * <p>{@code onCleared()} can run between a load being requested and this submit (the ViewModel is
+     * cleared when the screen goes away), and submitting to a shut-down executor throws on the
+     * calling thread. Returns false when the work could not be submitted.
+     */
+    private boolean runOnModsExecutor(Runnable work) {
+        return SafeExecutor.submit(modsExecutor, work);
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -59,6 +60,8 @@ import java.util.stream.Collectors;
 
 public class ContentListActivity extends BaseActivity {
 
+    private static final String TAG = "ContentListActivity";
+
     public static final String EXTRA_CONTENT_TYPE = "content_type";
     public static final String EXTRA_WORLDS_DIRECTORY = "worlds_directory";
     public static final String EXTRA_CURRENT_STORAGE_TYPE = "current_storage_type";
@@ -103,6 +106,12 @@ public class ContentListActivity extends BaseActivity {
     private final java.util.Set<String> pingedServerKeys = new java.util.HashSet<>();
 
     private void showProgressDialog(String message) {
+        // Showing a dialog on a finishing Activity throws WindowManager.BadTokenException, which
+        // took the screen down instead of reporting whatever it was about to report. The operation
+        // still runs; only the dialog is skipped.
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
         if (progressDialog == null) {
             progressDialog = new org.chimeramc.client.ui.dialogs.LoadingDialog(this);
         }
@@ -472,15 +481,37 @@ public class ContentListActivity extends BaseActivity {
         }
         ExecutorService executor = pingExecutor;
         for (org.chimeramc.client.core.content.ServerItem server : toPing) {
-            executor.execute(() -> {
-                ServerPongInfo pong = RakNetPing.ping(server.ip, server.port, 3000);
-                boolean failed = pong == null;
+            // A ping for a row the user has just scrolled away from is submitted while the screen is
+            // still alive, but a refresh can race onDestroy and shut the pool down between the check
+            // and this submit. The row would then keep saying "checking" forever, so a rejected ping
+            // is reported as an offline result instead.
+            try {
+                executor.execute(() -> {
+                    // The row renders "checking" until a result arrives, so a throw here left that
+                    // server showing a ping check that could never finish. A failure is reported as
+                    // an offline result rather than as no result.
+                    ServerPongInfo pong;
+                    try {
+                        pong = RakNetPing.ping(server.ip, server.port, 3000);
+                    } catch (Throwable t) {
+                        Log.w(TAG, "Server ping failed for " + server.ip + ":" + server.port, t);
+                        pong = null;
+                    }
+                    final ServerPongInfo result = pong;
+                    boolean failed = result == null;
+                    mainHandler.post(() -> {
+                        if (serversAdapter != null) {
+                            serversAdapter.onPingResult(server, result, failed);
+                        }
+                    });
+                });
+            } catch (java.util.concurrent.RejectedExecutionException rejected) {
                 mainHandler.post(() -> {
                     if (serversAdapter != null) {
-                        serversAdapter.onPingResult(server, pong, failed);
+                        serversAdapter.onPingResult(server, null, true);
                     }
                 });
-            });
+            }
         }
     }
 
@@ -1234,5 +1265,14 @@ public class ContentListActivity extends BaseActivity {
             pingExecutor.shutdownNow();
             pingExecutor = null;
         }
+        // The screenshots adapter owns a decode pool; without this its four worker threads outlive
+        // the screen and stay parked for the life of the process.
+        if (screenshotsAdapter != null) {
+            screenshotsAdapter.shutdown();
+            screenshotsAdapter = null;
+        }
+        // A dialog still attached to a destroyed Activity is the "Activity has leaked window"
+        // crash; it also trapped the user, because nothing could dismiss it once the owner was gone.
+        hideProgressDialog();
     }
 }

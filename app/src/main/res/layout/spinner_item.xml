@@ -3,8 +3,8 @@
     android:id="@android:id/text1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingStart="4dp"
-    android:paddingEnd="4dp"
-    android:paddingVertical="4dp"
+    android:paddingStart="@dimen/space_1"
+    android:paddingEnd="@dimen/space_1"
+    android:paddingVertical="@dimen/space_1"
     android:textColor="@color/on_surface"
-    android:textSize="11sp" />
+    android:textAppearance="@style/TextAppearance.Glowberry.Caption" />

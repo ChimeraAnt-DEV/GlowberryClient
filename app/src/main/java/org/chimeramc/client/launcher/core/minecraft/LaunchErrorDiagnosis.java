@@ -189,6 +189,25 @@ public final class LaunchErrorDiagnosis {
     }
 
     /**
+     * The inverse of {@link #key}: the cause a stored key names, or null when it names nothing.
+     *
+     * <p>Null rather than {@link Cause#UNKNOWN} on purpose. A stored report that predates the key
+     * carries no {@code Cause:} line at all, and returning {@code UNKNOWN} for it would stop the
+     * reader from re-deriving the cause from the message text — a report that says
+     * {@code dlopen failed: library "libminecraftpe.so" not found} must still be classified as the
+     * game-library case when it is read back.
+     */
+    public static Cause fromKey(String key) {
+        if (key == null) return null;
+        String trimmed = key.trim();
+        if (trimmed.isEmpty()) return null;
+        for (Cause candidate : Cause.values()) {
+            if (candidate.name().equalsIgnoreCase(trimmed)) return candidate;
+        }
+        return null;
+    }
+
+    /**
      * A one-line cause label for the crash screen, e.g. {@code "MISSING_GAME_LIBRARY"}.
      *
      * <p>Deliberately the enum name rather than a sentence: the crash screen shows the raw cause

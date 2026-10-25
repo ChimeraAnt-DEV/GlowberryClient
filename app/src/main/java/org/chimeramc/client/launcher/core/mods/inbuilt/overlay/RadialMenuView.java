@@ -14,6 +14,7 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.PathInterpolator;
+import android.widget.ImageView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.cosmetics.PlayerSkinProvider;
@@ -152,6 +153,8 @@ public class RadialMenuView extends View {
 
     /** The glass renderer: the only place the API-level blur lives. */
     private final WheelGlassRenderer glassRenderer = new WheelGlassRenderer();
+    /** The blurred backdrop layer (R3); supplied by the host, null when the wheel is a plain child. */
+    private ImageView backdropLayer;
     /** The resolved material for this open, recomputed when the environment changes. */
     private RadialWheelMaterial.Resolved material = RadialWheelMaterial.resolve(
             RadialWheelMaterial.Tier.REGULAR, null);
@@ -165,8 +168,6 @@ public class RadialMenuView extends View {
     /** Supplies the environment the material resolves against. */
     public interface MaterialEnvProvider {
         RadialWheelMaterial.Env env();
-        /** The window the wheel is drawn in, or null when it is a plain child view. */
-        android.view.Window window();
     }
 
     // --- Cancel gesture (R11) -----------------------------------------------------------------
@@ -183,6 +184,22 @@ public class RadialMenuView extends View {
     private boolean sectorPathsValid;
     private float cachedPathOuter = -1f;
     private float cachedPathInner = -1f;
+
+    // --- Cached profile-sector paths (R13) ----------------------------------------------------
+
+    /**
+     * The profile wheel's sector paths, one per possible sector (R13).
+     *
+     * <p>The profile wheel's count changes with the open profile, so it cannot reuse the fixed
+     * four-path cache above. These are rebuilt only when the count or the ring's radii change —
+     * during the open animation the radii move every frame, so the cache is inert then and takes
+     * effect the moment the ring settles, which is the steady state the player actually sees.
+     */
+    private final Path[] cachedProfilePaths = new Path[WheelLayout.MAX_SECTORS];
+    private boolean profilePathsValid;
+    private int cachedProfileCount = -1;
+    private float cachedProfileInner = -1f;
+    private float cachedProfileOuter = -1f;
 
     private static final PathInterpolator FAST_OUT_SLOW_IN =
             new PathInterpolator(0.4f, 0f, 0.2f, 1f);
@@ -213,10 +230,13 @@ public class RadialMenuView extends View {
         buildChips();
         resolveSkinHead();
         labelPaint.setTextAlign(Paint.Align.CENTER);
-        // R6: the segment label is 11sp at wght 500, one line.
+        // R6: the segment label is 11sp at wght 500, one line. The weight is a variable-font axis,
+        // not a separate typeface file: setting it on the paint is what makes the 500 real rather
+        // than a comment.
         labelPaint.setTypeface(Typeface.create(Typeface.DEFAULT,
                 RadialWheelMotion.LABEL_WEIGHT, false));
         labelPaint.setTextSize(RadialWheelMotion.LABEL_SP * density);
+        applyLabelWeight(labelPaint, RadialWheelMotion.LABEL_WEIGHT);
     }
 
     public void setListener(Listener listener) {
@@ -234,7 +254,20 @@ public class RadialMenuView extends View {
         refreshMaterial();
     }
 
-    /** Re-resolves the glass material from the current environment and applies the window blur. */
+    /**
+     * Hands the wheel the layer it paints the blurred backdrop on (R3).
+     *
+     * <p>The layer is a sibling behind the wheel in the overlay's {@code FrameLayout}. On API 31+
+     * the blur is a {@code RenderEffect} on that layer, which is the only place it can go without
+     * blurring the wheel's own content; on API 28-30 the layer stays hidden and the wheel blurs the
+     * capture into its own canvas instead.
+     */
+    public void setBackdropLayer(ImageView layer) {
+        this.backdropLayer = layer;
+        refreshMaterial();
+    }
+
+    /** Re-resolves the glass material from the current environment and applies the blur. */
     public void refreshMaterial() {
         RadialWheelMaterial.Env env = materialEnvProvider == null
                 ? new RadialWheelMaterial.Env() : materialEnvProvider.env();
@@ -242,10 +275,26 @@ public class RadialMenuView extends View {
         material = RadialWheelMaterial.resolveForBackdrop(
                 RadialWheelMaterial.tierFor(RadialWheelMaterial.Role.PANEL), env,
                 UiTokens.TEXT_PRIMARY, backdropSample);
-        if (materialEnvProvider != null) {
-            glassRenderer.applyWindowBlur(materialEnvProvider.window(), material, density);
-        }
+        applyBackdropLayer();
         invalidate();
+    }
+
+    /** Pushes the resolved material and the current capture onto the backdrop layer (R3). */
+    private void applyBackdropLayer() {
+        glassRenderer.applyBackdrop(backdropLayer, material, backdropCapture, density);
+    }
+
+    /**
+     * Releases the backdrop layer's bitmap and effect (R3).
+     *
+     * <p>Called when the overlay detaches. The wheel itself does not own the layer's lifetime, so
+     * this must not be left to garbage collection: the layer would keep the last capture alive, and
+     * a capture the host has already recycled would leave the layer pointing at dead pixels.
+     */
+    public void releaseBackdropLayer() {
+        glassRenderer.releaseBackdrop(backdropLayer);
+        backdropCapture = null;
+        backdropLayer = null;
     }
 
     /**
@@ -428,6 +477,7 @@ public class RadialMenuView extends View {
     public void playOpen() {
         cancelAnimators();
         sectorPathsValid = false;
+        profilePathsValid = false;
         openAnimator = ValueAnimator.ofFloat(0f, 1f);
         // R10: reduced motion runs a short linear transition rather than the spring.
         if (material != null && material.reducedMotion) {
@@ -448,6 +498,7 @@ public class RadialMenuView extends View {
     public void playClose() {
         cancelAnimators();
         sectorPathsValid = false;
+        profilePathsValid = false;
         openAnimator = ValueAnimator.ofFloat(openProgress, 0f);
         openAnimator.setDuration(material != null && material.reducedMotion
                 ? RadialWheelMotion.REDUCED_MS : 120);
@@ -682,7 +733,7 @@ public class RadialMenuView extends View {
         WheelEntry.Profile profile = currentProfile();
         if (profile == null) return;
         List<WheelEntry> entries = profile.safeEntries();
-        int count = WheelLayout.clampSectorCount(entries.size());
+        int count = usableSectorCount(entries, outer);
         if (entries.isEmpty()) return;
 
         if (count == 1) {
@@ -698,21 +749,15 @@ public class RadialMenuView extends View {
             float scale = 0.9f + 0.1f * local;
             float start = (float) (WheelLayout.sectorCenterDegrees(i, count) - span / 2.0);
             drawSectorColored(canvas, cx, cy, inner * scale, outer * scale, start, (float) span,
-                    i == highlightedEntry, alpha, local, entries.get(i).effectiveColor(accent));
+                    i == highlightedEntry, alpha, local, entries.get(i).effectiveColor(accent), i);
         }
     }
 
     /** Draws a profile sector with a per-entry fill colour (the four-destination path's variant). */
     private void drawSectorColored(Canvas canvas, float cx, float cy, float rInner, float rOuter,
                                    float startDeg, float sweepDeg, boolean hover, int alpha,
-                                   float localProgress, int entryColor) {
-        float gapPx = WheelLayout.GAP_DP * density;
-        float midR = (rInner + rOuter) / 2f;
-        float halfGapDeg = (float) WheelLayout.angularHalfGapDegrees(midR, gapPx);
-        float corner = RadialWheelLayout.SECTOR_CORNER_DP * density;
-        sectorPath.reset();
-        buildRoundedAnnularSector(sectorPath, cx, cy, rInner, rOuter,
-                startDeg + halfGapDeg, sweepDeg - 2f * halfGapDeg, corner);
+                                   float localProgress, int entryColor, int index) {
+        Path path = profileSectorPath(cx, cy, rInner, rOuter, startDeg, sweepDeg, index);
 
         int base = hover ? UiTokens.WHEEL_SEGMENT_HOVER : UiTokens.WHEEL_SEGMENT_BASE;
         // Blend the entry's colour into the glass fill so a coloured sector still reads as glass.
@@ -720,13 +765,74 @@ public class RadialMenuView extends View {
         sectorPaint.setStyle(Paint.Style.FILL);
         sectorPaint.setColor(UiTokens.withAlpha(fill,
                 (int) (((fill >>> 24) & 0xFF) * localProgress)));
-        canvas.drawPath(sectorPath, sectorPaint);
+        canvas.drawPath(path, sectorPaint);
 
         rimPaint.setStyle(Paint.Style.STROKE);
         rimPaint.setStrokeWidth(Math.max(1f, density));
         rimPaint.setColor(UiTokens.withAlpha(hover ? entryColor : UiTokens.WHEEL_SEGMENT_RIM,
                 (int) ((hover ? 0xAA : 0x24) * localProgress)));
-        canvas.drawPath(sectorPath, rimPaint);
+        canvas.drawPath(path, rimPaint);
+    }
+
+    /**
+     * Returns the cached path for a profile sector, rebuilding the cache when the ring moves (R13).
+     *
+     * <p>A profile sector's path is a pure function of the count, the radii and its own index, so it
+     * only needs rebuilding when one of those changes. During the open animation the radii change
+     * every frame, so the cache misses then; once the ring settles it hits, and the per-frame path
+     * construction — a full arc with two quadratic corner fillets per sector — stops happening.
+     */
+    private Path profileSectorPath(float cx, float cy, float rInner, float rOuter, float startDeg,
+                                   float sweepDeg, int index) {
+        int count = WheelLayout.clampSectorCount(currentProfile() == null ? 1
+                : currentProfile().safeEntries().size());
+        boolean cacheable = index >= 0 && index < cachedProfilePaths.length;
+        if (!cacheable) {
+            sectorPath.reset();
+            buildProfileSector(sectorPath, cx, cy, rInner, rOuter, startDeg, sweepDeg);
+            return sectorPath;
+        }
+        if (!profilePathsValid || cachedProfileCount != count
+                || cachedProfileInner != rInner || cachedProfileOuter != rOuter) {
+            rebuildProfilePaths(cx, cy, rInner, rOuter, count);
+        }
+        Path path = cachedProfilePaths[index];
+        if (path == null) {
+            path = new Path();
+            cachedProfilePaths[index] = path;
+            buildProfileSector(path, cx, cy, rInner, rOuter, startDeg, sweepDeg);
+        }
+        return path;
+    }
+
+    /** Rebuilds every profile sector path for the current count and radii (R13). */
+    private void rebuildProfilePaths(float cx, float cy, float rInner, float rOuter, int count) {
+        double span = WheelLayout.sectorSpanDegrees(count);
+        for (int i = 0; i < count && i < cachedProfilePaths.length; i++) {
+            if (cachedProfilePaths[i] == null) cachedProfilePaths[i] = new Path();
+            cachedProfilePaths[i].reset();
+            float start = (float) (WheelLayout.sectorCenterDegrees(i, count) - span / 2.0);
+            buildProfileSector(cachedProfilePaths[i], cx, cy, rInner, rOuter, start, (float) span);
+        }
+        // Drop any stale paths from a larger count so a shrunk wheel cannot draw a ghost sector.
+        for (int i = count; i < cachedProfilePaths.length; i++) {
+            if (cachedProfilePaths[i] != null) cachedProfilePaths[i].reset();
+        }
+        cachedProfileCount = count;
+        cachedProfileInner = rInner;
+        cachedProfileOuter = rOuter;
+        profilePathsValid = true;
+    }
+
+    /** Builds one rounded annular sector into {@code out}. */
+    private void buildProfileSector(Path out, float cx, float cy, float rInner, float rOuter,
+                                    float startDeg, float sweepDeg) {
+        float gapPx = WheelLayout.GAP_DP * density;
+        float midR = (rInner + rOuter) / 2f;
+        float halfGapDeg = (float) WheelLayout.angularHalfGapDegrees(midR, gapPx);
+        float corner = RadialWheelLayout.SECTOR_CORNER_DP * density;
+        buildRoundedAnnularSector(out, cx, cy, rInner, rOuter,
+                startDeg + halfGapDeg, sweepDeg - 2f * halfGapDeg, corner);
     }
 
     /** Draws the single-entry wheel as one full ring. */
@@ -748,7 +854,7 @@ public class RadialMenuView extends View {
         WheelEntry.Profile profile = currentProfile();
         if (profile == null) return;
         List<WheelEntry> entries = profile.safeEntries();
-        int count = WheelLayout.clampSectorCount(entries.size());
+        int count = usableSectorCount(entries, outerRadius());
         if (entries.isEmpty()) return;
 
         float labelSize = RadialWheelMotion.LABEL_SP * density;
@@ -1487,12 +1593,25 @@ public class RadialMenuView extends View {
     private int profileEntryAt(float x, float y) {
         WheelEntry.Profile profile = currentProfile();
         if (profile == null) return -1;
-        int count = WheelLayout.clampSectorCount(profile.safeEntries().size());
-        if (profile.safeEntries().isEmpty()) return -1;
+        List<WheelEntry> entries = profile.safeEntries();
+        if (entries.isEmpty()) return -1;
         float outer = outerRadius();
         float inner = ringInnerRadius();
+        int count = usableSectorCount(entries, outer);
         return WheelLayout.sectorAt(x - centerX(), y - centerY(), inner, outer,
                 WheelLayout.GAP_DP * density, count);
+    }
+
+    /**
+     * The sector count the wheel will actually draw and hit-test (R1).
+     *
+     * <p>Delegates to {@link RadialWheelMotion#segmentsFor}, which owns the rule, so the draw path
+     * and the hit test cannot compute different counts. This is the view's only involvement in the
+     * decision: it supplies the entry count and the measured radius.
+     */
+    private int usableSectorCount(List<WheelEntry> entries, float outerRadius) {
+        return RadialWheelMotion.segmentsFor(entries == null ? 0 : entries.size(),
+                outerRadius, density);
     }
 
     /**
@@ -1565,6 +1684,21 @@ public class RadialMenuView extends View {
         }
     }
 
+    /**
+     * Applies a variable-font weight axis to a paint (R6).
+     *
+     * <p>{@code Paint#setFontVariationSettings} is API 26, below this project's minSdk, so it needs
+     * no guard; the {@code try} is for a device whose default font has no {@code wght} axis, where
+     * the call is a no-op the framework may still reject. A missing axis must not cost the label.
+     */
+    private static void applyLabelWeight(Paint paint, int weight) {
+        if (paint == null) return;
+        try {
+            paint.setFontVariationSettings("'wght' " + weight);
+        } catch (Throwable ignored) {
+        }
+    }
+
     /** Arms or clears the cancel gesture, dimming and shrinking the ring while armed (R11). */
     private void setCancelArmed(boolean armed) {
         if (cancelArmed == armed) return;
@@ -1572,6 +1706,7 @@ public class RadialMenuView extends View {
         cancelOpacity = RadialWheelMotion.cancelOpacity(armed);
         cancelScale = RadialWheelMotion.cancelScale(armed);
         sectorPathsValid = false;
+        profilePathsValid = false;
         invalidate();
     }
 

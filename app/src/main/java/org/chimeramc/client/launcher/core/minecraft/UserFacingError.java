@@ -60,12 +60,33 @@ public final class UserFacingError {
         BAD_RESPONSE,
         /** The device is out of storage. */
         OUT_OF_SPACE,
+        /**
+         * The launcher's own process ran out of memory.
+         *
+         * <p>Distinct from {@link #OUT_OF_SPACE} because the fix is different and the two were
+         * conflated: an {@code OutOfMemoryError} while extracting a large package used to be
+         * reported as "not enough free storage", which sent the user to free disk space that was
+         * never the problem. There is plenty of disk; the heap the launcher is allowed to use ran
+         * out.
+         */
+        OUT_OF_MEMORY,
         /** The app is not allowed to read or write the target location. */
         PERMISSION_DENIED,
         /** The file is damaged or is not the kind of package it claims to be. */
         CORRUPT_PACKAGE,
         /** The transfer stopped before it finished. */
         INTERRUPTED,
+        /**
+         * The package ships no native library this process can load.
+         *
+         * <p>Belongs here rather than in the download causes because the launcher's own repair
+         * raises it: a package whose only native libraries are 32-bit cannot be extracted for this
+         * 64-bit process, and the repair used to report that as a completed repair. Reporting it as
+         * {@link #BAD_RESPONSE} - which the generic {@code IOException} fallback did - told the user
+         * the source's page layout had changed, sending them to retry a download that can never
+         * work on this device.
+         */
+        ABI_INCOMPATIBLE,
         /** Nothing recognisable in the failure. */
         UNKNOWN,
     }
@@ -90,6 +111,19 @@ public final class UserFacingError {
         if (lower.contains("permission denied") || lower.contains("eacces")
                 || lower.contains("operation not permitted")) {
             return Cause.PERMISSION_DENIED;
+        }
+        // The repair's own cache-clear failure: a read-only or in-use file cannot be deleted or
+        // rewritten, and the fix is a storage/permission one, not a retry.
+        if (lower.contains("read-only") || lower.contains("readonly")
+                || lower.contains("in use") || lower.contains("resource busy")) {
+            return Cause.PERMISSION_DENIED;
+        }
+        // The launcher's own ABI refusal, raised by the repair when a package's only native
+        // libraries are 32-bit. Matched before the generic branches so it is not reported as a
+        // source-side response problem.
+        if (lower.contains("no abi") || lower.contains("32-bit native librar")
+                || lower.contains("32 bit native librar") || lower.contains("ships 32-bit")) {
+            return Cause.ABI_INCOMPATIBLE;
         }
         // A damaged archive is recognised before the generic branches: a ZipException message also
         // contains "invalid", which the bad-response branch would otherwise claim.
@@ -185,7 +219,7 @@ public final class UserFacingError {
             Cause byText = classifyText(root.getMessage());
             return byText == Cause.UNKNOWN ? Cause.BAD_RESPONSE : byText;
         }
-        if (root instanceof OutOfMemoryError) return Cause.OUT_OF_SPACE;
+        if (root instanceof OutOfMemoryError) return Cause.OUT_OF_MEMORY;
         if (root instanceof InterruptedIOException) return Cause.INTERRUPTED;
 
         Cause byText = classifyText(root.getMessage());
@@ -224,12 +258,18 @@ public final class UserFacingError {
                 return R.string.error_reason_bad_response;
             case OUT_OF_SPACE:
                 return R.string.error_reason_out_of_space;
+            case OUT_OF_MEMORY:
+                return R.string.error_reason_out_of_memory;
             case PERMISSION_DENIED:
                 return R.string.error_reason_permission_denied;
             case CORRUPT_PACKAGE:
                 return R.string.error_reason_corrupt_package;
             case INTERRUPTED:
                 return R.string.error_reason_interrupted;
+            case ABI_INCOMPATIBLE:
+                // Reuses the launch screen's wording: it is the same condition and the same fix, and
+                // a second copy of the sentence is how the two drift apart.
+                return R.string.launch_failure_message_abi;
             default:
                 return R.string.error_reason_unknown;
         }
@@ -339,12 +379,16 @@ public final class UserFacingError {
                 return R.string.error_short_bad_response;
             case OUT_OF_SPACE:
                 return R.string.error_short_out_of_space;
+            case OUT_OF_MEMORY:
+                return R.string.error_short_out_of_memory;
             case PERMISSION_DENIED:
                 return R.string.error_short_permission_denied;
             case CORRUPT_PACKAGE:
                 return R.string.error_short_corrupt_package;
             case INTERRUPTED:
                 return R.string.error_short_interrupted;
+            case ABI_INCOMPATIBLE:
+                return R.string.error_short_abi_incompatible;
             default:
                 return R.string.error_short_unknown;
         }

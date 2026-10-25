@@ -29,6 +29,21 @@ public class AboutActivity extends BaseActivity {
     private static final String URL_YOUTUBE = "https://www.youtube.com/c/mrpokeg";
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    /**
+     * Submits the decorative avatar fetch, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>{@link #loadAvatars()} is called from {@code onCreate} but a configuration change tears the
+     * old instance down while a fresh one starts up, and submitting to the shut-down pool throws on
+     * the calling (main) thread.
+     */
+    private void runOnExecutor(Runnable work) {
+        try {
+            executor.execute(work);
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            android.util.Log.w("AboutActivity", "Avatar fetch dropped: the screen is gone", rejected);
+        }
+    }
     private final OkHttpClient client = buildLatencyTunedClient();
 
     private static OkHttpClient buildLatencyTunedClient() {
@@ -82,7 +97,7 @@ public class AboutActivity extends BaseActivity {
         com.microsoft.xbox.idp.toolkit.CircleImageView avatar = findViewById(R.id.author_avatar);
         com.microsoft.xbox.idp.toolkit.CircleImageView maintainerAvatar = findViewById(R.id.maintainer_avatar);
 
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             // try-with-resources on Response, not a bare execute(): an OkHttp response holds a
             // connection until its body is closed, and a swallowed exception left it checked out of
             // the pool. The avatar is decorative, so a failure is not surfaced - but the body must
@@ -99,7 +114,7 @@ public class AboutActivity extends BaseActivity {
                         }
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Throwable ignored) {}
 
             try {
                 if (maintainerAvatar != null) {
@@ -113,7 +128,7 @@ public class AboutActivity extends BaseActivity {
                         }
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Throwable ignored) {}
         });
     }
 
@@ -133,7 +148,7 @@ public class AboutActivity extends BaseActivity {
         btn.setOnClickListener(v -> {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-            } catch (Exception ignored) {}
+            } catch (Throwable ignored) {}
         });
         DynamicAnim.applyPressScale(btn);
     }

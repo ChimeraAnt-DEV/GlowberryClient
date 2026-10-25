@@ -273,6 +273,31 @@ public class ReplayLogicTest {
         assertNull(ReplayControls.forControllerKey(KeyEvent.KEYCODE_DPAD_UP));
     }
 
+    /**
+     * Every button the on-screen controller hint names must resolve, or the hint advertises a
+     * button that does nothing. The hint is `A play · Start pause · L2/R2 scrub · Select speed ·
+     * X delete · Y favorite · L1/R1 cycle`.
+     */
+    @Test
+    public void everyButtonTheHintNamesResolvesToAnAction() {
+        assertEquals(ReplayControls.Action.PLAY_PAUSE,
+                ReplayControls.forControllerKey(KeyEvent.KEYCODE_BUTTON_START));
+        assertEquals(ReplayControls.Action.SCRUB_BACK,
+                ReplayControls.forControllerKey(KeyEvent.KEYCODE_BUTTON_L2));
+        assertEquals(ReplayControls.Action.SCRUB_FORWARD,
+                ReplayControls.forControllerKey(KeyEvent.KEYCODE_BUTTON_R2));
+        assertEquals(ReplayControls.Action.SPEED,
+                ReplayControls.forControllerKey(KeyEvent.KEYCODE_BUTTON_SELECT));
+    }
+
+    /** The D-pad stays out of the map so the Replay tab does not fight grid navigation. */
+    @Test
+    public void theDpadIsNotMapped() {
+        assertNull(ReplayControls.forControllerKey(KeyEvent.KEYCODE_DPAD_LEFT));
+        assertNull(ReplayControls.forControllerKey(KeyEvent.KEYCODE_DPAD_RIGHT));
+        assertNull(ReplayControls.forControllerKey(KeyEvent.KEYCODE_DPAD_CENTER));
+    }
+
     @Test
     public void keyboardMapMatchesTheSpec() {
         assertEquals(ReplayControls.Action.DELETE,

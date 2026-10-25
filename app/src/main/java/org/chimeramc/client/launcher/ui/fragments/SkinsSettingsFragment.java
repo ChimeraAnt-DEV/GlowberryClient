@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,8 @@ import java.util.concurrent.Executors;
 
 /** Skin pack management, hosted inside {@code CustomizeActivity}. */
 public class SkinsSettingsFragment extends Fragment {
+
+    private static final String TAG = "SkinsSettingsFragment";
 
     private static final String PREFS_NAME = "skins_state";
     private static final String KEY_APPLIED_TYPE = "applied_type";
@@ -131,11 +134,35 @@ public class SkinsSettingsFragment extends Fragment {
         loadSkins();
     }
 
+    /**
+     * Submits skin work to the fragment's worker, tolerating a torn-down view.
+     *
+     * <p>The PNG import result can be delivered as the view is being destroyed, and the pool is
+     * shut down and nulled in {@link #onDestroyView()}. Submitting then either threw
+     * {@code RejectedExecutionException} or dereferenced the null field, both on the main thread,
+     * so picking a skin at the wrong moment took the app down. A submission with no view left has
+     * nowhere to report to, so it is dropped.
+     */
+    private void submitToIo(Runnable work) {
+        ExecutorService executor = ioExecutor;
+        if (executor == null || executor.isShutdown()) return;
+        try {
+            executor.execute(work);
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            Log.w(TAG, "Skin task dropped: the view is gone", rejected);
+        }
+    }
+
     @Override
     public void onDestroyView() {
         if (ioExecutor != null) {
             ioExecutor.shutdownNow();
             ioExecutor = null;
+        }
+        if (adapter != null) {
+            // The adapter owns a decode pool; without this the two worker threads outlive the view
+            // and stay parked for the life of the process.
+            adapter.shutdown();
         }
         recycler = null;
         adapter = null;
@@ -190,7 +217,7 @@ public class SkinsSettingsFragment extends Fragment {
     private void beginPngImport(List<Uri> uris) {
         final Context appContext = requireContext().getApplicationContext();
         Toast.makeText(appContext, R.string.skins_loading, Toast.LENGTH_SHORT).show();
-        ioExecutor.execute(() -> {
+        submitToIo(() -> {
             List<PendingSkin> decoded = new ArrayList<>();
             String error = null;
             for (Uri uri : uris) {
@@ -292,7 +319,7 @@ public class SkinsSettingsFragment extends Fragment {
         File skinPacksDir = new File(gameDataDir, "skin_packs");
 
         Toast.makeText(appContext, R.string.skins_loading, Toast.LENGTH_SHORT).show();
-        ioExecutor.execute(() -> {
+        submitToIo(() -> {
             String error = null;
             SkinPackBuilder.BuiltPack built = null;
             try {
@@ -362,7 +389,7 @@ public class SkinsSettingsFragment extends Fragment {
             return;
         }
         File gameDataDir = resolveGameDataDir(requireContext(), version);
-        ioExecutor.execute(() -> {
+        submitToIo(() -> {
             for (ResourcePackItem pack : readSkinPacks()) {
                 SkinPackActivator.PackIdentity identity = SkinPackActivator.readIdentity(pack.getFile());
                 if (identity != null && SkinPackActivator.isAppliedByLauncher(gameDataDir, identity.uuid)) {

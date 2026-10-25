@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:padding="@dimen/space_4"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold"
         android:ellipsize="middle"
         android:singleLine="true"
@@ -28,8 +28,8 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/misans"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:layout_marginTop="4dp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
+        android:layout_marginTop="@dimen/space_1"
         app:layout_constraintStart_toStartOf="@id/file_name"
         app:layout_constraintTop_toBottomOf="@id/file_name"
         tools:text="Oct 24, 2023" />
@@ -40,8 +40,8 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/misans"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:layout_marginStart="8dp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
+        android:layout_marginStart="@dimen/space_2"
         app:layout_constraintStart_toEndOf="@id/file_date"
         app:layout_constraintTop_toTopOf="@id/file_date"
         tools:text="1.20.40" />

@@ -6,8 +6,8 @@
     android:minHeight="44dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="10dp"
-    android:paddingVertical="6dp"
+    android:paddingHorizontal="@dimen/space_3"
+    android:paddingVertical="@dimen/space_2"
     android:background="@drawable/chimera_card_small"
     android:clickable="true"
     android:focusable="true">
@@ -19,15 +19,15 @@
         android:layout_weight="1"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Body" />
 
     <TextView
         android:id="@+id/voice_channel_row_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/space_2"
         android:fontFamily="@font/misans"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
 </LinearLayout>

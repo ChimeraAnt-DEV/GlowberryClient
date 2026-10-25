@@ -23,7 +23,7 @@
 
     <!-- About -->
     <string name="about_title">बारे में</string>
-    <string name="copyright">©2024–2026 GlowberryClient. सर्वाधिकार सुरक्षित।</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Apache License 2.0 के अंतर्गत लाइसेंस प्राप्त।</string>
     <string name="font_license">यह ऐप Misans फ़ॉन्ट का उपयोग करता है।</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">त्वरित कार्य</string>
@@ -448,7 +448,8 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="dialog_title_login_required">साइन-इन आवश्यक है</string>
     <string name="dialog_message_login_required">लॉन्चर-प्रबंधित लॉगिन सक्षम है, लेकिन कोई खाता साइन इन नहीं है। साइन इन करने के लिए खातों में जाएं।</string>
     <string name="go_to_accounts">खाते</string>
-    <string name="disable_launcher_login_and_continue">बंद करें</string>
+    <string name="disable_launcher_login_and_continue">अक्षम करें और जारी रखें</string>
+    <string name="launcher_login_disabled_launching">लॉन्चर-प्रबंधित साइन-इन अक्षम। लॉन्च हो रहा है…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">वर्तमान खाता</string>
@@ -693,10 +694,6 @@ GlowberryClient जारी रखने से पहले माइग्र
         <item>Minecraft सुविधाओं और प्रदर्शन का विस्तार या वृद्धि करने के लिए बाहरी देशी SO मॉड्यूल लोड करें।</item>
     </string-array>
 
-    <string name="theme_color_title">थीम रंग</string>
-    <string name="theme_color_desc">एप्लिकेशन का प्राथमिक उच्चारण रंग</string>
-    <string name="preset_colors">प्रीसेट रंग</string>
-    <string name="more_colors">अधिक रंग</string>
     <string name="bg_image_title">पृष्ठभूमि छवि</string>
     <string name="bg_image_desc">पृष्ठभूमि के रूप में उपयोग करने के लिए एक छवि चुनें</string>
     <string name="bg_image_none">कोई छवि नहीं चुनी गई</string>
@@ -885,7 +882,6 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="pagination_page_of">पृष्ठ %1$d / %2$s</string>
     <string name="pagination_page_one">पृष्ठ 1</string>
     <string name="logcat_filter_all">सभी</string>
-    <string name="invalid_color_format">अमान्य रंग प्रारूप</string>
     <string name="world_directory_not_found">वर्ल्ड निर्देशिका नहीं मिली</string>
     <string name="worlds_directory_unavailable">वर्ल्ड निर्देशिका उपलब्ध नहीं है</string>
     <string name="delete_screenshot_confirm">क्या आप वाकई यह स्क्रीनशॉट हटाना चाहते हैं?</string>
@@ -912,8 +908,6 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="resource_pack_description_placeholder">पैक का विवरण यहाँ दिखाई देगा</string>
     <string name="mod_name_placeholder">मॉड का नाम</string>
     <string name="mod_load_order_placeholder">लोड क्रम: 1</string>
-    <string name="custom_color_hex_rgb">कस्टम रंग (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB या R,G,B</string>
     <string name="screenshot_name_placeholder">स्क्रीनशॉट का नाम</string>
     <string name="screenshot_date_placeholder">दिनांक: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Minecraft-शैली के ऑन-स्क्रीन बटन बनाएँ, जिनमें प्रत्येक को ठीक एक कीबोर्ड कुंजी से मैप किया गया हो। बटन कभी भी मैक्रो, कुंजी अनुक्रम, स्वचालित रिपीट या ऑटोक्लिक नहीं चलाते।</string>

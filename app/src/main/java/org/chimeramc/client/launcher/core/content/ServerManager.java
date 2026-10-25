@@ -10,6 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerManager {
+
+    /**
+     * The outcome of adding a server, so the caller can say which one happened.
+     *
+     * <p>A boolean could not: "the server is already in your list" and "the file could not be
+     * written" both collapsed to {@code false}, so a disk or permission failure told the user their
+     * server was already there — a message that sends them looking for a duplicate that does not
+     * exist instead of at the storage problem that does.
+     */
+    public enum AddResult {
+        /** The server was written to the list. */
+        ADDED,
+        /** A server with the same name, address and port is already in the list. */
+        DUPLICATE,
+        /** The list could not be written: no target, an uncreatable directory, or an IO failure. */
+        FAILED,
+    }
+
     private File minecraftPeDir;
 
     public void setMinecraftPeDirectory(File directory) {
@@ -27,13 +45,13 @@ public class ServerManager {
      * <p>Static so a caller that knows the game data directory but does not own a ContentManager
      * (the Quick Launch "add server" action) can persist a server without first wiring one up.
      * The format is the one the game itself reads: {@code id:name:ip:port:timestamp}, with the id
-     * one past the current maximum. Returns false when the server already exists or the file
-     * cannot be written.
+     * one past the current maximum. The result distinguishes a duplicate from a write failure, so
+     * the caller can report the right one.
      */
-    public static boolean writeServerToFile(File file, ServerItem serverItem) {
-        if (file == null || serverItem == null) return false;
+    public static AddResult writeServerToFile(File file, ServerItem serverItem) {
+        if (file == null || serverItem == null) return AddResult.FAILED;
         File parent = file.getParentFile();
-        if (parent != null && !parent.exists() && !parent.mkdirs()) return false;
+        if (parent != null && !parent.exists() && !parent.mkdirs()) return AddResult.FAILED;
 
         List<String> lines = new ArrayList<>();
         int maxIndex = 0;
@@ -61,7 +79,7 @@ public class ServerManager {
                 e.printStackTrace();
             }
         }
-        if (exists) return false;
+        if (exists) return AddResult.DUPLICATE;
 
         long timestamp = System.currentTimeMillis() / 1000L;
         lines.add((maxIndex + 1) + ":" + serverItem.name + ":" + serverItem.ip + ":"
@@ -71,11 +89,11 @@ public class ServerManager {
                 bw.write(l);
                 bw.newLine();
             }
-            return true;
+            return AddResult.ADDED;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return AddResult.FAILED;
     }
 
     public List<ServerItem> getServers() {
@@ -145,9 +163,9 @@ public class ServerManager {
         return false;
     }
 
-    public boolean addServer(ServerItem serverItem) {
+    public AddResult addServer(ServerItem serverItem) {
         File file = getServerListFile();
-        if (file == null) return false;
+        if (file == null) return AddResult.FAILED;
 
         List<String> lines = new ArrayList<>();
         int maxIndex = 0;
@@ -177,7 +195,7 @@ public class ServerManager {
             }
         }
 
-        if (exists) return false;
+        if (exists) return AddResult.DUPLICATE;
 
         long timestamp = System.currentTimeMillis() / 1000L;
         String newLine = (maxIndex + 1) + ":" + serverItem.name + ":" + serverItem.ip + ":" + serverItem.port + ":" + timestamp;
@@ -188,10 +206,10 @@ public class ServerManager {
                 bw.write(l);
                 bw.newLine();
             }
-            return true;
+            return AddResult.ADDED;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return AddResult.FAILED;
     }
 }

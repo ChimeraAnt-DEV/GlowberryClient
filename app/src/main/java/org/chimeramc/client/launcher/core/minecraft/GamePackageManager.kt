@@ -19,7 +19,9 @@ import java.io.InputStream
 import java.util.zip.ZipFile
 
 import org.chimeramc.client.core.minecraft.ExtractionCachePolicy
+import org.chimeramc.client.core.minecraft.ExtractionManifest
 import org.chimeramc.client.core.minecraft.NativeLibraryVersionGate
+import org.chimeramc.client.core.minecraft.RequiredNativeLibraries
 
 class GamePackageManager private constructor(
     private val context: Context,
@@ -51,16 +53,11 @@ class GamePackageManager private constructor(
 
     private val knownPackages = arrayOf(MinecraftLauncher.MC_PACKAGE_NAME)
 
-    private val requiredLibs = arrayOf(
-        "libc++_shared.so",
-        "libfmod.so",
-        "libMediaDecoders_Android.so",
-        "libminecraftpe.so",
-    )
+    // The list itself lives in RequiredNativeLibraries (pure, Android-free) so the repair-need
+    // check and this manager cannot disagree about what the loader will open.
+    private val requiredLibs = RequiredNativeLibraries.BASE.toTypedArray()
 
-    private val optionalLibs = arrayOf(
-        "libHttpClient.Android.so",
-    )
+    private val optionalLibs = RequiredNativeLibraries.OPTIONAL.toTypedArray()
 
     private val extractableLibs = requiredLibs + optionalLibs
 
@@ -218,28 +215,8 @@ class GamePackageManager private constructor(
         Build.SUPPORTED_64_BIT_ABIS.isNotEmpty() && Build.SUPPORTED_32_BIT_ABIS.isEmpty()
     }
 
-    private fun getDeviceAbi(apkFiles: List<File> = emptyList()): String {
-        // The APK is the authority: it is what actually decides which libraries exist to
-        // load. The version's label is a record of a previous extraction, so it is consulted
-        // only when no APK could be inspected.
-        resolveAbiFromApks(apkFiles)?.let { return it }
-        if (version != null && "armeabi-v7a".equals(version.abiList)) {
-            return if (Build.SUPPORTED_32_BIT_ABIS.contains("armeabi-v7a")) {
-                "armeabi-v7a"
-            } else {
-                Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
-                    it.contains("arm64-v8a") || it.contains("x86_64")
-                } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
-                    it.contains("armeabi-v7a") || it.contains("x86")
-                } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
-            }
-        }
-        return Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
-            it.contains("arm64-v8a") || it.contains("x86_64")
-        } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
-            it.contains("armeabi-v7a") || it.contains("x86")
-        } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
-    }
+    private fun getDeviceAbi(apkFiles: List<File> = emptyList()): String =
+        resolveDeviceAbi(version, apkFiles)
 
     private fun resolveAbiFromApks(apkFiles: List<File>): String? {
         val shipped = AbiBitness.abisInApks(apkFiles)
@@ -422,22 +399,17 @@ class GamePackageManager private constructor(
     }
 
     private fun buildExtractionManifest(apkFiles: List<File>): String {
-        return buildString {
-            append("extractor=").append(ExtractionCachePolicy.EXTRACTOR_VERSION).append('\n')
-            append("abi=").append(getDeviceAbi(apkFiles)).append('\n')
-            append("token=").append(NativeImageGuard.TOKEN).append('\n')
-            append("mode=").append(if (version != null && !version.isInstalled) "isolated" else "installed").append('\n')
-            append("http=").append(shouldLoadHttpClient()).append('\n')
-            apkFiles.forEach { file ->
-                append("apk=")
-                    .append(file.absolutePath)
-                    .append('|')
-                    .append(file.length())
-                    .append('|')
-                    .append(file.lastModified())
-                    .append('\n')
-            }
-        }
+        // One format, in ExtractionManifest, because the reader compares the file by equality: the
+        // repair writes this same text and any drift between two builders turns every repaired cache
+        // back into a cache miss.
+        return ExtractionManifest.build(
+            ExtractionCachePolicy.EXTRACTOR_VERSION,
+            getDeviceAbi(apkFiles),
+            NativeImageGuard.TOKEN,
+            if (version != null && !version.isInstalled) "isolated" else "installed",
+            shouldLoadHttpClient(),
+            apkFiles.map { ExtractionManifest.ApkEntry.of(it) }
+        )
     }
 
     private fun copyFromNativeDir(sourceDir: String, destDir: File) {
@@ -691,8 +663,7 @@ class GamePackageManager private constructor(
         // complete and then fail at load with "libmaesdk.so not found" - the same class of
         // cache/loader disagreement the HTTP-client gate had. The list itself comes from the shared
         // rule, so the cache and the loader cannot drift again.
-        val gated = NativeLibraryVersionGate.gatedLibraries(version?.versionCode)
-        return (requiredLibs.asList() + gated).toTypedArray()
+        return RequiredNativeLibraries.required(version?.versionCode).toTypedArray()
     }
 
     private fun shouldLoadHttpClient(): Boolean {
@@ -1090,6 +1061,148 @@ class GamePackageManager private constructor(
          * True when the extraction cache for this version still holds the expected marker and
          * will be reused on the next launch instead of being wiped + re-extracted.
          */
+        /**
+         * True when an extraction has run for this version at all, whether or not it is current.
+         *
+         * <p>Distinct from [isExtractionCacheCurrent]: that answers "is the cache up to date", this
+         * answers "does a cache exist". The diagnostics screen needs both to tell "not extracted
+         * yet" (the launch will do it) from "extracted and damaged" (Repair is the fix), which is
+         * the same distinction the repair rule draws.
+         */
+        /**
+         * Records that [abiDirs] now hold a complete, current extraction of [version]'s libraries.
+         *
+         * <p>Both the manifest and the version marker are written, in the same place and with the
+         * same content `extractLibraries` writes, because the reuse decision reads exactly those two
+         * files. `VersionManager.repairLibsAsync` rebuilds the cache itself (it cannot call
+         * `extractLibraries`, which is instance-bound and runs the whole launch preparation), and it
+         * used to stop at the libraries: no marker, no manifest. The next launch then saw an
+         * unrecognised cache, discarded it and re-extracted the whole package - several hundred
+         * megabytes of work thrown away, on the launch the user was waiting for. Writing the same
+         * record makes the repaired cache a cache hit.
+         *
+         * <p>Best-effort: a failure to write the marker leaves the cache unrecognised, which is the
+         * previous behaviour (a re-extract), never a wrongly-trusted one.
+         */
+        @JvmStatic
+        fun writeExtractionMarkers(
+            version: GameVersion?,
+            apkFiles: List<File>,
+            abiDirs: List<File>
+        ): Boolean {
+            try {
+                if (version == null || abiDirs.isEmpty()) return false
+                val required = RequiredNativeLibraries.required(version.versionCode)
+                val manifest = buildExtractionManifest(version, apkFiles)
+                val marker = calculateNativeExtractionVersion().toString()
+                var wrote = false
+                for (dir in abiDirs) {
+                    if (!dir.isDirectory) continue
+                    // Only a directory that actually holds every required library is marked. Marking
+                    // an incomplete one would make the next launch trust a cache that still cannot
+                    // load, and suppress the repair prompt that would have fixed it - a false
+                    // success is worse than the re-extract this replaces.
+                    if (!ExtractionCachePolicy.allLibrariesPresent(required) { lib ->
+                            File(dir, lib).let { it.isFile && it.length() > 0L }
+                        }) {
+                        continue
+                    }
+                    try {
+                        File(dir, ".extraction_manifest").writeText(manifest)
+                        File(dir, "native_extraction_version").writeText(marker)
+                        wrote = true
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to write extraction markers in ${dir.absolutePath}: ${e.message}")
+                    }
+                }
+                return wrote
+            } catch (e: Throwable) {
+                Log.w(TAG, "Failed to write extraction markers: ${e.message}")
+                return false
+            }
+        }
+
+        /**
+         * The ABI the extractor will target for [version], from [apkFiles].
+         *
+         * <p>The one implementation, shared by the instance path (`getDeviceAbi`) and the repair
+         * path's manifest. It has to be shared, not copied: the manifest records this value, and the
+         * reuse decision compares the recorded manifest against a freshly built one, so any drift
+         * between the two builders silently turns a repaired cache back into a cache miss.
+         */
+        @JvmStatic
+        fun resolveDeviceAbi(version: GameVersion?, apkFiles: List<File>): String {
+            // The APK is the authority: it is what actually decides which libraries exist to
+            // load. The version's label is a record of a previous extraction, so it is consulted
+            // only when no APK could be inspected.
+            val fromApk = try {
+                val shipped = AbiBitness.abisInApks(apkFiles)
+                if (shipped.isEmpty()) null
+                else AbiBitness.selectLaunchAbi(shipped, processIs64BitStatic())
+            } catch (_: Throwable) {
+                null
+            }
+            if (fromApk != null) return fromApk
+            if (version != null && "armeabi-v7a".equals(version.abiList)) {
+                return if (Build.SUPPORTED_32_BIT_ABIS.contains("armeabi-v7a")) {
+                    "armeabi-v7a"
+                } else {
+                    device64BitAbi() ?: device32BitAbi()
+                        ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
+                }
+            }
+            return device64BitAbi() ?: device32BitAbi()
+                ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
+        }
+
+        private fun device64BitAbi(): String? = Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
+            it.contains("arm64-v8a") || it.contains("x86_64")
+        }
+
+        private fun device32BitAbi(): String? = Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
+            it.contains("armeabi-v7a") || it.contains("x86")
+        }
+
+        /**
+         * The manifest for an explicit version, matching the instance method byte for byte.
+         *
+         * <p>Static so the repair path can write the same record without constructing the package
+         * manager (whose initialisation performs a whole extraction).
+         */
+        private fun buildExtractionManifest(version: GameVersion, apkFiles: List<File>): String =
+            ExtractionManifest.build(
+                ExtractionCachePolicy.EXTRACTOR_VERSION,
+                resolveDeviceAbi(version, apkFiles),
+                NativeImageGuard.TOKEN,
+                if (!version.isInstalled) "isolated" else "installed",
+                shouldLoadHttpClientStatic(version),
+                apkFiles.map { ExtractionManifest.ApkEntry.of(it) }
+            )
+
+        private fun shouldLoadHttpClientStatic(version: GameVersion): Boolean =
+            NativeLibraryVersionGate.shouldLoadHttpClient(version.versionCode)
+
+        private fun processIs64BitStatic(): Boolean = try {
+            android.os.Process.is64Bit()
+        } catch (_: Throwable) {
+            Build.SUPPORTED_64_BIT_ABIS.isNotEmpty() && Build.SUPPORTED_32_BIT_ABIS.isEmpty()
+        }
+
+        @JvmStatic
+        fun isExtractionAttempted(context: Context, version: GameVersion?): Boolean {
+            return try {
+                if (version == null) return false
+                val profileId = MinecraftLauncher.getStorageProfileId(version)
+                val dir = MinecraftLauncher.getRuntimeLibDir(context, profileId)
+                if (!dir.isDirectory) return false
+                MinecraftLauncher.repairTargetAbiDirs().any { abi ->
+                    File(dir, abi).isDirectory
+                }
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
         @JvmStatic
         fun isExtractionCacheCurrent(context: Context, version: GameVersion?): Boolean {
             return try {
@@ -1143,10 +1256,60 @@ class GamePackageManager private constructor(
         }
 
         /**
+         * The ABI a launch of [version] would extract and load, without constructing the package
+         * manager.
+         *
+         * <p>{@link #getInstance} runs the entire native-library extraction and builds an
+         * AssetManager in its `init` block, so asking it this one question from a diagnostics
+         * screen performed the whole preparation on the UI thread - the same defect the launch
+         * preflight was fixed for. This reads the APK's own ABI table, which is the authority
+         * [getDeviceAbi] uses, and mirrors its fallback order exactly, so the diagnostics screen
+         * reports the ABI the launch would really use rather than "unknown".
+         *
+         * @return the ABI name; never null.
+         */
+        @JvmStatic
+        fun resolveLaunchAbi(context: Context, version: GameVersion?): String? {
+            return try {
+                val shipped = AbiBitness.abisInApks(collectVersionApkFiles(context, version))
+                if (shipped.isNotEmpty()) {
+                    val processIs64Bit = try {
+                        android.os.Process.is64Bit()
+                    } catch (_: Throwable) {
+                        Build.SUPPORTED_64_BIT_ABIS.isNotEmpty()
+                    }
+                    return AbiBitness.selectLaunchAbi(shipped, processIs64Bit)
+                }
+                // No APK could be inspected. The version's label is a record of a previous
+                // extraction, so it is a hint at best; mirror getDeviceAbi's preference for an
+                // ABI this process can actually load.
+                if (version != null && "armeabi-v7a" == version.abiList) {
+                    return if (Build.SUPPORTED_32_BIT_ABIS.contains("armeabi-v7a")) {
+                        "armeabi-v7a"
+                    } else {
+                        Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
+                            it.contains("arm64-v8a") || it.contains("x86_64")
+                        } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
+                            it.contains("armeabi-v7a") || it.contains("x86")
+                        } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
+                    }
+                }
+                Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
+                    it.contains("arm64-v8a") || it.contains("x86_64")
+                } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
+                    it.contains("armeabi-v7a") || it.contains("x86")
+                } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
+            } catch (_: Throwable) {
+                null
+            }
+        }
+
+        /**
          * The APK files a version's native libraries come from, without touching the extraction
          * cache. Mirrors the paths the instance's own `collectApkFiles` uses.
          */
-        private fun collectVersionApkFiles(context: Context, version: GameVersion): List<File> {
+        private fun collectVersionApkFiles(context: Context, version: GameVersion?): List<File> {
+            if (version == null) return emptyList()
             val paths = mutableListOf<String>()
             if (version.isInstalled) {
                 val appInfo = context.packageManager
@@ -1181,8 +1344,13 @@ class GamePackageManager private constructor(
                 if (version == null) return
                 val profileId = MinecraftLauncher.getStorageProfileId(version)
                 val dir = MinecraftLauncher.getRuntimeLibDir(context, profileId)
-                val abis = listOf("arm64", "arm", "x86_64", "x86")
-                for (abi in abis) {
+                // Every ABI directory the extractor can target, not just the one this version is
+                // expected to use. The extraction folder is derived from the APK's shipped ABIs
+                // (getDeviceAbi), while resolveLaunchAbi prefers the version's recorded abiList -
+                // and that label is a record of what was extracted *last*, so it can name a
+                // different directory than the extractor will actually write to. Clearing every
+                // candidate is what makes the repair cover the folder in use whichever it is.
+                for (abi in MinecraftLauncher.repairTargetAbiDirs()) {
                     val abiDir = File(dir, abi)
                     val versionFile = File(abiDir, "native_extraction_version")
                     val manifestFile = File(abiDir, ".extraction_manifest")
@@ -1193,7 +1361,7 @@ class GamePackageManager private constructor(
                         Log.w(TAG, "Failed to remove extraction manifest: ${manifestFile.absolutePath}")
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Log.w(TAG, "Failed to invalidate extraction cache: ${e.message}")
             }
         }

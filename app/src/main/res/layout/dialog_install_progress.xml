@@ -1,7 +1,7 @@
 <LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:padding="26dp"
+    android:padding="@dimen/space_6"
     android:background="@drawable/dialog_background_black_border"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,7 +10,7 @@
     <TextView
         android:id="@+id/tv_title"
         android:text="@string/installing_title"
-        android:textSize="18sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold"
         android:textColor="?attr/colorPrimary"
         android:fontFamily="@font/misans"
@@ -20,7 +20,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="@dimen/space_6"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -28,12 +28,12 @@
             android:id="@+id/tv_progress_status"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="@dimen/space_3"
             android:layout_weight="1"
             android:maxLines="2"
             android:text="@string/installing_message"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="15sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:minWidth="54dp"
             android:text="0%"
             android:textColor="?attr/colorPrimary"
-            android:textSize="20sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -54,7 +54,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="7dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="@dimen/space_4"
         android:indeterminateOnly="false"
         android:max="100"
         android:progress="0"

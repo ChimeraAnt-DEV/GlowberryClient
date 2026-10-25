@@ -23,7 +23,7 @@
 
     <!-- About -->
     <string name="about_title">Acerca de</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Todos los derechos reservados.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Licenciado bajo la Licencia Apache 2.0.</string>
     <string name="font_license">Esta aplicación usa la fuente Misans.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Acciones rápidas</string>
@@ -434,7 +434,8 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
     <string name="dialog_title_login_required">Se requiere inicio de sesión</string>
     <string name="dialog_message_login_required">El inicio de sesión gestionado está habilitado, pero no hay ninguna cuenta. Ve a Cuentas para iniciar sesión.</string>
     <string name="go_to_accounts">Cuentas</string>
-    <string name="disable_launcher_login_and_continue">Cerrar</string>
+    <string name="disable_launcher_login_and_continue">Desactivar y continuar</string>
+    <string name="launcher_login_disabled_launching">Inicio de sesión gestionado por el lanzador desactivado. Iniciando…</string>
 
     <string name="label_current_account">Cuenta Actual</string>
     <string name="label_other_accounts">Otras Cuentas</string>
@@ -665,10 +666,6 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
         <item>Carga módulos SO externos para extender o mejorar el rendimiento de Minecraft.</item>
     </string-array>
 
-    <string name="theme_color_title">Color del Tema</string>
-    <string name="theme_color_desc">El color de acento primario de la aplicación</string>
-    <string name="preset_colors">COLORES PREDETERMINADOS</string>
-    <string name="more_colors">MÁS COLORES</string>
     <string name="bg_image_title">Imagen de Fondo</string>
     <string name="bg_image_desc">Selecciona una imagen como fondo</string>
     <string name="bg_image_none">Ninguna imagen seleccionada</string>
@@ -857,7 +854,6 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
     <string name="pagination_page_of">Página %1$d de %2$s</string>
     <string name="pagination_page_one">Página 1</string>
     <string name="logcat_filter_all">TODOS</string>
-    <string name="invalid_color_format">Formato de color no válido</string>
     <string name="world_directory_not_found">No se encontró el directorio del mundo</string>
     <string name="worlds_directory_unavailable">El directorio de mundos no está disponible</string>
     <string name="delete_screenshot_confirm">¿Seguro que quieres eliminar esta captura de pantalla?</string>
@@ -884,8 +880,6 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
     <string name="resource_pack_description_placeholder">La descripción del paquete aparece aquí</string>
     <string name="mod_name_placeholder">Nombre del mod</string>
     <string name="mod_load_order_placeholder">Orden de carga: 1</string>
-    <string name="custom_color_hex_rgb">Color personalizado (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB o R,G,B</string>
     <string name="screenshot_name_placeholder">Nombre de la captura de pantalla</string>
     <string name="screenshot_date_placeholder">Fecha: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Crea botones en pantalla con estilo de Minecraft asignados exactamente a una tecla de teclado cada uno. Los botones nunca ejecutan macros, secuencias de teclas, repeticiones automáticas ni autoclic.</string>

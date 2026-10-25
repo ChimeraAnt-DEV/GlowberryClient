@@ -2,7 +2,7 @@
 <!-- The Launch tab's quick dock plate: a rounded frosted-glass strip holding the destination tiles. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/glass_background_elevated" />
-    <corners android:radius="18dp" />
+    <corners android:radius="@dimen/radius_card" />
     <stroke
         android:width="1dp"
         android:color="@color/glass_border" />

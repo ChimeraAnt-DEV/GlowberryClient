@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingHorizontal="24dp"
-    android:paddingVertical="20dp"
+    android:paddingHorizontal="@dimen/space_6"
+    android:paddingVertical="@dimen/space_6"
     style="@style/Widget.Chimera.Card"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:indeterminate="true"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginEnd="@dimen/space_4" />
         
     <TextView
         android:id="@+id/tv_message"
@@ -27,5 +27,5 @@
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"
         android:textStyle="bold"
-        android:textSize="16sp"/>
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"/>
 </LinearLayout>

@@ -17,7 +17,7 @@
 
     <!-- About -->
     <string name="about_title">关于</string>
-    <string name="copyright">©2024–2026 GlowberryClient. 保留所有权利</string>
+    <string name="copyright">©2024–2026 GlowberryClient. 依据 Apache 2.0 许可证授权。</string>
     <string name="font_license">本软件使用 Misans 字体</string>
     <string name="quick_actions_title">快捷操作</string>
     <string name="content_management_subtitle">管理世界、资源包和行为包</string>
@@ -433,7 +433,8 @@
     <string name="dialog_title_login_required">需要登录</string>
     <string name="dialog_message_login_required">已开启使用启动器登录，但当前未登录。请前往账号管理登录后再启动。</string>
     <string name="go_to_accounts">账号管理</string>
-    <string name="disable_launcher_login_and_continue">关闭</string>
+    <string name="disable_launcher_login_and_continue">禁用并继续</string>
+    <string name="launcher_login_disabled_launching">已关闭启动器管理的登录，正在启动…</string>
     <string name="sign_in">登录</string>
     <string name="ms_account_subtitle_format">用户ID：%1$s • 更新：%2$s</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
@@ -792,10 +793,6 @@
         <item>CurseForge 可以让你直接浏览并下载社区内容。</item>
         <item>导入模组以扩展或增强 Minecraft 功能和性能。</item>
     </string-array>
-    <string name="theme_color_title">主题颜色</string>
-    <string name="theme_color_desc">应用的主强调色</string>
-    <string name="preset_colors">预设颜色</string>
-    <string name="more_colors">更多颜色</string>
     <string name="bg_image_title">背景图片</string>
     <string name="bg_image_desc">选择一张图片作为背景</string>
     <string name="bg_image_none">未选择图片</string>
@@ -878,7 +875,6 @@
     <string name="pagination_page_of">第 %1$d 页，共 %2$s 页</string>
     <string name="pagination_page_one">第 1 页</string>
     <string name="logcat_filter_all">全部</string>
-    <string name="invalid_color_format">颜色格式无效</string>
     <string name="world_directory_not_found">未找到世界目录</string>
     <string name="worlds_directory_unavailable">世界目录不可用</string>
     <string name="delete_screenshot_confirm">确定要删除此截图吗？</string>
@@ -905,8 +901,6 @@
     <string name="resource_pack_description_placeholder">资源包描述显示在这里</string>
     <string name="mod_name_placeholder">Mod 名称</string>
     <string name="mod_load_order_placeholder">加载顺序：1</string>
-    <string name="custom_color_hex_rgb">自定义颜色 (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB 或 R,G,B</string>
     <string name="screenshot_name_placeholder">截图名称</string>
     <string name="screenshot_date_placeholder">日期：2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">创建 Minecraft 风格的屏幕按钮，每个按钮仅映射到一个键盘按键。按钮不会执行宏、按键序列、自动重复或自动点击。</string>

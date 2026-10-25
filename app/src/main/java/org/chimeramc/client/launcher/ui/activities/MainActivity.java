@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -86,6 +87,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 
  import android.widget.Button;
@@ -175,6 +177,15 @@ import okhttp3.OkHttpClient;
      * leaked a thread; it is one executor for the Activity's lifetime now.
      */
     private final ExecutorService resourcepackExecutor = Executors.newSingleThreadExecutor();
+
+    /**
+     * Gathers the Launch tab's disk-backed status counts (AntEgg packs, replay clips).
+     *
+     * <p>Separate from the other pools because it runs on every {@code onResume} and its work is
+     * only a couple of directory reads: it must never queue behind a migration or a launch probe,
+     * and those must never wait for it.
+     */
+    private final ExecutorService launchStatsExecutor = Executors.newSingleThreadExecutor();
 
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private Runnable pulseRunnable;
@@ -404,7 +415,7 @@ import okhttp3.OkHttpClient;
             return;
         }
         final String accountId = active.id;
-        accountExecutor.execute(() -> {
+        runOnAccountExecutor(() -> {
             try {
                 BedrockAuthManager authManager = MsftAuthManager.refreshAndAuth(active);
                 MsftAuthManager.saveAccountOrThrow(MainActivity.this, authManager);
@@ -414,10 +425,11 @@ import okhttp3.OkHttpClient;
                         refreshNavAccountUI();
                     }
                 });
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 // A stale or revoked token can no longer be refreshed silently. Send the user to the
                 // sign-in screen with the failure already explained instead of leaving them signed out
-                // with no prompt.
+                // with no prompt. Throwable, not Exception: an Error on this worker thread would
+                // otherwise die with the prompt never shown.
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
@@ -519,7 +531,7 @@ import okhttp3.OkHttpClient;
         accountAvatar.setTag(R.id.nav_account_avatar, url);
         accountAvatar.setImageDrawable(null);
         if (avatarProgress != null) avatarProgress.setVisibility(View.VISIBLE);
-        accountExecutor.execute(() -> {
+        runOnAccountExecutor(() -> {
             try {
                 try (Response imgResp = avatarClient.newCall(new Request.Builder().url(url).build()).execute()) {
                     Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null) ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream()) : null;
@@ -533,7 +545,10 @@ import okhttp3.OkHttpClient;
                         if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
                     });
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: decoding the avatar can exhaust the heap and that is an
+                // Error, which skipped this handler and left the account spinner turning forever
+                // with no way to tell it had failed.
                 runOnUiThread(() -> {
                     if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
                 });
@@ -566,7 +581,7 @@ import okhttp3.OkHttpClient;
         } else if (active != null) {
             final String url = AccountTextUtils.sanitizeUrl(active.xboxAvatarUrl);
             if (url != null) {
-                accountExecutor.execute(() -> {
+                runOnAccountExecutor(() -> {
                     try {
                         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
                         org.chimeramc.client.settings.LowLatencyNetworkManager.configure(clientBuilder);
@@ -581,7 +596,10 @@ import okhttp3.OkHttpClient;
                                     : null;
                         }
                         runOnUiThread(() -> { if (bmp != null) headerAvatar.setImageBitmap(bmp); });
-                    } catch (Exception ignored) {}
+                    } catch (Throwable ignored) {
+                        // Best-effort avatar: a decode failure, including a heap exhaustion while
+                        // decoding, must not kill the executor thread.
+                    }
                 });
             }
         }
@@ -666,7 +684,7 @@ import okhttp3.OkHttpClient;
                      accountLoadingDialog = DialogUtils.ensure(MainActivity.this, accountLoadingDialog);
                      DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_auth_xbox_device));
 
-                     accountExecutor.execute(() -> {
+                     runOnAccountExecutor(() -> {
                          try {
                              BedrockAuthManager authManager = MsftAuthManager.refreshAndAuth(account);
                              MsftAuthManager.saveAccountOrThrow(MainActivity.this, authManager);
@@ -679,7 +697,10 @@ import okhttp3.OkHttpClient;
                                  Toast.makeText(MainActivity.this, getString(R.string.ms_login_success, statusName), Toast.LENGTH_SHORT).show();
                                  refreshAccountHeaderUI();
                              });
-                         } catch (Exception e) {
+                         } catch (Throwable e) {
+                             // Throwable, not Exception: this handler is the only thing that dismisses
+                             // the "signing in" dialog, so an Error escaping it left that dialog up
+                             // forever with no sign-in and no message.
                              runOnUiThread(() -> {
                                  DialogUtils.dismissQuietly(accountLoadingDialog);
                                  Toast.makeText(MainActivity.this, getString(R.string.ms_login_failed_detail, MsftAuthManager.describeError(e)), Toast.LENGTH_LONG).show();
@@ -790,11 +811,29 @@ import okhttp3.OkHttpClient;
             onVersionManagerReady();
             return;
         }
-        VersionManager.initializeAsync(this, manager -> runOnUiThread(() -> {
-            if (isFinishing() || isDestroyed()) return;
-            versionManager = manager;
-            onVersionManagerReady();
-        }));
+        VersionManager.initializeAsync(this, new VersionManager.InitCallback() {
+            @Override
+            public void onReady(VersionManager manager) {
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    versionManager = manager;
+                    onVersionManagerReady();
+                });
+            }
+
+            @Override
+            public void onFailed(Throwable error) {
+                // The Launch control was disabled above and only onVersionManagerReady re-arms it,
+                // so a failed build has to release it here or the Play button stays dead for the
+                // life of the screen. The cause is named through the same classifier the rest of
+                // the launch path uses.
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    resetLaunchButton();
+                    reportLaunchFailure(error);
+                });
+            }
+        });
     }
 
     private void onVersionManagerReady() {
@@ -837,7 +876,7 @@ import okhttp3.OkHttpClient;
             }
 
             @Override
-            public void onLaunchFailed(Exception e) {
+            public void onLaunchFailed(Throwable e) {
                 runOnUiThread(() -> {
                     // Same classifier as the dialog path: the cause is named, then the raw text.
                     LaunchErrorDiagnosis.Cause cause = LaunchErrorDiagnosis.classify(e);
@@ -971,24 +1010,31 @@ import okhttp3.OkHttpClient;
             return;
         }
         migrationPromptCheckInFlight = true;
-        storageMigrationExecutor.execute(() -> {
-            boolean shouldOfferMigration = false;
-            try {
-                shouldOfferMigration = storageMigrationManager.shouldOfferMigration();
-            } catch (Exception ignored) {
-            }
-            boolean finalShouldOfferMigration = shouldOfferMigration;
-            runOnUiThread(() -> {
-                migrationPromptCheckInFlight = false;
-                if (isFinishing() || isDestroyed()) return;
-                if (!finalShouldOfferMigration) {
-                    initializeAfterMigrationGate();
-                    return;
+        // onDestroy shuts this executor down, and the check can be requested while the screen is
+        // going away. Submitting then throws on the UI thread. The gate flag is cleared so a later
+        // resume can retry instead of being blocked from ever offering the migration.
+        try {
+            storageMigrationExecutor.execute(() -> {
+                boolean shouldOfferMigration = false;
+                try {
+                    shouldOfferMigration = storageMigrationManager.shouldOfferMigration();
+                } catch (Exception ignored) {
                 }
-                if (migrationPromptShown || storageMigrationManager == null) return;
-                showStorageMigrationPromptDialog();
+                boolean finalShouldOfferMigration = shouldOfferMigration;
+                runOnUiThread(() -> {
+                    migrationPromptCheckInFlight = false;
+                    if (isFinishing() || isDestroyed()) return;
+                    if (!finalShouldOfferMigration) {
+                        initializeAfterMigrationGate();
+                        return;
+                    }
+                    if (migrationPromptShown || storageMigrationManager == null) return;
+                    showStorageMigrationPromptDialog();
+                });
             });
-        });
+        } catch (RejectedExecutionException rejected) {
+            migrationPromptCheckInFlight = false;
+        }
     }
 
     private void showStorageMigrationPromptDialog() {
@@ -1307,6 +1353,50 @@ import okhttp3.OkHttpClient;
         if (launchPreview != null) launchPreview.startPreview();
         bindHeadPod();
         refreshLaunchToggles();
+        announcePendingLaunchFailure();
+    }
+
+    /**
+     * Reports a launch that died inside the game activity.
+     *
+     * <p>That failure cannot show a dialog where it happens: {@code MinecraftActivity} tears the
+     * launcher process down to restart it, so the Activity that would own the dialog is already
+     * gone. The cause is stored instead and named here, on the screen the user lands back on — the
+     * step that was missing, and the reason a failed launch used to look like the app simply
+     * closing.
+     *
+     * <p>Runs at the end of {@code onResume}, after the EULA and migration gates have returned, so
+     * the failure is never shown over a first-run or migration prompt. It consumes the stored
+     * report, so it is announced exactly once; the file is also mirrored into the Diagnostics
+     * report for as long as it exists.
+     */
+    private void announcePendingLaunchFailure() {
+        if (isFinishing() || isDestroyed()) return;
+        org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure.Report report =
+                org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
+                        .consumePending(this);
+        if (report == null) return;
+        org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis.Cause cause = report.cause();
+        String detail = org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
+                .detailOf(report);
+        StringBuilder message = new StringBuilder(
+                getString(org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
+                        .messageRes(cause)));
+        if (!detail.isEmpty()) {
+            message.append("\n\n").append(getString(R.string.launch_error_cause_label)).append(' ')
+                    .append(org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
+                            .label(cause))
+                    .append('\n').append(detail);
+        }
+        new CustomAlertDialog(this)
+                .setTitleText(getString(org.chimeramc.client.launcher.core.minecraft
+                        .LaunchErrorDiagnosis.titleRes(cause)))
+                .setMessage(message.toString())
+                .setPositiveButton(getString(R.string.diagnostics_title),
+                        v -> startActivity(new Intent(this,
+                                org.chimeramc.client.launcher.ui.activities.DiagnosticsActivity.class)))
+                .setNegativeButton(getString(R.string.dialog_positive_ok), null)
+                .show();
     }
 
     /**
@@ -1384,13 +1474,18 @@ import okhttp3.OkHttpClient;
         applyGlowEffects(glow);
         
         
-        // Apply Show Animations toggle
-        boolean showAnims = pm.isShowAnimations();
-        if (!showAnims) {
-            DynamicAnim.disableAnimations();
-        } else {
-            DynamicAnim.enableAnimations();
+        // Apply Show Animations toggle. The platform's "remove animations" scale wins over the
+        // in-app switch, so a user who told Android to remove animations never gets springs back
+        // from a stale app preference (U6/U11).
+        boolean platformAnimationsOff = false;
+        try {
+            platformAnimationsOff = android.provider.Settings.Global.getFloat(
+                    getContentResolver(),
+                    android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        } catch (Throwable ignored) {
+            // The setting is unreadable on a restricted device; treat motion as allowed.
         }
+        DynamicAnim.applyMotionScheme(pm.isReduceMotion(), platformAnimationsOff);
     }
     
     private void applyCardRounding(int roundingDp) {
@@ -1747,14 +1842,10 @@ import okhttp3.OkHttpClient;
      */
     private void refreshLaunchToggles() {
         TextView antEggStatus = findViewById(R.id.launch_antegg_status);
-        if (antEggStatus != null) {
-            int count = countAntEggPacks();
-            antEggStatus.setText(count > 0
-                    ? getString(R.string.launch_antegg_status_ready, count)
-                    : getString(R.string.launch_antegg_status_none));
-        }
-
         TextView voiceStatus = findViewById(R.id.launch_voice_status);
+        TextView replayStatus = findViewById(R.id.launch_replay_status);
+
+        // Voice is in-memory state, so it is painted straight away.
         if (voiceStatus != null) {
             org.chimeramc.client.core.voice.VoiceChatModule module =
                     org.chimeramc.client.core.voice.VoiceChatModule.peek();
@@ -1764,12 +1855,34 @@ import okhttp3.OkHttpClient;
                     : getString(R.string.launch_voice_status_off));
         }
 
-        TextView replayStatus = findViewById(R.id.launch_replay_status);
-        if (replayStatus != null) {
-            int clips = countReplayClips();
-            replayStatus.setText(clips > 0
-                    ? getString(R.string.launch_replay_status_count, clips)
-                    : getString(R.string.launch_replay_status_none));
+        // The other two read the disk: the AntEgg count lists a directory and the Replay count
+        // scans the replays folder and asks MediaMetadataRetriever for every clip's duration. On
+        // the UI thread that ran on every onResume, so returning from any screen blocked the frame
+        // while the video metadata was parsed. Gather both on a worker and paint when they arrive.
+        if (antEggStatus == null && replayStatus == null) return;
+        // onResume can run against an executor that onDestroy has already shut down, and an
+        // escaping RejectedExecutionException would take the Launch tab down with it. The statuses
+        // then simply keep their last painted value, which is the right degradation for a
+        // decorative line.
+        try {
+            launchStatsExecutor.execute(() -> {
+                final int antEggCount = countAntEggPacks();
+                final int replayCount = countReplayClips();
+                uiHandler.post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    if (antEggStatus != null) {
+                        antEggStatus.setText(antEggCount > 0
+                                ? getString(R.string.launch_antegg_status_ready, antEggCount)
+                                : getString(R.string.launch_antegg_status_none));
+                    }
+                    if (replayStatus != null) {
+                        replayStatus.setText(replayCount > 0
+                                ? getString(R.string.launch_replay_status_count, replayCount)
+                                : getString(R.string.launch_replay_status_none));
+                    }
+                });
+            });
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {
         }
     }
 
@@ -2103,7 +2216,10 @@ import okhttp3.OkHttpClient;
         // the "duplicate Play" report. One flag guards every entry point.
         if (launchInProgress) return;
         launchInProgress = true;
-        binding.launchDock.launchButton.setEnabled(false);
+        // binding is nullable on this screen (resetLaunchButton guards it), so dereferencing it
+        // unguarded here threw on the UI thread when the launch was triggered from a path where the
+        // view had not been bound yet.
+        if (binding != null) binding.launchDock.launchButton.setEnabled(false);
         LaunchTrace trace = LaunchTrace.create(null);
         trace.milestone("Launch requested");
 
@@ -2116,13 +2232,61 @@ import okhttp3.OkHttpClient;
         // precedence still lives in LaunchReadiness, so the diagnostics screen and the wizard keep
         // reading the same states.
         final LaunchProbe.Source source = new AndroidLaunchProbe(this, version, trace);
-        launchProbeExecutor.execute(() -> {
-            final LaunchReadiness.Facts facts = LaunchProbe.gather(source);
-            uiHandler.post(() -> {
-                if (isFinishing() || isDestroyed()) return;
-                continueLaunchAfterProbe(version, trace, facts);
+        try {
+            launchProbeExecutor.execute(() -> {
+                final LaunchReadiness.Facts facts;
+                try {
+                    facts = LaunchProbe.gather(source);
+                } catch (Throwable throwable) {
+                    // A probe that throws must not leave the Play button disabled forever: the flag
+                    // was set and the button dimmed before the task was submitted, and nothing else
+                    // re-arms them. The failure is named through the same path every other launch
+                    // failure uses, then the control is released.
+                    trace.error("Launch preflight failed", throwable.getMessage());
+                    uiHandler.post(() -> reportLaunchFailure(throwable));
+                    return;
+                }
+                uiHandler.post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    // The decision path is state work on the UI thread, and a throw anywhere in it
+                    // (a dialog that cannot inflate, a launch intent that cannot be built) would
+                    // leave the button disabled with the flag still set - the same stuck control
+                    // the probe guard above prevents. Re-arming is the floor, not the whole answer.
+                    try {
+                        continueLaunchAfterProbe(version, trace, facts);
+                    } catch (Throwable throwable) {
+                        trace.error("Launch decision failed", throwable.getMessage());
+                        reportLaunchFailure(throwable);
+                    }
+                });
             });
-        });
+        } catch (RejectedExecutionException rejected) {
+            // The executor is torn down in onDestroy; a launch requested after that (a queued post
+            // from a finishing screen) must re-arm the button rather than leave it disabled.
+            trace.error("Launch preflight could not be scheduled", rejected.getMessage());
+            resetLaunchButton();
+        }
+    }
+
+    /**
+     * Names a failure that happened on a background step and re-arms the Play control.
+     *
+     * <p>Shared by the preflight gather and the decision that follows it: both run after the button
+     * has already been disabled, so both owe the user the cause and a usable control. The cause is
+     * classified rather than printed raw, for the same reason the other launch surfaces do it.
+     */
+    private void reportLaunchFailure(Throwable throwable) {
+        if (isFinishing() || isDestroyed()) return;
+        resetLaunchButton();
+        LaunchErrorDiagnosis.Cause cause = LaunchErrorDiagnosis.classify(throwable);
+        new CustomAlertDialog(this)
+                .setTitleText(getString(LaunchErrorDiagnosis.titleRes(cause)))
+                .setMessage(getString(LaunchErrorDiagnosis.messageRes(cause))
+                        + "\n\n" + getString(R.string.launch_error_cause_label) + " "
+                        + LaunchErrorDiagnosis.label(cause)
+                        + (throwable.getMessage() != null ? "\n" + throwable.getMessage() : ""))
+                .setPositiveButton(getString(R.string.dialog_positive_ok), null)
+                .show();
     }
 
     /**
@@ -2163,14 +2327,17 @@ import okhttp3.OkHttpClient;
                 }
 
                 @Override
-                public void onLaunchFailed(Exception e) {
+                public void onLaunchFailed(Throwable e) {
                     trace.error("Launch failed before loading screen", e.getMessage());
                     runOnUiThread(() -> {
                         resetLaunchButton();
                     });
                 }
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // Throwable, not Exception: this builds the launch intent and hands it to the launcher,
+            // so a heap exhaustion is a real outcome here, and an escaping Error left the Play
+            // button disabled with no dialog at all.
             trace.error("Launch failed before activity start", e.getMessage());
             resetLaunchButton();
             // Name the cause instead of only appending the raw dlopen text. The raw message is
@@ -2206,7 +2373,8 @@ import okhttp3.OkHttpClient;
                     .setMessage(getString(message))
                     .setPositiveButton(getString(R.string.go_to_accounts),
                             v -> startActivity(new Intent(this, AccountsActivity.class)))
-                    .setNegativeButton(getString(R.string.disable_launcher_login_and_continue), null)
+                    .setNegativeButton(getString(R.string.disable_launcher_login_and_continue),
+                            v -> disableLauncherManagedLoginAndLaunch())
                     .show();
             return;
         }
@@ -2231,6 +2399,24 @@ import okhttp3.OkHttpClient;
                 .setMessage(getString(message))
                 .setPositiveButton(getString(R.string.dialog_positive_ok), null)
                 .show();
+    }
+
+    /**
+     * Turns off launcher-managed sign-in and re-runs the launch, which is what the dialog's second
+     * button says it does.
+     *
+     * <p>The button was wired to {@code null}, so choosing it only dismissed the dialog: the flag
+     * stayed on, the next launch was refused for exactly the same reason, and the user was left
+     * with a button whose label described an action it never performed. Disabling the requirement
+     * is the user's explicit decision here, so the flag is cleared and the preflight re-runs with
+     * the new state rather than making them press Play again.
+     */
+    private void disableLauncherManagedLoginAndLaunch() {
+        FeatureSettings.getInstance().setLauncherManagedMcLoginEnabled(false);
+        Toast.makeText(this, R.string.launcher_login_disabled_launching, Toast.LENGTH_SHORT).show();
+        // resetLaunchButton() already ran before the dialog was shown, so the Play button is armed
+        // again; re-running the launch picks up the cleared flag.
+        performActualLaunch();
     }
 
     private Intent createMinecraftLaunchIntent() {
@@ -2701,12 +2887,34 @@ import okhttp3.OkHttpClient;
         }
         unbindStorageMigrationService();
         dismissStorageMigrationDialog(null);
+        // Both managers own a single-thread pool; without this they outlived the Activity.
+        if (storageMigrationManager != null) {
+            storageMigrationManager.close();
+            storageMigrationManager = null;
+        }
+        if (apkImportManager != null) {
+            apkImportManager.release();
+            apkImportManager = null;
+        }
         storageMigrationExecutor.shutdownNow();
         launchProbeExecutor.shutdownNow();
         resourcepackExecutor.shutdownNow();
+        launchStatsExecutor.shutdownNow();
         // The account executor was never shut down either, so it outlived the Activity.
         accountExecutor.shutdownNow();
-        super.onDestroy();
     }
 
- }
+    /**
+     * Submits account work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>Every call site is reached from a UI event - a sign-in tap, an account switch, an avatar
+     * bind - so a submit that raced the teardown threw
+     * {@link java.util.concurrent.RejectedExecutionException} on the main thread and took the Launch
+     * tab down. The work is best-effort (a refresh or an avatar decode), so dropping it is safe.
+     */
+    private void runOnAccountExecutor(Runnable work) {
+        // A false return means the screen is gone; there is nothing to refresh.
+        SafeExecutor.submit(accountExecutor, work);
+    }
+
+}

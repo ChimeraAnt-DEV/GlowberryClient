@@ -1,5 +1,6 @@
 package org.chimeramc.client.core.content.leveldb;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.util.Log;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class LevelDBManager {
     }
 
     public void loadDatabase(LoadCallback callback) {
-        executor.execute(() -> {
+        if (!SafeExecutor.submit(executor, () -> {
             try {
                 if (!dbDir.exists() || !dbDir.isDirectory()) {
                     callback.onError("Database directory not found: " + dbDir.getAbsolutePath());
@@ -59,11 +60,14 @@ public class LevelDBManager {
                 callback.onProgress(100, 100);
                 callback.onComplete(entries);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to load database", e);
                 callback.onError("Failed to load database: " + e.getMessage());
             }
-        });
+        })) {
+            callback.onError("The database manager has been shut down");
+        }
     }
 
     private void categorizeEntries() {
@@ -88,7 +92,7 @@ public class LevelDBManager {
     }
 
     public void exportAllStructures(File outputDir, StructureExportCallback callback) {
-        executor.execute(() -> {
+        if (!SafeExecutor.submit(executor, () -> {
             try {
                 if (structureEntries.isEmpty()) {
                     callback.onError("No structures found in this world");
@@ -147,11 +151,14 @@ public class LevelDBManager {
                 Log.d(TAG, "Export complete: " + exported + "/" + total + " structures exported to " + outputPath);
                 callback.onComplete(exported, outputPath);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to export structures", e);
                 callback.onError("Export failed: " + e.getMessage());
             }
-        });
+        })) {
+            callback.onError("The database manager has been shut down");
+        }
     }
 
     private String sanitizeFileName(String name) {

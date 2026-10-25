@@ -2,20 +2,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp"
+    android:layout_marginBottom="@dimen/space_1"
     android:layout_marginStart="0dp"
-    android:layout_marginEnd="12dp">
+    android:layout_marginEnd="@dimen/space_3">
 
     <LinearLayout
         android:id="@+id/linear_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
+        android:layout_marginStart="@dimen/space_align_inset"
         style="@style/Widget.Chimera.Card.Compact"
-        android:paddingStart="12dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingStart="@dimen/space_3"
+        android:paddingEnd="@dimen/space_2"
+        android:paddingTop="@dimen/space_2"
+        android:paddingBottom="@dimen/space_2"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:foreground="?android:attr/selectableItemBackground"
@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="15sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textColor="@color/on_surface"
             android:fontFamily="@font/misans"/>
 
@@ -38,7 +38,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_edit"
             android:tint="@color/primary"
-            android:padding="6dp"
+            android:padding="@dimen/space_2"
             android:scaleType="fitCenter"
             android:visibility="gone"/>
     </LinearLayout>

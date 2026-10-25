@@ -104,6 +104,19 @@ public class StorageMigrationManager {
         this.prefs = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
+    /**
+     * Releases the migration worker.
+     *
+     * <p>The manager is created per owner (an Activity, or the migration service), so without this
+     * its single-thread pool outlived the screen that created it. Idempotent, and safe to call while
+     * a migration is running: the worker is interrupted and {@code running} is cleared, which is the
+     * state the interrupted-run bookkeeping already expects.
+     */
+    public void close() {
+        running.set(false);
+        executor.shutdownNow();
+    }
+
     public boolean shouldOfferMigration() {
         if (running.get()) return false;
         if (isMigrationCompleted()) return false;
@@ -141,87 +154,102 @@ public class StorageMigrationManager {
     public void startMigration(MigrationCallback callback) {
         if (!running.compareAndSet(false, true)) return;
         cancelled = false;
-        executor.execute(() -> {
-            try {
-                if (!canReadLegacyRoot() && LauncherStorage.getLegacyRoot().exists()) {
-                    throw new IOException("Legacy storage permission is not available");
-                }
-                if (callback != null) callback.onScanning();
+        if (!SafeExecutor.submit(executor, () -> runMigration(callback))) {
+            // close() shut the pool down between the CAS and the submit. The caller is waiting on a
+            // callback that can no longer arrive, so it is answered here instead.
+            running.set(false);
+            if (callback != null) callback.onFailed(new IllegalStateException("Migration was cancelled"));
+        }
+    }
 
-                File sourceRoot = LauncherStorage.getLegacyRoot();
-                File targetRoot = LauncherStorage.getTargetAppRoot(context);
-                if (!LauncherStorage.ensureDir(targetRoot)) {
-                    throw new IOException("Cannot create target directory: " + targetRoot.getAbsolutePath());
-                }
-                if (!targetRoot.canWrite()) {
-                    throw new IOException("Target directory is not writable: " + targetRoot.getAbsolutePath());
-                }
+    private void runMigration(MigrationCallback callback) {
+        try {
+            if (!canReadLegacyRoot() && LauncherStorage.getLegacyRoot().exists()) {
+                throw new IOException("Legacy storage permission is not available");
+            }
+            if (callback != null) callback.onScanning();
 
-                List<MigrationFile> files = scanFiles(sourceRoot, targetRoot);
-                long scannedBytes = 0L;
-                for (MigrationFile file : files) scannedBytes += file.size;
-                if (files.isEmpty()) {
-                    MigrationResult result = new MigrationResult(0, 0L, 0, 0);
-                    markCompleted(sourceRoot, result);
-                    if (callback != null) callback.onCompleted(result);
-                    return;
-                }
-                final long totalBytes = scannedBytes;
+            File sourceRoot = LauncherStorage.getLegacyRoot();
+            File targetRoot = LauncherStorage.getTargetAppRoot(context);
+            if (!LauncherStorage.ensureDir(targetRoot)) {
+                throw new IOException("Cannot create target directory: " + targetRoot.getAbsolutePath());
+            }
+            if (!targetRoot.canWrite()) {
+                throw new IOException("Target directory is not writable: " + targetRoot.getAbsolutePath());
+            }
 
-                int[] failedFiles = {0};
-                int skippedFiles = 0;
-                int[] processedFiles = {0};
-                long[] processedBytes = {0L};
-                long[] lastUiAt = {0L};
-                int[] lastPercent = {-1};
-                byte[] buffer = new byte[BUFFER_SIZE];
+            List<MigrationFile> files = scanFiles(sourceRoot, targetRoot);
+            long scannedBytes = 0L;
+            for (MigrationFile file : files) scannedBytes += file.size;
+            if (files.isEmpty()) {
+                MigrationResult result = new MigrationResult(0, 0L, 0, 0);
+                markCompleted(sourceRoot, result);
+                if (callback != null) callback.onCompleted(result);
+                return;
+            }
+            final long totalBytes = scannedBytes;
 
-                for (MigrationFile file : files) {
-                    throwIfStopped();
+            int[] failedFiles = {0};
+            int skippedFiles = 0;
+            int[] processedFiles = {0};
+            long[] processedBytes = {0L};
+            long[] lastUiAt = {0L};
+            int[] lastPercent = {-1};
+            byte[] buffer = new byte[BUFFER_SIZE];
 
-                    if (isAlreadyMigrated(file)) {
-                        skippedFiles++;
-                        processedFiles[0]++;
-                        processedBytes[0] += file.size;
-                        ProgressState state = new ProgressState(processedFiles[0], files.size(), processedBytes[0], totalBytes, file.relativePath);
-                        maybePostProgress(callback, state, lastUiAt, lastPercent);
-                        continue;
-                    }
+            for (MigrationFile file : files) {
+                throwIfStopped();
 
-                    try {
-                        final int processedFilesBeforeCopy = processedFiles[0];
-                        final long processedBytesBeforeCopy = processedBytes[0];
-                        copyFile(file, buffer, bytesCopied -> {
-                            ProgressState state = new ProgressState(
-                                    processedFilesBeforeCopy,
-                                    files.size(),
-                                    processedBytesBeforeCopy + bytesCopied,
-                                    totalBytes,
-                                    file.relativePath
-                            );
-                            maybePostProgress(callback, state, lastUiAt, lastPercent);
-                        });
-                    } catch (IOException error) {
-                        failedFiles[0]++;
-                    }
-
+                if (isAlreadyMigrated(file)) {
+                    skippedFiles++;
                     processedFiles[0]++;
                     processedBytes[0] += file.size;
                     ProgressState state = new ProgressState(processedFiles[0], files.size(), processedBytes[0], totalBytes, file.relativePath);
                     maybePostProgress(callback, state, lastUiAt, lastPercent);
+                    continue;
                 }
 
-                MigrationResult result = new MigrationResult(files.size(), totalBytes, skippedFiles, failedFiles[0]);
-                if (failedFiles[0] == 0) {
-                    markCompleted(sourceRoot, result);
+                try {
+                    final int processedFilesBeforeCopy = processedFiles[0];
+                    final long processedBytesBeforeCopy = processedBytes[0];
+                    copyFile(file, buffer, bytesCopied -> {
+                        ProgressState state = new ProgressState(
+                                processedFilesBeforeCopy,
+                                files.size(),
+                                processedBytesBeforeCopy + bytesCopied,
+                                totalBytes,
+                                file.relativePath
+                        );
+                        maybePostProgress(callback, state, lastUiAt, lastPercent);
+                    });
+                } catch (IOException error) {
+                    failedFiles[0]++;
                 }
-                if (callback != null) callback.onCompleted(result);
-            } catch (Exception error) {
-                if (callback != null) callback.onFailed(error);
-            } finally {
-                running.set(false);
+
+                processedFiles[0]++;
+                processedBytes[0] += file.size;
+                ProgressState state = new ProgressState(processedFiles[0], files.size(), processedBytes[0], totalBytes, file.relativePath);
+                maybePostProgress(callback, state, lastUiAt, lastPercent);
             }
-        });
+
+            MigrationResult result = new MigrationResult(files.size(), totalBytes, skippedFiles, failedFiles[0]);
+            if (failedFiles[0] == 0) {
+                markCompleted(sourceRoot, result);
+            }
+            if (callback != null) callback.onCompleted(result);
+        } catch (Throwable error) {
+            // Throwable, not Exception: the migration copies many gigabytes, and the only thing
+            // that settles the progress dialog is this callback. An OutOfMemoryError skipped it
+            // and left the user staring at a stalled progress bar with no way forward.
+            if (callback != null) callback.onFailed(asException(error));
+        } finally {
+            running.set(false);
+        }
+    }
+
+    /** Presents any {@link Throwable} as the {@link Exception} the callback contract requires. */
+    private static Exception asException(Throwable error) {
+        return error instanceof Exception ? (Exception) error : new RuntimeException(error);
     }
 
     public void cancel() {

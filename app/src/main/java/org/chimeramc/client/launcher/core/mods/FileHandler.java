@@ -1356,19 +1356,13 @@ public class FileHandler {
 
     private void importAntEggFiles(List<Uri> uris, FileOperationCallback callback) {
         new Thread(() -> {
-            int success = 0;
-            String lastError = null;
-            for (Uri uri : uris) {
-                org.chimeramc.client.core.antegg.AntEggLoader.LoadResult result =
-                        org.chimeramc.client.core.antegg.AntEggImport.importUri(context, uri);
-                if (result.success) {
-                    success++;
-                } else {
-                    lastError = result.error;
-                }
-            }
-            final int successCount = success;
-            final String finalError = lastError;
+            // Item G4: the batch is staged and read before anything loads, so a package whose
+            // dependency is in the same selection is ordered after it instead of being refused
+            // for arriving first. See AntEggImport.importUriBatch.
+            org.chimeramc.client.core.antegg.AntEggImport.BatchResult batch =
+                    org.chimeramc.client.core.antegg.AntEggImport.importUriBatch(context, uris);
+            final int successCount = batch.successCount;
+            final String finalError = batch.error;
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (successCount > 0 && callback != null) {
                     callback.onSuccess(successCount);

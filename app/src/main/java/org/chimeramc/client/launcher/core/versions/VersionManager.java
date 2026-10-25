@@ -14,6 +14,9 @@ import androidx.annotation.NonNull;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.minecraft.AbiBitness;
+import org.chimeramc.client.core.minecraft.ExtractedLibraryState;
+import org.chimeramc.client.core.minecraft.GamePackageManager;
+import org.chimeramc.client.core.minecraft.RequiredNativeLibraries;
 import org.chimeramc.client.core.minecraft.MinecraftLauncher;
 import org.chimeramc.client.core.mods.ModManager;
 import org.chimeramc.client.ui.activities.MainActivity;
@@ -35,6 +38,7 @@ import java.util.zip.ZipInputStream;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 
 public class VersionManager {
+    private static final String TAG = "VersionManager";
     private static final String PREFS_NAME = "version_manager";
     private static final String KEY_SELECTED_TYPE = "selected_type";
     private static final String KEY_SELECTED_PACKAGE = "selected_package";
@@ -60,7 +64,7 @@ public class VersionManager {
 
         void onRepairCompleted(boolean success);
 
-        void onRepairFailed(Exception e);
+        void onRepairFailed(Throwable e);
     }
 
     public interface OnDeleteVersionCallback {
@@ -77,6 +81,18 @@ public class VersionManager {
 
     public interface InitCallback {
         void onReady(VersionManager manager);
+
+        /**
+         * Called when the manager could not be built at all.
+         *
+         * <p>Building it scans the instances directory and reads each version's metadata, so it can
+         * fail on an unreadable or corrupt store. Without this the caller waited forever: the
+         * screen disables its Launch control until {@link #onReady} arrives, and a swallowed
+         * failure meant that never happened. A default no-op keeps existing callers source
+         * compatible.
+         */
+        default void onFailed(Throwable error) {
+        }
     }
 
     public static VersionManager get(Context ctx) {
@@ -99,9 +115,20 @@ public class VersionManager {
     public static void initializeAsync(Context ctx, InitCallback callback) {
         Context appContext = ctx.getApplicationContext();
         new Thread(() -> {
-            VersionManager manager = get(appContext);
-            if (callback != null) {
-                callback.onReady(manager);
+            // The build is disk I/O over the instances directory, so it can fail. A failure has to
+            // reach the caller: the screen that started this disabled its Launch control and only
+            // re-arms it on a callback, so an uncaught throw would strand it disabled with no
+            // message. Reported through onFailed rather than swallowed.
+            try {
+                VersionManager manager = get(appContext);
+                if (callback != null) {
+                    callback.onReady(manager);
+                }
+            } catch (Throwable error) {
+                android.util.Log.e(TAG, "Version manager initialisation failed", error);
+                if (callback != null) {
+                    callback.onFailed(error);
+                }
             }
         }, "version-manager-init").start();
     }
@@ -320,9 +347,18 @@ public class VersionManager {
                 }
                 if (totalSize == 0) totalSize = 1;
 
-                File libDir = getRuntimeLibDir(dataDirName);
+                // The same accessor the extractor (getRuntimeLibAbiDir) and the marker writer
+                // (repairMarkerDirs) use, so all three name one directory by construction.
+                // getRuntimeLibDir sanitises internally, so passing the raw folder name would in
+                // fact resolve to this same path - this is consistency, not a behaviour change.
+                // RuntimeLibDirAgreementTest pins the idempotence that makes the two equivalent, so
+                // the equivalence is a checked fact rather than a comment.
+                File libDir = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
                 if (libDir.exists()) {
-                    deleteDir(libDir);
+                    // Throws with the path when the cache survives: extraction is about to write into
+                    // these exact files, so a stale read-only tree must be a named failure, not a
+                    // "Permission denied" from a FileOutputStream that mentions neither.
+                    deleteDirOrThrow(libDir);
                 }
                 long[] progress = {0};
                 int[] lastPercent = {-1};
@@ -361,15 +397,55 @@ public class VersionManager {
 
                 callback.onRepairProgress(PROGRESS_FINALIZING);
                 writeVersionMetadata(apkFile, version, dataDirName);
+                // Record the rebuilt cache exactly as the extractor does. Without this the repair
+                // wrote libraries the next launch refused to trust - no marker, no manifest - so it
+                // wiped them and re-extracted the whole package, on the launch the user was waiting
+                // for. The markers make the repaired cache a cache hit.
+                boolean cacheUsable = GamePackageManager.writeExtractionMarkers(
+                        version, apkFiles, repairMarkerDirs(version));
                 loadAllVersions();
                 callback.onRepairProgress(PROGRESS_MAX);
 
-                callback.onRepairCompleted(true);
+                // Success means the cache is now usable, not merely that the copy loop finished.
+                // A package that ships no loadable ABI copies nothing markable, and reporting
+                // "Repair completed" for it sent the user back to a launch that failed for the
+                // reason the repair was supposed to fix. The failure message names the cause.
+                if (cacheUsable) {
+                    callback.onRepairCompleted(true);
+                } else {
+                    // Wording is load-bearing: UserFacingError classifies from the text, and the
+                    // phrase "ships 32-bit" is what routes this to the ABI cause (and its launch
+                    // screen wording) instead of the generic "bad response" a bare IOException got.
+                    callback.onRepairFailed(new IOException(
+                            "This build ships 32-bit native libraries only, and GlowberryClient "
+                                    + "runs as a 64-bit app, so its libraries cannot be loaded."));
+                }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that clears the repair
+                // dialog and releases the flow latch. Extraction streams a several-hundred-megabyte
+                // APK, so an OutOfMemoryError is realistic - and with the latch still set,
+                // attemptRepairLibs refused every later repair for the life of the process.
                 callback.onRepairFailed(e);
             }
         }).start();
+    }
+
+    /**
+     * The ABI directories the repair just wrote into, as directories rather than names.
+     *
+     * <p>Every candidate rather than only the one this launch is predicted to use, for the same
+     * reason the repair clears every candidate: the extraction folder comes from the ABIs the APK
+     * ships while the launch ABI comes from the version's recorded label, and the two can name
+     * different directories.
+     */
+    private List<File> repairMarkerDirs(GameVersion version) {
+        File libRoot = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
+        List<File> dirs = new ArrayList<>();
+        for (String abiDir : MinecraftLauncher.repairTargetAbiDirs()) {
+            dirs.add(new File(libRoot, abiDir));
+        }
+        return dirs;
     }
 
     private void writeVersionMetadata(File apkFile, GameVersion version, String directoryName) throws IOException {
@@ -445,6 +521,8 @@ public class VersionManager {
                     "unknown"
             );
 
+            // An installed package's libraries come from the app's own native dir, not the
+            // extraction cache, so there is nothing here to repair.
             gv.needsRepair = false;
             if (!hasSoFiles) {
                 gv.isExtractFalse = true;
@@ -469,7 +547,11 @@ public class VersionManager {
                 if (!apk.exists()) continue;
 
                 GameVersion gv = getGameVersion(dir);
-                gv.needsRepair = false;
+                // Read the extracted cache rather than assuming it is intact. This was hard-coded
+                // to false, so the launch-time "missing game library files, repair now?" offer and
+                // MainActivity.repairNeededVersions() could never fire: a version whose libraries
+                // had been deleted or truncated failed at dlopen with no way to fix it in-app.
+                gv.needsRepair = computeNeedsRepair(gv);
                 gv.onlyVersionTxt = false;
                 customVersions.add(gv);
             }
@@ -526,6 +608,68 @@ public class VersionManager {
         File dir = new File(baseDir, packageName);
         LauncherStorage.ensureDir(dir);
         return dir;
+    }
+
+    /**
+     * Whether an instance's extracted native-library cache is present but incomplete.
+     *
+     * <p>Drives {@code GameVersion.needsRepair}, which the launch path and
+     * {@link #repairNeededVersions} read. The rule is pure ({@link ExtractedLibraryState}); this
+     * only supplies the file-system facts.
+     */
+    private boolean computeNeedsRepair(GameVersion version) {
+        if (version == null) return false;
+        // The same root the extractor writes and the repair clears, so all three agree on where the
+        // cache lives: the storage profile id, not the raw directory name (they differ for an
+        // instance whose folder name is not already sanitised).
+        File libRoot = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
+        if (!libRoot.isDirectory()) return false;
+        List<String> required = RequiredNativeLibraries.required(version.versionCode);
+        String expectedMarker = String.valueOf(GamePackageManager.calculateNativeExtractionVersion());
+        return ExtractedLibraryState.needsRepair(
+                required,
+                java.util.Arrays.asList(MinecraftLauncher.repairTargetAbiDirs()),
+                isExtractionMarkerCurrent(libRoot, expectedMarker),
+                new ExtractedLibraryState.DirectoryProbe() {
+                    @Override
+                    public boolean directoryExists(String abiDirName) {
+                        return new File(libRoot, abiDirName).isDirectory();
+                    }
+
+                    @Override
+                    public boolean fileIsNonEmpty(String abiDirName, String libName) {
+                        File f = new File(new File(libRoot, abiDirName), libName);
+                        return f.isFile() && f.length() > 0L;
+                    }
+                });
+    }
+
+    /**
+     * Whether the extraction marker under any ABI directory names the current extraction version.
+     *
+     * <p>Reads the same marker, in the same place, as
+     * {@code GamePackageManager.isExtractionCacheCurrent}: the extractor writes it inside the ABI
+     * directory it extracted into, and only after a complete extraction. A current marker is
+     * therefore the record that the cache was whole for this build, which is what lets a missing
+     * library be called damage rather than "not extracted yet".
+     */
+    private boolean isExtractionMarkerCurrent(File libRoot, String expectedMarker) {
+        for (String abiDir : MinecraftLauncher.repairTargetAbiDirs()) {
+            File marker = new File(new File(libRoot, abiDir), "native_extraction_version");
+            if (marker.isFile()) {
+                try (FileInputStream in = new FileInputStream(marker)) {
+                    byte[] raw = new byte[(int) Math.min(marker.length(), 64L)];
+                    int read = in.read(raw);
+                    if (read > 0 && new String(raw, 0, read, java.nio.charset.StandardCharsets.UTF_8)
+                            .trim().equals(expectedMarker)) {
+                        return true;
+                    }
+                } catch (IOException ignored) {
+                    // An unreadable marker is not evidence of a current one.
+                }
+            }
+        }
+        return false;
     }
 
     private boolean hasSoFilesInDir(File nativeLibDir) {
@@ -883,7 +1027,7 @@ public class VersionManager {
             }
 
             @Override
-            public void onRepairFailed(Exception e) {
+            public void onRepairFailed(Throwable e) {
                 activity.runOnUiThread(() -> {
                     libsRepairFlowActive = false;
                     Runnable showError = () -> {
@@ -941,7 +1085,7 @@ public class VersionManager {
      * classifier names the cause (out of space, permission denied, damaged files) so the dialog
      * says what to do, and falls back to the exception's type when it has no text at all.
      */
-    private static String repairFailureMessage(android.content.Context context, Exception error) {
+    private static String repairFailureMessage(android.content.Context context, Throwable error) {
         if (error == null) return context.getString(R.string.error_reason_unknown);
         String reason = context.getString(
                 org.chimeramc.client.launcher.core.minecraft.UserFacingError.messageRes(
@@ -1059,15 +1203,46 @@ public class VersionManager {
         }
     }
 
+    /**
+     * Removes a file or directory tree, making directories writable first.
+     *
+     * <p>Why directories and not files: on Linux and Android, {@code unlink} needs write permission
+     * on the <em>parent directory</em>, not on the file. A read-only file (which is what the
+     * extractor's {@code ensureReadOnly} produces) deletes fine; a read-only <em>directory</em>
+     * does not - every child fails with {@code EACCES}. The extractor only ever makes files
+     * read-only, so this is defence rather than a fix for a state the launcher creates today, but
+     * the cost of getting it wrong is high: the repair deletes the whole cache tree before
+     * re-extracting into it, so a directory that lost its write bit would strand the tree and the
+     * repair would then die opening the surviving files, reporting a bare "Permission denied" that
+     * named neither the file nor the reason. {@link #deleteDirOrThrow} turns a tree that still
+     * survives into a named failure.
+     *
+     * @return true when the path no longer exists
+     */
     private boolean deleteDir(File file) {
         if (file == null || !file.exists()) return true;
         if (file.isDirectory()) {
+            // Before descending: without write permission on this directory, every child delete
+            // below fails, however the child's own mode is set.
+            try {
+                file.setWritable(true, true);
+            } catch (SecurityException ignored) {
+                // Fall through: the deletes below are the authority on whether it worked.
+            }
             File[] files = file.listFiles();
             if (files != null)
                 for (File c : files)
                     deleteDir(c);
         }
         return file.delete();
+    }
+
+    /** As {@link #deleteDir}, but names the path when the tree survives, for the repair path. */
+    private void deleteDirOrThrow(File dir) throws IOException {
+        if (!deleteDir(dir) && dir != null && dir.exists()) {
+            throw new IOException("Could not clear the extracted library cache at "
+                    + dir.getAbsolutePath() + " (the files are in use or the storage is read-only)");
+        }
     }
 
     private File getRuntimeLibDir(String dirName) {

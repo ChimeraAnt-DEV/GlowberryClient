@@ -15,20 +15,25 @@ import org.chimeramc.client.R;
  * the size and the weight together. Setting a size by hand is what lets two screens that show the
  * same kind of text drift apart, so the roles are the only public entry point.
  *
- * <p>The family is a <b>variable</b> font ({@code dmsans}), so a role's weight is a real axis value
- * rather than the coarse {@code NORMAL}/{@code BOLD} pair the platform falls back to: the "title
- * 600" and "label 500" weights the design uses are expressible, which is the Material 3 Expressive
- * type treatment (U6). {@code fontVariationSettings} is API 26+, and the project's minSdk is 28, so
- * it always applies; the bold flag is still set as a belt-and-braces fallback for a device that
- * ignores the axis.
+ * <p>The family is the app's one <b>CJK-capable</b> family. It is deliberately not a variable
+ * Latin family: no font shipped here is both variable and CJK-capable, and the app ships Chinese,
+ * Japanese and Hindi, so a Latin-only family would render those locales as tofu. A role therefore
+ * carries a size and a family, and a role that wants emphasis relies on the bold flag;
+ * {@link #applyWeight} is the continuous {@code wght} path and is only meaningful on a surface
+ * that has deliberately chosen a variable family (the user-selectable font in
+ * {@code LauncherFonts}), where {@code fontVariationSettings} (API 26+, and minSdk is 28) applies.
+ *
+ * <p>{@code TypeRoleTest} reads {@code res/values/styles.xml} and asserts that
+ * {@code TextAppearance.Glowberry.*} carries the same sizes this class does, so the XML half and
+ * the code half cannot drift apart.
  */
 public final class UiType {
 
     private UiType() {
     }
 
-    /** The one family every role uses. Variable, so a role's weight is an axis value. */
-    public static final int FAMILY = R.font.dmsans;
+    /** The one family every role uses. The app's only CJK-capable family. */
+    public static final int FAMILY = R.font.misans;
 
     /** The five roles, in descending prominence. */
     public enum Role {
@@ -57,7 +62,14 @@ public final class UiType {
         return "'wght' " + clamped;
     }
 
-    /** Applies a role's family, size and weight to a TextView. */
+    /**
+     * Applies a role's family, size and weight to a {@code TextView}.
+     *
+     * <p>Emphasis is the bold flag, not a {@code wght} axis: the role family is the CJK-capable
+     * static font, and asking a static font for a variation axis is at best ignored and on some
+     * platform versions resets the typeface. A caller that has deliberately selected a variable
+     * family (the user's font choice) can still call {@link #applyWeight} itself.
+     */
     public static void apply(TextView view, Role role) {
         if (view == null || role == null) return;
         Context context = view.getContext();
@@ -65,14 +77,15 @@ public final class UiType {
         if (base == null) base = Typeface.DEFAULT;
         view.setTypeface(base, role.weight >= 600 ? Typeface.BOLD : Typeface.NORMAL);
         view.setTextSize(role.sizeSp);
-        applyWeight(view, role.weight);
     }
 
     /**
-     * Sets the weight axis on a TextView whose family is already a variable font.
+     * Sets the weight axis on a {@code TextView} whose family is already a variable font.
      *
-     * <p>Kept separate from {@link #apply} so a view that only wants the weight (a title whose size
-     * is set in the layout) can have it without the family being reassigned.
+     * <p>Kept separate from {@link #apply} because it is only meaningful for a variable family:
+     * the role family is static, so a role expresses emphasis with the bold flag instead. The
+     * user-selectable fonts in {@code LauncherFonts} include variable ones, and those are the
+     * surfaces this is for.
      */
     public static void applyWeight(TextView view, int weight) {
         if (view == null) return;

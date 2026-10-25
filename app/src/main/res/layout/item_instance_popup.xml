@@ -5,9 +5,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="10dp"
-    android:layout_marginTop="4dp"
+    android:paddingHorizontal="@dimen/space_3"
+    android:paddingVertical="@dimen/space_3"
+    android:layout_marginTop="@dimen/space_1"
     android:background="@drawable/bg_instance_item"
     android:clickable="true"
     android:focusable="true"
@@ -24,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="@dimen/space_3"
         android:orientation="vertical">
 
         <TextView
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/on_surface"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Body"
             android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="end"
@@ -41,7 +41,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="@dimen/space_divider"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:fontFamily="@font/misans" />
@@ -60,11 +60,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="16dp"
-                android:layout_marginStart="5dp"
-                android:paddingHorizontal="5dp"
+                android:layout_marginStart="@dimen/space_1"
+                android:paddingHorizontal="@dimen/space_1"
                 android:gravity="center"
                 android:fontFamily="@font/misans"
-                android:textSize="8sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Micro"
                 android:textStyle="bold"
                 android:background="@drawable/bg_alpha_chip"
                 android:visibility="gone" />
@@ -76,9 +76,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minHeight="22dp"
-        android:paddingHorizontal="8dp"
+        android:paddingHorizontal="@dimen/space_2"
         android:gravity="center"
-        android:textSize="10sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold"
         android:fontFamily="@font/misans"
         android:textColor="@color/primary"
@@ -89,7 +89,7 @@
         android:id="@+id/instance_check"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/space_2"
         android:src="@drawable/ic_check"
         android:tint="@color/primary"
         android:visibility="gone" />

@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingTop="@dimen/space_4"
+        android:paddingBottom="@dimen/space_2">
 
         <TextView
             android:id="@+id/modrinth_detail_title"
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="22sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Display"
             android:textStyle="bold"
             tools:text="Fresh Animations" />
 
@@ -29,42 +29,42 @@
             android:id="@+id/modrinth_detail_author"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_hairline"
             android:fontFamily="@font/misans"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             tools:text="by FreshLX • 47.3M downloads" />
 
         <TextView
             android:id="@+id/modrinth_detail_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/space_2"
             android:fontFamily="@font/misans"
             android:textColor="@color/on_surface"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             tools:text="Make your game like the trailers!" />
 
         <TextView
             android:id="@+id/modrinth_detail_warning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_3"
             android:background="@drawable/bg_diagnostics_banner"
             android:fontFamily="@font/misans"
-            android:padding="10dp"
+            android:padding="@dimen/space_3"
             android:text="@string/modrinth_java_warning"
             android:textColor="@color/on_surface"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="@dimen/space_4"
             android:fontFamily="@font/misans"
             android:text="@string/modrinth_versions_title"
             android:textColor="@color/on_surface"
-            android:textSize="15sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="12dp" />
+            android:paddingBottom="@dimen/space_3" />
 
         <ProgressBar
             android:id="@+id/modrinth_versions_progress"
@@ -94,10 +94,10 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:fontFamily="@font/misans"
-            android:padding="32dp"
+            android:padding="@dimen/space_8"
             android:text="@string/modrinth_no_versions"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

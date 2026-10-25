@@ -1,18 +1,23 @@
 package org.chimeramc.client.core.content;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import org.chimeramc.client.core.versions.GameVersion;
+import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ContentManager {
+    private static final String TAG = "ContentManager";
     private static ContentManager instance;
     
     private final Context context;
@@ -72,45 +77,84 @@ public class ContentManager {
     }
 
     public void refreshWorlds() {
-        refreshExecutor.execute(() -> {
-            List<WorldItem> worlds = worldManager.getWorlds();
-            worldsLiveData.postValue(worlds);
-        });
+        runRefresh(worldsLiveData, worldManager::getWorlds);
     }
 
     public void refreshResourcePacks() {
-        refreshExecutor.execute(() -> {
-            List<ResourcePackItem> resourcePacks = resourcePackManager.getResourcePacks();
-            resourcePacksLiveData.postValue(resourcePacks);
-        });
+        runRefresh(resourcePacksLiveData, resourcePackManager::getResourcePacks);
     }
 
     public void refreshBehaviorPacks() {
-        refreshExecutor.execute(() -> {
-            List<ResourcePackItem> behaviorPacks = resourcePackManager.getBehaviorPacks();
-            behaviorPacksLiveData.postValue(behaviorPacks);
-        });
+        runRefresh(behaviorPacksLiveData, resourcePackManager::getBehaviorPacks);
     }
 
     public void refreshSkinPacks() {
-        refreshExecutor.execute(() -> {
-            List<ResourcePackItem> skinPacks = resourcePackManager.getSkinPacks();
-            skinPacksLiveData.postValue(skinPacks);
-        });
+        runRefresh(skinPacksLiveData, resourcePackManager::getSkinPacks);
     }
 
     public void refreshScreenshots() {
-        refreshExecutor.execute(() -> {
-            List<ScreenshotItem> screenshots = screenshotManager.getScreenshots();
-            screenshotsLiveData.postValue(screenshots);
-        });
+        runRefresh(screenshotsLiveData, screenshotManager::getScreenshots);
     }
 
     public void refreshServers() {
-        refreshExecutor.execute(() -> {
-            List<ServerItem> servers = serverManager.getServers();
-            serversLiveData.postValue(servers);
-        });
+        runRefresh(serversLiveData, serverManager::getServers);
+    }
+
+    /**
+     * Runs one directory scan on the refresh worker and always publishes a result.
+     *
+     * <p>The screens clear their loading overlay from the LiveData observer, so a scan that threw
+     * without posting left that overlay up forever and the tab unusable - the failure was invisible
+     * because the only surface that would have reported it was the one that never got called. A
+     * failed scan now publishes an empty list (the same thing a genuinely empty directory
+     * produces), so the screen settles and the user sees an empty tab rather than a dead spinner.
+     */
+    private <T> void runRefresh(MutableLiveData<List<T>> target, java.util.concurrent.Callable<List<T>> scan) {
+        if (!SafeExecutor.submit(refreshExecutor, () -> {
+            List<T> result;
+            try {
+                result = scan.call();
+            } catch (Throwable t) {
+                Log.w(TAG, "Content refresh failed; publishing an empty result", t);
+                result = new ArrayList<>();
+            }
+            target.postValue(result);
+        })) {
+            // The manager was shut down under the caller; settle the screen rather than leaving it
+            // waiting on a result that can never arrive.
+            target.postValue(new ArrayList<>());
+        }
+    }
+
+    /**
+     * Runs a content operation (delete/add/import) on the refresh worker and always answers its
+     * callback.
+     *
+     * <p>Two things used to go wrong here and each one stranded the screen: submitting to a
+     * {@link #shutdown()} executor threw on the caller's thread, and a throw from the operation
+     * skipped the callback, so the dialog or row waiting on it never settled. A failure is
+     * marshalled to the main thread, where the callbacks and the LiveData they refresh expect to
+     * run.
+     */
+    private void runOperation(Runnable work, ContentOperationCallback callback) {
+        final android.os.Handler mainHandler =
+                new android.os.Handler(android.os.Looper.getMainLooper());
+        if (!SafeExecutor.submit(refreshExecutor, () -> {
+            try {
+                work.run();
+            } catch (Throwable t) {
+                Log.w(TAG, "Content operation failed", t);
+                final String reason = UserFacingError.reason(context, t);
+                mainHandler.post(() -> {
+                    setStatus(reason);
+                    if (callback != null) callback.onError(reason);
+                });
+            }
+        })) {
+            // The manager was shut down under the caller; answer the callback rather than leaving
+            // the screen waiting on a result that can never arrive.
+            if (callback != null) callback.onError("The content manager has been shut down");
+        }
     }
 
     public LiveData<List<WorldItem>> getWorldsLiveData() {
@@ -152,9 +196,8 @@ public class ContentManager {
 
     public void deleteScreenshot(ScreenshotItem screenshot, ContentOperationCallback callback) {
         setStatus("Deleting screenshot...");
-        refreshExecutor.execute(() -> {
-            boolean success = screenshotManager.deleteScreenshot(screenshot);
-            if (success) {
+        runOperation(() -> {
+            if (screenshotManager.deleteScreenshot(screenshot)) {
                 refreshScreenshots();
                 setStatus("Screenshot deleted");
                 if (callback != null) callback.onSuccess("Screenshot deleted");
@@ -162,14 +205,13 @@ public class ContentManager {
                 setStatus("Failed to delete screenshot");
                 if (callback != null) callback.onError("Failed to delete screenshot");
             }
-        });
+        }, callback);
     }
 
     public void deleteServer(ServerItem server, ContentOperationCallback callback) {
         setStatus("Deleting server...");
-        refreshExecutor.execute(() -> {
-            boolean success = serverManager.deleteServer(server);
-            if (success) {
+        runOperation(() -> {
+            if (serverManager.deleteServer(server)) {
                 refreshServers();
                 setStatus("Server deleted");
                 if (callback != null) callback.onSuccess("Server deleted");
@@ -177,22 +219,28 @@ public class ContentManager {
                 setStatus("Failed to delete server");
                 if (callback != null) callback.onError("Failed to delete server");
             }
-        });
+        }, callback);
     }
 
     public void addServer(ServerItem server, ContentOperationCallback callback) {
         setStatus("Adding server...");
-        refreshExecutor.execute(() -> {
-            boolean success = serverManager.addServer(server);
-            if (success) {
+        runOperation(() -> {
+            ServerManager.AddResult result = serverManager.addServer(server);
+            if (result == ServerManager.AddResult.ADDED) {
                 refreshServers();
                 setStatus("Server added");
                 if (callback != null) callback.onSuccess("Server added");
             } else {
-                setStatus("Failed to add server");
-                if (callback != null) callback.onError("Failed to add server");
+                // A duplicate and a write failure are different problems with different fixes; the
+                // boolean this replaced reported both as "Failed to add server", and the Quick
+                // Launch path reported both as "already in your list".
+                String message = result == ServerManager.AddResult.DUPLICATE
+                        ? "That server is already in your list"
+                        : "Could not add the server";
+                setStatus(message);
+                if (callback != null) callback.onError(message);
             }
-        });
+        }, callback);
     }
 
     public void shutdown() {

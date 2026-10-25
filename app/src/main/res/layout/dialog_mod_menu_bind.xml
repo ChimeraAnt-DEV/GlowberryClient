@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_modal_card"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="@dimen/space_6">
 
     <TextView
         android:id="@+id/bind_dialog_title"
@@ -12,40 +12,40 @@
         android:layout_height="wrap_content"
         android:text="@string/mod_menu_controller_bind"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/bind_dialog_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/space_2"
         android:text="@string/mod_menu_bind_press_button"
         android:textColor="@color/ui_text_secondary"
-        android:textSize="12sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     <org.chimeramc.client.launcher.ui.views.Controller3DView
         android:id="@+id/bind_dialog_illustration"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="14dp" />
+        android:layout_marginTop="@dimen/space_4" />
 
     <TextView
         android:id="@+id/bind_dialog_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/space_3"
         android:gravity="center"
         android:text="@string/mod_menu_bind_none"
         android:textColor="@color/primary"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/space_4"
         android:gravity="end"
         android:orientation="horizontal">
 

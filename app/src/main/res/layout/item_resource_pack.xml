@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="@dimen/space_1"
     style="@style/Widget.Chimera.Card"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="@dimen/space_3">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,18 +27,18 @@
                 android:fontFamily="@font/misans"
                 android:text="@string/resource_pack_name_placeholder"
                 android:textColor="@color/on_surface"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/pack_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/space_hairline"
                 android:fontFamily="@font/misans"
                 android:text="@string/resource_pack_size_placeholder"
                 android:textColor="@color/on_surface"
-                android:textSize="11sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         </LinearLayout>
 
@@ -46,33 +46,33 @@
             android:id="@+id/pack_export_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/space_2"
             android:backgroundTint="@color/primary"
             android:fontFamily="@font/misans"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="6dp"
+            android:paddingHorizontal="@dimen/space_4"
+            android:paddingVertical="@dimen/space_2"
             android:text="@string/export"
             android:textAllCaps="false"
             android:textColor="@color/on_primary"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <Button
             android:id="@+id/pack_transfer_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/space_2"
             android:backgroundTint="@color/secondary"
             android:fontFamily="@font/misans"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="6dp"
+            android:paddingHorizontal="@dimen/space_4"
+            android:paddingVertical="@dimen/space_2"
             android:text="@string/transfer"
             android:textAllCaps="false"
             android:textColor="@color/on_secondary"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
         <Button
             android:id="@+id/pack_delete_button"
@@ -82,12 +82,12 @@
             android:fontFamily="@font/misans"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="6dp"
+            android:paddingHorizontal="@dimen/space_4"
+            android:paddingVertical="@dimen/space_2"
             android:text="@string/delete_pack"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="11sp" />
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
     </LinearLayout>
 
@@ -95,10 +95,10 @@
         android:id="@+id/pack_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/space_1"
         android:fontFamily="@font/misans"
         android:text="@string/resource_pack_description_placeholder"
         android:textColor="@color/on_surface"
-        android:textSize="12sp" />
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
 </LinearLayout>

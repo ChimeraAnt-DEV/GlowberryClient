@@ -7,7 +7,7 @@
     android:alpha="0.85"
     android:clipToPadding="false"
     android:contentDescription="@string/inbuilt_mods"
-    android:padding="5dp"
+    android:padding="@dimen/space_1"
     tools:ignore="TouchTargetSizeCheck">
 
     <ImageView

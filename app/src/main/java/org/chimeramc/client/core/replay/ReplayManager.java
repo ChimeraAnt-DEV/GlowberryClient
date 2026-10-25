@@ -41,6 +41,18 @@ public final class ReplayManager {
     /** Receives state changes; every method runs on the main thread. */
     public interface Listener {
         void onReplayStateChanged(State state, long elapsedMs, ReplayQuality.Profile profile);
+
+        /**
+         * A capture ended without producing a clip.
+         *
+         * <p>Distinct from a state change on purpose: a failure drops the state straight back to
+         * {@link State#IDLE}, which is byte-for-byte the state the screen is in before the user
+         * ever pressed Record. Without this callback the panel could not tell the two apart, so a
+         * recording that failed on the first frame looked like the press being ignored, and the
+         * "recording could not start" message had no caller at all.
+         */
+        default void onReplayCaptureFailed() {
+        }
     }
 
     private static volatile Context holderContext;
@@ -233,6 +245,19 @@ public final class ReplayManager {
         state = State.IDLE;
         profile = null;
         notifyState();
+        notifyCaptureFailed();
+    }
+
+    private void notifyCaptureFailed() {
+        mainHandler.post(() -> {
+            for (Listener listener : listeners) {
+                try {
+                    listener.onReplayCaptureFailed();
+                } catch (Throwable t) {
+                    Log.w(TAG, "Replay listener threw", t);
+                }
+            }
+        });
     }
 
     private void writeSidecar(File file, long durationMs, ReplayQuality.Profile profile) {

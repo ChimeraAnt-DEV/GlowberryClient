@@ -37,6 +37,7 @@ import org.chimeramc.client.core.mods.inbuilt.ExternalModuleProvider;
 import org.chimeramc.client.core.mods.inbuilt.InbuiltModuleProvider;
 import org.chimeramc.client.core.mods.inbuilt.UnifiedMod;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
+import org.chimeramc.client.core.replay.ReplayControls;
 import org.chimeramc.client.core.replay.ReplayPanel;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.core.mods.pvp.PvpSectionPolicy;
@@ -106,6 +107,50 @@ public class ModMenuOverlay {
             if (isShowing) handler.postDelayed(this, 1000L);
         }
     };
+
+    /**
+     * Refreshes the blurred panel backdrop at the configured blur rate (M4/M6).
+     *
+     * <p>Self-rescheduling and only while the menu is open, so the capture costs nothing during
+     * ordinary play. The interval comes from the blur-fps setting through the same pure rule the
+     * wheel uses; a setting of 0 means "no refresh", which is why this re-posts with a guard rather
+     * than a fixed delay.
+     */
+    private final Runnable backdropTick = new Runnable() {
+        @Override
+        public void run() {
+            if (!isShowing || overlayView == null) return;
+            // The OS accessibility switches can force the glass off, in which case there is nothing
+            // to refresh.
+            if (effectivePanelGlass() == ModMenuSettings.GlassIntensity.OFF) return;
+            long interval = menuSettings == null
+                    ? RadialWheelMaterial.blurIntervalMs(RadialWheelMaterial.BLUR_FPS_DEFAULT)
+                    : RadialWheelMaterial.blurIntervalMs(menuSettings.blurFps());
+            if (interval <= 0L) return;
+            // Drop the cached capture so the next apply requests a fresh one.
+            if (backdropCapture != null) {
+                backdropCapture.captureIfDue(activity.getWindow(),
+                        android.os.SystemClock.uptimeMillis(),
+                        menuSettings == null ? RadialWheelMaterial.BLUR_FPS_DEFAULT
+                                : menuSettings.blurFps(),
+                        new WheelBackdropCapture.Callback() {
+                            @Override
+                            public void onCaptured(android.graphics.Bitmap capture) {
+                                if (overlayView == null || capture == null) return;
+                                backdropBitmap = capture;
+                                android.widget.ImageView view =
+                                        overlayView.findViewById(R.id.mod_menu_backdrop);
+                                if (view != null) showBackdropBitmap(view, capture);
+                            }
+
+                            @Override
+                            public void onFailed() {
+                            }
+                        });
+            }
+            handler.postDelayed(this, interval);
+        }
+    };
     private View settingsContainer;
     private View modulesContainer;
     private FrameLayout cosmeticsContainer;
@@ -126,6 +171,17 @@ public class ModMenuOverlay {
     private View filterBar;
     private View compactFilterBar;
     private CosmeticsPanel cosmeticsPanel;
+
+    // --- Panel glass (M4/M6) ------------------------------------------------------------------
+
+    /** The glass renderer, shared with the wheel so the panel and the wheel are one material. */
+    private final WheelGlassRenderer glassRenderer = new WheelGlassRenderer();
+    /** The backdrop capture for the panel, created lazily on the first glass-on render. */
+    private WheelBackdropCapture backdropCapture;
+    /** The raw capture currently shown (or pending) on the backdrop layer. */
+    private android.graphics.Bitmap backdropBitmap;
+    /** The blurred copy for the pre-API-31 route, cached so a refresh does not re-blur. */
+    private android.graphics.Bitmap backdropBlurred;
     private Switch notificationsSwitch;
     private Switch pauseMenuOnlySwitch;
     private Switch compactModeSwitch;
@@ -344,6 +400,13 @@ public class ModMenuOverlay {
             handler.removeCallbacks(statsTick);
             refreshStatsStrip();
             handler.postDelayed(statsTick, 1000L);
+
+            // Start the backdrop refresh tick at the configured blur rate (M6). Also removed in
+            // hide(), so the capture never runs while the menu is closed.
+            handler.removeCallbacks(backdropTick);
+            handler.postDelayed(backdropTick, Math.max(1L,
+                    RadialWheelMaterial.blurIntervalMs(menuSettings == null
+                            ? RadialWheelMaterial.BLUR_FPS_DEFAULT : menuSettings.blurFps())));
 
             overlayView.setAlpha(0f);
             overlayView.animate().alpha(1f).setDuration(220).start();
@@ -749,15 +812,17 @@ public class ModMenuOverlay {
             public void onStopTrackingTouch(android.widget.SeekBar seekBar) {}
         });
 
+        // M1/M6: the menu's own appearance settings drive the theme, the accent and the motion.
+        // Read before the surfaces are applied — a theme built while the settings are still null
+        // resolves to the defaults, so the panel would open with the wrong preset and no glass.
+        menuSettings = InbuiltModManager.getInstance(activity).getModMenuSettings();
+
         applyMenuOpacity();
 
         setupKeybindSettings(modManager);
         setupLoadoutSettings(modManager);
         setupModMenuAppearanceSettings();
 
-        // M1/M6: the menu's own appearance settings drive the theme, the accent and the motion.
-        // Read once here; a change from the Settings tab re-applies through applyModMenuSettings().
-        menuSettings = InbuiltModManager.getInstance(activity).getModMenuSettings();
         adapter = new ModMenuAdapter(new ModMenuTheme(activity, menuSettings));
         adapter.setSettings(menuSettings);
         adapter.setCompactMode(compactMode);
@@ -2083,7 +2148,12 @@ public class ModMenuOverlay {
         }
         if (adapter != null) {
             adapter.setCompactMode(compact);
-            adapter.updateMods(filteredMods, favoriteKeys);
+            // Rebuild through the filter path rather than handing the adapter the module list
+            // alone: the two-argument updateMods appends no section actions, so toggling density
+            // silently dropped the ACTIONS block (Reset HUD Position / Reload Modules) until the
+            // next filter change. applyFilters() recomputes both the modules and the actions for
+            // the section that is on screen.
+            applyFilters();
         }
         applyCompactModeLayout(compact);
         updateFilterBarVisibility();
@@ -2654,12 +2724,16 @@ public class ModMenuOverlay {
         if (overlayView == null) return;
         View menuContainer = overlayView.findViewById(R.id.mod_menu_container);
         if (menuContainer == null) return;
-        InbuiltModManager manager = InbuiltModManager.getInstance(activity);
-        int opacity = manager.getModMenuOpacity();
-        menuContainer.setAlpha(opacity / 100f);
         // Re-resolve the theme so a change to the accent or its opacity redraws the accent surfaces
-        // without recreating the overlay.
-        theme = new ModMenuTheme(activity, manager.getModMenuThemeState(activity));
+        // without recreating the overlay. The menu's own settings are passed in: building the theme
+        // from the theme-state alone silently dropped the theme preset, the density, the radius and
+        // the HUD opacity, so any live change reset them to their defaults.
+        theme = new ModMenuTheme(activity,
+                menuSettings != null ? menuSettings : InbuiltModManager.getInstance(activity)
+                        .getModMenuSettings());
+        // applyThemeToSurfaces owns the container alpha now: the menu-opacity control and the
+        // HUD-opacity setting are two multipliers on the same view, and setting it in two places is
+        // how one of them silently stops working.
         applyThemeToSurfaces();
     }
 
@@ -2673,6 +2747,7 @@ public class ModMenuOverlay {
     private void applyThemeToSurfaces() {
         if (overlayView == null || theme == null) return;
         try {
+            applyPanelSurfaces();
             // The rail bakes the accent into its icons and pills when it is built, so a colour
             // change means rebuilding it rather than patching each tile. Only rebuild a rail that
             // already exists — at first setup the rail is built later, by its own path.
@@ -2692,10 +2767,212 @@ public class ModMenuOverlay {
         }
     }
 
+    /**
+     * Paints the panel, the scrim and the HUD opacity from the resolved theme (M6).
+     *
+     * <p>Three settings met here and none of them previously reached a pixel: the theme preset (the
+     * panel's fill came from the layout's fixed {@code mod_menu_bg_surface1}), the scrim (fixed in
+     * the layout) and the HUD-opacity slider. The glass intensity reaches the panel through
+     * {@link #applyPanelBackdrop()} — a blurred layer behind the panel — and through the panel's own
+     * fill, so glass on is a real material rather than an opaque card.
+     */
+    private void applyPanelSurfaces() {
+        View container = overlayView.findViewById(R.id.mod_menu_container);
+        ModMenuSettings.GlassIntensity glass = effectivePanelGlass();
+        if (container instanceof androidx.cardview.widget.CardView) {
+            androidx.cardview.widget.CardView cv = (androidx.cardview.widget.CardView) container;
+            cv.setCardBackgroundColor(ModMenuPalette.panelFill(theme.scheme(), glass));
+            cv.setRadius(theme.cornerRadiusDp() * density());
+        }
+        View scrim = overlayView.findViewById(R.id.mod_menu_scrim);
+        if (scrim != null) {
+            // The glass intensity drives how much of the game the scrim lets through: full glass
+            // keeps it light, solid hides the game behind the panel. Never fully transparent, or the
+            // menu text lands directly on the game with no separation.
+            float scrimAlpha = scrimAlphaFor(glass);
+            scrim.setBackgroundColor(ModMenuPalette.blend(0x00000000, theme.scrimColor(),
+                    scrimAlpha));
+        }
+        applyPanelBackdrop(glass);
+        // The HUD-opacity slider is a multiplier on the whole panel, independent of the panel's own
+        // alpha (which the menu-opacity control owns).
+        if (container != null) {
+            container.setAlpha(menuOpacity() * theme.hudOpacity());
+        }
+    }
+
+    /**
+     * The glass intensity actually in effect (M6).
+     *
+     * <p>The player's in-menu choice is filtered through the accessibility switches: "reduce motion"
+     * (which the app folds the OS reduce-transparency signal into) and the platform's
+     * "animations off" scale both force the solid surface. A user-facing override that beats the OS
+     * accessibility setting is a bug, so the OS always wins here — the in-menu value is only the
+     * starting point.
+     */
+    private ModMenuSettings.GlassIntensity effectivePanelGlass() {
+        if (menuSettings == null) return ModMenuSettings.GlassIntensity.OFF;
+        boolean reduce = false;
+        boolean animationsOff = false;
+        try {
+            reduce = new org.chimeramc.client.util.PersonalizationManager(activity)
+                    .isReduceMotion();
+        } catch (Throwable ignored) {
+        }
+        try {
+            animationsOff = android.provider.Settings.Global.getFloat(
+                    activity.getContentResolver(),
+                    android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        } catch (Throwable ignored) {
+        }
+        return menuSettings.effectiveGlass(reduce, animationsOff);
+    }
+
+    /**
+     * Captures the game behind the panel and blurs it onto the backdrop layer (M4).
+     *
+     * <p>Reuses the wheel's capture machinery: a 1/4-resolution {@code PixelCopy} of the launcher's
+     * window, then either a {@code RenderEffect} on the layer (API 31+) or a downscale/upscale blit
+     * (API 28-30). The capture is taken once when the menu opens and then refreshed at the configured
+     * blur rate while it is open — never per frame, because the panel is drawn over a live game and a
+     * per-frame blur is the fastest way to lose the frame budget on a mid-range GPU.
+     *
+     * <p>Everything here is fail-open: no capture, no {@code PixelCopy} support, or a failed blit
+     * leaves the layer hidden and the panel shows its opaque-ish fill, which is what
+     * {@link ModMenuTheme#panelFill()} already accounts for.
+     */
+    private void applyPanelBackdrop(ModMenuSettings.GlassIntensity glass) {
+        android.widget.ImageView layer = overlayView == null ? null
+                : overlayView.findViewById(R.id.mod_menu_backdrop);
+        if (layer == null) return;
+        if (glass == ModMenuSettings.GlassIntensity.OFF
+                || !WheelBackdropCapture.isSupported()) {
+            releasePanelBackdrop(layer);
+            return;
+        }
+        if (backdropCapture == null) backdropCapture = new WheelBackdropCapture();
+        if (backdropBitmap != null && !backdropBitmap.isRecycled()) {
+            showBackdropBitmap(layer, backdropBitmap);
+            return;
+        }
+        // No capture yet: ask for one. The callback re-enters here and shows it.
+        backdropCapture.captureIfDue(activity.getWindow(),
+                android.os.SystemClock.uptimeMillis(), menuSettings.blurFps(),
+                new WheelBackdropCapture.Callback() {
+                    @Override
+                    public void onCaptured(android.graphics.Bitmap capture) {
+                        if (overlayView == null || capture == null) return;
+                        backdropBitmap = capture;
+                        android.widget.ImageView view = overlayView.findViewById(R.id.mod_menu_backdrop);
+                        if (view != null) showBackdropBitmap(view, capture);
+                    }
+
+                    @Override
+                    public void onFailed() {
+                        // Keep the previous capture; the panel stays on its solid fill.
+                    }
+                });
+    }
+
+    /**
+     * Puts a capture on the backdrop layer, blurred (M4).
+     *
+     * <p>Two routes, chosen by API level exactly as the wheel's are. The blurred bitmap for the
+     * pre-31 route is cached on the overlay so a refresh reuses the same allocation; it is recycled
+     * when a new capture replaces it.
+     */
+    private void showBackdropBitmap(android.widget.ImageView layer, android.graphics.Bitmap capture) {
+        try {
+            layer.setVisibility(android.view.View.VISIBLE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                layer.setImageBitmap(capture);
+                // The blur radius is the regular tier's, matching the wheel's panel backdrop. The
+                // RenderEffect type is reached only through the renderer's guarded holder.
+                glassRenderer.applyLayerBlur(layer, RadialWheelMaterial.REGULAR_BLUR_DP * density());
+            } else {
+                // Below 31 there is no RenderEffect: blur by blitting the capture down and back up.
+                android.graphics.Bitmap blurred = glassRenderer.stackBlurCopy(capture);
+                if (blurred == null) {
+                    releasePanelBackdrop(layer);
+                    return;
+                }
+                android.graphics.Bitmap previous = backdropBlurred;
+                backdropBlurred = blurred;
+                layer.setImageBitmap(blurred);
+                recycleQuietly(previous);
+            }
+        } catch (Throwable ignored) {
+            releasePanelBackdrop(layer);
+        }
+    }
+
+    private void releasePanelBackdrop(android.widget.ImageView layer) {
+        if (layer != null) {
+            glassRenderer.clearViewEffect(layer);
+            try {
+                layer.setImageDrawable(null);
+                layer.setVisibility(android.view.View.GONE);
+            } catch (Throwable ignored) {
+            }
+        }
+        recycleQuietly(backdropBlurred);
+        backdropBlurred = null;
+        backdropBitmap = null;
+        if (backdropCapture != null) {
+            backdropCapture.release();
+            backdropCapture = null;
+        }
+    }
+
+    private static void recycleQuietly(android.graphics.Bitmap bitmap) {
+        if (bitmap == null || bitmap.isRecycled()) return;
+        try {
+            bitmap.recycle();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** The menu-opacity control's value (0..1), the panel's own alpha. */
+    private float menuOpacity() {
+        if (activity == null) return 1f;
+        int opacity = InbuiltModManager.getInstance(activity).getModMenuOpacity();
+        return Math.max(0f, Math.min(1f, opacity / 100f));
+    }
+
+    /**
+     * The scrim opacity for a glass intensity (M6).
+     *
+     * <p>Pure so the three steps are pinned by a test. More glass means less scrim: a fully opaque
+     * scrim behind a "Full" blur would hide the very thing the blur is sampling.
+     */
+    static float scrimAlphaFor(ModMenuSettings.GlassIntensity intensity) {
+        if (intensity == null) return SCRIM_ALPHA_FULL;
+        switch (intensity) {
+            case OFF:
+                return SCRIM_ALPHA_OFF;
+            case SUBTLE:
+                return SCRIM_ALPHA_SUBTLE;
+            case FULL:
+            default:
+                return SCRIM_ALPHA_FULL;
+        }
+    }
+
+    /** The scrim opacity when glass is off (solid panel, most separation). */
+    static final float SCRIM_ALPHA_OFF = 0.85f;
+    /** The scrim opacity for subtle glass. */
+    static final float SCRIM_ALPHA_SUBTLE = 0.62f;
+    /** The scrim opacity for full glass (lightest, so the blur has something to sample). */
+    static final float SCRIM_ALPHA_FULL = 0.40f;
+
     public void hide() {
         if (!isShowing || overlayView == null) return;
 
         handler.removeCallbacks(statsTick);
+        handler.removeCallbacks(backdropTick);
+        // Release the panel's backdrop capture and its blurred copy: the layer is about to be
+        // detached, and a capture held past that point keeps a full-window bitmap alive for nothing.
+        releasePanelBackdrop(overlayView.findViewById(R.id.mod_menu_backdrop));
         if (renderDebugOverlay != null) {
             renderDebugOverlay.stop();
             renderDebugOverlay = null;
@@ -2801,38 +3078,28 @@ public class ModMenuOverlay {
         }
     }
 
-    /** Controller handling for the Replay section, matching the VIP menu's bind hints. */
+    /**
+     * Controller handling for the Replay section.
+     *
+     * <p>Every binding the on-screen hint names is resolved through {@link ReplayControls} and
+     * applied by {@link ReplayPanel#handleControl}, so the in-game menu and the Library's Replay tab
+     * run one implementation and cannot drift. Only the cinematic-camera button is a menu-only
+     * extra, because the Library does not offer that route.
+     */
     private boolean handleReplayKey(int keyCode) {
+        ReplayControls.Action action = ReplayControls.forControllerKey(keyCode);
+        if (action != null) {
+            // Start is the transport play/pause only while a clip is open; otherwise it is not
+            // consumed here, so the caller can fall back to its own binding.
+            if (action == ReplayControls.Action.PLAY_PAUSE && !replayPanel.isPlayerOpen()) {
+                return false;
+            }
+            return replayPanel.handleControl(action);
+        }
         switch (keyCode) {
-            case android.view.KeyEvent.KEYCODE_BUTTON_L1:
-                replayPanel.cycleSelection(false);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_R1:
-                replayPanel.cycleSelection(true);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_A:
             case android.view.KeyEvent.KEYCODE_ENTER:
             case android.view.KeyEvent.KEYCODE_DPAD_CENTER:
                 replayPanel.playSelected();
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_X:
-                replayPanel.deleteSelected();
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_Y:
-                replayPanel.favoriteSelected();
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_START:
-                // While a clip is open, Start is the transport play/pause rather than a close.
-                if (replayPanel.isPlayerOpen() && replayPanel.togglePlayback()) return true;
-                return false;
-            case android.view.KeyEvent.KEYCODE_BUTTON_L2:
-                replayPanel.scrubPlayback(-0.1f);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_R2:
-                replayPanel.scrubPlayback(0.1f);
-                return true;
-            case android.view.KeyEvent.KEYCODE_BUTTON_SELECT:
-                replayPanel.stepPlaybackSpeed();
                 return true;
             case android.view.KeyEvent.KEYCODE_BUTTON_THUMBR:
                 replayPanel.cinematicSelected();

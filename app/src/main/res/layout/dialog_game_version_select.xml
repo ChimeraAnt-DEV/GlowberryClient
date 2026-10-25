@@ -1,7 +1,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingTop="32dp"
-    android:paddingBottom="32dp"
+    android:paddingTop="@dimen/space_8"
+    android:paddingBottom="@dimen/space_8"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -14,10 +14,10 @@
         <LinearLayout
             android:id="@+id/header_container"
             android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="6dp"
+            android:paddingStart="@dimen/space_4"
+            android:paddingEnd="@dimen/space_4"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_2"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -31,9 +31,9 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="@dimen/space_2"
                 android:text="@string/game_version_select_title"
-                android:textSize="20sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary"
                 android:fontFamily="@font/misans"/>
@@ -43,15 +43,15 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#1A888888"
-            android:layout_marginHorizontal="16dp"/>
+            android:layout_marginHorizontal="@dimen/space_4"/>
             
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_versions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp"
+            android:paddingStart="@dimen/space_4"
+            android:paddingEnd="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:overScrollMode="never"/>
     </LinearLayout>
 </FrameLayout>

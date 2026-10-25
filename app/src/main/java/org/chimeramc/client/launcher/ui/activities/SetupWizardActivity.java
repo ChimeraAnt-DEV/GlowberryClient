@@ -266,4 +266,14 @@ public class SetupWizardActivity extends BaseActivity {
             return false;
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        // The wizard's import manager owns a single-thread pool; without this it outlived the wizard.
+        if (apkImportManager != null) {
+            apkImportManager.release();
+            apkImportManager = null;
+        }
+        super.onDestroy();
+    }
 }

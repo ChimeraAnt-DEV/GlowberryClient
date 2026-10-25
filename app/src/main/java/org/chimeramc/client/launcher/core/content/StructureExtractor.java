@@ -1,5 +1,6 @@
 package org.chimeramc.client.core.content;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -97,7 +98,7 @@ public class StructureExtractor {
     }
 
     public void loadStructures(File worldDir, StructureListCallback callback) {
-        executor.execute(() -> {
+        if (!SafeExecutor.submit(executor, () -> {
             LevelDBManager dbManager = null;
             try {
                 dbManager = new LevelDBManager(worldDir);
@@ -160,18 +161,23 @@ public class StructureExtractor {
                 finalDbManager.shutdown();
                 callback.onComplete(structures);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to load structures", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Failed to load structures", e.getMessage()));
                 if (dbManager != null) {
                     dbManager.shutdown();
                 }
             }
-        });
+        })) {
+            // shutdown() tore the pool down under the caller; answer the callback rather than
+            // leaving the screen waiting on a result that cannot arrive.
+            callback.onError("The structure extractor has been shut down");
+        }
     }
 
     public void exportSingleStructure(StructureInfo structure, Uri outputUri, ExtractionCallback callback) {
-        executor.execute(() -> {
+        if (!SafeExecutor.submit(executor, () -> {
             // try-with-resources: the old code closed the stream by hand inside each branch, so a
             // write that failed partway (a full or unwritable destination) leaked the descriptor
             // and left a half-written file behind.
@@ -190,11 +196,16 @@ public class StructureExtractor {
                     callback.onError("Structure has no data");
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to export structure", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Export failed", e.getMessage()));
             }
-        });
+        })) {
+            // shutdown() tore the pool down under the caller; answer the callback rather than
+            // leaving the screen waiting on a result that cannot arrive.
+            callback.onError("The structure extractor has been shut down");
+        }
     }
 
     public void shutdown() {

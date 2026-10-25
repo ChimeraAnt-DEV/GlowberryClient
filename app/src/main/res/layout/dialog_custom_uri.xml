@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="@dimen/space_4">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/custom_uri_hint"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textColor="?android:textColorSecondary"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="@dimen/space_3" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"

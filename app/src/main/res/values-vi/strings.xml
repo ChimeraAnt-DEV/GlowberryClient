@@ -22,7 +22,7 @@
 
     <!-- About -->
     <string name="about_title">Về</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Mọi quyền được bảo lưu.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Được cấp phép theo Giấy phép Apache 2.0.</string>
     <string name="font_license">Ứng dụng đang sử dụng phông chữ Misans.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Thao tác nhanh</string>
@@ -501,7 +501,8 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="dialog_title_login_required">Cần đăng nhập</string>
     <string name="dialog_message_login_required">Tính năng đăng nhập do launcher quản lý đã được bật, nhưng chưa có tài khoản nào được đăng nhập. Vui lòng vào mục Tài khoản để đăng nhập.</string>
     <string name="go_to_accounts">Tài khoản</string>
-    <string name="disable_launcher_login_and_continue">Đóng</string>
+    <string name="disable_launcher_login_and_continue">Tắt và tiếp tục</string>
+    <string name="launcher_login_disabled_launching">Đã tắt đăng nhập do trình khởi chạy quản lý. Đang khởi chạy…</string>
 
     <!-- Popup labels -->
     <string name="label_current_account">Tài khoản hiện tại</string>
@@ -746,10 +747,6 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
         <item>Nhập các bản mod để mở rộng hoặc nâng cao các tính năng và hiệu năng của Minecraft.</item>
     </string-array>
 
-    <string name="theme_color_title">Màu chủ đề</string>
-    <string name="theme_color_desc">Màu nhấn chủ đạo của ứng dụng</string>
-    <string name="preset_colors">MÀU SẮC CÀI SẴN</string>
-    <string name="more_colors">NHIỀU MÀU SẮC HƠN</string>
     <string name="bg_image_title">Hình nền</string>
     <string name="bg_image_desc">Chọn một hình ảnh để sử dụng làm hình nền</string>
     <string name="bg_image_none">Chưa chọn hình ảnh nào</string>
@@ -887,7 +884,6 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="pagination_page_of">Trang %1$d / %2$s</string>
     <string name="pagination_page_one">Trang 1</string>
     <string name="logcat_filter_all">TẤT CẢ</string>
-    <string name="invalid_color_format">Định dạng màu không hợp lệ</string>
     <string name="world_directory_not_found">Không tìm thấy thư mục thế giới</string>
     <string name="worlds_directory_unavailable">Thư mục thế giới không khả dụng</string>
     <string name="delete_screenshot_confirm">Bạn có chắc muốn xóa ảnh chụp màn hình này không?</string>
@@ -914,8 +910,6 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="resource_pack_description_placeholder">Mô tả gói hiển thị ở đây</string>
     <string name="mod_name_placeholder">Tên mod</string>
     <string name="mod_load_order_placeholder">Thứ tự tải: 1</string>
-    <string name="custom_color_hex_rgb">Màu tùy chỉnh (HEX/RGB)</string>
-    <string name="custom_color_hint">#RRGGBB hoặc R,G,B</string>
     <string name="screenshot_name_placeholder">Tên ảnh chụp màn hình</string>
     <string name="screenshot_date_placeholder">Ngày: 2024-01-01 12:00:00</string>
     <string name="more_buttons_intro">Tạo các nút trên màn hình theo phong cách Minecraft, mỗi nút được ánh xạ chính xác tới một phím bàn phím. Các nút không bao giờ chạy macro, chuỗi phím, lặp tự động hoặc tự động nhấp.</string>

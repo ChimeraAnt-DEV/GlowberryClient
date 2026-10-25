@@ -62,6 +62,20 @@ public class JavaBridgeActivity extends BaseActivity {
     public static final String EXTRA_JAR_URI = "extra_jar_uri";
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    /**
+     * Submits porting work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>A dialog button can be pressed as the screen closes. Submitting to a shut-down executor
+     * throws on the calling (main) thread, so that press crashed the app instead of doing nothing.
+     */
+    private void runOnExecutor(Runnable work) {
+        try {
+            executor.execute(work);
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            android.util.Log.w("JavaBridgeActivity", "JavaBridge task dropped: the screen is gone", rejected);
+        }
+    }
     private final Handler main = new Handler(Looper.getMainLooper());
 
     private ActivityResultLauncher<Intent> pickJarLauncher;
@@ -156,7 +170,7 @@ public class JavaBridgeActivity extends BaseActivity {
             return;
         }
         showLoading(true);
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 File staged = new File(getCacheDir(), "javabridge_import.jar");
                 copyToFile(uri, staged);
@@ -168,7 +182,10 @@ public class JavaBridgeActivity extends BaseActivity {
                     stagedJar = staged;
                     showAssessment(result);
                 });
-            } catch (IOException e) {
+            } catch (Throwable e) {
+                // Throwable, not IOException: the decompiler and the assessment are both
+                // memory-hungry, and an Error escaping here skipped this handler - which is the only
+                // thing that clears the loading overlay - leaving the spinner up forever.
                 main.post(() -> {
                     if (isFinishing()) return;
                     showLoading(false);
@@ -333,7 +350,7 @@ public class JavaBridgeActivity extends BaseActivity {
         final File jar = stagedJar;
         showLoading(true, R.string.javabridge_porting);
         reportCard.setVisibility(View.GONE);
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             JavaPorter porter = new JavaPorter(new CfrDecompiler(),
                     new OpenAiCompatibleLlmClient(this));
             File outputDir = AntEggLoader.sandboxRoot(this);
@@ -346,7 +363,11 @@ public class JavaBridgeActivity extends BaseActivity {
                 });
                 return;
             }
-            JavaPorter.Result result = porter.port(jar, outputDir);
+            // The loading overlay is only ever cleared from the post below, so an escaping throw
+            // (the CFR decompiler is memory-hungry and a large jar can exhaust the heap) left the
+            // spinner up forever with the Port button unusable. The failure is converted to a
+            // result the same post can render.
+            final JavaPorter.Result result = portSafely(porter, jar, outputDir);
             main.post(() -> {
                 if (isFinishing()) return;
                 showLoading(false);
@@ -361,6 +382,26 @@ public class JavaBridgeActivity extends BaseActivity {
                 showReviewDialog(result);
             });
         });
+    }
+
+    /**
+     * Runs the port, converting an escaping throw into a failure result.
+     *
+     * <p>The loading overlay is only cleared from the post that renders the result, so a throw
+     * escaping this call (the CFR decompiler is memory-hungry and a large jar can exhaust the
+     * heap) left the spinner up forever with the Port button unusable. The failure is named and
+     * returned as a result so the same post can render it.
+     */
+    private JavaPorter.Result portSafely(JavaPorter porter, File jar, File outputDir) {
+        try {
+            return porter.port(jar, outputDir);
+        } catch (Throwable t) {
+            String detail = t.getMessage();
+            if (detail == null || detail.trim().isEmpty()) {
+                detail = t.getClass().getSimpleName();
+            }
+            return JavaPorter.Result.failure(null, detail);
+        }
     }
 
     /**
@@ -425,11 +466,23 @@ public class JavaBridgeActivity extends BaseActivity {
     }
 
     private void enablePortedMod(File packageFile) {
-        executor.execute(() -> {
-            AntEggLoader.LoadResult load = AntEggLoader.loadMod(this, packageFile);
+        runOnExecutor(() -> {
+            // The button's only feedback is the toast below, so an escaping throw left the press
+            // with no visible result at all. The failure is named instead.
+            final boolean loaded;
+            try {
+                loaded = AntEggLoader.loadMod(this, packageFile).success;
+            } catch (Throwable t) {
+                main.post(() -> {
+                    if (isFinishing()) return;
+                    Toast.makeText(this, R.string.javabridge_load_failed, Toast.LENGTH_LONG).show();
+                });
+                return;
+            }
+            final boolean success = loaded;
             main.post(() -> {
                 if (isFinishing()) return;
-                Toast.makeText(this, load.success ? R.string.javabridge_port_success
+                Toast.makeText(this, success ? R.string.javabridge_port_success
                         : R.string.javabridge_load_failed, Toast.LENGTH_LONG).show();
             });
         });

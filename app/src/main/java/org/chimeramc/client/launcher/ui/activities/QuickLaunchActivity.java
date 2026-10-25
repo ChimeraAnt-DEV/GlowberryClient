@@ -23,6 +23,8 @@ import org.chimeramc.client.settings.FeatureSettings;
 import org.chimeramc.client.ui.adapter.QuickLaunchAdapter;
 import org.chimeramc.client.util.MinecraftUriHandler;
 import org.chimeramc.client.util.LauncherStorage;
+
+import java.util.concurrent.RejectedExecutionException;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 
 import java.io.File;
@@ -30,6 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuickLaunchActivity extends BaseActivity {
+    // The write of a new server entry is IO, so it runs off the UI thread; owning the worker
+    // means it is torn down with the screen rather than posting its toast to a dead Activity.
+    private final java.util.concurrent.ExecutorService worker =
+            java.util.concurrent.Executors.newSingleThreadExecutor();
 
     private RecyclerView quickActionsRecycler;
     private QuickLaunchAdapter adapter;
@@ -303,12 +309,31 @@ public class QuickLaunchActivity extends BaseActivity {
         File serverFile = new File(new File(gameDataDir, "minecraftpe"), "external_servers.txt");
 
         final ServerItem server = new ServerItem(name, ip, port);
-        new Thread(() -> {
-            boolean ok = ServerManager.writeServerToFile(serverFile, server);
-            runOnUiThread(() -> Toast.makeText(this,
-                    ok ? R.string.server_added : R.string.server_exists,
-                    Toast.LENGTH_SHORT).show());
-        }).start();
+        if (worker.isShutdown()) return;
+        try {
+            worker.execute(() -> {
+                ServerManager.AddResult result = ServerManager.writeServerToFile(serverFile, server);
+                // A write failure used to report "that server is already in your list", which sent
+                // the user looking for a duplicate instead of at the storage problem that occurred.
+                int message = result == ServerManager.AddResult.ADDED
+                        ? R.string.server_added
+                        : result == ServerManager.AddResult.DUPLICATE
+                                ? R.string.server_exists
+                                : R.string.server_add_failed;
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                });
+            });
+        } catch (RejectedExecutionException ignored) {
+            // The screen was destroyed between the check and the submit.
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        worker.shutdownNow();
+        super.onDestroy();
     }
 
     private void showRealmInviteDialog() {

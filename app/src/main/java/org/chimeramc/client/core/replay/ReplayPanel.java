@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Executors;
 
 /**
@@ -48,6 +50,8 @@ import java.util.concurrent.Executors;
  * plays so the two do not share the decoder.
  */
 public final class ReplayPanel {
+
+    private static final String TAG = "ReplayPanel";
 
     private final Activity activity;
     private final ReplayStyle style;
@@ -95,8 +99,23 @@ public final class ReplayPanel {
     private ReplayPlayerView playerView;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final ReplayManager.Listener stateListener = (state, elapsed, profile) ->
+    private final ReplayManager.Listener stateListener = new ReplayManager.Listener() {
+        @Override
+        public void onReplayStateChanged(ReplayManager.State state, long elapsed,
+                                         ReplayQuality.Profile profile) {
             renderRecordingState(state, elapsed, profile);
+        }
+
+        @Override
+        public void onReplayCaptureFailed() {
+            // The state callback alone cannot say this: a failed capture returns to IDLE, which is
+            // exactly the state the panel shows before Record was ever pressed, so the press looked
+            // ignored. The failure is named and the library is rescanned in case a partial clip was
+            // left behind.
+            Toast.makeText(activity, R.string.replay_capture_failed, Toast.LENGTH_LONG).show();
+            refreshLibrary();
+        }
+    };
     private final Runnable tick = new Runnable() {
         @Override
         public void run() {
@@ -220,6 +239,24 @@ public final class ReplayPanel {
     public void dispose() {
         onHidden();
         io.shutdownNow();
+    }
+
+    /**
+     * Submits work to the panel's single background thread, tolerating a shut-down pool.
+     *
+     * <p>{@link #dispose()} shuts this executor down, and the panel is disposed while work it
+     * started can still arrive: a thumbnail decode finishing, a dialog button pressed as the screen
+     * closes, a refresh queued by a fragment swap. Submitting to a shut-down executor throws
+     * {@link RejectedExecutionException} on the calling (UI) thread, so every one of those paths
+     * could crash the app at the moment the user left the screen. A submission after disposal has
+     * nobody left to report to, so it is dropped.
+     */
+    private void runOnIo(Runnable work) {
+        try {
+            io.execute(work);
+        } catch (RejectedExecutionException rejected) {
+            Log.w(TAG, "Replay task dropped: the panel is disposed", rejected);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -572,14 +609,33 @@ public final class ReplayPanel {
     // Library
     // ---------------------------------------------------------------------------------------------
 
-    /** Rescans the library off the UI thread and repaints. */
+    /**
+     * Rescans the library off the UI thread and repaints.
+     *
+     * <p>The {@code loading} latch is released from the post, so it used to stay set forever if the
+     * scan threw: the skeleton stayed up and every later refresh returned at the guard, which is
+     * the whole Replay tab dead until the overlay was reopened. The scan failure is now caught and
+     * still posts, so the latch is always released and the skeleton always clears.
+     */
     public void refreshLibrary() {
         if (loading) return;
         loading = true;
         skeleton.setVisibility(View.VISIBLE);
-        io.execute(() -> {
-            final List<ReplayClip> scanned = repository.scan();
-            final long usage = ReplayStorage.usageBytes(activity);
+        runOnIo(() -> {
+            final List<ReplayClip> scanned;
+            final long usage;
+            try {
+                scanned = repository.scan();
+                usage = ReplayStorage.usageBytes(activity);
+            } catch (Throwable t) {
+                Log.w(TAG, "Replay library scan failed; showing an empty library", t);
+                mainHandler.post(() -> {
+                    loading = false;
+                    skeleton.setVisibility(View.GONE);
+                    renderLibrary(new ArrayList<>());
+                });
+                return;
+            }
             mainHandler.post(() -> {
                 loading = false;
                 skeleton.setVisibility(View.GONE);
@@ -621,9 +677,17 @@ public final class ReplayPanel {
     }
 
     private void renderLibrary() {
-        io.execute(() -> {
-            final List<ReplayClip> scanned = repository.scan();
-            final long usage = ReplayStorage.usageBytes(activity);
+        runOnIo(() -> {
+            final List<ReplayClip> scanned;
+            final long usage;
+            try {
+                scanned = repository.scan();
+                usage = ReplayStorage.usageBytes(activity);
+            } catch (Throwable t) {
+                Log.w(TAG, "Replay library rescan failed", t);
+                mainHandler.post(() -> renderLibrary(new ArrayList<>()));
+                return;
+            }
             mainHandler.post(() -> {
                 renderStorage(usage);
                 renderLibrary(scanned);
@@ -690,7 +754,7 @@ public final class ReplayPanel {
 
                 @Override
                 public void onScrub(ReplayClip c, float fraction) {
-                    io.execute(() -> {
+                    runOnIo(() -> {
                         final android.graphics.Bitmap frame = ReplayThumbnails.frameAt(c, fraction);
                         if (frame == null) return;
                         mainHandler.post(() -> {
@@ -734,7 +798,7 @@ public final class ReplayPanel {
             card.setThumbnail(cached);
             return;
         }
-        io.execute(() -> {
+        runOnIo(() -> {
             final android.graphics.Bitmap bitmap = ReplayThumbnails.load(clip);
             if (bitmap == null) return;
             mainHandler.post(() -> {
@@ -796,20 +860,37 @@ public final class ReplayPanel {
     }
 
     private void trimClip(ReplayClip clip) {
-        ReplayTrimDialog.show(activity, style, clip, trim -> io.execute(() -> {
-            File result = ReplayExporter.trim(activity, clip, trim);
+        ReplayTrimDialog.show(activity, style, clip, trim -> runOnIo(() -> {
+            File result;
+            try {
+                result = ReplayExporter.trim(activity, clip, trim);
+            } catch (Throwable t) {
+                Log.w(TAG, "Replay trim failed", t);
+                result = null;
+            }
+            final File trimmed = result;
             mainHandler.post(() -> {
-                Toast.makeText(activity, result != null
+                Toast.makeText(activity, trimmed != null
                         ? R.string.replay_clip_saved : R.string.replay_export_failed,
                         Toast.LENGTH_SHORT).show();
-                if (result != null) refreshLibrary();
+                if (trimmed != null) refreshLibrary();
             });
         }));
     }
 
     private void exportClip(ReplayClip clip) {
-        io.execute(() -> {
-            Uri uri = ReplayExporter.exportToGallery(activity, clip);
+        runOnIo(() -> {
+            // The toast below is the action's only feedback; an escaping throw meant the user
+            // pressed Export and nothing at all happened.
+            final Uri uri;
+            try {
+                uri = ReplayExporter.exportToGallery(activity, clip);
+            } catch (Throwable t) {
+                Log.w(TAG, "Replay export failed", t);
+                mainHandler.post(() -> Toast.makeText(activity, R.string.replay_export_failed,
+                        Toast.LENGTH_SHORT).show());
+                return;
+            }
             mainHandler.post(() -> Toast.makeText(activity, uri != null
                     ? R.string.replay_exported : R.string.replay_export_failed,
                     Toast.LENGTH_SHORT).show());
@@ -847,8 +928,18 @@ public final class ReplayPanel {
             Toast.makeText(activity, R.string.replay_stitch_needs_two, Toast.LENGTH_SHORT).show();
             return;
         }
-        io.execute(() -> {
-            File reel = ReplayExporter.stitch(activity, favorites);
+        runOnIo(() -> {
+            // A mux over several clips is the most failure-prone file operation on this panel, and
+            // the toast is the only feedback, so a throw must still produce one.
+            final File reel;
+            try {
+                reel = ReplayExporter.stitch(activity, favorites);
+            } catch (Throwable t) {
+                Log.w(TAG, "Replay stitch failed", t);
+                mainHandler.post(() -> Toast.makeText(activity, R.string.replay_stitch_failed,
+                        Toast.LENGTH_SHORT).show());
+                return;
+            }
             mainHandler.post(() -> {
                 Toast.makeText(activity, reel != null
                         ? R.string.replay_reel_saved : R.string.replay_stitch_failed,
@@ -859,8 +950,16 @@ public final class ReplayPanel {
     }
 
     private void renameClip(ReplayClip clip) {
-        ReplayClipActionsDialog.showRename(activity, style, clip, name -> io.execute(() -> {
-            File renamed = repository.rename(clip, name);
+        ReplayClipActionsDialog.showRename(activity, style, clip, name -> runOnIo(() -> {
+            final File renamed;
+            try {
+                renamed = repository.rename(clip, name);
+            } catch (Throwable t) {
+                Log.w(TAG, "Replay rename failed", t);
+                mainHandler.post(() -> Toast.makeText(activity, R.string.replay_rename_failed,
+                        Toast.LENGTH_SHORT).show());
+                return;
+            }
             mainHandler.post(() -> {
                 if (renamed != null) {
                     ReplayThumbnails.invalidate(clip.file());
@@ -975,9 +1074,18 @@ public final class ReplayPanel {
                         clip.displayName()))
                 .setNegativeButton(R.string.replay_action_cancel, null)
                 .setPositiveButton(R.string.replay_action_delete, (d, w) -> {
-                    io.execute(() -> {
-                        repository.delete(clip);
-                        ReplayThumbnails.invalidate(clip.file());
+                    runOnIo(() -> {
+                        // A throw here left the row on screen with the delete dialog dismissed and
+                        // no explanation; the clip is still there, which reads as the press being
+                        // ignored. The failure is named and the library is still refreshed.
+                        try {
+                            repository.delete(clip);
+                            ReplayThumbnails.invalidate(clip.file());
+                        } catch (Throwable t) {
+                            Log.w(TAG, "Replay delete failed", t);
+                            mainHandler.post(() -> Toast.makeText(activity,
+                                    R.string.replay_delete_failed, Toast.LENGTH_SHORT).show());
+                        }
                         mainHandler.post(() -> {
                             if (selected == clip) selected = null;
                             refreshLibrary();
@@ -1048,6 +1156,48 @@ public final class ReplayPanel {
         if (next >= filtered.size()) next = 0;
         selected = filtered.get(next);
         highlightSelection();
+    }
+
+    /**
+     * Performs one {@link ReplayControls.Action}, so every screen shares one implementation.
+     *
+     * <p>This is the single place an action turns into behaviour. The in-game Mod Menu and the
+     * Library's Replay tab both route through it, so a mapping cannot do one thing on one screen
+     * and something else on the other. {@link ReplayControls} owns the key→action table; this owns
+     * action→behaviour.
+     *
+     * @return true when the action applied. {@code PLAY_PAUSE} is false when no clip is open, which
+     *         is what lets the in-game menu fall through to its own Start binding.
+     */
+    public boolean handleControl(ReplayControls.Action action) {
+        if (action == null) return false;
+        switch (action) {
+            case SELECT:
+                playSelected();
+                return true;
+            case DELETE:
+                deleteSelected();
+                return true;
+            case FAVORITE:
+                favoriteSelected();
+                return true;
+            case CYCLE_PREV:
+                cycleSelection(false);
+                return true;
+            case CYCLE_NEXT:
+                cycleSelection(true);
+                return true;
+            case PLAY_PAUSE:
+                return isPlayerOpen() && togglePlayback();
+            case SCRUB_BACK:
+                return scrubPlayback(-0.1f);
+            case SCRUB_FORWARD:
+                return scrubPlayback(0.1f);
+            case SPEED:
+                return stepPlaybackSpeed();
+            default:
+                return false;
+        }
     }
 
     private static int indexOfName(List<ReplayClip> clips, ReplayClip target) {

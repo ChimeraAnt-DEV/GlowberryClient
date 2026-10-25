@@ -8,7 +8,7 @@ import org.chimeramc.client.util.PersonalizationManager;
  * The single source of truth for the GlowberryClient UI's colours, shape and type.
  *
  * <p>This replaces the retired violet/magenta brand palette and the two separate mod-menu themes
- * ({@code ModMenuTheme} and {@code VipTheme}). Every screen — the radial wheel, both mod menus, the
+ * ({@code ModMenuTheme} and {@code VipTheme}). Every screen — the radial wheel, the one mod menu, the
  * Closet and the Launch tab — reads from here, so a screen cannot drift onto its own colours.
  *
  * <p>The values are the "blueberry" palette: a near-black, very slightly cool window on a blue

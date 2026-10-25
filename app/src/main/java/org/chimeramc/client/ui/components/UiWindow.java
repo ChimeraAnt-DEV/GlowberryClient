@@ -5,7 +5,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 
 /**
- * The window chrome shared by both mod menus and the Closet: a rounded 16dp near-black panel with a
+ * The window chrome shared by the Mod Menu and the Closet: a rounded 16dp near-black panel with a
  * 1dp hairline and a shadow, a 48dp title bar with a hairline divider, and a centred layout rule.
  */
 public final class UiWindow {
@@ -34,14 +34,36 @@ public final class UiWindow {
 
     /** The title bar rectangle inside a window. */
     public static RectF titleBar(RectF window, float density) {
-        float h = UiTokens.TITLEBAR_HEIGHT * density;
-        return new RectF(window.left, window.top, window.right, window.top + h);
+        float[] b = titleBarArray(window.left, window.top, window.right, window.bottom, density);
+        return new RectF(b[0], b[1], b[2], b[3]);
+    }
+
+    /**
+     * The title bar rectangle as {@code {left, top, right, bottom}}, pure and device-free.
+     *
+     * <p>The array form is what the JVM test can exercise, since {@code android.graphics.RectF} is
+     * not on the unit-test classpath. {@link #titleBar} delegates here, so there is one definition.
+     */
+    public static float[] titleBarArray(float left, float top, float right, float bottom,
+                                        float density) {
+        return new float[]{left, top, right, top + UiTokens.TITLEBAR_HEIGHT * density};
     }
 
     /** The content rectangle below the title bar. */
     public static RectF content(RectF window, float density) {
-        RectF bar = titleBar(window, density);
-        return new RectF(window.left, bar.bottom, window.right, window.bottom);
+        float[] b = contentArray(window.left, window.top, window.right, window.bottom, density);
+        return new RectF(b[0], b[1], b[2], b[3]);
+    }
+
+    /**
+     * The content rectangle as {@code {left, top, right, bottom}}, pure and device-free. It starts
+     * exactly where {@link #titleBarArray} ends and reaches the window's bottom, so the two tile the
+     * window without an overlap or a gap.
+     */
+    public static float[] contentArray(float left, float top, float right, float bottom,
+                                       float density) {
+        float barBottom = titleBarArray(left, top, right, bottom, density)[3];
+        return new float[]{left, barBottom, right, bottom};
     }
 
     /** Draws the window background, the title bar and the divider. */

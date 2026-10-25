@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ModsFullscreenActivity extends BaseActivity {
+    // Owned so an in-flight .antegg link import is torn down with the screen.
+    private final java.util.concurrent.ExecutorService worker =
+            java.util.concurrent.Executors.newSingleThreadExecutor();
 
     private RecyclerView modsRecycler;
     private ModsAdapter modsAdapter;
@@ -352,7 +355,7 @@ public class ModsFullscreenActivity extends BaseActivity {
                         .AntEggLinkDownloader.Callback() {
                     @Override
                     public void onSuccess(java.io.File staged, String fileName) {
-                        new Thread(() -> {
+                        runOnWorker(() -> {
                             org.chimeramc.client.core.antegg.AntEggLoader.LoadResult result =
                                     org.chimeramc.client.core.antegg.AntEggLoader
                                             .loadMod(ModsFullscreenActivity.this, staged);
@@ -363,6 +366,7 @@ public class ModsFullscreenActivity extends BaseActivity {
                                         ModsFullscreenActivity.this, fileName, result.error);
                             }
                             runOnUiThread(() -> {
+                                if (isFinishing() || isDestroyed()) return;
                                 if (result.success) {
                                     Toast.makeText(ModsFullscreenActivity.this,
                                             getString(R.string.mod_import_link_done, fileName),
@@ -374,7 +378,7 @@ public class ModsFullscreenActivity extends BaseActivity {
                                             Toast.LENGTH_LONG).show();
                                 }
                             });
-                        }, "antegg-link-import").start();
+                        });
                     }
 
                     @Override
@@ -384,6 +388,27 @@ public class ModsFullscreenActivity extends BaseActivity {
                                 Toast.LENGTH_LONG).show());
                     }
                 });
+    }
+
+    /**
+     * Runs a .antegg import off the UI thread, on a worker this screen owns.
+     *
+     * <p>The bare Thread this replaced outlived the screen, so a link import that finished on the
+     * way out posted its toast to a destroyed Activity.
+     */
+    private void runOnWorker(Runnable task) {
+        if (worker.isShutdown()) return;
+        try {
+            worker.execute(task);
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {
+            // The screen was destroyed between the check and the submit.
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        worker.shutdownNow();
+        super.onDestroy();
     }
 
     private void startFilePicker() {

@@ -15,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.Chimera.Card"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/space_2"
             android:elevation="4dp"
-            android:padding="16dp"
+            android:padding="@dimen/space_4"
             android:orientation="vertical"
             app:layout_scrollFlags="scroll">
             
@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="@dimen/space_3">
 
                 <TextView
                     android:id="@+id/title_text"
@@ -36,7 +36,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/worlds_title"
                     android:textColor="@color/primary"
-                    android:textSize="22sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Display"
                     android:textStyle="bold" />
 
                 <Button
@@ -47,7 +47,7 @@
                     android:fontFamily="@font/misans"
                     android:text="@string/custom_flat_world"
                     android:textColor="@color/on_primary"
-                    android:textSize="12sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -61,12 +61,12 @@
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:maxLines="1"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/space_4"
                 android:drawableStart="@drawable/ic_search"
-                android:drawablePadding="12dp"
+                android:drawablePadding="@dimen/space_3"
                 android:textColor="@color/on_surface"
                 android:textColorHint="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Body" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -80,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="8dp" />
+            android:padding="@dimen/space_2" />
 
         <FrameLayout
             android:id="@+id/content_empty"
@@ -109,22 +109,22 @@
                     android:id="@+id/content_empty_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/space_3"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/on_surface"
-                    android:textSize="17sp"
+                    android:textAppearance="@style/TextAppearance.Glowberry.Title"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/content_empty_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginHorizontal="32dp"
+                    android:layout_marginTop="@dimen/space_2"
+                    android:layout_marginHorizontal="@dimen/space_8"
                     android:gravity="center"
                     android:fontFamily="@font/misans"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/TextAppearance.Glowberry.Label" />
             </LinearLayout>
         </FrameLayout>
 

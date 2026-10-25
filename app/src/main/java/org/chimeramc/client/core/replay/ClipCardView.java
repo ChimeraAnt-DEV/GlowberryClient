@@ -17,8 +17,9 @@ import org.chimeramc.client.R;
 /**
  * One clip card in the Replay grid.
  *
- * <p>Built in code because the library is live data, and drawn from {@link ReplayStyle} so Screen A
- * renders the same card. It carries the thumbnail, name, duration, date/size, the
+ * <p>Built in code because the library is live data, and drawn from {@link ReplayStyle} so the
+ * in-game Replay tab and the launcher-side Replay screen render the same card. It carries the
+ * thumbnail, name, duration, date/size, the
  * favorite star and the highlight badge; press feedback is the shared
  * {@code DynamicAnim.applyPressScale} used everywhere else.
  */

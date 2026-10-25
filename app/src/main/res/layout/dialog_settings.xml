@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="@dimen/space_6"
     android:minWidth="480dp"
     android:minHeight="320dp"
     style="@style/Widget.Chimera.Card">
@@ -27,12 +27,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="12dp">
+            android:paddingLeft="@dimen/space_3">
             <TextView
                 android:id="@+id/settings_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Title"
                 android:textStyle="bold"
                 android:text="@string/settings_title"/>
             <TextView
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#888888"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Body"
                 android:text="@string/settings_desc"/>
         </LinearLayout>
     </LinearLayout>
@@ -63,29 +63,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:paddingTop="@dimen/space_3">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/about_title"
             android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:textAppearance="@style/TextAppearance.Glowberry.Title"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/copyright"
-            android:textSize="13sp"/>
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/font_license"
-            android:textSize="13sp"/>
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/about_footer_github"
             android:autoLink="web"
-            android:textSize="13sp"/>
+            android:textAppearance="@style/TextAppearance.Glowberry.Label"/>
     </LinearLayout>
 
 </LinearLayout>

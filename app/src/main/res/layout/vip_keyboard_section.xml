@@ -10,7 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="18dp">
+    android:padding="@dimen/space_4">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -18,7 +18,7 @@
         android:layout_weight="1.25"
         android:background="@drawable/bg_vip_surface"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="@dimen/space_4">
 
         <TextView
             android:id="@+id/vip_keyboard_status"
@@ -28,14 +28,14 @@
             android:text="@string/vip_live_preview"
             android:textAllCaps="true"
             android:textColor="@color/ui_text_secondary"
-            android:textSize="11sp"
+            android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:textStyle="bold" />
 
         <org.chimeramc.client.launcher.ui.views.KeyboardIllustrationView
             android:id="@+id/vip_keyboard_illustration"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_3"
             android:layout_weight="1"
             android:minHeight="140dp" />
     </LinearLayout>
@@ -43,7 +43,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/space_4"
         android:layout_weight="1"
         android:fillViewport="true"
         android:scrollbars="none">
@@ -60,43 +60,43 @@
                 android:text="@string/vip_section_remap"
                 android:textAllCaps="true"
                 android:textColor="@color/ui_text_secondary"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/vip_keyboard_keys"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/space_2"
                 android:orientation="vertical" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="@dimen/space_4"
                 android:letterSpacing="0.14"
                 android:text="@string/vip_sensitivity"
                 android:textAllCaps="true"
                 android:textColor="@color/ui_text_secondary"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/vip_keyboard_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/space_2"
                 android:orientation="vertical" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/space_3"
                 android:background="@drawable/bg_vip_surface"
-                android:padding="14dp"
+                android:padding="@dimen/space_4"
                 android:text="@string/vip_keyboard_hint"
                 android:textColor="@color/ui_text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

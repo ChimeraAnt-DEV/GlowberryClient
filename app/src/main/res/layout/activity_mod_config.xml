@@ -9,9 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="24dp">
+        android:paddingHorizontal="@dimen/space_6"
+        android:paddingTop="@dimen/space_4"
+        android:paddingBottom="@dimen/space_6">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,20 +24,20 @@
                 android:id="@+id/mod_config_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="@dimen/space_3"
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:fontFamily="@font/misans"
                 android:maxLines="1"
                 android:textColor="@color/primary"
-                android:textSize="22sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Display"
                 android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/mod_config_file_spinner"
                 android:layout_width="220dp"
                 android:layout_height="36dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="@dimen/space_3"
                 android:background="@drawable/bg_spinner_outline"
                 android:visibility="gone" />
 
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:minWidth="0dp"
                 android:minHeight="36dp"
-                android:paddingHorizontal="22dp"
+                android:paddingHorizontal="@dimen/space_6"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:background="@drawable/bg_launch_button"
@@ -56,14 +56,14 @@
                 android:text="@string/save"
                 android:textAllCaps="false"
                 android:textColor="@color/on_primary"
-                android:textSize="13sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="@dimen/space_4"
             android:layout_weight="1">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -88,7 +88,7 @@
                 android:layout_gravity="center"
                 android:fontFamily="@font/misans"
                 android:textColor="@color/on_surface"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Glowberry.Body"
                 android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="@dimen/space_4">
 
     <Button
         android:id="@+id/btn_prev_page"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:minWidth="0dp"
         android:minHeight="32dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="@dimen/space_4"
         android:paddingVertical="0dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -21,7 +21,7 @@
         app:backgroundTint="@null"
         android:text="@string/previous"
         android:textColor="@color/primary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold"
         android:textAllCaps="false"
         android:fontFamily="@font/misans"
@@ -32,8 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/pagination_page_one"
-        android:layout_marginHorizontal="16dp"
-        android:textSize="14sp"
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:fontFamily="@font/misans"
         android:textColor="@color/on_surface"/>
 
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:minWidth="0dp"
         android:minHeight="32dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="@dimen/space_4"
         android:paddingVertical="0dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -51,7 +51,7 @@
         app:backgroundTint="@null"
         android:text="@string/next"
         android:textColor="@color/primary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:textStyle="bold"
         android:textAllCaps="false"
         android:fontFamily="@font/misans"

@@ -1,5 +1,6 @@
 package org.chimeramc.client.core.content;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -45,6 +46,22 @@ public class ResourcePackManager {
     public ResourcePackManager(Context context) {
         this.context = context;
         this.executor = Executors.newSingleThreadExecutor();
+    }
+
+    /**
+     * Submits pack work, closing the race the bare {@code isShutdown()} check left open.
+     *
+     * <p>{@code isShutdown()} followed by {@code execute(...)} is a check-then-act: {@link #shutdown()}
+     * can run between the two on another thread, and submitting to a shut-down executor throws
+     * {@link java.util.concurrent.RejectedExecutionException} on the calling - main - thread. The
+     * check stays as a fast path; the catch is what makes the race harmless.
+     */
+    private boolean submit(Runnable work, PackOperationCallback callback) {
+        if (!SafeExecutor.submit(executor, work)) {
+            callback.onError("ResourcePackManager has been shut down");
+            return false;
+        }
+        return true;
     }
 
     public void setCurrentVersion(GameVersion version) {
@@ -137,11 +154,7 @@ public class ResourcePackManager {
     }
 
     public void importPack(Uri packUri, PackOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("ResourcePackManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             // The staged copy is deleted in a finally, not after the import calls. The import
             // helpers throw on a malformed archive, and the old straight-line delete was skipped on
             // exactly that path - so every failed import left a full copy of the pack in the app
@@ -200,7 +213,10 @@ public class ResourcePackManager {
                     callback.onSuccess(msg.toString().trim());
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the
+                // callback, and packing/unpacking is a large allocation - an OutOfMemoryError
+                // skipped it, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to import pack", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Import failed", e.getMessage()));
             } finally {
@@ -209,7 +225,7 @@ public class ResourcePackManager {
                     tempFile.delete();
                 }
             }
-        });
+        }, callback);
     }
 
     private int[] importMcpack(File zipFile) throws IOException {
@@ -448,11 +464,7 @@ public class ResourcePackManager {
     }
 
     public void deletePack(ResourcePackItem pack, PackOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("ResourcePackManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 if (deleteFile(pack.getFile())) {
                     callback.onSuccess("Pack deleted successfully");
@@ -460,19 +472,18 @@ public class ResourcePackManager {
                     callback.onError("Failed to delete pack");
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the
+                // callback, and packing/unpacking is a large allocation - an OutOfMemoryError
+                // skipped it, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to delete pack", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Delete failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 
     public void exportPack(ResourcePackItem pack, Uri exportUri, PackOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("ResourcePackManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try (OutputStream outputStream = context.getContentResolver().openOutputStream(exportUri)) {
                 if (outputStream == null) {
                     callback.onError("Cannot create export file");
@@ -485,11 +496,14 @@ public class ResourcePackManager {
                     zipDirectory(pack.getFile(), "", zos);
                 }
                 callback.onSuccess("Pack exported successfully");
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the
+                // callback, and packing/unpacking is a large allocation - an OutOfMemoryError
+                // skipped it, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to export pack", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Export failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 
     private void zipDirectory(File dir, String basePath, ZipOutputStream zos) throws IOException {
@@ -668,11 +682,7 @@ public class ResourcePackManager {
     }
 
     public void transferPack(ResourcePackItem pack, File targetDirectory, PackOperationCallback callback) {
-        if (executor.isShutdown()) {
-            callback.onError("ResourcePackManager has been shut down");
-            return;
-        }
-        executor.execute(() -> {
+        submit(() -> {
             try {
                 if (targetDirectory == null) {
                     callback.onError("Target directory not available");
@@ -702,10 +712,13 @@ public class ResourcePackManager {
 
                 callback.onSuccess("Pack transferred successfully");
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the
+                // callback, and packing/unpacking is a large allocation - an OutOfMemoryError
+                // skipped it, leaving the screen waiting on a result that never arrived.
                 Log.e(TAG, "Failed to transfer pack", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Transfer failed", e.getMessage()));
             }
-        });
+        }, callback);
     }
 }

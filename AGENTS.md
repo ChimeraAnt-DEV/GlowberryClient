@@ -1166,6 +1166,12 @@ Do not re-run this RE from scratch; these are the conclusions.
   aliases of those four, never literals. `SPACE_1/2/3/4/6/8` = 4/8/12/16/24/32dp.
   `TEXT_DISPLAY/TITLE_ROLE/BODY/LABEL/CAPTION` are the five type roles. `UiTokensTest` pins all
   four scales, so adding a bespoke value fails the build rather than drifting.
+  The XML side is the same scale: `dimens.xml` declares `radius_small/medium/large/xlarge` at those
+  four values and the card tokens (`chimera_card_radius` 16dp, `chimera_card_radius_small` 12dp)
+  **alias** them. They used to be a fifth and sixth radius (14dp/10dp) that every shared card
+  drawable read, so an XML card and a code-drawn `UiCard` rounded different corners;
+  `UiTokensTest.theXmlRadiusTokensAreTheSameScaleAsTheCode` reads the real resource file to keep
+  them aliased.
 - **One accent, resolved from the theme (U7).** `PersonalizationManager.getAccentColor()` now reads
   the theme's `colorPrimary` through `resolveThemeColor` — so Material You's wallpaper palette wins
   when dynamic colour is on and the brand colour is the fallback. The stored accent pref, the two
@@ -2245,7 +2251,18 @@ black and no pure white: `#070A0F` + `#E8EEF6` is what reads as "smooth" rather 
 - **Components are pure where it matters.** `UiToggle`, `UiRow`, `UiChip`, `UiRailButton`, `UiButton`,
   `UiCard`, `UiSegmented`, `UiSlider`, `UiSearchField`, `UiWindow` keep their geometry/state machine
   pure and are covered by `UiTokensTest` (palette, WCAG contrast, toggle state machine, segmented
-  hit-testing, window bounds). `UiIcons` is the outline icon set (24dp grid, 2dp stroke, round caps).
+  hit-testing, slider value→thumb, rail-button stacking, window bounds/title-bar/content tiling,
+  search-field clear bounds). `UiIcons` is the outline icon set (24dp grid, 2dp stroke, round caps).
+  **Geometry that a JVM test must pin is exposed in an array form** (`UiWindow.boundsArray`/
+  `titleBarArray`/`contentArray`, `UiRailButton.boundsArray`, `UiSearchField.clearBoundsArray`),
+  because `android.graphics.RectF` is not on the unit-test classpath; the `RectF` overloads delegate
+  to the arrays so there is one definition. `UiCard`/`UiButton` take their radius as a parameter and
+  are exercised by the gallery, not by a geometry assertion.
+- **The hidden UI gallery renders every component, not a sample.** `UiGalleryActivity` shows the
+  palette, the type roles, the shape scale and one live view per component (toggle, row, window
+  chrome, segmented, search field, slider, button, card, rail button). It is the device pass for the
+  shared library — a component added without a gallery entry has no way to be eyeballed on hardware,
+  and the gallery's own doc-comment claims "every shared component in every state".
 - **The radial wheel is rounded annular sectors, not stroked arcs.** `RadialMenuView` builds each
   sector as one `Path` (outer arc, quadratic corner fillet, inner arc, fillet) with a **parallel-sided
   linear gap** (`RadialWheelLayout.angularHalfGapDegrees`, constant 6dp) rather than a fixed angular
@@ -2255,6 +2272,58 @@ black and no pure white: `#070A0F` + `#E8EEF6` is what reads as "smooth" rather 
 - **The Mod Menu keeps its top navigation bar, not a left rail.** This is the same constraint the
   earlier "side rail was reverted" note records: the app is landscape-only, so a rail only gets the
   short edge. Restyling must not convert it. The module grid is two columns wide / one compact.
+
+### The four design scales are enforced, not merely declared (U6/U8/U9/U10)
+
+The scales existed as tokens and were then bypassed by the layouts, so "one type scale", "one
+spacing scale" and "one radius scale" described an intention rather than the app. Each now has a
+token set, a migration, and a test that reads the real resource files. **Adding a numeric
+`textSize`, `margin`, `padding` or `radius` to a layout fails the build.**
+
+- **U8 type roles.** `TextAppearance.Glowberry.{Display,Title,Body,Label,Caption}` in `styles.xml`,
+  plus two named exceptions: `Wordmark` (the 34sp brand title) and `Micro` (the 9sp sub-caption).
+  Every layout's `textSize` was a literal across 17 distinct sizes; all 759 now reference a role.
+  `UiType` is the code-side equivalent. `TypeRoleTest` pins the role sizes to the `UiTokens.TEXT_*`
+  constants and fails on a raw `textSize`.
+  - **`UiType.FAMILY` is the CJK-capable family, and emphasis is the bold flag.** It previously named
+    a variable Latin-only font, so a code-built view using a role would have rendered zh/ja/hi as
+    tofu — the app ships those locales. No shipped font is both variable *and* CJK-capable, so
+    `applyWeight`/`weightAxis` exist for a deliberately chosen variable family but `apply` uses bold.
+    Do not "restore" the variable font without checking its glyph coverage.
+- **U9 spacing.** Six steps (`space_1/2/3/4/6/8` = 4/8/12/16/24/32) on a 4dp rhythm, mirroring
+  `UiTokens.SPACE_*`. 1529 margins/paddings/drawablePaddings now reference a step.
+  - **Four values are deliberately off the rhythm and are named so they stay countable:**
+    `space_divider` (1dp — a line, not a step), `space_hairline` (2dp — the label/value coupling),
+    `space_align_inset` (52dp — the version row's icon-column alignment) and `space_dock_clearance`
+    (168dp — the docked Play control's measured clearance). Snapping any of them breaks what it is
+    for; `SpacingScaleTest` asserts they stay off the scale so an exception cannot quietly become a
+    second scale.
+  - **A layout dimension is never `sp`.** `sp` scales with the font-size setting, which is right for
+    text and wrong for a gap: the one `12sp` margin in `dialog_apk_version_confirm` grew on a
+    low-vision device and pushed the dialog apart. `SpacingScaleTest.noLayoutDimensionIsInSp` guards
+    the whole class of bug.
+- **U10 radius.** The scale is 8/12/16/28 (`radius_small/medium/large/xlarge`) with semantic aliases
+  (`radius_card/window/chip/button/field/toggle`) mirroring `UiTokens.RADIUS_*`. All 19 layout
+  `cardCornerRadius` values and all 95 drawable `android:radius` values now reference a token.
+  - **The shapes the surface scale does not describe have their own named family**, because a 20dp
+    chip radius *is its own height* and a 4dp tag is not a card: `radius_tag` (4dp), `radius_badge`
+    (6dp), `radius_chip_small` (10dp), `radius_pill` (= `radius_toggle`, the stadium),
+    `radius_circle` (24dp), `radius_accent_bar` (2dp), `radius_square` (0dp). `RadiusScaleTest` fails
+    on any numeric radius in a layout or drawable, and asserts the small-shape tokens stay named.
+  - This is still the rule AGENTS.md already records: **do not add a recursive "apply card rounding
+    to every GradientDrawable" walk** — pills, tags and accent bars are meant to keep their own
+    radii, which is exactly why they are tokens now rather than literals.
+- **U6 motion scheme.** `UiTokens.Motion.{EXPRESSIVE,REDUCED}` and `UiTokens.motionScheme` had **zero
+  consumers**: `DynamicAnim` hard-coded its springs, so "Material 3 Expressive" was a description.
+  `DynamicAnim` now holds the scheme in force and derives every spring's damping and stiffness from
+  it, so the two schemes are two different feels rather than one spring at two speeds.
+  `DynamicAnim.applyMotionScheme(reduceMotion, platformAnimationsOff)` is the single entry point;
+  `MainActivity` passes the real reduce-motion switch and the platform `ANIMATOR_DURATION_SCALE`.
+  - **The platform setting wins over the in-app switch.** A user who told Android to remove
+    animations must not get springs back because a stale app preference says motion is on.
+    `MotionSchemeTest` pins that precedence, and pins the wiring rather than the token — a dead token
+    cannot fail a test that only reads the token, which is how this went unnoticed.
+
 - **The Closet's Hats/Back split is `ClosetCategory` (pure).** An accessory is exactly one of the two
   (`followsHead()` decides), pinned by `ClosetCategoryTest` so the screen cannot silently drop one.
 - **Hidden UI gallery:** Settings > Updates, tap the version text 7 times
@@ -2386,3 +2455,65 @@ The rules live in three pure classes and the view only applies them.
   `0xE60B1118`); the old violet wash was the last place the retired brand survived.
 - Tests: `RadialWheelMaterialTest`, `RadialWheelMotionTest`, `BackdropRefreshScheduleTest`,
   `WheelBackdropCaptureTest` (all pure, no mocks) plus the existing `RadialWheelLayoutTest`.
+
+## Update-list audit (GlowberryClient) — what is shipped, what is honest, what cannot be built
+
+The B/G/U/R/M/F/C update list was audited item by item. Recording the conclusions so a later pass
+does not re-derive them, and so the two items that cannot be built as written are not "fixed" into
+a regression.
+
+### Implemented and verified (logic + tests, device unverified unless noted)
+- **B2** in-app copyright is Apache-2.0 across all 11 locales. **B10** "Bedrock Optifine Mode" is
+  `optifine_mode_title` = "Game Performance Mode"; no Java-brand wording remains. **B5** the only
+  package format is `.antegg` (`.chimerapack`/`.levipack` have zero hits). **C3** the `.antegg`
+  manifest carries a `permissions` list (`AntEggManifest`, parsed and emitted by the template).
+- **U1** the four destinations are Play/Library/Mods/Settings. **U5** `NavLayoutMode` (bottom nav →
+  nav rail → expanded rail) with `nav_bar.xml` + `nav_rail.xml`. **U13** `SetupWizardActivity`.
+  **U14** `LaunchFailurePresenter` maps `LaunchReadiness.State` to named copy. **U16**
+  `DiagnosticsActivity` (now also reports Min SDK and the launch ABI). **U17** mod rows carry a
+  one-line reason and per-row actions (`ModMenuAdapter`).
+- **R1/R3/R12/R13** `RadialWheelLayout` (segment cap, 48dp targets), `WheelBackdropCapture`
+  (capture-then-blur), `RadialWheelMaterial` (API-level fallback + SOLID tier). **R2** three glass
+  tiers. **R5** haptics (`KEYBOARD_TAP`/`CLOCK_TICK`). **R8** thermal ladder via
+  `RadialWheelMaterial.budgetFor`/`degrade`. **R9** `MIN_CONTRAST = 4.5f`. **R10** fallbacks.
+- **M1** dark-navy tokens in `colors.xml` (`mod_menu_bg_base` `#070A0F` …). **M3** module (switch) vs
+  action (button) are separate builders and render differently. **M5** `ModMenuSwitchView` (52x32
+  track, 24dp thumb). **M6** settings tab. **M7** sections + search. **M8** `resolveInbuiltModEnabled`
+  / `setInbuiltModEnabled` / `ModLoadoutStore.apply`. **M9** `ModMenuOrdering.apply` (pure, persisted).
+  **M10** failure badges + reason sheet.
+- **G1** `ExtractionCachePolicy` (native extraction version → wipe stale libs). **G2** "Repair
+  installation" in Diagnostics. **G3** `libc++_shared.so` provided by the launcher, `ElfHeaderValidator`
+  (ABI gate) + `ElfLibraryReader`/`NativeLibraryLoadOrder` (multi-`.so` load order) wired into
+  `ModNativeLoader` and `AntEggLoader.loadNative`.
+  **G4** `.antegg` dependency check (`AntEggLoader`). **G5** signature DB with fail-closed refusal.
+  **G6** submodule-init check. **G8** `ModCrashAttribution` auto-disable after N crashes. **G9**
+  `CosmeticsDiagnosticsReport` + dialog. **G10** upstream known-issues note (`cosmetics_known_issues_note`,
+  MCPE-238211/243527/241755/242499/229837). **G13** scheduled world backups. **G14** server list.
+  **G15** migration interruption messaging. **U12** the blue firework touch layer is deleted.
+
+### Cannot be built as written (do not "fix" these)
+- **G7 — crash isolation via a separate `:modhost` process.** A native mod's whole purpose is to hook
+  the *game's* address space; `System.loadLibrary("preloader")` maps the preloader into the game
+  process, and the mod-menu/HUD/render hooks are in-process calls. A `:modhost` process could not
+  install a hook in `libminecraftpe.so`, so it would isolate the crash by removing the feature. The
+  honest response is per-mod crash attribution (G8) plus the `:crash` process the manifest already
+  uses for the crash reporter — both present. Do not add a `:modhost` process and claim isolation.
+- **B16 — "signed release builds + checksums" in CI is done** (the release job signs via
+  `kevin-david/zipalign-sign-android-release` and publishes `compute_checksums.py` sidecars). The
+  *debug* APK is still what the debug artifact upload carries, which is correct for a debug artifact;
+  the release artifact is signed. Re-check this if the release job is ever reordered.
+
+### Orphaned strings are not automatically debt
+A full scan (`R.string.*`, `@string/*` in layouts, plus the `getIdentifier`/`getString` dynamic
+paths) finds ~218 `strings.xml` entries with no consumer. They are **not** a uniform defect:
+- The families the update list *removed* (accent, compact-mode, glass-card, firework, blur-intensity,
+  animations-enabled, glow-effects, `vip_*`) have **zero** orphan hits — the removals were clean.
+- The remainder are deliberate: strings for features whose UI lives elsewhere (the account-skin
+  diagnostics rows read by `CosmeticsPanel`), `.antegg`/manifest authoring text, and a handful of
+  historical labels. `mod_config_badge_with_count`, `mod_config_restart_hint`,
+  `mod_config_offhand_swap_key` and `mod_config_category_prediction` are leftovers of that kind.
+- **Do not bulk-delete by scan.** `GamePackageManager.getGameStringResource` and
+  `ExternalButtonOverlay` resolve resources by *name at runtime* (`getIdentifier`), and the account
+  skin path builds ids dynamically; a name-matching scan cannot see those. Deleting an "orphan"
+  there is a silent runtime break. Delete only a family whose consumer you have confirmed is gone,
+  the way the accent/`vip_*` removals were done.
