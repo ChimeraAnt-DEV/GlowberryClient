@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Executors;
 
 /**
@@ -238,6 +239,24 @@ public final class ReplayPanel {
     public void dispose() {
         onHidden();
         io.shutdownNow();
+    }
+
+    /**
+     * Submits work to the panel's single background thread, tolerating a shut-down pool.
+     *
+     * <p>{@link #dispose()} shuts this executor down, and the panel is disposed while work it
+     * started can still arrive: a thumbnail decode finishing, a dialog button pressed as the screen
+     * closes, a refresh queued by a fragment swap. Submitting to a shut-down executor throws
+     * {@link RejectedExecutionException} on the calling (UI) thread, so every one of those paths
+     * could crash the app at the moment the user left the screen. A submission after disposal has
+     * nobody left to report to, so it is dropped.
+     */
+    private void runOnIo(Runnable work) {
+        try {
+            io.execute(work);
+        } catch (RejectedExecutionException rejected) {
+            Log.w(TAG, "Replay task dropped: the panel is disposed", rejected);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -602,7 +621,7 @@ public final class ReplayPanel {
         if (loading) return;
         loading = true;
         skeleton.setVisibility(View.VISIBLE);
-        io.execute(() -> {
+        runOnIo(() -> {
             final List<ReplayClip> scanned;
             final long usage;
             try {
@@ -658,7 +677,7 @@ public final class ReplayPanel {
     }
 
     private void renderLibrary() {
-        io.execute(() -> {
+        runOnIo(() -> {
             final List<ReplayClip> scanned;
             final long usage;
             try {
@@ -735,7 +754,7 @@ public final class ReplayPanel {
 
                 @Override
                 public void onScrub(ReplayClip c, float fraction) {
-                    io.execute(() -> {
+                    runOnIo(() -> {
                         final android.graphics.Bitmap frame = ReplayThumbnails.frameAt(c, fraction);
                         if (frame == null) return;
                         mainHandler.post(() -> {
@@ -779,7 +798,7 @@ public final class ReplayPanel {
             card.setThumbnail(cached);
             return;
         }
-        io.execute(() -> {
+        runOnIo(() -> {
             final android.graphics.Bitmap bitmap = ReplayThumbnails.load(clip);
             if (bitmap == null) return;
             mainHandler.post(() -> {
@@ -841,7 +860,7 @@ public final class ReplayPanel {
     }
 
     private void trimClip(ReplayClip clip) {
-        ReplayTrimDialog.show(activity, style, clip, trim -> io.execute(() -> {
+        ReplayTrimDialog.show(activity, style, clip, trim -> runOnIo(() -> {
             File result;
             try {
                 result = ReplayExporter.trim(activity, clip, trim);
@@ -860,7 +879,7 @@ public final class ReplayPanel {
     }
 
     private void exportClip(ReplayClip clip) {
-        io.execute(() -> {
+        runOnIo(() -> {
             // The toast below is the action's only feedback; an escaping throw meant the user
             // pressed Export and nothing at all happened.
             final Uri uri;
@@ -909,7 +928,7 @@ public final class ReplayPanel {
             Toast.makeText(activity, R.string.replay_stitch_needs_two, Toast.LENGTH_SHORT).show();
             return;
         }
-        io.execute(() -> {
+        runOnIo(() -> {
             // A mux over several clips is the most failure-prone file operation on this panel, and
             // the toast is the only feedback, so a throw must still produce one.
             final File reel;
@@ -931,7 +950,7 @@ public final class ReplayPanel {
     }
 
     private void renameClip(ReplayClip clip) {
-        ReplayClipActionsDialog.showRename(activity, style, clip, name -> io.execute(() -> {
+        ReplayClipActionsDialog.showRename(activity, style, clip, name -> runOnIo(() -> {
             final File renamed;
             try {
                 renamed = repository.rename(clip, name);
@@ -1055,7 +1074,7 @@ public final class ReplayPanel {
                         clip.displayName()))
                 .setNegativeButton(R.string.replay_action_cancel, null)
                 .setPositiveButton(R.string.replay_action_delete, (d, w) -> {
-                    io.execute(() -> {
+                    runOnIo(() -> {
                         // A throw here left the row on screen with the delete dialog dismissed and
                         // no explanation; the clip is still there, which reads as the press being
                         // ignored. The failure is named and the library is still refreshed.

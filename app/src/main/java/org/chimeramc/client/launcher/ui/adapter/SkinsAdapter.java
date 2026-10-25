@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 
 public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHolder> {
 
+    private static final String TAG = "SkinsAdapter";
+
     public interface OnSkinActionListener {
         void onApply(ResourcePackItem pack);
     }
@@ -56,6 +58,22 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
     /** Releases the decode pool. Call from the host's {@code onDestroy}/{@code onDestroyView}. */
     public void shutdown() {
         previewExecutor.shutdownNow();
+    }
+
+    /**
+     * Submits a preview decode, tolerating a shut-down pool.
+     *
+     * <p>{@link #shutdown()} runs from the host's {@code onDestroyView}, but the RecyclerView can
+     * still bind a row afterwards while the view tree is being torn down. Submitting to a shut-down
+     * executor throws on the main thread, so a fast scroll out of the Skins screen could crash the
+     * app. Nothing is left to draw for, so the submission is dropped.
+     */
+    private void submitPreview(Runnable work) {
+        try {
+            previewExecutor.execute(work);
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            android.util.Log.w(TAG, "Skin preview decode dropped: the adapter is shut down", rejected);
+        }
     }
 
     public void setOnSkinActionListener(OnSkinActionListener listener) {
@@ -113,7 +131,7 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
     private void loadPreview(SkinViewHolder holder, ResourcePackItem pack, int position) {
         if (position == RecyclerView.NO_POSITION) return;
         holder.progress.setVisibility(View.VISIBLE);
-        previewExecutor.execute(() -> {
+        submitPreview(() -> {
             Bitmap bitmap = null;
             try {
                 File[] candidates = findPreviewCandidates(pack);
