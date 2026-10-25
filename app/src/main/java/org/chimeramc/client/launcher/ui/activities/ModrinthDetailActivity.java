@@ -27,6 +27,9 @@ import org.chimeramc.client.ui.adapter.ModrinthVersionAdapter;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
@@ -59,6 +62,9 @@ public class ModrinthDetailActivity extends BaseActivity {
     private OkHttpClient httpClient;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
+    // Owned so the download thread is torn down with the screen instead of posting a result
+    // (or a failure dialog) to a destroyed Activity.
+    private final ExecutorService worker = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,23 +185,34 @@ public class ModrinthDetailActivity extends BaseActivity {
         progress.setVisibility(View.VISIBLE);
         Toast.makeText(this, R.string.curseforge_downloading, Toast.LENGTH_SHORT).show();
 
-        new Thread(() -> {
-            File output = null;
-            try {
-                output = download(file);
-                File downloaded = output;
-                handler.post(() -> {
-                    progress.setVisibility(View.GONE);
-                    importDownloaded(downloaded);
-                });
-            } catch (final IOException e) {
-                handler.post(() -> {
-                    progress.setVisibility(View.GONE);
-                    Toast.makeText(this, getString(R.string.curseforge_download_failed) + "\n\n"
-                            + UserFacingError.reason(ModrinthDetailActivity.this, e), Toast.LENGTH_LONG).show();
-                });
-            }
-        }).start();
+        if (worker.isShutdown()) return;
+        try {
+            worker.execute(() -> {
+                try {
+                    File downloaded = download(file);
+                    postIfAlive(() -> {
+                        progress.setVisibility(View.GONE);
+                        importDownloaded(downloaded);
+                    });
+                } catch (final IOException e) {
+                    postIfAlive(() -> {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(this, getString(R.string.curseforge_download_failed) + "\n\n"
+                                + UserFacingError.reason(ModrinthDetailActivity.this, e), Toast.LENGTH_LONG).show();
+                    });
+                }
+            });
+        } catch (RejectedExecutionException ignored) {
+            // The screen was destroyed between the check and the submit.
+        }
+    }
+
+    /** Posts to the UI thread only while the screen is still alive. */
+    private void postIfAlive(Runnable task) {
+        handler.post(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            task.run();
+        });
     }
 
     private File download(ModrinthFile file) throws IOException {
@@ -310,6 +327,7 @@ public class ModrinthDetailActivity extends BaseActivity {
             contentImporter.shutdown();
             contentImporter = null;
         }
+        worker.shutdownNow();
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }

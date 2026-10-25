@@ -23,12 +23,20 @@ import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 public class ModConfigActivity extends BaseActivity {
     public static final String EXTRA_MOD_NAME = "mod_name";
     public static final String EXTRA_MOD_ROOT = "mod_root";
 
     private final ModConfigManager configManager = new ModConfigManager();
+    //
+    // One worker for this screen instead of a fresh Thread per action: a raw Thread posted its
+    // result with runOnUiThread even after the Activity was destroyed, so a config that finished
+    // loading on the way out touched a dead view tree (or showed a dialog on a dead window).
+    private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final List<ModConfigManager.ConfigFile> configFiles = new ArrayList<>();
     private TextView titleText;
     private Spinner configSpinner;
@@ -75,9 +83,9 @@ public class ModConfigActivity extends BaseActivity {
 
     private void loadConfigFiles(File modRoot) {
         loadingProgress.setVisibility(View.VISIBLE);
-        new Thread(() -> {
+        runOnWorker(() -> {
             List<ModConfigManager.ConfigFile> files = configManager.scanConfigFiles(modRoot);
-            runOnUiThread(() -> {
+            runOnUiThreadIfAlive(() -> {
                 loadingProgress.setVisibility(View.GONE);
                 configFiles.clear();
                 configFiles.addAll(files);
@@ -88,7 +96,7 @@ public class ModConfigActivity extends BaseActivity {
                 setupSpinner();
                 loadConfig(configFiles.get(0));
             });
-        }).start();
+        });
     }
 
     private void setupSpinner() {
@@ -119,17 +127,17 @@ public class ModConfigActivity extends BaseActivity {
         currentFile = file;
         loadingProgress.setVisibility(View.VISIBLE);
         emptyText.setVisibility(View.GONE);
-        new Thread(() -> {
+        runOnWorker(() -> {
             try {
                 ModConfigManager.LoadedConfig loadedConfig = configManager.load(file);
-                runOnUiThread(() -> {
+                runOnUiThreadIfAlive(() -> {
                     loadingProgress.setVisibility(View.GONE);
                     adapter = new ModConfigAdapter(loadedConfig.getValue(), loadedConfig.getSchema());
                     recyclerView.setAdapter(adapter);
                     recyclerView.setVisibility(View.VISIBLE);
                 });
             } catch (Exception e) {
-                runOnUiThread(() -> {
+                runOnUiThreadIfAlive(() -> {
                     loadingProgress.setVisibility(View.GONE);
                     // Name the file as well as the cause. The screen can be showing several config
                     // files, and a bare getMessage() on a malformed one is usually null or
@@ -139,7 +147,7 @@ public class ModConfigActivity extends BaseActivity {
                             + "\n\n" + UserFacingError.describe(ModConfigActivity.this, e));
                 });
             }
-        }).start();
+        });
     }
 
     private void saveCurrentConfig() {
@@ -158,15 +166,15 @@ public class ModConfigActivity extends BaseActivity {
         }
 
         loadingProgress.setVisibility(View.VISIBLE);
-        new Thread(() -> {
+        runOnWorker(() -> {
             try {
                 configManager.save(currentFile, adapter.getRoot());
-                runOnUiThread(() -> {
+                runOnUiThreadIfAlive(() -> {
                     loadingProgress.setVisibility(View.GONE);
                     Toast.makeText(this, R.string.mod_config_saved, Toast.LENGTH_SHORT).show();
                 });
             } catch (Exception e) {
-                runOnUiThread(() -> {
+                runOnUiThreadIfAlive(() -> {
                     loadingProgress.setVisibility(View.GONE);
                     new CustomAlertDialog(this)
                             .setTitleText(getString(R.string.mod_config_save_failed))
@@ -175,7 +183,42 @@ public class ModConfigActivity extends BaseActivity {
                             .show();
                 });
             }
-        }).start();
+        });
+    }
+
+    /**
+     * Runs {@code task} on this screen's worker, or reports nothing when it is already torn down.
+     *
+     * <p>The old raw {@code Thread} per action had no owner, so a scan that was still running when
+     * the screen closed posted its result to a destroyed Activity anyway.
+     */
+    private void runOnWorker(Runnable task) {
+        if (worker.isShutdown()) return;
+        try {
+            worker.execute(task);
+        } catch (RejectedExecutionException ignored) {
+            // The screen was destroyed between the check and the submit; nothing to do.
+        }
+    }
+
+    /**
+     * Posts to the UI thread only while the screen is still alive.
+     *
+     * <p>Guarding here rather than at each call site is what stops a late result from touching a
+     * dead view tree, and stops a failure dialog from being shown on a dead window
+     * ({@code WindowManager.BadTokenException}).
+     */
+    private void runOnUiThreadIfAlive(Runnable task) {
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            task.run();
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        worker.shutdownNow();
+        super.onDestroy();
     }
 
     private void showEmpty(String message) {

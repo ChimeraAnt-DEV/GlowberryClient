@@ -46,6 +46,9 @@ import org.chimeramc.client.util.UIHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.List;
 
 /**
@@ -86,6 +89,9 @@ public class ModHubActivity extends BaseActivity {
     private ContentImporter contentImporter;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
+    // Owned so a Downloads walk in progress is torn down with the screen instead of posting its
+    // result to a destroyed Activity.
+    private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final List<TypeOption> typeOptions = new ArrayList<>();
     private final List<SortOption> sortOptions = new ArrayList<>();
 
@@ -397,20 +403,36 @@ public class ModHubActivity extends BaseActivity {
 
         // A full walk of the public Downloads directory can be slow on a busy device;
         // keep it off the UI thread.
-        new Thread(() -> {
-            List<DownloadsScanner.Found> found = DownloadsScanner.scan(ModHubActivity.this);
-            handler.post(() -> {
-                scanning = false;
-                downloadsProgress.setVisibility(View.GONE);
-                downloadsAdapter.setItems(found);
-                downloadsEmpty.setVisibility(found.isEmpty() ? View.VISIBLE : View.GONE);
+        if (worker.isShutdown()) {
+            scanning = false;
+            return;
+        }
+        try {
+            worker.execute(() -> {
+                List<DownloadsScanner.Found> found = DownloadsScanner.scan(ModHubActivity.this);
+                postIfAlive(() -> {
+                    scanning = false;
+                    downloadsProgress.setVisibility(View.GONE);
+                    downloadsAdapter.setItems(found);
+                    downloadsEmpty.setVisibility(found.isEmpty() ? View.VISIBLE : View.GONE);
 
-                int importable = downloadsAdapter.importableCount();
-                downloadsSummary.setText(getString(R.string.downloads_summary, importable, found.size()));
-                downloadsImportAllButton.setEnabled(importable > 0);
-                downloadsImportAllButton.setAlpha(importable > 0 ? 1f : 0.5f);
+                    int importable = downloadsAdapter.importableCount();
+                    downloadsSummary.setText(getString(R.string.downloads_summary, importable, found.size()));
+                    downloadsImportAllButton.setEnabled(importable > 0);
+                    downloadsImportAllButton.setAlpha(importable > 0 ? 1f : 0.5f);
+                });
             });
-        }).start();
+        } catch (RejectedExecutionException e) {
+            scanning = false;
+        }
+    }
+
+    /** Posts to the UI thread only while the screen is still alive. */
+    private void postIfAlive(Runnable task) {
+        handler.post(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            task.run();
+        });
     }
 
     private void importFound(DownloadsScanner.Found found) {
@@ -502,6 +524,7 @@ public class ModHubActivity extends BaseActivity {
             contentImporter.shutdown();
             contentImporter = null;
         }
+        worker.shutdownNow();
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
