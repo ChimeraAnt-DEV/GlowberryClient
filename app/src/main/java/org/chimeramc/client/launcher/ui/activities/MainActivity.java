@@ -424,10 +424,11 @@ import okhttp3.OkHttpClient;
                         refreshNavAccountUI();
                     }
                 });
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 // A stale or revoked token can no longer be refreshed silently. Send the user to the
                 // sign-in screen with the failure already explained instead of leaving them signed out
-                // with no prompt.
+                // with no prompt. Throwable, not Exception: an Error on this worker thread would
+                // otherwise die with the prompt never shown.
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
@@ -543,7 +544,10 @@ import okhttp3.OkHttpClient;
                         if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
                     });
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: decoding the avatar can exhaust the heap and that is an
+                // Error, which skipped this handler and left the account spinner turning forever
+                // with no way to tell it had failed.
                 runOnUiThread(() -> {
                     if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
                 });
@@ -591,7 +595,10 @@ import okhttp3.OkHttpClient;
                                     : null;
                         }
                         runOnUiThread(() -> { if (bmp != null) headerAvatar.setImageBitmap(bmp); });
-                    } catch (Exception ignored) {}
+                    } catch (Throwable ignored) {
+                        // Best-effort avatar: a decode failure, including a heap exhaustion while
+                        // decoding, must not kill the executor thread.
+                    }
                 });
             }
         }
@@ -689,7 +696,10 @@ import okhttp3.OkHttpClient;
                                  Toast.makeText(MainActivity.this, getString(R.string.ms_login_success, statusName), Toast.LENGTH_SHORT).show();
                                  refreshAccountHeaderUI();
                              });
-                         } catch (Exception e) {
+                         } catch (Throwable e) {
+                             // Throwable, not Exception: this handler is the only thing that dismisses
+                             // the "signing in" dialog, so an Error escaping it left that dialog up
+                             // forever with no sign-in and no message.
                              runOnUiThread(() -> {
                                  DialogUtils.dismissQuietly(accountLoadingDialog);
                                  Toast.makeText(MainActivity.this, getString(R.string.ms_login_failed_detail, MsftAuthManager.describeError(e)), Toast.LENGTH_LONG).show();
@@ -999,24 +1009,31 @@ import okhttp3.OkHttpClient;
             return;
         }
         migrationPromptCheckInFlight = true;
-        storageMigrationExecutor.execute(() -> {
-            boolean shouldOfferMigration = false;
-            try {
-                shouldOfferMigration = storageMigrationManager.shouldOfferMigration();
-            } catch (Exception ignored) {
-            }
-            boolean finalShouldOfferMigration = shouldOfferMigration;
-            runOnUiThread(() -> {
-                migrationPromptCheckInFlight = false;
-                if (isFinishing() || isDestroyed()) return;
-                if (!finalShouldOfferMigration) {
-                    initializeAfterMigrationGate();
-                    return;
+        // onDestroy shuts this executor down, and the check can be requested while the screen is
+        // going away. Submitting then throws on the UI thread. The gate flag is cleared so a later
+        // resume can retry instead of being blocked from ever offering the migration.
+        try {
+            storageMigrationExecutor.execute(() -> {
+                boolean shouldOfferMigration = false;
+                try {
+                    shouldOfferMigration = storageMigrationManager.shouldOfferMigration();
+                } catch (Exception ignored) {
                 }
-                if (migrationPromptShown || storageMigrationManager == null) return;
-                showStorageMigrationPromptDialog();
+                boolean finalShouldOfferMigration = shouldOfferMigration;
+                runOnUiThread(() -> {
+                    migrationPromptCheckInFlight = false;
+                    if (isFinishing() || isDestroyed()) return;
+                    if (!finalShouldOfferMigration) {
+                        initializeAfterMigrationGate();
+                        return;
+                    }
+                    if (migrationPromptShown || storageMigrationManager == null) return;
+                    showStorageMigrationPromptDialog();
+                });
             });
-        });
+        } catch (RejectedExecutionException rejected) {
+            migrationPromptCheckInFlight = false;
+        }
     }
 
     private void showStorageMigrationPromptDialog() {
