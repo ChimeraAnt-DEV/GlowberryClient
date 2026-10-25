@@ -137,6 +137,11 @@ public class SkinsSettingsFragment extends Fragment {
             ioExecutor.shutdownNow();
             ioExecutor = null;
         }
+        if (adapter != null) {
+            // The adapter owns a decode pool; without this the two worker threads outlive the view
+            // and stay parked for the life of the process.
+            adapter.shutdown();
+        }
         recycler = null;
         adapter = null;
         loadingOverlay = null;

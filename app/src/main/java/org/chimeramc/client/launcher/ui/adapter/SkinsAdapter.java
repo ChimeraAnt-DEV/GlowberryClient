@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHolder> {
 
@@ -34,8 +36,26 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
     private OnSkinActionListener listener;
     private String appliedPackName;
 
+    /**
+     * Decodes preview textures off the UI thread.
+     *
+     * <p>A small fixed pool rather than one thread per row: scrolling a large skin list used to
+     * spawn an unbounded number of short-lived threads, each holding a decoded bitmap. Two workers
+     * keep the visible rows filled without letting a fling open dozens of decoders at once.
+     */
+    private final ExecutorService previewExecutor = Executors.newFixedThreadPool(2, r -> {
+        Thread thread = new Thread(r, "skin-preview");
+        thread.setDaemon(true);
+        return thread;
+    });
+
     public SkinsAdapter() {
         setHasStableIds(true);
+    }
+
+    /** Releases the decode pool. Call from the host's {@code onDestroy}/{@code onDestroyView}. */
+    public void shutdown() {
+        previewExecutor.shutdownNow();
     }
 
     public void setOnSkinActionListener(OnSkinActionListener listener) {
@@ -76,23 +96,37 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
         });
 
         holder.preview.setImageResource(R.drawable.ic_tshirt);
+        holder.progress.setVisibility(View.GONE);
         holder.preview.post(() -> loadPreview(holder, pack, holder.getBindingAdapterPosition()));
     }
 
+    /**
+     * Loads a pack's preview texture and paints it into the row.
+     *
+     * <p>Both halves are off the UI thread. Finding the candidate PNG walks the pack directory
+     * recursively and the decode reads it; the walk used to run inline from
+     * {@code preview.post(...)}, so scrolling the skin list performed a directory walk per bind on
+     * the UI thread, and the decode spawned a fresh thread per row. One bounded pool replaces both,
+     * and the bitmap is applied only while the row still shows the same pack, so a fast scroll
+     * cannot paint a stale texture.
+     */
     private void loadPreview(SkinViewHolder holder, ResourcePackItem pack, int position) {
         if (position == RecyclerView.NO_POSITION) return;
-        File[] candidates = findPreviewCandidates(pack);
-        if (candidates == null || candidates.length == 0) return;
-        File first = candidates[0];
-        if (!first.exists()) return;
-
         holder.progress.setVisibility(View.VISIBLE);
-        new Thread(() -> {
-            Bitmap bitmap;
-            try (FileInputStream fis = new FileInputStream(first)) {
-                BitmapFactory.Options opts = new BitmapFactory.Options();
-                opts.inScaled = false;
-                bitmap = BitmapFactory.decodeStream(fis, null, opts);
+        previewExecutor.execute(() -> {
+            Bitmap bitmap = null;
+            try {
+                File[] candidates = findPreviewCandidates(pack);
+                if (candidates != null && candidates.length > 0) {
+                    File first = candidates[0];
+                    if (first.exists()) {
+                        try (FileInputStream fis = new FileInputStream(first)) {
+                            BitmapFactory.Options opts = new BitmapFactory.Options();
+                            opts.inScaled = false;
+                            bitmap = BitmapFactory.decodeStream(fis, null, opts);
+                        }
+                    }
+                }
             } catch (Exception e) {
                 bitmap = null;
             }
@@ -102,12 +136,13 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
             }
             Bitmap finalBitmap = bitmap;
             holder.itemView.post(() -> {
-                if (finalBitmap != null && holder.getBindingAdapterPosition() == position) {
+                if (holder.getBindingAdapterPosition() != position) return;
+                holder.progress.setVisibility(View.GONE);
+                if (finalBitmap != null) {
                     holder.preview.setImageBitmap(finalBitmap);
                 }
-                holder.progress.setVisibility(View.GONE);
             });
-        }).start();
+        });
     }
 
     private static File[] findPreviewCandidates(ResourcePackItem pack) {
