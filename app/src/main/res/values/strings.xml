@@ -131,6 +131,7 @@
     <string name="import_error_32bit_only">This version only contains 32-bit (armeabi-v7a) libraries. The launcher only supports 64-bit (arm64) versions, so it cannot be installed.</string>
     <string name="import_error_clear_failed">The launcher could not clear the existing files for this instance. Close any other app that may be using them, then try again. If it keeps failing, delete the instance from the Instances tab first.</string>
     <string name="import_error_create_dir">The launcher could not create the folder for this instance. Free some storage space and check that GlowberryClient has file access in Android Settings, then try again.</string>
+    <string name="import_error_cancelled">The import was cancelled because the screen was closed before it could start. Open the import again from a screen you will keep on screen while it runs.</string>
     <string name="import_error_open_package">The selected package could not be opened for reading. It may have been moved or deleted since you picked it. Pick the file again and retry.</string>
     <string name="import_error_no_base_apk">This bundle does not contain a base APK, so it is not a valid Minecraft package. Download it again from the source, or pick a different file.</string>
 
@@ -2406,6 +2407,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_reason_server_refused">The download source refused the request. It sometimes asks for a browser check before it will serve a file; complete the check in the browser panel, then try again.</string>
     <string name="error_reason_server_error">The download server reported an internal error. This is a problem on the server, not on your device. Try again in a few minutes.</string>
     <string name="error_reason_bad_response">The download source answered, but the launcher could not read a usable download link from it. The source may have changed its page layout. Try Refresh, and report it if it keeps happening.</string>
+    <string name="error_reason_out_of_memory">The launcher ran out of memory while handling this file. Close other apps and try again; if it keeps happening, the package may be larger than this device can import.</string>
     <string name="error_reason_out_of_space">There is not enough free storage to finish this. Free some space — the launcher needs room for the downloaded package and for the files it extracts from it — then try again.</string>
     <string name="error_reason_permission_denied">The launcher is not allowed to read or write that location. Grant storage access to GlowberryClient in Android Settings, then try again.</string>
     <string name="error_reason_corrupt_package">The downloaded file is damaged or is not a valid Minecraft package. Delete it and download it again; if it fails the same way, the source is serving a broken file.</string>
@@ -2422,6 +2424,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_short_server_refused">the source refused the request</string>
     <string name="error_short_server_error">the server reported an internal error</string>
     <string name="error_short_bad_response">the source returned something unreadable</string>
+    <string name="error_short_out_of_memory">the launcher ran out of memory</string>
     <string name="error_short_out_of_space">not enough free storage</string>
     <string name="error_short_permission_denied">storage permission denied</string>
     <string name="error_short_corrupt_package">the file is damaged or not a valid package</string>

@@ -64,6 +64,17 @@ public class UserFacingErrorTest {
     }
 
     @Test
+    public void anOutOfMemoryErrorIsNotReportedAsAFullDisk() {
+        // The launcher's heap running out and the device being out of storage have different fixes
+        // and used to share one message, which sent the user to free disk space that was never the
+        // problem. The type is the only signal an OutOfMemoryError carries.
+        assertEquals(UserFacingError.Cause.OUT_OF_MEMORY,
+                UserFacingError.classify(new OutOfMemoryError("Failed to allocate a 12 byte allocation")));
+        assertNotEquals(UserFacingError.Cause.OUT_OF_SPACE,
+                UserFacingError.classify(new OutOfMemoryError()));
+    }
+
+    @Test
     public void permissionDeniedIsRecognisedFromTheMessage() {
         assertEquals(UserFacingError.Cause.PERMISSION_DENIED,
                 UserFacingError.classify(new IOException("open failed: EACCES (Permission denied)")));

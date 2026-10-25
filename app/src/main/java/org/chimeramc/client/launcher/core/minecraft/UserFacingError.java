@@ -60,6 +60,16 @@ public final class UserFacingError {
         BAD_RESPONSE,
         /** The device is out of storage. */
         OUT_OF_SPACE,
+        /**
+         * The launcher's own process ran out of memory.
+         *
+         * <p>Distinct from {@link #OUT_OF_SPACE} because the fix is different and the two were
+         * conflated: an {@code OutOfMemoryError} while extracting a large package used to be
+         * reported as "not enough free storage", which sent the user to free disk space that was
+         * never the problem. There is plenty of disk; the heap the launcher is allowed to use ran
+         * out.
+         */
+        OUT_OF_MEMORY,
         /** The app is not allowed to read or write the target location. */
         PERMISSION_DENIED,
         /** The file is damaged or is not the kind of package it claims to be. */
@@ -185,7 +195,7 @@ public final class UserFacingError {
             Cause byText = classifyText(root.getMessage());
             return byText == Cause.UNKNOWN ? Cause.BAD_RESPONSE : byText;
         }
-        if (root instanceof OutOfMemoryError) return Cause.OUT_OF_SPACE;
+        if (root instanceof OutOfMemoryError) return Cause.OUT_OF_MEMORY;
         if (root instanceof InterruptedIOException) return Cause.INTERRUPTED;
 
         Cause byText = classifyText(root.getMessage());
@@ -224,6 +234,8 @@ public final class UserFacingError {
                 return R.string.error_reason_bad_response;
             case OUT_OF_SPACE:
                 return R.string.error_reason_out_of_space;
+            case OUT_OF_MEMORY:
+                return R.string.error_reason_out_of_memory;
             case PERMISSION_DENIED:
                 return R.string.error_reason_permission_denied;
             case CORRUPT_PACKAGE:
@@ -339,6 +351,8 @@ public final class UserFacingError {
                 return R.string.error_short_bad_response;
             case OUT_OF_SPACE:
                 return R.string.error_short_out_of_space;
+            case OUT_OF_MEMORY:
+                return R.string.error_short_out_of_memory;
             case PERMISSION_DENIED:
                 return R.string.error_short_permission_denied;
             case CORRUPT_PACKAGE:

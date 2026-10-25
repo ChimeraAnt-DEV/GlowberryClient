@@ -68,7 +68,11 @@ public class ApkInstaller {
     }
 
     public void install(final Uri apkOrApksUri, final String dirName) {
-        executor.submit(() -> {
+        // submit() throws RejectedExecutionException on the caller once the pool is shut down, and
+        // the caller is the UI thread. That happened when the owning screen was destroyed between
+        // the click and the submit, and it crashed instead of reporting.
+        try {
+            executor.submit(() -> {
             boolean committed = false;
             try {
                 lastPostedProgress = -1;
@@ -198,7 +202,13 @@ public class ApkInstaller {
                 postProgress(PROGRESS_MAX);
                 postSuccess(versionName);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: extracting a multi-hundred-megabyte package is the
+                // launcher's largest allocation, and an OutOfMemoryError is an Error, so it used
+                // to escape this block entirely. The caller only dismisses its modal progress
+                // dialog from onSuccess/onError, so the escape left that dialog on screen forever
+                // with no message and no way out but killing the app.
+                //
                 // Name the cause instead of pasting the exception. "Install error: null" was a
                 // real report: an IOException with no message produced a toast with no
                 // information in it. UserFacingError classifies the failure (out of space,
@@ -216,7 +226,13 @@ public class ApkInstaller {
                     rollBackPartialInstall(dirName);
                 }
             }
-        });
+            });
+        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+            // Nothing is running and the caller's modal dialog is still up; name the cause so it
+            // can be dismissed rather than hanging. The pool only rejects once its owner has been
+            // torn down, so the cause is the closed screen - not a bad package.
+            postError(context.getString(R.string.import_error_cancelled));
+        }
     }
 
     /** Removes a version directory left behind by an install that did not complete. */
