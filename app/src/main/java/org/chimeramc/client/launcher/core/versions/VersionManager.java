@@ -347,7 +347,13 @@ public class VersionManager {
                 }
                 if (totalSize == 0) totalSize = 1;
 
-                File libDir = getRuntimeLibDir(dataDirName);
+                // The storage profile id, not the raw folder name: the extractor writes its cache
+                // to MinecraftLauncher.getRuntimeLibAbiDir(...getStorageProfileId(version)...), and
+                // the two differ whenever the instance's folder name is not already a legal profile
+                // id. Repairing the un-sanitised folder left the extractor's real cache untouched
+                // and wrote a second copy the launch never reads - the repair "succeeded" and the
+                // launch still failed with the same missing-library error.
+                File libDir = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
                 if (libDir.exists()) {
                     deleteDir(libDir);
                 }
