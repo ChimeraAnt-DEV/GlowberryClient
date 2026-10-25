@@ -35,6 +35,7 @@ import java.util.zip.ZipInputStream;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 
 public class VersionManager {
+    private static final String TAG = "VersionManager";
     private static final String PREFS_NAME = "version_manager";
     private static final String KEY_SELECTED_TYPE = "selected_type";
     private static final String KEY_SELECTED_PACKAGE = "selected_package";
@@ -77,6 +78,18 @@ public class VersionManager {
 
     public interface InitCallback {
         void onReady(VersionManager manager);
+
+        /**
+         * Called when the manager could not be built at all.
+         *
+         * <p>Building it scans the instances directory and reads each version's metadata, so it can
+         * fail on an unreadable or corrupt store. Without this the caller waited forever: the
+         * screen disables its Launch control until {@link #onReady} arrives, and a swallowed
+         * failure meant that never happened. A default no-op keeps existing callers source
+         * compatible.
+         */
+        default void onFailed(Throwable error) {
+        }
     }
 
     public static VersionManager get(Context ctx) {
@@ -99,9 +112,20 @@ public class VersionManager {
     public static void initializeAsync(Context ctx, InitCallback callback) {
         Context appContext = ctx.getApplicationContext();
         new Thread(() -> {
-            VersionManager manager = get(appContext);
-            if (callback != null) {
-                callback.onReady(manager);
+            // The build is disk I/O over the instances directory, so it can fail. A failure has to
+            // reach the caller: the screen that started this disabled its Launch control and only
+            // re-arms it on a callback, so an uncaught throw would strand it disabled with no
+            // message. Reported through onFailed rather than swallowed.
+            try {
+                VersionManager manager = get(appContext);
+                if (callback != null) {
+                    callback.onReady(manager);
+                }
+            } catch (Throwable error) {
+                android.util.Log.e(TAG, "Version manager initialisation failed", error);
+                if (callback != null) {
+                    callback.onFailed(error);
+                }
             }
         }, "version-manager-init").start();
     }

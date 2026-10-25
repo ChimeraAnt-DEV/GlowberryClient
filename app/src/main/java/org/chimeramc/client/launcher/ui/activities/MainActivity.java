@@ -800,11 +800,29 @@ import okhttp3.OkHttpClient;
             onVersionManagerReady();
             return;
         }
-        VersionManager.initializeAsync(this, manager -> runOnUiThread(() -> {
-            if (isFinishing() || isDestroyed()) return;
-            versionManager = manager;
-            onVersionManagerReady();
-        }));
+        VersionManager.initializeAsync(this, new VersionManager.InitCallback() {
+            @Override
+            public void onReady(VersionManager manager) {
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    versionManager = manager;
+                    onVersionManagerReady();
+                });
+            }
+
+            @Override
+            public void onFailed(Throwable error) {
+                // The Launch control was disabled above and only onVersionManagerReady re-arms it,
+                // so a failed build has to release it here or the Play button stays dead for the
+                // life of the screen. The cause is named through the same classifier the rest of
+                // the launch path uses.
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    resetLaunchButton();
+                    reportLaunchFailure(error);
+                });
+            }
+        });
     }
 
     private void onVersionManagerReady() {
