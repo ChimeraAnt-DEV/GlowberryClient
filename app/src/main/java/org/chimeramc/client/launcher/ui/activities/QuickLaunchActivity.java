@@ -304,10 +304,15 @@ public class QuickLaunchActivity extends BaseActivity {
 
         final ServerItem server = new ServerItem(name, ip, port);
         new Thread(() -> {
-            boolean ok = ServerManager.writeServerToFile(serverFile, server);
-            runOnUiThread(() -> Toast.makeText(this,
-                    ok ? R.string.server_added : R.string.server_exists,
-                    Toast.LENGTH_SHORT).show());
+            ServerManager.AddResult result = ServerManager.writeServerToFile(serverFile, server);
+            // A write failure used to report "that server is already in your list", which sent the
+            // user looking for a duplicate instead of at the storage problem that actually occurred.
+            int message = result == ServerManager.AddResult.ADDED
+                    ? R.string.server_added
+                    : result == ServerManager.AddResult.DUPLICATE
+                            ? R.string.server_exists
+                            : R.string.server_add_failed;
+            runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
         }).start();
     }
 

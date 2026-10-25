@@ -183,14 +183,20 @@ public class ContentManager {
     public void addServer(ServerItem server, ContentOperationCallback callback) {
         setStatus("Adding server...");
         refreshExecutor.execute(() -> {
-            boolean success = serverManager.addServer(server);
-            if (success) {
+            ServerManager.AddResult result = serverManager.addServer(server);
+            if (result == ServerManager.AddResult.ADDED) {
                 refreshServers();
                 setStatus("Server added");
                 if (callback != null) callback.onSuccess("Server added");
             } else {
-                setStatus("Failed to add server");
-                if (callback != null) callback.onError("Failed to add server");
+                // A duplicate and a write failure are different problems with different fixes; the
+                // boolean this replaced reported both as "Failed to add server", and the Quick
+                // Launch path reported both as "already in your list".
+                String message = result == ServerManager.AddResult.DUPLICATE
+                        ? "That server is already in your list"
+                        : "Could not add the server";
+                setStatus(message);
+                if (callback != null) callback.onError(message);
             }
         });
     }
