@@ -23,7 +23,7 @@
 
     <!-- About -->
     <string name="about_title">アプリについて</string>
-    <string name="copyright">©2024–2026 GlowberryClient. All rights reserved.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Apache License 2.0 の下でライセンスされています。</string>
     <string name="font_license">このアプリは Misans フォントを使用しています。</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">クイックアクション</string>

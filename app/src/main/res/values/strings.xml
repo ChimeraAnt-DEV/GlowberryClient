@@ -40,7 +40,7 @@
 
     <!-- About -->
     <string name="about_title">About</string>
-    <string name="copyright">©2024–2026 GlowberryClient. All rights reserved.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Licensed under the Apache License 2.0.</string>
     <string name="font_license">This app uses the Misans font.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Quick Actions</string>

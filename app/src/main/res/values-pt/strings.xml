@@ -23,7 +23,7 @@
 
     <!-- About -->
     <string name="about_title">Sobre</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Todos os direitos reservados.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Licenciado sob a Licença Apache 2.0.</string>
     <string name="font_license">Este aplicativo usa a fonte Misans.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Ações Rápidas</string>

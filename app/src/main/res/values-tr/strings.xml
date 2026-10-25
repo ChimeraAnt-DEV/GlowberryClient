@@ -22,7 +22,7 @@
 
     <!-- About -->
     <string name="about_title">Hakkında</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Tüm hakları saklıdır.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Apache 2.0 Lisansı ile lisanslanmıştır.</string>
     <string name="font_license">Bu uygulama Misans yazı tipini kullanmaktadır.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Hızlı İşlemler</string>

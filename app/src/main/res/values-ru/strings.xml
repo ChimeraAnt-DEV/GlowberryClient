@@ -19,7 +19,7 @@
 
     <!-- О приложении -->
     <string name="about_title">О приложении</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Все права защищены.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Лицензировано по лицензии Apache 2.0.</string>
     <string name="font_license">Это приложение использует шрифт Misans.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Быстрые действия</string>

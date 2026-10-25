@@ -22,7 +22,7 @@
 
     <!-- About -->
     <string name="about_title">Về</string>
-    <string name="copyright">©2024–2026 GlowberryClient. Mọi quyền được bảo lưu.</string>
+    <string name="copyright">©2024–2026 GlowberryClient. Được cấp phép theo Giấy phép Apache 2.0.</string>
     <string name="font_license">Ứng dụng đang sử dụng phông chữ Misans.</string>
     <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Thao tác nhanh</string>
