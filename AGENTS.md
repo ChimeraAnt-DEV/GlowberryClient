@@ -1166,6 +1166,12 @@ Do not re-run this RE from scratch; these are the conclusions.
   aliases of those four, never literals. `SPACE_1/2/3/4/6/8` = 4/8/12/16/24/32dp.
   `TEXT_DISPLAY/TITLE_ROLE/BODY/LABEL/CAPTION` are the five type roles. `UiTokensTest` pins all
   four scales, so adding a bespoke value fails the build rather than drifting.
+  The XML side is the same scale: `dimens.xml` declares `radius_small/medium/large/xlarge` at those
+  four values and the card tokens (`chimera_card_radius` 16dp, `chimera_card_radius_small` 12dp)
+  **alias** them. They used to be a fifth and sixth radius (14dp/10dp) that every shared card
+  drawable read, so an XML card and a code-drawn `UiCard` rounded different corners;
+  `UiTokensTest.theXmlRadiusTokensAreTheSameScaleAsTheCode` reads the real resource file to keep
+  them aliased.
 - **One accent, resolved from the theme (U7).** `PersonalizationManager.getAccentColor()` now reads
   the theme's `colorPrimary` through `resolveThemeColor` — so Material You's wallpaper palette wins
   when dynamic colour is on and the brand colour is the fallback. The stored accent pref, the two

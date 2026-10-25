@@ -6,9 +6,19 @@
     designed.
 -->
 <resources>
+    <!--
+        The one radius scale (U10): 8/12/16/28dp, mirroring UiTokens.RADIUS_*. A surface picks one
+        of the four; the card tokens below are aliases of them rather than values of their own, so a
+        card drawn in XML and one drawn in code (UiCard) round the same corner.
+    -->
+    <dimen name="radius_small">8dp</dimen>
+    <dimen name="radius_medium">12dp</dimen>
+    <dimen name="radius_large">16dp</dimen>
+    <dimen name="radius_xlarge">28dp</dimen>
+
     <!-- Card geometry -->
-    <dimen name="chimera_card_radius">14dp</dimen>
-    <dimen name="chimera_card_radius_small">10dp</dimen>
+    <dimen name="chimera_card_radius">@dimen/radius_large</dimen>
+    <dimen name="chimera_card_radius_small">@dimen/radius_medium</dimen>
     <dimen name="chimera_card_border_width">1dp</dimen>
     <dimen name="chimera_card_elevation">2dp</dimen>
     <dimen name="chimera_card_elevation_glow">6dp</dimen>

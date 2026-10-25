@@ -5,6 +5,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Pins the shared UI tokens: the exact palette values, the contrast ratios the spec requires
  * (text.primary on bg.surface &gt;= 7:1, text.secondary &gt;= 4.5:1) and the toggle state machine.
@@ -240,5 +248,47 @@ public class UiTokensTest {
         // radius: UiCard draws at RADIUS_CARD and UiButton at RADIUS_BUTTON.
         assertEquals(UiTokens.RADIUS_LARGE, UiTokens.RADIUS_CARD);
         assertEquals(UiTokens.RADIUS_LARGE, UiTokens.RADIUS_BUTTON);
+    }
+
+    /**
+     * The XML card tokens must be the same four scale values, not a fifth and sixth radius.
+     *
+     * <p>This is the half that drifted: {@code UiTokens} declared 8/12/16/28 and AGENTS.md called the
+     * scale closed, while {@code dimens.xml} kept a 14dp card and a 10dp small card that every shared
+     * card drawable read. A card drawn in XML and one drawn in code (UiCard, at RADIUS_CARD = 16)
+     * therefore rounded a visibly different corner. The test reads the real resource file so a future
+     * literal cannot slip back in unnoticed.
+     */
+    @Test
+    public void theXmlRadiusTokensAreTheSameScaleAsTheCode() throws IOException {
+        String dimens = readResource("app/src/main/res/values/dimens.xml");
+        assertEquals(UiTokens.RADIUS_SMALL + "dp", dimenValue(dimens, "radius_small"));
+        assertEquals(UiTokens.RADIUS_MEDIUM + "dp", dimenValue(dimens, "radius_medium"));
+        assertEquals(UiTokens.RADIUS_LARGE + "dp", dimenValue(dimens, "radius_large"));
+        assertEquals(UiTokens.RADIUS_XLARGE + "dp", dimenValue(dimens, "radius_xlarge"));
+
+        // The card tokens alias the scale rather than restating a value.
+        assertEquals("@dimen/radius_large", dimenValue(dimens, "chimera_card_radius"));
+        assertEquals("@dimen/radius_medium", dimenValue(dimens, "chimera_card_radius_small"));
+    }
+
+    private static String dimenValue(String xml, String name) {
+        Matcher m = Pattern.compile(
+                "<dimen name=\"" + Pattern.quote(name) + "\">([^<]+)</dimen>").matcher(xml);
+        assertTrue("dimen " + name + " is missing from dimens.xml", m.find());
+        return m.group(1).trim();
+    }
+
+    private static String readResource(String relativePath) throws IOException {
+        Path dir = Paths.get("").toAbsolutePath();
+        for (int i = 0; i < 6 && dir != null; i++) {
+            Path candidate = dir.resolve(relativePath);
+            if (Files.isRegularFile(candidate)) {
+                return new String(Files.readAllBytes(candidate), StandardCharsets.UTF_8);
+            }
+            dir = dir.getParent();
+        }
+        throw new IllegalStateException("could not find " + relativePath + " from "
+                + Paths.get("").toAbsolutePath());
     }
 }
