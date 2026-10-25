@@ -22,13 +22,13 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import org.chimeramc.client.R
+import org.chimeramc.client.core.minecraft.LaunchLogBuffer
 import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
 import org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
 import org.chimeramc.client.ui.activities.BaseActivity
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog
 import org.chimeramc.client.util.PersonalizationManager
 import java.text.SimpleDateFormat
-import java.util.ArrayDeque
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -57,7 +57,9 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
     private var statusRenderScheduled = false
     private var lastRenderedStatus: String? = null
     private var lastRenderedDetail: String? = null
-    private val visibleLogMessages = ArrayDeque<String>()
+    // The cap and the render live in a pure, tested class; the view is assigned its whole output
+    // so the two can never disagree about how many lines exist.
+    private val launchLog = LaunchLogBuffer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -217,10 +219,7 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         if (message == lastLogMessage) return
         val timestamp = timeFormat.format(Date())
         lastLogMessage = message
-        visibleLogMessages.addLast("[$timestamp] ${trace.formatForUi(message)}")
-        while (visibleLogMessages.size > MAX_VISIBLE_LOG_LINES) {
-            visibleLogMessages.removeFirst()
-        }
+        launchLog.add("[$timestamp] ${trace.formatForUi(message)}")
         scheduleLogRender()
     }
 
@@ -230,11 +229,12 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         mainHandler.postDelayed({
             logRenderScheduled = false
             if (isFinishing || isDestroyed) return@postDelayed
-            logView.append(visibleLogMessages.removeFirst())
-            for (message in visibleLogMessages) {
-                logView.append("\n$message")
-            }
-            visibleLogMessages.clear()
+            // The buffer mirrors what should be on screen, so it is re-rendered wholesale. Appending
+            // only the newly arrived lines treated it as a delta queue, which left the line cap
+            // bounding the *buffer* and not the view: the TextView accumulated every line of the
+            // whole launch with no ceiling, so a slow extraction grew it into a long-layout,
+            // high-memory scroll that also duplicated lines when a render drained the queue.
+            logView.text = launchLog.render()
             logScroll.post { logScroll.fullScroll(ScrollView.FOCUS_DOWN) }
         }, LOG_RENDER_DEBOUNCE_MS)
     }
@@ -417,6 +417,5 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
         private const val LOG_RENDER_DEBOUNCE_MS = 200L
         private const val STATUS_RENDER_DEBOUNCE_MS = 100L
         private const val TRACK_ALPHA = 42
-        private const val MAX_VISIBLE_LOG_LINES = 48
     }
 }
