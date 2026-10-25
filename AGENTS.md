@@ -2245,7 +2245,18 @@ black and no pure white: `#070A0F` + `#E8EEF6` is what reads as "smooth" rather 
 - **Components are pure where it matters.** `UiToggle`, `UiRow`, `UiChip`, `UiRailButton`, `UiButton`,
   `UiCard`, `UiSegmented`, `UiSlider`, `UiSearchField`, `UiWindow` keep their geometry/state machine
   pure and are covered by `UiTokensTest` (palette, WCAG contrast, toggle state machine, segmented
-  hit-testing, window bounds). `UiIcons` is the outline icon set (24dp grid, 2dp stroke, round caps).
+  hit-testing, slider value→thumb, rail-button stacking, window bounds/title-bar/content tiling,
+  search-field clear bounds). `UiIcons` is the outline icon set (24dp grid, 2dp stroke, round caps).
+  **Geometry that a JVM test must pin is exposed in an array form** (`UiWindow.boundsArray`/
+  `titleBarArray`/`contentArray`, `UiRailButton.boundsArray`, `UiSearchField.clearBoundsArray`),
+  because `android.graphics.RectF` is not on the unit-test classpath; the `RectF` overloads delegate
+  to the arrays so there is one definition. `UiCard`/`UiButton` take their radius as a parameter and
+  are exercised by the gallery, not by a geometry assertion.
+- **The hidden UI gallery renders every component, not a sample.** `UiGalleryActivity` shows the
+  palette, the type roles, the shape scale and one live view per component (toggle, row, window
+  chrome, segmented, search field, slider, button, card, rail button). It is the device pass for the
+  shared library — a component added without a gallery entry has no way to be eyeballed on hardware,
+  and the gallery's own doc-comment claims "every shared component in every state".
 - **The radial wheel is rounded annular sectors, not stroked arcs.** `RadialMenuView` builds each
   sector as one `Path` (outer arc, quadratic corner fillet, inner arc, fillet) with a **parallel-sided
   linear gap** (`RadialWheelLayout.angularHalfGapDegrees`, constant 6dp) rather than a fixed angular

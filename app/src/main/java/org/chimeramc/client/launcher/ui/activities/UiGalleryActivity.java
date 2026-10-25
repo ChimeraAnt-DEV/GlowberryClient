@@ -73,6 +73,34 @@ public class UiGalleryActivity extends Activity {
         root.addView(new UiRowView(this, accent, false, false));
         root.addView(new UiRowView(this, accent, true, false));
 
+        addSection(root, density, "Window chrome");
+        root.addView(new UiWindowView(this, density));
+
+        addSection(root, density, "Segmented (first / second selected)");
+        root.addView(new UiSegmentedView(this, accent, 0));
+        root.addView(new UiSegmentedView(this, accent, 1));
+
+        addSection(root, density, "Search field (empty / with text)");
+        root.addView(new UiSearchFieldView(this, false));
+        root.addView(new UiSearchFieldView(this, true));
+
+        addSection(root, density, "Slider (25% / 75%)");
+        root.addView(new UiSliderView(this, accent, 25f));
+        root.addView(new UiSliderView(this, accent, 75f));
+
+        addSection(root, density, "Buttons (primary / secondary / pressed / disabled)");
+        root.addView(new UiButtonView(this, accent, org.chimeramc.client.ui.components.UiButton.Style.PRIMARY, false, true));
+        root.addView(new UiButtonView(this, accent, org.chimeramc.client.ui.components.UiButton.Style.SECONDARY, false, true));
+        root.addView(new UiButtonView(this, accent, org.chimeramc.client.ui.components.UiButton.Style.PRIMARY, true, true));
+        root.addView(new UiButtonView(this, accent, org.chimeramc.client.ui.components.UiButton.Style.SECONDARY, false, false));
+
+        addSection(root, density, "Card surface");
+        root.addView(new UiCardView(this));
+
+        addSection(root, density, "Rail buttons (selected / unselected)");
+        root.addView(new UiRailButtonView(this, accent, true));
+        root.addView(new UiRailButtonView(this, accent, false));
+
         setContentView(scroll);
     }
 
@@ -155,6 +183,192 @@ public class UiGalleryActivity extends Activity {
         row.addView(label);
         row.setPadding(0, (int) (UiTokens.SPACE_1 * density), 0, (int) (UiTokens.SPACE_1 * density));
         root.addView(row);
+    }
+
+    /** A live window chrome rendered by {@code UiWindow}, at the real panel geometry. */
+    private static final class UiWindowView extends View {
+        private final float density;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiWindowView(Activity a, float density) {
+            super(a);
+            this.density = density;
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (180 * density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            android.graphics.RectF window = new android.graphics.RectF(
+                    0, 0, getWidth(), getHeight() - 8 * density);
+            org.chimeramc.client.ui.components.UiWindow.draw(canvas, paint, window,
+                    UiTokens.RADIUS_WINDOW * density, density, 12 * density, 0.35f);
+        }
+    }
+
+    /** A live segmented control rendered by {@code UiSegmented}. */
+    private static final class UiSegmentedView extends View {
+        private final int accent;
+        private final int selected;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint text = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiSegmentedView(Activity a, int accent, int selected) {
+            super(a);
+            this.accent = accent;
+            this.selected = selected;
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (44 * a.getResources()
+                    .getDisplayMetrics().density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            float h = org.chimeramc.client.ui.components.UiSegmented.HEIGHT_DP * density;
+            android.graphics.RectF b = new android.graphics.RectF(
+                    0, (getHeight() - h) / 2f, Math.min(getWidth(), 240 * density),
+                    (getHeight() + h) / 2f);
+            org.chimeramc.client.ui.components.UiSegmented.draw(canvas, paint, text, b,
+                    new String[]{"Navy", "Black", "System"}, selected, accent, density);
+        }
+    }
+
+    /** A live search field rendered by {@code UiSearchField}. */
+    private static final class UiSearchFieldView extends View {
+        private final boolean withText;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiSearchFieldView(Activity a, boolean withText) {
+            super(a);
+            this.withText = withText;
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (44 * a.getResources()
+                    .getDisplayMetrics().density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            float h = org.chimeramc.client.ui.components.UiSearchField.HEIGHT_DP * density;
+            android.graphics.RectF field = new android.graphics.RectF(
+                    0, (getHeight() - h) / 2f, Math.min(getWidth(), 240 * density),
+                    (getHeight() + h) / 2f);
+            org.chimeramc.client.ui.components.UiSearchField.draw(canvas, paint, field,
+                    withText ? "fps" : "", withText, density);
+        }
+    }
+
+    /** A live slider rendered by {@code UiSlider} at the given percentage. */
+    private static final class UiSliderView extends View {
+        private final int accent;
+        private final float percent;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiSliderView(Activity a, int accent, float percent) {
+            super(a);
+            this.accent = accent;
+            this.percent = percent;
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (32 * a.getResources()
+                    .getDisplayMetrics().density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            float right = Math.min(getWidth(), 240 * density);
+            org.chimeramc.client.ui.components.UiSlider.draw(canvas, paint,
+                    8 * density, right - 8 * density, getHeight() / 2f,
+                    percent, 0f, 100f, accent, density);
+        }
+    }
+
+    /** A live button rendered by {@code UiButton}. */
+    private static final class UiButtonView extends View {
+        private final int accent;
+        private final org.chimeramc.client.ui.components.UiButton.Style style;
+        private final boolean pressed;
+        private final boolean enabled;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiButtonView(Activity a, int accent, org.chimeramc.client.ui.components.UiButton.Style style,
+                     boolean pressed, boolean enabled) {
+            super(a);
+            this.accent = accent;
+            this.style = style;
+            this.pressed = pressed;
+            this.enabled = enabled;
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (56 * a.getResources()
+                    .getDisplayMetrics().density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            android.graphics.RectF b = new android.graphics.RectF(
+                    0, 6 * density, Math.min(getWidth(), 180 * density), getHeight() - 6 * density);
+            org.chimeramc.client.ui.components.UiButton.draw(canvas, paint, b,
+                    UiTokens.RADIUS_BUTTON * density, accent, style, pressed, enabled);
+        }
+    }
+
+    /** A live card surface rendered by {@code UiCard}. */
+    private static final class UiCardView extends View {
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiCardView(Activity a) {
+            super(a);
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (72 * a.getResources()
+                    .getDisplayMetrics().density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            android.graphics.RectF b = new android.graphics.RectF(
+                    0, 6 * density, Math.min(getWidth(), 260 * density), getHeight() - 6 * density);
+            org.chimeramc.client.ui.components.UiCard.draw(canvas, paint, b,
+                    UiTokens.RADIUS_CARD * density);
+        }
+    }
+
+    /** A live rail button rendered by {@code UiRailButton}. */
+    private static final class UiRailButtonView extends View {
+        private final int accent;
+        private final boolean selected;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        UiRailButtonView(Activity a, int accent, boolean selected) {
+            super(a);
+            this.accent = accent;
+            this.selected = selected;
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (52 * a.getResources()
+                    .getDisplayMetrics().density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            android.graphics.RectF b = org.chimeramc.client.ui.components.UiRailButton
+                    .bounds(0f, (getHeight() - UiTokens.RAIL_BUTTON * density) / 2f, density, 0);
+            org.chimeramc.client.ui.components.UiRailButton.drawBackground(canvas, paint, b,
+                    UiTokens.RADIUS_BUTTON * density, accent, selected, false);
+            paint.setColor(org.chimeramc.client.ui.components.UiRailButton
+                    .iconColor(accent, selected));
+            canvas.drawCircle(b.centerX(), b.centerY(), 8 * density, paint);
+        }
     }
 
     /** A live toggle rendered by {@code UiToggle}, at a fixed 36x20dp. */

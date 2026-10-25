@@ -15,11 +15,23 @@ public final class UiRailButton {
 
     /** The button's rectangle inside a rail column of the given width, at the given slot. */
     public static RectF bounds(float railLeft, float railTop, float density, int slot) {
+        float[] b = boundsArray(railLeft, railTop, density, slot);
+        return new RectF(b[0], b[1], b[2], b[3]);
+    }
+
+    /**
+     * The button's rectangle as {@code {left, top, right, bottom}}, pure and device-free.
+     *
+     * <p>The array form exists so the geometry is testable on the JVM: {@code android.graphics.RectF}
+     * is not on the unit-test classpath, which is the same reason {@link UiWindow#boundsArray}
+     * exists. {@link #bounds} delegates here, so there is one definition of the layout.
+     */
+    public static float[] boundsArray(float railLeft, float railTop, float density, int slot) {
         float size = UiTokens.RAIL_BUTTON * density;
         float gap = 8f * density;
         float left = railLeft + (UiTokens.RAIL_WIDTH * density - size) / 2f;
         float top = railTop + slot * (size + gap);
-        return new RectF(left, top, left + size, top + size);
+        return new float[]{left, top, left + size, top + size};
     }
 
     /** Draws the button background for a state. */

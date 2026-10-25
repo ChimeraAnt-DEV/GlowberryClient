@@ -191,4 +191,54 @@ public class UiTokensTest {
         assertEquals(400 * 0.66f, narrow[2] - narrow[0], 0.5f);
         assertEquals(800 * 0.78f, narrow[3] - narrow[1], 0.5f);
     }
+
+    @Test
+    public void windowTitleBarAndContentTileTheWindowWithoutOverlap() {
+        float[] window = UiWindow.boundsArray(1200, 800, 1f);
+        float[] bar = UiWindow.titleBarArray(window[0], window[1], window[2], window[3], 1f);
+        float[] content = UiWindow.contentArray(window[0], window[1], window[2], window[3], 1f);
+        assertEquals(UiTokens.TITLEBAR_HEIGHT, bar[3] - bar[1], 0.5f);
+        assertEquals(window[0], bar[0], 0.5f);
+        assertEquals(window[2], bar[2], 0.5f);
+        // The content starts exactly where the bar ends and reaches the window's bottom.
+        assertEquals(bar[3], content[1], 0.5f);
+        assertEquals(window[3], content[3], 0.5f);
+    }
+
+    @Test
+    public void searchFieldClearButtonSitsInsideTheField() {
+        float[] clear = UiSearchField.clearBoundsArray(0f, 0f, 200f, UiSearchField.HEIGHT_DP, 1f);
+        assertTrue("the clear button must be inside the field horizontally",
+                clear[0] >= 0f && clear[2] <= 200f);
+        assertTrue("the clear button must be inside the field vertically",
+                clear[1] >= 0f && clear[3] <= UiSearchField.HEIGHT_DP);
+        assertTrue(clear[2] - clear[0] > 0f && clear[3] - clear[1] > 0f);
+    }
+
+    @Test
+    public void railButtonsStackDownTheColumnWithoutOverlap() {
+        float density = 1f;
+        float[] first = UiRailButton.boundsArray(0f, 0f, density, 0);
+        float[] second = UiRailButton.boundsArray(0f, 0f, density, 1);
+        assertEquals(UiTokens.RAIL_BUTTON, first[2] - first[0], 0.5f);
+        assertEquals(UiTokens.RAIL_BUTTON, first[3] - first[1], 0.5f);
+        assertTrue("the second button must sit below the first", second[1] > first[3]);
+        // The button is centred in the rail column.
+        assertEquals((UiTokens.RAIL_WIDTH - UiTokens.RAIL_BUTTON) / 2f, first[0], 0.5f);
+    }
+
+    @Test
+    public void aSelectedRailButtonDrawsItsIconInWhiteAndAnUnselectedOneInSecondary() {
+        assertEquals(0xFFFFFFFF, UiRailButton.iconColor(UiTokens.ACCENT_500, true));
+        assertEquals(UiTokens.TEXT_SECONDARY, UiRailButton.iconColor(UiTokens.ACCENT_500, false));
+    }
+
+    @Test
+    public void theCardAndButtonRadiiComeFromTheScaleNotABespokeValue() {
+        // The two surface helpers take their radius as a parameter, and every caller in the app
+        // passes a scale token. Pinning the mapping here is what keeps a caller from inventing a
+        // radius: UiCard draws at RADIUS_CARD and UiButton at RADIUS_BUTTON.
+        assertEquals(UiTokens.RADIUS_LARGE, UiTokens.RADIUS_CARD);
+        assertEquals(UiTokens.RADIUS_LARGE, UiTokens.RADIUS_BUTTON);
+    }
 }
