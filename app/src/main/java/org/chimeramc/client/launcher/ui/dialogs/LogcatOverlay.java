@@ -502,7 +502,6 @@ public class LogcatOverlay extends FrameLayout {
             if (ln.isEmpty()) continue;
             items.add(colorizeLine(ln));
         }
-        int startPos = logAdapter.getItemCount();
         logAdapter.addAll(items);
         if (autoScroll) smoothScrollToBottom();
     }
@@ -687,9 +686,17 @@ public class LogcatOverlay extends FrameLayout {
 
         void addAll(@NonNull List<CharSequence> more) {
             if (more.isEmpty()) return;
-            int start = items.size();
             items.addAll(more);
-            notifyItemRangeInserted(start, more.size());
+            // The adapter is the view, so it needs the same ceiling the ring buffer has: without
+            // this the list grew to every line the overlay had ever shown (the buffer capped itself
+            // and the view kept appending), so a long session with the overlay open turned into an
+            // unbounded RecyclerView whose every insert got slower.
+            int excess = items.size() - MAX_BUFFER_LINES;
+            if (excess > 0) {
+                items.subList(0, excess).clear();
+                notifyItemRangeRemoved(0, excess);
+            }
+            notifyItemRangeInserted(items.size() - more.size(), more.size());
         }
 
         void setItems(@NonNull List<CharSequence> newItems) {
