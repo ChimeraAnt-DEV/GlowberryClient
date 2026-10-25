@@ -2149,7 +2149,12 @@ public class ModMenuOverlay {
         }
         if (adapter != null) {
             adapter.setCompactMode(compact);
-            adapter.updateMods(filteredMods, favoriteKeys);
+            // Rebuild through the filter path rather than handing the adapter the module list
+            // alone: the two-argument updateMods appends no section actions, so toggling density
+            // silently dropped the ACTIONS block (Reset HUD Position / Reload Modules) until the
+            // next filter change. applyFilters() recomputes both the modules and the actions for
+            // the section that is on screen.
+            applyFilters();
         }
         applyCompactModeLayout(compact);
         updateFilterBarVisibility();

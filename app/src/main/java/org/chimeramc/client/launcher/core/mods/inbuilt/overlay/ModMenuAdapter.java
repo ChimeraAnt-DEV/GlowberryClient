@@ -378,16 +378,17 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
-    public void updateMods(List<UnifiedMod> mods, Set<String> favoriteKeys) {
-        updateMods(mods, favoriteKeys, java.util.Collections.emptyList());
-    }
-
     /**
      * Replaces the list with the modules and the one-shot actions for the current section (M3).
      *
      * <p>Actions are appended after the modules under their own {@code ACTIONS} header, never mixed
      * into a module's section: a switch and a chevron must not sit in the same run, because that is
      * exactly the "is this a toggle or a button?" ambiguity the split removes.
+     *
+     * <p>There is deliberately no module-list-only overload. One existed and the density toggle
+     * called it, which silently dropped the ACTIONS block until the next filter change; making the
+     * action list a required argument means a caller cannot rebuild the list without deciding what
+     * happens to the actions.
      */
     public void updateMods(List<UnifiedMod> mods, Set<String> favoriteKeys,
                            List<ModMenuAction> sectionActions) {
