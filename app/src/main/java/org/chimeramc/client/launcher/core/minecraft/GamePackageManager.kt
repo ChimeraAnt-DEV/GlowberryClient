@@ -20,6 +20,7 @@ import java.util.zip.ZipFile
 
 import org.chimeramc.client.core.minecraft.ExtractionCachePolicy
 import org.chimeramc.client.core.minecraft.NativeLibraryVersionGate
+import org.chimeramc.client.core.minecraft.RequiredNativeLibraries
 
 class GamePackageManager private constructor(
     private val context: Context,
@@ -51,16 +52,11 @@ class GamePackageManager private constructor(
 
     private val knownPackages = arrayOf(MinecraftLauncher.MC_PACKAGE_NAME)
 
-    private val requiredLibs = arrayOf(
-        "libc++_shared.so",
-        "libfmod.so",
-        "libMediaDecoders_Android.so",
-        "libminecraftpe.so",
-    )
+    // The list itself lives in RequiredNativeLibraries (pure, Android-free) so the repair-need
+    // check and this manager cannot disagree about what the loader will open.
+    private val requiredLibs = RequiredNativeLibraries.BASE.toTypedArray()
 
-    private val optionalLibs = arrayOf(
-        "libHttpClient.Android.so",
-    )
+    private val optionalLibs = RequiredNativeLibraries.OPTIONAL.toTypedArray()
 
     private val extractableLibs = requiredLibs + optionalLibs
 
@@ -691,8 +687,7 @@ class GamePackageManager private constructor(
         // complete and then fail at load with "libmaesdk.so not found" - the same class of
         // cache/loader disagreement the HTTP-client gate had. The list itself comes from the shared
         // rule, so the cache and the loader cannot drift again.
-        val gated = NativeLibraryVersionGate.gatedLibraries(version?.versionCode)
-        return (requiredLibs.asList() + gated).toTypedArray()
+        return RequiredNativeLibraries.required(version?.versionCode).toTypedArray()
     }
 
     private fun shouldLoadHttpClient(): Boolean {

@@ -14,6 +14,9 @@ import androidx.annotation.NonNull;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.minecraft.AbiBitness;
+import org.chimeramc.client.core.minecraft.ExtractedLibraryState;
+import org.chimeramc.client.core.minecraft.GamePackageManager;
+import org.chimeramc.client.core.minecraft.RequiredNativeLibraries;
 import org.chimeramc.client.core.minecraft.MinecraftLauncher;
 import org.chimeramc.client.core.mods.ModManager;
 import org.chimeramc.client.ui.activities.MainActivity;
@@ -473,6 +476,8 @@ public class VersionManager {
                     "unknown"
             );
 
+            // An installed package's libraries come from the app's own native dir, not the
+            // extraction cache, so there is nothing here to repair.
             gv.needsRepair = false;
             if (!hasSoFiles) {
                 gv.isExtractFalse = true;
@@ -497,7 +502,11 @@ public class VersionManager {
                 if (!apk.exists()) continue;
 
                 GameVersion gv = getGameVersion(dir);
-                gv.needsRepair = false;
+                // Read the extracted cache rather than assuming it is intact. This was hard-coded
+                // to false, so the launch-time "missing game library files, repair now?" offer and
+                // MainActivity.repairNeededVersions() could never fire: a version whose libraries
+                // had been deleted or truncated failed at dlopen with no way to fix it in-app.
+                gv.needsRepair = computeNeedsRepair(gv);
                 gv.onlyVersionTxt = false;
                 customVersions.add(gv);
             }
@@ -554,6 +563,68 @@ public class VersionManager {
         File dir = new File(baseDir, packageName);
         LauncherStorage.ensureDir(dir);
         return dir;
+    }
+
+    /**
+     * Whether an instance's extracted native-library cache is present but incomplete.
+     *
+     * <p>Drives {@code GameVersion.needsRepair}, which the launch path and
+     * {@link #repairNeededVersions} read. The rule is pure ({@link ExtractedLibraryState}); this
+     * only supplies the file-system facts.
+     */
+    private boolean computeNeedsRepair(GameVersion version) {
+        if (version == null) return false;
+        // The same root the extractor writes and the repair clears, so all three agree on where the
+        // cache lives: the storage profile id, not the raw directory name (they differ for an
+        // instance whose folder name is not already sanitised).
+        File libRoot = getRuntimeLibDir(MinecraftLauncher.getStorageProfileId(version));
+        if (!libRoot.isDirectory()) return false;
+        List<String> required = RequiredNativeLibraries.required(version.versionCode);
+        String expectedMarker = String.valueOf(GamePackageManager.calculateNativeExtractionVersion());
+        return ExtractedLibraryState.needsRepair(
+                required,
+                java.util.Arrays.asList(MinecraftLauncher.repairTargetAbiDirs()),
+                isExtractionMarkerCurrent(libRoot, expectedMarker),
+                new ExtractedLibraryState.DirectoryProbe() {
+                    @Override
+                    public boolean directoryExists(String abiDirName) {
+                        return new File(libRoot, abiDirName).isDirectory();
+                    }
+
+                    @Override
+                    public boolean fileIsNonEmpty(String abiDirName, String libName) {
+                        File f = new File(new File(libRoot, abiDirName), libName);
+                        return f.isFile() && f.length() > 0L;
+                    }
+                });
+    }
+
+    /**
+     * Whether the extraction marker under any ABI directory names the current extraction version.
+     *
+     * <p>Reads the same marker, in the same place, as
+     * {@code GamePackageManager.isExtractionCacheCurrent}: the extractor writes it inside the ABI
+     * directory it extracted into, and only after a complete extraction. A current marker is
+     * therefore the record that the cache was whole for this build, which is what lets a missing
+     * library be called damage rather than "not extracted yet".
+     */
+    private boolean isExtractionMarkerCurrent(File libRoot, String expectedMarker) {
+        for (String abiDir : MinecraftLauncher.repairTargetAbiDirs()) {
+            File marker = new File(new File(libRoot, abiDir), "native_extraction_version");
+            if (marker.isFile()) {
+                try (FileInputStream in = new FileInputStream(marker)) {
+                    byte[] raw = new byte[(int) Math.min(marker.length(), 64L)];
+                    int read = in.read(raw);
+                    if (read > 0 && new String(raw, 0, read, java.nio.charset.StandardCharsets.UTF_8)
+                            .trim().equals(expectedMarker)) {
+                        return true;
+                    }
+                } catch (IOException ignored) {
+                    // An unreadable marker is not evidence of a current one.
+                }
+            }
+        }
+        return false;
     }
 
     private boolean hasSoFilesInDir(File nativeLibDir) {
