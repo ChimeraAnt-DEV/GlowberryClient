@@ -18,6 +18,7 @@ import android.widget.TextView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.vip.MenuBindRelay;
+import org.chimeramc.client.launcher.controller.ControllerConnectionMonitor;
 import org.chimeramc.client.launcher.controller.ControllerInputProcessor;
 import org.chimeramc.client.launcher.controller.ControllerProfile;
 import org.chimeramc.client.launcher.controller.ControllerProfileList;
@@ -322,13 +323,7 @@ final class ModMenuControllerSection {
         if (im == null) return null;
         for (int id : im.getInputDeviceIds()) {
             InputDevice device = im.getInputDevice(id);
-            if (device == null) continue;
-            if (ControllerType.from(device) != null) return device;
-            int sources = device.getSources();
-            if ((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
-                    || (sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
-                return device;
-            }
+            if (ControllerConnectionMonitor.isGamepad(device)) return device;
         }
         return null;
     }

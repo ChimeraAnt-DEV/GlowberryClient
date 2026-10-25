@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.view.InputDevice;
+
 import org.junit.Test;
 
 /**
@@ -22,6 +24,24 @@ public class ControllerConnectionMonitorTest {
     public void disconnectedMessageFallsBackToTouchControls() {
         assertEquals("DualSense disconnected. Touch controls active.",
                 ControllerConnectionMonitor.disconnectedMessage("DualSense"));
+    }
+
+    @Test
+    public void sourceFilterRejectsKeyboardAndDpadClassBits() {
+        // These devices share SOURCE_CLASS_BUTTON with SOURCE_GAMEPAD. A partial/nonzero mask
+        // check would mistake both for controllers.
+        assertFalse(ControllerConnectionMonitor.isGamepadSource(InputDevice.SOURCE_KEYBOARD));
+        assertFalse(ControllerConnectionMonitor.isGamepadSource(InputDevice.SOURCE_DPAD));
+        assertFalse(ControllerConnectionMonitor.isGamepadSource(InputDevice.SOURCE_MOUSE));
+        assertFalse(ControllerConnectionMonitor.isGamepadSource(InputDevice.SOURCE_TOUCHSCREEN));
+    }
+
+    @Test
+    public void sourceFilterAcceptsFullGamepadAndJoystickSources() {
+        assertTrue(ControllerConnectionMonitor.isGamepadSource(InputDevice.SOURCE_GAMEPAD));
+        assertTrue(ControllerConnectionMonitor.isGamepadSource(InputDevice.SOURCE_JOYSTICK));
+        assertTrue(ControllerConnectionMonitor.isGamepadSource(
+                InputDevice.SOURCE_GAMEPAD | InputDevice.SOURCE_KEYBOARD));
     }
 
     @Test

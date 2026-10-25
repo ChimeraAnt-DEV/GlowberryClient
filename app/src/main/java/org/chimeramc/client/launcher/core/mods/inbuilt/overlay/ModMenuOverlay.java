@@ -42,6 +42,7 @@ import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.core.mods.pvp.PvpSectionPolicy;
 import org.chimeramc.client.core.mods.inbuilt.model.ModLoadoutStore;
 import org.chimeramc.client.core.mods.inbuilt.vip.ModCategory;
+import org.chimeramc.client.launcher.controller.ControllerConnectionMonitor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1794,9 +1795,7 @@ public class ModMenuOverlay {
             for (int id : inputManager.getInputDeviceIds()) {
                 android.view.InputDevice device = inputManager.getInputDevice(id);
                 if (device == null) continue;
-                int sources = device.getSources();
-                if ((sources & android.view.InputDevice.SOURCE_GAMEPAD) != 0
-                        || (sources & android.view.InputDevice.SOURCE_JOYSTICK) != 0) {
+                if (ControllerConnectionMonitor.isGamepad(device)) {
                     return true;
                 }
             }

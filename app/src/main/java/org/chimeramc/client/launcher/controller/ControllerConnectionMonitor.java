@@ -240,8 +240,18 @@ public final class ControllerConnectionMonitor {
 
     /** True for a source that is a gamepad or joystick rather than a keyboard or touchscreen. */
     public static boolean isGamepad(InputDevice device) {
-        if (device == null) return false;
-        int sources = device.getSources();
+        return device != null && isGamepadSource(device.getSources());
+    }
+
+    /**
+     * Checks an Android input-source bitfield for a complete gamepad or joystick source.
+     *
+     * <p>Use equality against the full source constant, not a nonzero bitwise intersection:
+     * {@link InputDevice#SOURCE_GAMEPAD} and {@link InputDevice#SOURCE_KEYBOARD} both include
+     * {@code SOURCE_CLASS_BUTTON}, so testing {@code (sources & SOURCE_GAMEPAD) != 0} also
+     * classifies an ordinary keyboard as a controller.
+     */
+    public static boolean isGamepadSource(int sources) {
         return (sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
                 || (sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK;
     }
