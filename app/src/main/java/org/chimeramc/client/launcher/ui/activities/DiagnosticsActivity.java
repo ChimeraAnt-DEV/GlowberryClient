@@ -1,5 +1,6 @@
 package org.chimeramc.client.launcher.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -148,7 +149,8 @@ public class DiagnosticsActivity extends BaseActivity {
      * took, which on a cold cache is long enough for the system to call it an ANR.
      */
     private void refresh() {
-        probeExecutor.execute(() -> {
+        // onDestroy shuts the probe pool down; a refresh tap that races it is simply dropped.
+        runProbe(() -> {
             Snapshot gathered = gatherSnapshot();
             uiHandler.post(() -> {
                 if (isFinishing() || isDestroyed()) return;
@@ -657,6 +659,17 @@ public class DiagnosticsActivity extends BaseActivity {
         sb.append("\n");
         sb.append(Locale.getDefault().toString()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * Submits a probe gather, tolerating a pool {@link #onDestroy()} has shut down.
+     *
+     * <p>Refresh is a button, so a tap that lands as the screen closes would otherwise throw
+     * {@link java.util.concurrent.RejectedExecutionException} on the main thread.
+     */
+    private void runProbe(Runnable work) {
+        // A false return means the screen is going away; there is nothing to render.
+        SafeExecutor.submit(probeExecutor, work);
     }
 
     @Override

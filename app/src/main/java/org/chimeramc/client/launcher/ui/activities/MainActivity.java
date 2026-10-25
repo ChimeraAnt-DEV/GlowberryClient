@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -414,7 +415,7 @@ import okhttp3.OkHttpClient;
             return;
         }
         final String accountId = active.id;
-        accountExecutor.execute(() -> {
+        runOnAccountExecutor(() -> {
             try {
                 BedrockAuthManager authManager = MsftAuthManager.refreshAndAuth(active);
                 MsftAuthManager.saveAccountOrThrow(MainActivity.this, authManager);
@@ -530,7 +531,7 @@ import okhttp3.OkHttpClient;
         accountAvatar.setTag(R.id.nav_account_avatar, url);
         accountAvatar.setImageDrawable(null);
         if (avatarProgress != null) avatarProgress.setVisibility(View.VISIBLE);
-        accountExecutor.execute(() -> {
+        runOnAccountExecutor(() -> {
             try {
                 try (Response imgResp = avatarClient.newCall(new Request.Builder().url(url).build()).execute()) {
                     Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null) ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream()) : null;
@@ -580,7 +581,7 @@ import okhttp3.OkHttpClient;
         } else if (active != null) {
             final String url = AccountTextUtils.sanitizeUrl(active.xboxAvatarUrl);
             if (url != null) {
-                accountExecutor.execute(() -> {
+                runOnAccountExecutor(() -> {
                     try {
                         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
                         org.chimeramc.client.settings.LowLatencyNetworkManager.configure(clientBuilder);
@@ -683,7 +684,7 @@ import okhttp3.OkHttpClient;
                      accountLoadingDialog = DialogUtils.ensure(MainActivity.this, accountLoadingDialog);
                      DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_auth_xbox_device));
 
-                     accountExecutor.execute(() -> {
+                     runOnAccountExecutor(() -> {
                          try {
                              BedrockAuthManager authManager = MsftAuthManager.refreshAndAuth(account);
                              MsftAuthManager.saveAccountOrThrow(MainActivity.this, authManager);
@@ -2896,7 +2897,19 @@ import okhttp3.OkHttpClient;
         launchStatsExecutor.shutdownNow();
         // The account executor was never shut down either, so it outlived the Activity.
         accountExecutor.shutdownNow();
-        super.onDestroy();
     }
 
- }
+    /**
+     * Submits account work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>Every call site is reached from a UI event - a sign-in tap, an account switch, an avatar
+     * bind - so a submit that raced the teardown threw
+     * {@link java.util.concurrent.RejectedExecutionException} on the main thread and took the Launch
+     * tab down. The work is best-effort (a refresh or an avatar decode), so dropping it is safe.
+     */
+    private void runOnAccountExecutor(Runnable work) {
+        // A false return means the screen is gone; there is nothing to refresh.
+        SafeExecutor.submit(accountExecutor, work);
+    }
+
+}

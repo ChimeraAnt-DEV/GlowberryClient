@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -178,7 +179,7 @@ public class CustomFlatWorldActivity extends BaseActivity {
             layersCopy.add(new BlockLayer(layer.blockName, layer.count));
         }
 
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 FlatWorldGenerator.generateFlatWorld(worldsDirectory, worldName, layersCopy, biomeId, gameMode);
 
@@ -188,7 +189,9 @@ public class CustomFlatWorldActivity extends BaseActivity {
                     setResult(RESULT_OK);
                     finish();
                 });
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that clears the spinner
+                // and re-enables Create; generating a world writes a lot of blocks.
                 runOnUiThread(() -> {
                     binding.loadingProgress.setVisibility(View.GONE);
                     binding.createWorldButton.setEnabled(true);
@@ -204,6 +207,19 @@ public class CustomFlatWorldActivity extends BaseActivity {
         super.onDestroy();
         if (executor != null) {
             executor.shutdown();
+        }
+    }
+
+    /**
+     * Submits work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>Reachable from a button press, and a press that lands as the screen closes would otherwise
+     * throw {@link java.util.concurrent.RejectedExecutionException} on the main thread.
+     */
+    private void runOnExecutor(Runnable work) {
+        // A false return means the screen is gone; the log names the dropped task.
+        if (!SafeExecutor.submit(executor, work)) {
+            android.util.Log.w("CustomFlatWorld", "Task dropped: the screen is gone");
         }
     }
 

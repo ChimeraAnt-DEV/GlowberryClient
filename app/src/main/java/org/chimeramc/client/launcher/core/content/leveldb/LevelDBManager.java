@@ -59,7 +59,8 @@ public class LevelDBManager {
                 callback.onProgress(100, 100);
                 callback.onComplete(entries);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to load database", e);
                 callback.onError("Failed to load database: " + e.getMessage());
             }
@@ -147,7 +148,8 @@ public class LevelDBManager {
                 Log.d(TAG, "Export complete: " + exported + "/" + total + " structures exported to " + outputPath);
                 callback.onComplete(exported, outputPath);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to export structures", e);
                 callback.onError("Export failed: " + e.getMessage());
             }

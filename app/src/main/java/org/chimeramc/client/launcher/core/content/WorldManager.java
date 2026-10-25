@@ -1,5 +1,6 @@
 package org.chimeramc.client.core.content;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -55,17 +56,11 @@ public class WorldManager {
      * what makes the race harmless.
      */
     private boolean submit(Runnable work, WorldOperationCallback callback) {
-        if (executor.isShutdown()) {
+        if (!SafeExecutor.submit(executor, work)) {
             callback.onError("WorldManager has been shut down");
             return false;
         }
-        try {
-            executor.execute(work);
-            return true;
-        } catch (java.util.concurrent.RejectedExecutionException rejected) {
-            callback.onError("WorldManager has been shut down");
-            return false;
-        }
+        return true;
     }
 
     public void setCurrentVersion(GameVersion version) {

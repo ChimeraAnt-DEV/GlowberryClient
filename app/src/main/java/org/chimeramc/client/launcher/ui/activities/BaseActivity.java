@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -521,7 +522,7 @@ public class BaseActivity extends AppCompatActivity {
         avatar.setTag(R.id.nav_account_avatar, url);
         avatar.setImageResource(R.drawable.ic_minecraft_cube);
         if (progress != null) progress.setVisibility(View.VISIBLE);
-        navAccountExecutor.execute(() -> {
+        if (!runOnNavAccountExecutor(() -> {
             Bitmap bmp = null;
             try (Response imgResp = navAvatarClient.newCall(new Request.Builder().url(url).build()).execute()) {
                 if (imgResp.isSuccessful() && imgResp.body() != null) {
@@ -539,7 +540,11 @@ public class BaseActivity extends AppCompatActivity {
                 }
                 if (progress != null) progress.setVisibility(View.GONE);
             });
-        });
+        })) {
+            // onDestroy shut the pool down while this avatar was being requested; the placeholder
+            // stays up, which is the same result as a failed download.
+            if (progress != null) progress.setVisibility(View.GONE);
+        }
     }
 
     private void handleNavAccountLoginResult(int resultCode, Intent data) {
@@ -775,6 +780,17 @@ public class BaseActivity extends AppCompatActivity {
         // change was never seen.
         controllerMonitor().clearListener(controllerListener);
         super.onStop();
+    }
+
+    /**
+     * Submits nav-bar account work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>The avatar fetch is kicked off from a UI event, so a submit that raced the teardown threw
+     * {@link java.util.concurrent.RejectedExecutionException} on the main thread and took the screen
+     * down. Returns false when the work could not be submitted.
+     */
+    private boolean runOnNavAccountExecutor(Runnable work) {
+        return SafeExecutor.submit(navAccountExecutor, work);
     }
 
     @Override

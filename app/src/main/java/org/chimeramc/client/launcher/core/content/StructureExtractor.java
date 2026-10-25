@@ -160,7 +160,8 @@ public class StructureExtractor {
                 finalDbManager.shutdown();
                 callback.onComplete(structures);
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to load structures", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Failed to load structures", e.getMessage()));
                 if (dbManager != null) {
@@ -190,7 +191,8 @@ public class StructureExtractor {
                     callback.onError("Structure has no data");
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that answers the callback.
                 Log.e(TAG, "Failed to export structure", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Export failed", e.getMessage()));
             }

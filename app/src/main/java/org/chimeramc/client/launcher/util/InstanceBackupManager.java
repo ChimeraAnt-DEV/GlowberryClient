@@ -132,8 +132,19 @@ public class InstanceBackupManager {
         executor.shutdownNow();
     }
 
+    /**
+     * Submits backup work, tolerating a pool {@link #close()} has shut down.
+     *
+     * <p>{@code close()} runs from the host's teardown while a Backup or Restore button can still be
+     * pressed, so the submit raced it and threw {@link java.util.concurrent.RejectedExecutionException}
+     * on the main thread. Returns false when the work could not be submitted.
+     */
+    private boolean submit(Runnable work) {
+        return SafeExecutor.submit(executor, work);
+    }
+
     public void backup(GameVersion version, BackupCallback callback) {
-        executor.execute(() -> {
+        if (!submit(() -> {
             postStarted(callback);
             OutputTarget target = null;
             try {
@@ -177,18 +188,22 @@ public class InstanceBackupManager {
                 finishOutputTarget(target, true);
                 postProgress(callback, 100, lastProgress);
                 postBackupSuccess(callback, target.displayPath);
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that dismisses the progress
+                // dialog. An instance backup is a large zip copy, so an OutOfMemoryError is realistic.
                 Log.e(TAG, "Failed to backup instance", e);
                 if (target != null) {
                     finishOutputTarget(target, false);
                 }
                 postBackupError(callback, e.getMessage());
             }
-        });
+        })) {
+            postBackupError(callback, "The backup manager has been shut down");
+        }
     }
 
     public void restore(Uri backupUri, RestoreCallback callback) {
-        executor.execute(() -> {
+        if (!submit(() -> {
             postStarted(callback);
             File tempFile = new File(context.getCacheDir(), "instance_restore_" + System.currentTimeMillis() + ".zip");
             try {
@@ -208,7 +223,9 @@ public class InstanceBackupManager {
                     VersionManager.get(context).loadAllVersions();
                     postRestoreSuccess(callback, restoredName);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that dismisses the progress
+                // dialog. An instance backup is a large zip copy, so an OutOfMemoryError is realistic.
                 Log.e(TAG, "Failed to restore instance backup", e);
                 postRestoreError(callback, e.getMessage());
             } finally {
@@ -216,7 +233,9 @@ public class InstanceBackupManager {
                     tempFile.delete();
                 }
             }
-        });
+        })) {
+            postRestoreError(callback, "The backup manager has been shut down");
+        }
     }
 
     public static boolean isBackupFileName(String fileName) {

@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -62,6 +63,20 @@ public class OptionsEditorActivity extends BaseActivity {
         optionsEditor = new OptionsEditor(new File(optionsPath));
         setupUI(storageType);
         loadOptionsData();
+    }
+
+    /**
+     * Submits options work, tolerating an executor {@link #onDestroy()} has shut down.
+     *
+     * <p>Both calls are reachable from a button press, and a press that lands as the screen closes
+     * would otherwise throw {@link java.util.concurrent.RejectedExecutionException} on the main
+     * thread. A dropped load is harmless; a dropped save is not, so the log names it.
+     */
+    private void runOnExecutor(Runnable work) {
+        // A false return means the screen is gone; the log names the dropped task.
+        if (!SafeExecutor.submit(executor, work)) {
+            android.util.Log.w("OptionsEditor", "Options task dropped: the screen is gone");
+        }
     }
 
     private void setupUI(String storageType) {
@@ -131,11 +146,13 @@ public class OptionsEditorActivity extends BaseActivity {
         binding.optionsRecyclerView.setVisibility(View.GONE);
         binding.emptyText.setVisibility(View.GONE);
 
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 optionsEditor.load();
                 runOnUiThread(this::displayOptions);
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that clears the spinner,
+                // and parsing a large options file can exhaust the heap.
                 runOnUiThread(() -> {
                     binding.loadingProgress.setVisibility(View.GONE);
                     binding.emptyText.setVisibility(View.VISIBLE);
@@ -185,7 +202,7 @@ public class OptionsEditorActivity extends BaseActivity {
         binding.loadingProgress.setVisibility(View.VISIBLE);
         binding.saveButton.setEnabled(false);
 
-        executor.execute(() -> {
+        runOnExecutor(() -> {
             try {
                 optionsEditor.save();
                 runOnUiThread(() -> {
@@ -193,7 +210,9 @@ public class OptionsEditorActivity extends BaseActivity {
                     hasUnsavedChanges = false;
                     Toast.makeText(this, R.string.options_saved, Toast.LENGTH_SHORT).show();
                 });
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that re-enables Save and
+                // clears the spinner.
                 runOnUiThread(() -> {
                     binding.loadingProgress.setVisibility(View.GONE);
                     binding.saveButton.setEnabled(true);

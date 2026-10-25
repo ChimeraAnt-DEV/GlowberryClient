@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.activities;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -353,7 +354,7 @@ public class ContentDetailsActivity extends BaseActivity {
             Toast.makeText(this, getString(R.string.curseforge_downloading), Toast.LENGTH_SHORT).show();
         });
         
-        downloadExecutor.execute(() -> {
+        if (!runOnDownloadExecutor(() -> {
             try {
                 File cacheDir = getCacheDir();
                 File outputFile = new File(cacheDir, file.fileName);
@@ -381,7 +382,10 @@ public class ContentDetailsActivity extends BaseActivity {
                     importFile(outputFile);
                 });
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // Throwable, not Exception: this handler is the only thing that clears the progress
+                // bar and re-enables Install, and a CurseForge download buffers a whole pack in
+                // memory - an OutOfMemoryError skipped it and left the screen stuck mid-download.
                 runOnUiThread(() -> {
                     progressBar.setVisibility(View.GONE);
                     btnInstall.setEnabled(true);
@@ -389,7 +393,22 @@ public class ContentDetailsActivity extends BaseActivity {
                             + UserFacingError.reason(this, e), Toast.LENGTH_LONG).show();
                 });
             }
-        });
+        })) {
+            // onDestroy shut the download pool down while the Install tap was being handled.
+            progressBar.setVisibility(View.GONE);
+            btnInstall.setEnabled(true);
+        }
+    }
+
+    /**
+     * Submits a CurseForge download, tolerating a pool {@link #onDestroy()} has shut down.
+     *
+     * <p>Install is a button, so a tap that lands as the screen closes would otherwise throw
+     * {@link java.util.concurrent.RejectedExecutionException} on the main thread. Returns false when
+     * the work could not be submitted.
+     */
+    private boolean runOnDownloadExecutor(Runnable work) {
+        return SafeExecutor.submit(downloadExecutor, work);
     }
 
     private void importFile(File file) {

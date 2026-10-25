@@ -481,25 +481,37 @@ public class ContentListActivity extends BaseActivity {
         }
         ExecutorService executor = pingExecutor;
         for (org.chimeramc.client.core.content.ServerItem server : toPing) {
-            executor.execute(() -> {
-                // The row renders "checking" until a result arrives, so a throw here left that
-                // server showing a ping check that could never finish. A failure is reported as an
-                // offline result rather than as no result.
-                ServerPongInfo pong;
-                try {
-                    pong = RakNetPing.ping(server.ip, server.port, 3000);
-                } catch (Throwable t) {
-                    Log.w(TAG, "Server ping failed for " + server.ip + ":" + server.port, t);
-                    pong = null;
-                }
-                final ServerPongInfo result = pong;
-                boolean failed = result == null;
+            // A ping for a row the user has just scrolled away from is submitted while the screen is
+            // still alive, but a refresh can race onDestroy and shut the pool down between the check
+            // and this submit. The row would then keep saying "checking" forever, so a rejected ping
+            // is reported as an offline result instead.
+            try {
+                executor.execute(() -> {
+                    // The row renders "checking" until a result arrives, so a throw here left that
+                    // server showing a ping check that could never finish. A failure is reported as
+                    // an offline result rather than as no result.
+                    ServerPongInfo pong;
+                    try {
+                        pong = RakNetPing.ping(server.ip, server.port, 3000);
+                    } catch (Throwable t) {
+                        Log.w(TAG, "Server ping failed for " + server.ip + ":" + server.port, t);
+                        pong = null;
+                    }
+                    final ServerPongInfo result = pong;
+                    boolean failed = result == null;
+                    mainHandler.post(() -> {
+                        if (serversAdapter != null) {
+                            serversAdapter.onPingResult(server, result, failed);
+                        }
+                    });
+                });
+            } catch (java.util.concurrent.RejectedExecutionException rejected) {
                 mainHandler.post(() -> {
                     if (serversAdapter != null) {
-                        serversAdapter.onPingResult(server, result, failed);
+                        serversAdapter.onPingResult(server, null, true);
                     }
                 });
-            });
+            }
         }
     }
 

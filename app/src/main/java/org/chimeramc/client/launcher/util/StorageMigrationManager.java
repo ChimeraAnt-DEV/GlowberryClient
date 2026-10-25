@@ -154,11 +154,7 @@ public class StorageMigrationManager {
     public void startMigration(MigrationCallback callback) {
         if (!running.compareAndSet(false, true)) return;
         cancelled = false;
-        try {
-            executor.execute(() -> {
-                runMigration(callback);
-            });
-        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+        if (!SafeExecutor.submit(executor, () -> runMigration(callback))) {
             // close() shut the pool down between the CAS and the submit. The caller is waiting on a
             // callback that can no longer arrive, so it is answered here instead.
             running.set(false);

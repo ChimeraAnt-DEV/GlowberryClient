@@ -1,5 +1,6 @@
 package org.chimeramc.client.core.content;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.content.Context;
 import android.util.Log;
 
@@ -140,20 +141,18 @@ public class ContentManager {
     private void runOperation(Runnable work, ContentOperationCallback callback) {
         final android.os.Handler mainHandler =
                 new android.os.Handler(android.os.Looper.getMainLooper());
-        try {
-            refreshExecutor.execute(() -> {
-                try {
-                    work.run();
-                } catch (Throwable t) {
-                    Log.w(TAG, "Content operation failed", t);
-                    final String reason = UserFacingError.reason(context, t);
-                    mainHandler.post(() -> {
-                        setStatus(reason);
-                        if (callback != null) callback.onError(reason);
-                    });
-                }
-            });
-        } catch (java.util.concurrent.RejectedExecutionException rejected) {
+        if (!SafeExecutor.submit(refreshExecutor, () -> {
+            try {
+                work.run();
+            } catch (Throwable t) {
+                Log.w(TAG, "Content operation failed", t);
+                final String reason = UserFacingError.reason(context, t);
+                mainHandler.post(() -> {
+                    setStatus(reason);
+                    if (callback != null) callback.onError(reason);
+                });
+            }
+        })) {
             // The manager was shut down under the caller; answer the callback rather than leaving
             // the screen waiting on a result that can never arrive.
             if (callback != null) callback.onError("The content manager has been shut down");

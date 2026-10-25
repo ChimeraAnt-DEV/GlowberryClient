@@ -1,5 +1,6 @@
 package org.chimeramc.client.ui.views;
 
+import org.chimeramc.client.util.SafeExecutor;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -51,22 +52,20 @@ public class MainViewModel extends ViewModel {
      */
     private void loadMods(boolean invalidateCache) {
         long generation = refreshGeneration.incrementAndGet();
-        try {
-            modsExecutor.execute(() -> {
-                List<Mod> mods;
-                try {
-                    mods = invalidateCache ? modManager.reloadMods() : modManager.getMods();
-                } catch (Throwable t) {
-                    Log.w(TAG, "Mod discovery failed; publishing an empty list", t);
-                    mods = new ArrayList<>();
-                }
-                if (generation == refreshGeneration.get()) {
-                    modsLiveData.postValue(mods);
-                }
-            });
-        } catch (java.util.concurrent.RejectedExecutionException rejected) {
-            // The ViewModel was cleared under the caller; settle the observer rather than leaving
-            // it on a value that will never arrive.
+        // onCleared shuts this pool down. A load queued from a late observer is dropped, and the
+        // observer is settled with an empty list rather than left on a value that cannot arrive.
+        if (!runOnModsExecutor(() -> {
+            List<Mod> mods;
+            try {
+                mods = invalidateCache ? modManager.reloadMods() : modManager.getMods();
+            } catch (Throwable t) {
+                Log.w(TAG, "Mod discovery failed; publishing an empty list", t);
+                mods = new ArrayList<>();
+            }
+            if (generation == refreshGeneration.get()) {
+                modsLiveData.postValue(mods);
+            }
+        })) {
             modsLiveData.postValue(new ArrayList<>());
         }
     }
@@ -94,6 +93,17 @@ public class MainViewModel extends ViewModel {
             modManager.reorderMods(reorderedMods);
             refreshMods();
         }).start();
+    }
+
+    /**
+     * Submits a mod load, tolerating a pool {@link #onCleared()} has shut down.
+     *
+     * <p>{@code onCleared()} can run between a load being requested and this submit (the ViewModel is
+     * cleared when the screen goes away), and submitting to a shut-down executor throws on the
+     * calling thread. Returns false when the work could not be submitted.
+     */
+    private boolean runOnModsExecutor(Runnable work) {
+        return SafeExecutor.submit(modsExecutor, work);
     }
 
     @Override
