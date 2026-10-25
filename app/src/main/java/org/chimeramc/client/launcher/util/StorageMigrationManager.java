@@ -104,6 +104,19 @@ public class StorageMigrationManager {
         this.prefs = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
+    /**
+     * Releases the migration worker.
+     *
+     * <p>The manager is created per owner (an Activity, or the migration service), so without this
+     * its single-thread pool outlived the screen that created it. Idempotent, and safe to call while
+     * a migration is running: the worker is interrupted and {@code running} is cleared, which is the
+     * state the interrupted-run bookkeeping already expects.
+     */
+    public void close() {
+        running.set(false);
+        executor.shutdownNow();
+    }
+
     public boolean shouldOfferMigration() {
         if (running.get()) return false;
         if (isMigrationCompleted()) return false;

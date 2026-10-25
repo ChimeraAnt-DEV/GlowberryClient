@@ -357,6 +357,10 @@ public class StorageMigrationService extends Service {
             markInterrupted("service stopped before completion");
         }
         releaseWakeLock();
+        if (migrationManager != null) {
+            migrationManager.close();
+            migrationManager = null;
+        }
         super.onDestroy();
     }
 

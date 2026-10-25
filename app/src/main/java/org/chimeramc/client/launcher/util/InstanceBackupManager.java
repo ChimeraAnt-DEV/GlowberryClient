@@ -120,6 +120,18 @@ public class InstanceBackupManager {
         this.context = context.getApplicationContext();
     }
 
+    /**
+     * Releases the backup worker.
+     *
+     * <p>The manager is created per screen ({@code InstanceSettingsActivity},
+     * {@code InstancesFragment}), so without this its single-thread pool outlived the screen.
+     * Idempotent; interrupting a running backup leaves the partial file where the existing
+     * interruption handling already expects it.
+     */
+    public void close() {
+        executor.shutdownNow();
+    }
+
     public void backup(GameVersion version, BackupCallback callback) {
         executor.execute(() -> {
             postStarted(callback);
