@@ -348,10 +348,24 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
 
     private fun transitionToGame(gameIntent: Intent) {
         if (enteringGame) return
-        enteringGame = true
-
+        // The guards run before the latch is set. Setting it first meant a call that arrived while
+        // the screen was finishing latched `enteringGame` and returned without starting anything,
+        // so the retry from the incompatible-mods dialog could never transition: the game simply
+        // never opened.
         if (returningToLauncher || isFinishing || isDestroyed) return
-        startActivity(gameIntent)
+        enteringGame = true
+        // Starting the game is the last step and the only one that was unguarded on this path: the
+        // dialog button calls straight into here with no enclosing try, so a throw from
+        // startActivity (a missing target, TransactionTooLarge, an OOM while the game activity
+        // inflates) unwound through the main thread and killed the process. Contained and named
+        // through the same path every other launch failure uses.
+        try {
+            startActivity(gameIntent)
+        } catch (throwable: Throwable) {
+            enteringGame = false
+            showFailure(throwable)
+            return
+        }
         finish()
         overridePendingTransition(0, 0)  // no animation, test only
     }

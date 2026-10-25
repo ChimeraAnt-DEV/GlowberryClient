@@ -1231,6 +1231,12 @@ class GamePackageManager private constructor(
                 if (version == null) return
                 val profileId = MinecraftLauncher.getStorageProfileId(version)
                 val dir = MinecraftLauncher.getRuntimeLibDir(context, profileId)
+                // Every ABI directory the extractor can target, not just the one this version is
+                // expected to use. The extraction folder is derived from the APK's shipped ABIs
+                // (getDeviceAbi), while resolveLaunchAbi prefers the version's recorded abiList -
+                // and that label is a record of what was extracted *last*, so it can name a
+                // different directory than the extractor will actually write to. Clearing every
+                // candidate is what makes the repair cover the folder in use whichever it is.
                 val abis = listOf("arm64", "arm", "x86_64", "x86")
                 for (abi in abis) {
                     val abiDir = File(dir, abi)
@@ -1243,7 +1249,7 @@ class GamePackageManager private constructor(
                         Log.w(TAG, "Failed to remove extraction manifest: ${manifestFile.absolutePath}")
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Log.w(TAG, "Failed to invalidate extraction cache: ${e.message}")
             }
         }

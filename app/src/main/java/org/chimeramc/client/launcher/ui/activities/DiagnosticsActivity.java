@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -58,6 +59,8 @@ import java.util.concurrent.Executors;
  * and only paints it on the UI thread; nothing on the paint path touches the disk.
  */
 public class DiagnosticsActivity extends BaseActivity {
+
+    private static final String TAG = "DiagnosticsActivity";
 
     private VersionManager versionManager;
     private PersonalizationManager personalizationManager;
@@ -526,10 +529,20 @@ public class DiagnosticsActivity extends BaseActivity {
     }
 
     private void runRepair(GameVersion version) {
+        // Repair is two steps and neither was guarded: the marker invalidation deletes files and
+        // attemptRepairLibs rewrites the instance's libraries. A throw from either unwound through
+        // the dialog's click handler, so the toast still said the repair had started and nothing
+        // said it had failed - the user was told the opposite of what happened.
+        try {
+            GamePackageManager.invalidateExtractionCache(this, version);
+            VersionManager.attemptRepairLibs(this, version);
+        } catch (Throwable t) {
+            Log.e(TAG, "Repair installation failed", t);
+            Toast.makeText(this, R.string.diagnostics_repair_failed, Toast.LENGTH_LONG).show();
+            return;
+        }
         Toast.makeText(this, R.string.diagnostics_repair_started, Toast.LENGTH_SHORT).show();
-        // Invalidate the extraction marker + manifest and let the normal launch re-extract.
-        GamePackageManager.invalidateExtractionCache(this, version);
-        VersionManager.attemptRepairLibs(this, version);
+        refresh();
     }
 
     private void copyReport() {

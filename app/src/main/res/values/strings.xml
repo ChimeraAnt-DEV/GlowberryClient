@@ -1471,6 +1471,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_repair_desc">Wipe and re-extract the native library cache for the selected version. Fixes stale or corrupted extracted libraries that fail to dlopen.</string>
     <string name="diagnostics_repair_confirm_title">Repair native libraries?</string>
     <string name="diagnostics_repair_confirm_message">This wipes the extracted library cache for this version and re-extracts everything from the APK. Installed worlds, settings and mods are not touched.</string>
+    <string name="diagnostics_repair_failed">Repair could not be started. Nothing was changed. Reopen the launcher and try again.</string>
     <string name="diagnostics_repair_started">Repair started — re-extracting native libraries…</string>
     <string name="diagnostics_no_version">No version selected.</string>
     <string name="diagnostics_section_app">Application</string>
