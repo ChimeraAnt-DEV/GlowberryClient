@@ -49,6 +49,7 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
     @Volatile
     private var returningToLauncher = false
     private var preparingStarted = false
+    private var firstFrameFallback: Runnable? = null
     private var enteringGame = false
     private var progressAnimator: ValueAnimator? = null
     private var currentProgress = 0
@@ -124,14 +125,21 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
                 return true
             }
         })
-        content.postDelayed({
+        // Held so onDestroy can cancel it. View.postDelayed goes through the ViewRootImpl handler,
+        // not the one this activity owns, so mainHandler.removeCallbacksAndMessages in onDestroy
+        // does not reach it - a screen destroyed inside the fallback window would still fire it and
+        // submit to the executor after it was shut down.
+        firstFrameFallback = Runnable {
             hideSystemUi()
             startPreparingOnce("loading first frame fallback")
-        }, FIRST_FRAME_FALLBACK_MS)
+        }
+        content.postDelayed(firstFrameFallback!!, FIRST_FRAME_FALLBACK_MS)
     }
 
     private fun startPreparingOnce(reason: String) {
-        if (preparingStarted) return
+        // A late first-frame callback (or the fallback) can arrive after the screen is gone; the
+        // preparation must not start then, and must never submit to a shut-down executor.
+        if (preparingStarted || isFinishing || isDestroyed) return
         preparingStarted = true
         trace.milestone("Runtime preparation continuing")
         appendLog("Preparing game")
@@ -148,35 +156,48 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
     }
 
     private fun startPreparing() {
-        executor.execute {
-            try {
-                val gameIntent = Intent(intent).apply {
-                    setClass(this@MinecraftLoadingActivity, MinecraftActivity::class.java)
-                }
-                val preparedRuntime = MinecraftRuntimePreparer.prepare(this, gameIntent, this)
-                MinecraftLaunchSession.setPreparedRuntime(preparedRuntime)
+        if (executor.isShutdown || executor.isTerminated) return
+        try {
+            executor.execute { prepareAndEnterGame() }
+        } catch (rejected: java.util.concurrent.RejectedExecutionException) {
+            // The screen was destroyed between the check and the submit; there is nobody left to
+            // report to and nothing to launch.
+            trace.error("Runtime preparation could not be scheduled", rejected.message)
+        }
+    }
 
-                mainHandler.post {
-                    if (returningToLauncher || isFinishing || isDestroyed) return@post
-                    updateProgress(100, getString(R.string.minecraft_loading_complete), getString(R.string.minecraft_loading_entering_game))
-                    trace.milestone("Entering game")
-                    appendLog("Entering Minecraft")
-                    // Starting the game activity is the last thing that can fail, and it failed
-                    // outside any guard: a throw from startActivity (a missing target, a
-                    // TransactionTooLarge, an OOM while the game activity inflated) unwound through
-                    // the main thread and killed the process, so the user saw the app vanish with
-                    // no message at all. It is contained here and reported through the same
-                    // cause-naming path every other launch failure uses.
-                    try {
-                        showSkippedIncompatibleModsIfNeeded(preparedRuntime, gameIntent)
-                    } catch (throwable: Throwable) {
-                        showFailure(throwable)
-                    }
-                }
-            } catch (throwable: Throwable) {
-                mainHandler.post {
+    private fun prepareAndEnterGame() {
+        try {
+            val gameIntent = Intent(intent).apply {
+                setClass(this@MinecraftLoadingActivity, MinecraftActivity::class.java)
+            }
+            val preparedRuntime = MinecraftRuntimePreparer.prepare(this, gameIntent, this)
+            MinecraftLaunchSession.setPreparedRuntime(preparedRuntime)
+
+            mainHandler.post {
+                if (returningToLauncher || isFinishing || isDestroyed) return@post
+                updateProgress(
+                    100,
+                    getString(R.string.minecraft_loading_complete),
+                    getString(R.string.minecraft_loading_entering_game)
+                )
+                trace.milestone("Entering game")
+                appendLog("Entering Minecraft")
+                // Starting the game activity is the last thing that can fail, and it failed
+                // outside any guard: a throw from startActivity (a missing target, a
+                // TransactionTooLarge, an OOM while the game activity inflated) unwound through
+                // the main thread and killed the process, so the user saw the app vanish with
+                // no message at all. It is contained here and reported through the same
+                // cause-naming path every other launch failure uses.
+                try {
+                    showSkippedIncompatibleModsIfNeeded(preparedRuntime, gameIntent)
+                } catch (throwable: Throwable) {
                     showFailure(throwable)
                 }
+            }
+        } catch (throwable: Throwable) {
+            mainHandler.post {
+                showFailure(throwable)
             }
         }
     }
@@ -376,6 +397,10 @@ class MinecraftLoadingActivity : BaseActivity(), MinecraftRuntimePreparer.Progre
 
     override fun onDestroy() {
         mainHandler.removeCallbacksAndMessages(null)
+        // The first-frame fallback is posted through the decor view's handler, so it has to be
+        // cancelled explicitly or it fires into a destroyed screen.
+        firstFrameFallback?.let { window.decorView.removeCallbacks(it) }
+        firstFrameFallback = null
         progressAnimator?.cancel()
         executor.shutdownNow()
         super.onDestroy()
