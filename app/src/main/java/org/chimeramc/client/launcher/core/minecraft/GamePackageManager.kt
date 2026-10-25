@@ -1143,10 +1143,60 @@ class GamePackageManager private constructor(
         }
 
         /**
+         * The ABI a launch of [version] would extract and load, without constructing the package
+         * manager.
+         *
+         * <p>{@link #getInstance} runs the entire native-library extraction and builds an
+         * AssetManager in its `init` block, so asking it this one question from a diagnostics
+         * screen performed the whole preparation on the UI thread - the same defect the launch
+         * preflight was fixed for. This reads the APK's own ABI table, which is the authority
+         * [getDeviceAbi] uses, and mirrors its fallback order exactly, so the diagnostics screen
+         * reports the ABI the launch would really use rather than "unknown".
+         *
+         * @return the ABI name; never null.
+         */
+        @JvmStatic
+        fun resolveLaunchAbi(context: Context, version: GameVersion?): String? {
+            return try {
+                val shipped = AbiBitness.abisInApks(collectVersionApkFiles(context, version))
+                if (shipped.isNotEmpty()) {
+                    val processIs64Bit = try {
+                        android.os.Process.is64Bit()
+                    } catch (_: Throwable) {
+                        Build.SUPPORTED_64_BIT_ABIS.isNotEmpty()
+                    }
+                    return AbiBitness.selectLaunchAbi(shipped, processIs64Bit)
+                }
+                // No APK could be inspected. The version's label is a record of a previous
+                // extraction, so it is a hint at best; mirror getDeviceAbi's preference for an
+                // ABI this process can actually load.
+                if (version != null && "armeabi-v7a" == version.abiList) {
+                    return if (Build.SUPPORTED_32_BIT_ABIS.contains("armeabi-v7a")) {
+                        "armeabi-v7a"
+                    } else {
+                        Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
+                            it.contains("arm64-v8a") || it.contains("x86_64")
+                        } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
+                            it.contains("armeabi-v7a") || it.contains("x86")
+                        } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
+                    }
+                }
+                Build.SUPPORTED_64_BIT_ABIS.firstOrNull {
+                    it.contains("arm64-v8a") || it.contains("x86_64")
+                } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
+                    it.contains("armeabi-v7a") || it.contains("x86")
+                } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
+            } catch (_: Throwable) {
+                null
+            }
+        }
+
+        /**
          * The APK files a version's native libraries come from, without touching the extraction
          * cache. Mirrors the paths the instance's own `collectApkFiles` uses.
          */
-        private fun collectVersionApkFiles(context: Context, version: GameVersion): List<File> {
+        private fun collectVersionApkFiles(context: Context, version: GameVersion?): List<File> {
+            if (version == null) return emptyList()
             val paths = mutableListOf<String>()
             if (version.isInstalled) {
                 val appInfo = context.packageManager
