@@ -176,6 +176,15 @@ import okhttp3.OkHttpClient;
      */
     private final ExecutorService resourcepackExecutor = Executors.newSingleThreadExecutor();
 
+    /**
+     * Gathers the Launch tab's disk-backed status counts (AntEgg packs, replay clips).
+     *
+     * <p>Separate from the other pools because it runs on every {@code onResume} and its work is
+     * only a couple of directory reads: it must never queue behind a migration or a launch probe,
+     * and those must never wait for it.
+     */
+    private final ExecutorService launchStatsExecutor = Executors.newSingleThreadExecutor();
+
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private Runnable pulseRunnable;
     private boolean pulseRunning;
@@ -1747,14 +1756,10 @@ import okhttp3.OkHttpClient;
      */
     private void refreshLaunchToggles() {
         TextView antEggStatus = findViewById(R.id.launch_antegg_status);
-        if (antEggStatus != null) {
-            int count = countAntEggPacks();
-            antEggStatus.setText(count > 0
-                    ? getString(R.string.launch_antegg_status_ready, count)
-                    : getString(R.string.launch_antegg_status_none));
-        }
-
         TextView voiceStatus = findViewById(R.id.launch_voice_status);
+        TextView replayStatus = findViewById(R.id.launch_replay_status);
+
+        // Voice is in-memory state, so it is painted straight away.
         if (voiceStatus != null) {
             org.chimeramc.client.core.voice.VoiceChatModule module =
                     org.chimeramc.client.core.voice.VoiceChatModule.peek();
@@ -1764,13 +1769,28 @@ import okhttp3.OkHttpClient;
                     : getString(R.string.launch_voice_status_off));
         }
 
-        TextView replayStatus = findViewById(R.id.launch_replay_status);
-        if (replayStatus != null) {
-            int clips = countReplayClips();
-            replayStatus.setText(clips > 0
-                    ? getString(R.string.launch_replay_status_count, clips)
-                    : getString(R.string.launch_replay_status_none));
-        }
+        // The other two read the disk: the AntEgg count lists a directory and the Replay count
+        // scans the replays folder and asks MediaMetadataRetriever for every clip's duration. On
+        // the UI thread that ran on every onResume, so returning from any screen blocked the frame
+        // while the video metadata was parsed. Gather both on a worker and paint when they arrive.
+        if (antEggStatus == null && replayStatus == null) return;
+        launchStatsExecutor.execute(() -> {
+            final int antEggCount = countAntEggPacks();
+            final int replayCount = countReplayClips();
+            uiHandler.post(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                if (antEggStatus != null) {
+                    antEggStatus.setText(antEggCount > 0
+                            ? getString(R.string.launch_antegg_status_ready, antEggCount)
+                            : getString(R.string.launch_antegg_status_none));
+                }
+                if (replayStatus != null) {
+                    replayStatus.setText(replayCount > 0
+                            ? getString(R.string.launch_replay_status_count, replayCount)
+                            : getString(R.string.launch_replay_status_none));
+                }
+            });
+        });
     }
 
     /**
@@ -2723,6 +2743,7 @@ import okhttp3.OkHttpClient;
         storageMigrationExecutor.shutdownNow();
         launchProbeExecutor.shutdownNow();
         resourcepackExecutor.shutdownNow();
+        launchStatsExecutor.shutdownNow();
         // The account executor was never shut down either, so it outlived the Activity.
         accountExecutor.shutdownNow();
         super.onDestroy();
