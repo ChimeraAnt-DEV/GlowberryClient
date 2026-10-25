@@ -136,7 +136,17 @@ class MinecraftActivity : MainActivity(), PojavControlsHost {
             return
         }
         trace.mark("Native mod enable started")
-        ModManager.enableLoadedMods()
+        // enableLoadedMods() reads the instance's mod list off disk, so it can throw on an
+        // unreadable or corrupt store. It sat between the runtime-prepare guard and the super call
+        // with no guard of its own, so a throw there unwound onCreate and killed the process before
+        // the game ever started - a launch the user could not diagnose. Enabling mods is
+        // best-effort: a failure is recorded and the launch continues without them.
+        try {
+            ModManager.enableLoadedMods()
+        } catch (throwable: Throwable) {
+            trace.error("Native mod enable failed", formatLaunchFailure(throwable))
+            recordModEnableFailure(throwable)
+        }
         trace.mark("Native mod enable finished")
         trace.mark("Mojang MainActivity super.onCreate starting")
         try {
@@ -264,6 +274,34 @@ class MinecraftActivity : MainActivity(), PojavControlsHost {
         )
         MinecraftProcessRestarter.restartLauncherAfterMinecraftExit(this)
         finish()
+    }
+
+    /**
+     * Records a mod-enable failure without discarding what the preparer already recorded.
+     *
+     * <p>{@code ModLoadDiagnostics.record} replaces the whole store, and the preparer has just
+     * written the per-mod failures it found while loading. Writing only this record would erase
+     * them, so the existing records are read back and this one is appended. A recording failure is
+     * swallowed: a diagnostic must never be the reason a launch dies.
+     */
+    private fun recordModEnableFailure(throwable: Throwable) {
+        try {
+            val merged = ArrayList(
+                org.chimeramc.client.core.mods.ModLoadDiagnostics.getAll(this)
+            )
+            merged.add(
+                org.chimeramc.client.core.mods.ModLoadDiagnostics.Record(
+                    "",
+                    "Native mods",
+                    "",
+                    "enableLoadedMods: ${throwable.message ?: throwable.javaClass.simpleName}",
+                    org.chimeramc.client.core.mods.ModLoadDiagnostics.KIND_INCOMPATIBLE,
+                    System.currentTimeMillis()
+                )
+            )
+            org.chimeramc.client.core.mods.ModLoadDiagnostics.record(this, merged)
+        } catch (ignored: Throwable) {
+        }
     }
 
     private fun formatLaunchFailure(throwable: Throwable): String {
