@@ -7,10 +7,10 @@ import java.util.List;
  * The cosmetics preview scene: textured quads in model space, a camera-fitted view, and a render
  * pass through {@link PreviewRaster}.
  *
- * <p>This replaces the preview's {@code Canvas} scene. Because the rasteriser holds a per-pixel depth
- * buffer, the scene does not need the old two-level painter's sort ({@code QuadDepthSorter}) and can
- * draw the body, the overlay layer, cosmetics and the pet in one pass with correct occlusion — the
- * triangular holes the painter's sort produced at box seams are gone by construction.
+ * <p>This replaces the preview's {@code Canvas} scene. Because the rasteriser holds a per-pixel
+ * depth buffer, the scene does not need a painter's sort and can draw the body, the overlay layer,
+ * cosmetics and the pet in one pass with correct occlusion — the triangular holes the painter's sort
+ * produced at box seams are gone by construction.
  *
  * <p>The camera fit is the second fix: the caller gives the whole scene's model bounds, and the fit
  * chooses a scale and origin that place <em>every</em> quad inside the viewport with a margin, so a
