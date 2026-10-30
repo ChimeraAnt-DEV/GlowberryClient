@@ -142,6 +142,18 @@ public class BaseActivity extends AppCompatActivity {
     /** True once the nav indicator has been placed once, so later moves spring instead of jump. */
     private boolean navIndicatorPlaced;
 
+    /**
+     * The one-shot layout listener waiting for the active tab to re-measure after its label
+     * changed, or null when no placement is pending.
+     *
+     * <p>{@link #setActiveNavTab} swaps the tab's text (a compact bar shows only the active
+     * label), which invalidates the tab's width. Reading {@code getWidth()} in that same frame
+     * returns the *old* width, so the indicator would be positioned under where the tab used to
+     * be. One listener is kept and replaced so a fast tab switch cannot stack placements.
+     */
+    @Nullable
+    private View.OnLayoutChangeListener pendingIndicatorListener;
+
     private void wrapWithNavBar(View contentView) {
         if (shouldSkipNavBar()) {
             super.setContentView(contentView);
@@ -636,8 +648,48 @@ public class BaseActivity extends AppCompatActivity {
             float targetX = tab.getLeft() + (tabWidth - indicatorWidth) / 2f;
             placeIndicator(indicator, targetX, 0f, false);
         };
-        if (tab.getWidth() > 0) place.run();
-        else tab.post(place);
+        placeIndicatorWhenMeasured(tab, place);
+    }
+
+    /**
+     * Runs [place] once the tab has a real width.
+     *
+     * <p>If the tab already has a width and no layout is pending the placement runs immediately.
+     * Otherwise it waits for the next layout pass, because the width read in this frame is stale:
+     * {@link #setActiveNavTab} has just changed the label, and on a compact bar that change is what
+     * gives the active tab its width. A pending listener is replaced rather than added, so a rapid
+     * tab switch leaves exactly one waiting placement and never a burst of them.
+     */
+    private void placeIndicatorWhenMeasured(View tab, Runnable place) {
+        if (pendingIndicatorListener != null) {
+            tab.removeOnLayoutChangeListener(pendingIndicatorListener);
+            pendingIndicatorListener = null;
+        }
+        if (tab.getWidth() > 0 && !tab.isLayoutRequested()) {
+            place.run();
+            return;
+        }
+        View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (v.getWidth() <= 0) return;
+                v.removeOnLayoutChangeListener(this);
+                if (pendingIndicatorListener == this) pendingIndicatorListener = null;
+                place.run();
+            }
+        };
+        pendingIndicatorListener = listener;
+        tab.addOnLayoutChangeListener(listener);
+        // Fallback: if the view is already attached and no layout pass is coming (for example the
+        // width did not actually change), place from the current bounds so the indicator is never
+        // left unpositioned.
+        tab.post(() -> {
+            if (pendingIndicatorListener != listener) return;
+            tab.removeOnLayoutChangeListener(listener);
+            pendingIndicatorListener = null;
+            place.run();
+        });
     }
 
     /**

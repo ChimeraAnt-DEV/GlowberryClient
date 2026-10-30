@@ -22,23 +22,30 @@
     android:background="@drawable/nav_rail_background"
     android:orientation="vertical">
 
+    <!--
+        The rail header stacks the back button above the logo rather than placing them side by
+        side. In a horizontal row the pair is centred as a unit, which leaves the 28dp logo about
+        20dp right of the rail's centre line; stacked, each child is centred on the rail's own
+        axis, so the logo sits directly above the tab icons below it.
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingTop="@dimen/space_2">
 
         <ImageView
             android:id="@+id/nav_back_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:contentDescription="@string/nav_back"
             android:focusable="true"
+            android:padding="@dimen/space_2"
             android:rotation="90"
-            android:scaleType="centerInside"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_arrow_down"
             app:tint="@color/text_secondary" />
 
@@ -46,7 +53,7 @@
             android:id="@+id/nav_logo"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_marginStart="@dimen/space_2"
+            android:layout_marginTop="@dimen/space_1"
             android:contentDescription="@string/app_name"
             android:src="@drawable/ic_glowberry_logo" />
     </LinearLayout>

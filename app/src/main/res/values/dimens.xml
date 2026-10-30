@@ -78,8 +78,21 @@
     <dimen name="nav_tab_padding">14dp</dimen>
     <!-- The vertical rail's width and the height of one destination row in it (U5). -->
     <dimen name="nav_rail_width">72dp</dimen>
-    <dimen name="nav_rail_tab_height">44dp</dimen>
+    <!-- A rail destination row is a touch target, so it is 48dp tall even though the icon-only
+         rail is only 72dp wide. -->
+    <dimen name="nav_rail_tab_height">48dp</dimen>
     <dimen name="nav_tab_drawable_padding">0dp</dimen>
+    <!--
+        The leading inset of a rail destination row. It must NOT be the rail width: a row is
+        match_parent inside a 72dp-wide rail, so a paddingStart of nav_rail_width (72dp) pushes
+        the icon and label clean off the right edge and they are clipped. 24dp is the standard
+        navigation-rail icon inset, which lands the icon on the rail's centre line once the
+        drawable and the 24dp end inset are accounted for.
+    -->
+    <dimen name="nav_rail_tab_padding_start">24dp</dimen>
+    <!-- Gap between a rail row's icon and its label. The expanded rail (values-sw840dp) widens
+         it; the icon-only rail never shows a label so the value does not matter there. -->
+    <dimen name="nav_rail_tab_drawable_padding">8dp</dimen>
 
     <!--
         The one spacing scale (U9): 4/8/12/16/24/32dp, mirroring UiTokens.SPACE_*. Layouts use
