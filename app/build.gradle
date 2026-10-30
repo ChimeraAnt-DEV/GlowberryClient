@@ -215,6 +215,10 @@ dependencies {
     // Microsoft Authentication Library (MSAL) for official OAuth
     implementation 'com.microsoft.identity.client:msal:2.2.3'
     testImplementation libs.junit
+    // Android ships org.json in the platform, so the local unit-test runtime has stubs that
+    // throw "not mocked". org.json:json is the same API as a plain jar, so a JSON-parsing
+    // rule stays unit-testable without an instrumented test.
+    testImplementation 'org.json:json:20240303'
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.glide
