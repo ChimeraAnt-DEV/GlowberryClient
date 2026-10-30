@@ -164,7 +164,7 @@ public class BaseActivity extends AppCompatActivity {
         // The navigation shape is chosen from the window width (U5): a bottom bar on a compact
         // window, a vertical icon rail on a medium one, and an expanded rail on a large one. Both
         // layouts declare the same ids, so everything below this line is layout-agnostic.
-        navLayoutMode = NavLayoutMode.forWidthDp(currentWidthDp());
+        navLayoutMode = resolveNavLayoutMode();
         boolean rail = navLayoutMode.isRail();
 
         LinearLayout wrapper = new LinearLayout(this);
@@ -273,6 +273,26 @@ public class BaseActivity extends AppCompatActivity {
                 / getResources().getDisplayMetrics().density);
     }
 
+    /** The current window width in dp, which tracks a split-screen or freeform column. */
+    private int currentWindowWidthDp() {
+        Configuration config = getResources().getConfiguration();
+        if (config.screenWidthDp > 0) return config.screenWidthDp;
+        return (int) (getResources().getDisplayMetrics().widthPixels
+                / getResources().getDisplayMetrics().density);
+    }
+
+    /**
+     * The navigation shape for the current window.
+     *
+     * Both readings are needed: the smallest width is stable across rotation but stays a tablet's
+     * width inside a narrow split-screen column, and the current width tracks the column but flips
+     * on rotation. {@link NavLayoutMode#forWindow} takes the smaller classification, so the rail
+     * never lands on a window too narrow to hold it.
+     */
+    private NavLayoutMode resolveNavLayoutMode() {
+        return NavLayoutMode.forWindow(currentWidthDp(), currentWindowWidthDp());
+    }
+
     private void applyPersonalization() {
         PersonalizationManager pm = new PersonalizationManager(this);
         pm.applyToActivity(this);
@@ -323,16 +343,6 @@ public class BaseActivity extends AppCompatActivity {
         return super.dispatchKeyEvent(event);
     }
 
-    /** Top-bar tabs, in declaration order. Order matches LauncherTab and nav_bar.xml. */
-    private static final int[] NAV_TAB_IDS = {
-            R.id.nav_tab_launch, R.id.nav_tab_library, R.id.nav_tab_mods, R.id.nav_tab_settings
-    };
-
-    /** Labels for {@link #NAV_TAB_IDS}, same order, so compact mode can restore the active one. */
-    private static final int[] NAV_TAB_LABELS = {
-            R.string.nav_launch, R.string.nav_library, R.string.nav_mods, R.string.nav_settings
-    };
-
     /** True on a narrow window, where only the selected tab shows its label. */
     private boolean compactNavTabs;
 
@@ -355,9 +365,8 @@ public class BaseActivity extends AppCompatActivity {
         // expanded rail names every destination, the icon-only rail names none.
         compactNavTabs = !navLayoutMode.showsAllLabels();
         LauncherTab own = LauncherTab.forActivity(getClass());
-        int ownTabId = own != null && own.index() < NAV_TAB_IDS.length
-                ? NAV_TAB_IDS[own.index()] : 0;
-        for (int id : NAV_TAB_IDS) {
+        int ownTabId = own != null ? own.viewId() : 0;
+        for (int id : LauncherTab.viewIds()) {
             TextView tab = findViewById(id);
             if (tab == null) continue;
             if (navLayoutMode.isRail()) {
@@ -383,9 +392,15 @@ public class BaseActivity extends AppCompatActivity {
 
         // Each tab is a single TextView carrying its own icon via drawableStart, so tinting
         // the compound drawable is what colours the icon.
-        for (int id : NAV_TAB_IDS) {
-            TextView tab = findViewById(id);
+        for (LauncherTab destination : LauncherTab.values()) {
+            TextView tab = findViewById(destination.viewId());
             if (tab == null) continue;
+            // The label and the icon come from the enum, so the two nav layouts and the
+            // destination list cannot disagree about what a tab is (U5).
+            tab.setText(destination.labelRes());
+            tab.setCompoundDrawablesRelativeWithIntrinsicBounds(destination.iconRes(), 0, 0, 0);
+            tab.setContentDescription(getString(destination.labelRes()));
+            tab.setTooltipText(getString(destination.labelRes()));
             int color = getResources().getColor(R.color.text_secondary, getTheme());
             tab.setTextColor(color);
             // The one type system (U8): a destination label is the LABEL role, so its size and its
@@ -473,9 +488,10 @@ public class BaseActivity extends AppCompatActivity {
      */
     protected void animateNavTabsArrival() {
         if (!navBarInjected) return;
-        View[] tabs = new View[NAV_TAB_IDS.length];
-        for (int i = 0; i < NAV_TAB_IDS.length; i++) {
-            tabs[i] = findViewById(NAV_TAB_IDS[i]);
+        int[] tabIds = LauncherTab.viewIds();
+        View[] tabs = new View[tabIds.length];
+        for (int i = 0; i < tabIds.length; i++) {
+            tabs[i] = findViewById(tabIds[i]);
         }
         org.chimeramc.client.ui.animation.DynamicAnim.staggerArrival(tabs, 60L);
     }
@@ -585,11 +601,15 @@ public class BaseActivity extends AppCompatActivity {
                 : getResources().getColor(R.color.on_surface, getTheme());
         int inactive = getResources().getColor(R.color.text_secondary, getTheme());
 
-        for (int id : NAV_TAB_IDS) {
+        for (int id : LauncherTab.viewIds()) {
             TextView tab = findViewById(id);
             if (tab == null) continue;
             boolean active = id == activeTabId;
             int color = active ? accentColor : inactive;
+            // `selected` is what a screen reader announces, and it is also the state the compound
+            // drawable tint and the press feedback key off, so it is set before either is applied.
+            tab.setSelected(active);
+            tab.setContentDescription(describeTab(id, active));
             tab.setTextColor(color);
             // The weight axis carries the emphasis: the active entry is heavier, not just a
             // different colour, which is the Expressive type treatment (U6). The bold flag stays
@@ -777,12 +797,24 @@ public class BaseActivity extends AppCompatActivity {
         return (int) (value * getResources().getDisplayMetrics().density);
     }
 
-    /** The resource string for one of {@link #NAV_TAB_IDS}, or 0 for an unknown id. */
+    /** The label resource for a tab view id, or 0 for an id that is not a destination. */
     private int labelForTab(int tabId) {
-        for (int i = 0; i < NAV_TAB_IDS.length; i++) {
-            if (NAV_TAB_IDS[i] == tabId) return NAV_TAB_LABELS[i];
-        }
-        return 0;
+        LauncherTab tab = LauncherTab.forViewId(tabId);
+        return tab != null ? tab.labelRes() : 0;
+    }
+
+    /**
+     * The accessibility description for a tab.
+     *
+     * <p>The icon-only rail and the compact bar hide the label with {@code setText("")}, so without
+     * this a screen reader would announce a bare, nameless node. The active destination also says
+     * so, because {@code selected} alone is not read on every Android version.
+     */
+    private CharSequence describeTab(int tabId, boolean active) {
+        int label = labelForTab(tabId);
+        if (label == 0) return null;
+        String name = getString(label);
+        return active ? getString(R.string.nav_tab_selected, name) : name;
     }
 
     @Override
@@ -860,7 +892,7 @@ public class BaseActivity extends AppCompatActivity {
         // crosses a breakpoint (a foldable unfolding, a tablet entering split screen) has to
         // rebuild to pick the new one. Without this the bar would stay a bar on a wide window and
         // the rail would stay a rail on a narrow one.
-        if (navBarInjected && NavLayoutMode.forWidthDp(currentWidthDp()) != navLayoutMode) {
+        if (navBarInjected && resolveNavLayoutMode() != navLayoutMode) {
             recreate();
         }
     }

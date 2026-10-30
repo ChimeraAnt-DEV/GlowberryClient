@@ -1289,6 +1289,9 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="nav_mods">Mods</string>
     <string name="nav_about">About</string>
     <string name="nav_settings">Settings</string>
+    <!-- Accessibility: announced for the active destination. `selected` is not read on every
+         Android version, and the icon-only rail hides the label entirely. -->
+    <string name="nav_tab_selected">%1$s, selected</string>
     <string name="nav_controller">Controller</string>
     <string name="nav_skins">Skins</string>
     <string name="nav_customize">Customize</string>
