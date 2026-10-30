@@ -231,7 +231,18 @@ public final class HitTimingOverlay {
         private final RectF pill = new RectF();
         private final RectF bar = new RectF();
         private final RectF comboPill = new RectF();
+        private final RectF border = new RectF();
         private final float density;
+
+        // onDraw runs at the refresh tick, so anything it builds is built ~30 times a second. The
+        // gradient depends only on the view height, the border rect is a fixed inset, and the two
+        // captions change only when their value does.
+        private LinearGradient bodyGradient;
+        private float gradientHeight = -1f;
+        private long captionMs = Long.MIN_VALUE;
+        private String captionText = "";
+        private int comboValue = Integer.MIN_VALUE;
+        private String comboText = "";
 
         /** Smoothed 0..1 fill so the bar tracks the window instead of snapping per frame. */
         private float shownProgress = 1f;
@@ -285,9 +296,14 @@ public final class HitTimingOverlay {
             pill.set(0f, 1.5f * density, w, h + 1.5f * density);
             canvas.drawRoundRect(pill, radius, radius, paint);
 
-            // Body: a dark translucent fill with a subtle top-lit gradient.
-            paint.setShader(new LinearGradient(0f, 0f, 0f, h,
-                    0xE61A1D24, 0xE60E1015, Shader.TileMode.CLAMP));
+            // Body: a dark translucent fill with a subtle top-lit gradient, rebuilt only when the
+            // view height changes rather than on every frame.
+            if (bodyGradient == null || gradientHeight != h) {
+                bodyGradient = new LinearGradient(0f, 0f, 0f, h,
+                        0xE61A1D24, 0xE60E1015, Shader.TileMode.CLAMP);
+                gradientHeight = h;
+            }
+            paint.setShader(bodyGradient);
             pill.set(0f, 0f, w, h);
             canvas.drawRoundRect(pill, radius, radius, paint);
             paint.setShader(null);
@@ -311,7 +327,7 @@ public final class HitTimingOverlay {
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(2f * density);
             paint.setColor(color);
-            RectF border = new RectF(density, density, w - density, h - density);
+            border.set(density, density, w - density, h - density);
             canvas.drawRoundRect(border, radius - density, radius - density, paint);
             paint.setStyle(Paint.Style.FILL);
 
@@ -329,15 +345,21 @@ public final class HitTimingOverlay {
 
             if (!idle && !decision.isGreen()) {
                 labelPaint.setColor(0xCCFFFFFF);
-                String ms = decision.remainingMs + "ms";
+                if (captionMs != decision.remainingMs) {
+                    captionMs = decision.remainingMs;
+                    captionText = captionMs + "ms";
+                }
                 float capCenterY = h / 2f - (labelPaint.descent() + labelPaint.ascent()) / 2f;
-                canvas.drawText(ms, w * 0.72f, capCenterY, labelPaint);
+                canvas.drawText(captionText, w * 0.72f, capCenterY, labelPaint);
             }
 
             // Combo badge, drawn as a small pill on the leading edge so a streak is readable
             // at a glance without widening the main indicator.
             if (HitTimingMod.isShowCombo() && decision.combo > 1) {
-                String comboText = decision.combo + "x";
+                if (comboValue != decision.combo) {
+                    comboValue = decision.combo;
+                    comboText = comboValue + "x";
+                }
                 labelPaint.setColor(0xFF0E1015);
                 float cw = labelPaint.measureText(comboText) + 8f * density;
                 float ch = 14f * density;

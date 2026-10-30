@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -31,8 +32,26 @@ public class ReplaySkeletonView extends View {
     private final Paint cardPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
+    // The sweep gradient is one shader whose position is moved with a local matrix. Rebuilding a
+    // LinearGradient per card per frame would allocate during the very scan the skeleton exists to
+    // cover, and a skeleton that stutters is worse than the spinner it replaced.
+    private final Matrix sweepMatrix = new Matrix();
+    private final LinearGradient sweepGradient;
+    private final float sweepUnitWidth;
+
     private final int surface;
     private final int barColor;
+
+    // Geometry inputs are context-derived and cannot change while the view is attached, so they are
+    // resolved once rather than per frame.
+    private final float padding;
+    private final float gap;
+    private final float wideBreakpoint;
+    private final float radius;
+    private final float barInset;
+    private final float barBottomInset;
+    private final float barHeight;
+    private final float barRadius;
 
     private ValueAnimator animator;
     private float phase;
@@ -46,6 +65,19 @@ public class ReplaySkeletonView extends View {
         ReplayStyle style = new ReplayStyle(context);
         surface = style.surfaceElevated();
         barColor = ReplayStyle.blend(surface, style.textTertiary(), 0.25f);
+        padding = ReplayStyle.dp(context, 12f);
+        gap = ReplayStyle.dp(context, 10f);
+        wideBreakpoint = ReplayStyle.dp(context, 520f);
+        radius = ReplayStyle.dp(context, 14f);
+        barInset = ReplayStyle.dp(context, 10f);
+        barBottomInset = ReplayStyle.dp(context, 22f);
+        barHeight = ReplayStyle.dp(context, 8f);
+        barRadius = ReplayStyle.dp(context, 4f);
+        // The gradient spans a unit of card width and is translated per card; 1f is the unit.
+        sweepUnitWidth = 1f;
+        sweepGradient = new LinearGradient(0f, 0f, sweepUnitWidth, 0f,
+                new int[]{0x00FFFFFF, 0x18FFFFFF, 0x00FFFFFF},
+                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
     }
 
     @Override
@@ -102,12 +134,9 @@ public class ReplaySkeletonView extends View {
         int height = getHeight();
         if (width <= 0 || height <= 0) return;
 
-        float padding = ReplayStyle.dp(getContext(), 12f);
-        float gap = ReplayStyle.dp(getContext(), 10f);
-        int columns = width > ReplayStyle.dp(getContext(), 520f) ? 3 : 2;
+        int columns = width > wideBreakpoint ? 3 : 2;
         float cardWidth = (width - padding * 2 - gap * (columns - 1)) / columns;
         float cardHeight = cardWidth * 0.62f;
-        float radius = ReplayStyle.dp(getContext(), 14f);
 
         int drawn = 0;
         for (int row = 0; drawn < CARD_COUNT; row++) {
@@ -125,19 +154,19 @@ public class ReplaySkeletonView extends View {
                 canvas.clipRect(rect);
                 float sweepWidth = cardWidth * 0.9f;
                 float sweepX = rect.left - sweepWidth + phase * (cardWidth + sweepWidth) * 1.4f;
-                sweepPaint.setShader(new LinearGradient(
-                        sweepX, 0f, sweepX + sweepWidth, 0f,
-                        new int[]{0x00FFFFFF, 0x18FFFFFF, 0x00FFFFFF},
-                        new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
+                // Move the one gradient rather than building a new one for every card.
+                sweepMatrix.setScale(sweepWidth / sweepUnitWidth, 1f);
+                sweepMatrix.postTranslate(sweepX, 0f);
+                sweepGradient.setLocalMatrix(sweepMatrix);
+                sweepPaint.setShader(sweepGradient);
                 canvas.drawRect(rect, sweepPaint);
                 canvas.restoreToCount(save);
 
                 barPaint.setColor(barColor);
-                float barLeft = left + ReplayStyle.dp(getContext(), 10f);
-                float barTop = top + cardHeight - ReplayStyle.dp(getContext(), 22f);
-                rect.set(barLeft, barTop, barLeft + cardWidth * 0.55f, barTop + ReplayStyle.dp(getContext(), 8f));
-                canvas.drawRoundRect(rect, ReplayStyle.dp(getContext(), 4f),
-                        ReplayStyle.dp(getContext(), 4f), barPaint);
+                float barLeft = left + barInset;
+                float barTop = top + cardHeight - barBottomInset;
+                rect.set(barLeft, barTop, barLeft + cardWidth * 0.55f, barTop + barHeight);
+                canvas.drawRoundRect(rect, barRadius, barRadius, barPaint);
             }
         }
     }

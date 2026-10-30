@@ -699,6 +699,11 @@ public final class ReplayPlayerView {
         private final Paint padPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint thumbPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint railPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // The boost ring is drawn while the stick is deflected, which is exactly when the player is
+        // looking at it, so its Paint and geometry are fields rather than per-frame allocations.
+        private final Paint boostPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float boostRingRadius;
+        private final float padCenterX;
         private final int railWidth;
         private final float padRadius;
         private final float thumbRadius;
@@ -723,6 +728,11 @@ public final class ReplayPlayerView {
             padPaint.setColor(style.accentFill(44));
             thumbPaint.setColor(style.accent());
             railPaint.setColor(style.accentFill(50));
+            boostPaint.setStyle(Paint.Style.STROKE);
+            boostPaint.setStrokeWidth(ReplayStyle.dpInt(activity, 2));
+            boostPaint.setColor(style.statusReady());
+            boostRingRadius = padRadius + ReplayStyle.dpInt(activity, 3);
+            padCenterX = padRadius + railWidth + ReplayStyle.dpInt(activity, 6);
             thumbX = padRadius;
             thumbY = padRadius;
             railY = padRadius;
@@ -778,7 +788,7 @@ public final class ReplayPlayerView {
 
         @Override
         protected void onDraw(Canvas canvas) {
-            float cx = padRadius + railWidth + ReplayStyle.dpInt(getContext(), 6);
+            float cx = padCenterX;
             float cy = getHeight() / 2f;
 
             canvas.drawRoundRect(railX, cy - padRadius, railX + railWidth, cy + padRadius,
@@ -791,11 +801,7 @@ public final class ReplayPlayerView {
             float tY = cy + (thumbY - padRadius);
             canvas.drawCircle(tX, tY, thumbRadius, thumbPaint);
             if (boost()) {
-                Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
-                ring.setStyle(Paint.Style.STROKE);
-                ring.setStrokeWidth(ReplayStyle.dpInt(getContext(), 2));
-                ring.setColor(style.statusReady());
-                canvas.drawCircle(cx, cy, padRadius + ReplayStyle.dpInt(getContext(), 3), ring);
+                canvas.drawCircle(cx, cy, boostRingRadius, boostPaint);
             }
         }
 
@@ -803,7 +809,7 @@ public final class ReplayPlayerView {
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX();
             float y = event.getY();
-            float cx = padRadius + railWidth + ReplayStyle.dpInt(getContext(), 6);
+            float cx = padCenterX;
             float cy = getHeight() / 2f;
 
             switch (event.getActionMasked()) {

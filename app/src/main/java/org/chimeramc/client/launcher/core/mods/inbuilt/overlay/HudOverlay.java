@@ -13,6 +13,14 @@ import org.chimeramc.client.core.mods.inbuilt.ExternalModBridge.DrawCommand;
 public class HudOverlay extends View {
     private boolean isShowing = false;
     private final Paint paint = new Paint();
+
+    // The command list is drawn every frame, so a text command whose only placeholder is the
+    // surface size must not rebuild its string each time. The cache holds the last command and its
+    // expansion, and is invalidated when the surface size changes.
+    private DrawCommand cachedSizeCommand;
+    private int cachedSizeWidth = -1;
+    private int cachedSizeHeight = -1;
+    private String cachedSizeText = "";
     private DrawCommand[] cachedDrawCommands = new DrawCommand[0];
     private long cachedDrawRevision = Long.MIN_VALUE;
     private boolean frameCallbackPosted = false;
@@ -506,7 +514,7 @@ public class HudOverlay extends View {
             paint.setTextSize(cmd.size);
             String text = cmd.text;
             if (text != null && text.contains("{DISPLAY_SIZE}")) {
-                text = text.replace("{DISPLAY_SIZE}", getWidth() + "x" + getHeight());
+                text = expandDisplaySize(cmd);
             }
             float textWidth = text != null && !text.isEmpty() ? paint.measureText(text) : 100f;
             float width = cmd.w > 0 ? cmd.w : textWidth;
@@ -596,6 +604,27 @@ public class HudOverlay extends View {
         }
     }
 
+    /**
+     * Expands a text command's {@code {DISPLAY_SIZE}} placeholder, reusing the previous expansion
+     * when neither the command nor the surface size changed.
+     *
+     * <p>Commands are redrawn every frame, so building the string each time is a per-frame
+     * allocation for a value that changes only when the surface does. A mod that shows the
+     * resolution would otherwise allocate two strings and a builder 60 times a second.
+     */
+    private String expandDisplaySize(DrawCommand cmd) {
+        int width = getWidth();
+        int height = getHeight();
+        if (cmd == cachedSizeCommand && width == cachedSizeWidth && height == cachedSizeHeight) {
+            return cachedSizeText;
+        }
+        cachedSizeCommand = cmd;
+        cachedSizeWidth = width;
+        cachedSizeHeight = height;
+        cachedSizeText = cmd.text.replace("{DISPLAY_SIZE}", width + "x" + height);
+        return cachedSizeText;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -634,7 +663,7 @@ public class HudOverlay extends View {
                     
                     String txt = cmd.text;
                     if (txt != null && txt.contains("{DISPLAY_SIZE}")) {
-                        txt = txt.replace("{DISPLAY_SIZE}", getWidth() + "x" + getHeight());
+                        txt = expandDisplaySize(cmd);
                     }
                     
                     int bgColor = Float.floatToRawIntBits(cmd.x3);

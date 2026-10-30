@@ -124,6 +124,9 @@ public final class ReachIndicatorOverlay {
         private final Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint accentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final RectF pill = new RectF();
+        // The border rect is a fixed inset of the pill, so it is reused rather than rebuilt on
+        // every draw; this overlay redraws with the game's frame tick.
+        private final RectF border = new RectF();
         private final float density;
 
         ReachView(Context context) {
@@ -166,7 +169,7 @@ public final class ReachIndicatorOverlay {
             // A thin accent border in the module's own colour so the caption reads as a HUD
             // element rather than a debug label.
             accentPaint.setColor(0xFF5AD1FF);
-            RectF border = new RectF(left + density, top + density, left + w - density, top + h - density);
+            border.set(left + density, top + density, left + w - density, top + h - density);
             canvas.drawRoundRect(border, radius - density, radius - density, accentPaint);
 
             textPaint.setColor(0xFFEAF6FF);
