@@ -99,6 +99,10 @@ public class HudOverlay extends View {
 
     private final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
 
+    // The attach is deferred by 100ms so the window token is settled, which is a window a hide can
+    // land in. The gate makes that hide win instead of the overlay reappearing untracked.
+    private final OverlayShowGate showGate = new OverlayShowGate();
+
     private void postFrameCallback() {
         if (frameCallbackPosted || !isShowing || getVisibility() != VISIBLE) return;
         frameCallbackPosted = true;
@@ -114,10 +118,11 @@ public class HudOverlay extends View {
     public void show() {
         if (isShowing) return;
 
+        final long token = showGate.begin();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isShowing) return;
+                if (isShowing || !showGate.isCurrent(token)) return;
                 
                 try {
                     ViewGroup rootView = ((Activity) getContext()).findViewById(android.R.id.content);
@@ -144,6 +149,10 @@ public class HudOverlay extends View {
     }
 
     public void hide() {
+        // Invalidated first, before the isShowing check: a pending attach has not set isShowing yet,
+        // so a hide during that window would otherwise return here and leave the runnable armed.
+        showGate.invalidate();
+        handler.removeCallbacksAndMessages(null);
         if (!isShowing) return;
         try {
             ViewGroup rootView = ((Activity) getContext()).findViewById(android.R.id.content);

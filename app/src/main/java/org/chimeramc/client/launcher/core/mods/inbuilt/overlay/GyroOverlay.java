@@ -308,6 +308,9 @@ public class GyroOverlay extends BaseOverlayButton implements SensorEventListene
 
     @Override
     public void hide() {
+        // Drop the pending native init: hiding before it fires must not leave the runnable (and
+        // this overlay) referenced, and must not initialise a module the user just switched off.
+        handler.removeCallbacksAndMessages(null);
         if (isActive && initialized) {
             disableGyro();
         }

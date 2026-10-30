@@ -26,6 +26,11 @@ public class ModMenuButton {
     private WindowManager windowManager;
     private WindowManager.LayoutParams wmParams;
     private final Handler handler = new Handler(Looper.getMainLooper());
+
+    // The button attaches 500ms after show() so the game window is up. A hide in that window used to
+    // be a no-op (isShowing was still false) and the button appeared afterwards with nothing
+    // tracking it.
+    private final OverlayShowGate showGate = new OverlayShowGate();
     private boolean isShowing = false;
     
     private float initialX, initialY, initialTouchX, initialTouchY;
@@ -46,7 +51,11 @@ public class ModMenuButton {
     
     public void show(int startX, int startY) {
         if (isShowing) return;
-        handler.postDelayed(() -> showInternal(startX, startY), 500);
+        long token = showGate.begin();
+        handler.postDelayed(() -> {
+            if (!showGate.isCurrent(token)) return;
+            showInternal(startX, startY);
+        }, 500);
     }
     
     private void showInternal(int startX, int startY) {
@@ -238,6 +247,9 @@ public class ModMenuButton {
     }
     
     public void hide() {
+        // Invalidated before the isShowing check so a hide during the attach delay still wins.
+        showGate.invalidate();
+        handler.removeCallbacksAndMessages(null);
         if (menuOverlay != null) {
             menuOverlay.hide();
             menuOverlay = null;

@@ -97,6 +97,7 @@ public class SnaplookOverlay extends BaseOverlayButton {
 
     @Override
     public void hide() {
+        handler.removeCallbacksAndMessages(null);
         if (isActive && initialized) {
             SnaplookMod.nativeOnKeyUp();
             isActive = false;

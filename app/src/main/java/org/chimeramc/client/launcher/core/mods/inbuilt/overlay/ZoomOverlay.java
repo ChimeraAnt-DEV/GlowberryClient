@@ -122,6 +122,7 @@ public class ZoomOverlay extends BaseOverlayButton {
 
     @Override
     public void hide() {
+        handler.removeCallbacksAndMessages(null);
         if (isZooming && initialized) {
             ZoomMod.nativeOnKeyUp();
             isZooming = false;
