@@ -17,7 +17,7 @@ import android.widget.TextView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
-import org.levimc.launcher.core.mods.inbuilt.nativemod.FpsMod;
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod;
 
 public class FpsDisplayOverlay {
     private static final int UPDATE_INTERVAL = 250;

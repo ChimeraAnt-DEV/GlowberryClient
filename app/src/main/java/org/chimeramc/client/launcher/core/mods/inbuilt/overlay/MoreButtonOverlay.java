@@ -12,7 +12,7 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.MoreButtonsSvgBridge;
 import org.chimeramc.client.core.mods.inbuilt.manager.MoreButtonsManager;
 import org.chimeramc.client.core.mods.inbuilt.model.MoreButtonConfig;
-import org.levimc.launcher.core.mods.inbuilt.nativemod.MoreButtonsMod;
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.MoreButtonsMod;
 import org.chimeramc.pojavcontrols.KeyMapper;
 
 public final class MoreButtonOverlay extends BaseOverlayButton {

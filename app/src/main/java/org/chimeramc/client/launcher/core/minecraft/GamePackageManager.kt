@@ -10,8 +10,6 @@ import android.os.SystemClock
 import android.util.Log
 import org.chimeramc.client.BuildConfig
 import org.chimeramc.client.core.versions.GameVersion
-import org.levimc.launcher.util.NativeBridgeHelper
-import org.levimc.launcher.util.NativeImageGuard
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -64,7 +62,6 @@ class GamePackageManager private constructor(
     private val systemLoadedLibs = arrayOf(
         "libPlayFabMultiplayer.so",
         "libmaesdk.so",
-        "libgxcore.so",
     )
 
     data class LibraryLoadResult(
@@ -242,7 +239,7 @@ class GamePackageManager private constructor(
         } catch (_: Exception) {
             false
         }
-        // A launcher update changes the extraction pipeline (new NativeImageGuard step, ABI
+        // A launcher update changes the extraction pipeline (ABI
         // handling, packaging rules). Stale extracted libs from an older extractor can fail
         // dlopen with confusing errors until wiped. Invalidate on both a manual extractor bump
         // and the app's own version so a plain update always wipes + re-extracts before any
@@ -405,7 +402,7 @@ class GamePackageManager private constructor(
         return ExtractionManifest.build(
             ExtractionCachePolicy.EXTRACTOR_VERSION,
             getDeviceAbi(apkFiles),
-            NativeImageGuard.TOKEN,
+            EXTRACTION_MANIFEST_TOKEN,
             if (version != null && !version.isInstalled) "isolated" else "installed",
             shouldLoadHttpClient(),
             apkFiles.map { ExtractionManifest.ApkEntry.of(it) }
@@ -447,10 +444,6 @@ class GamePackageManager private constructor(
                         copyStreamToReadOnlyFile(input, dstFile)
                     }
                     report("Copied $lib from native lib directory")
-                    if (!processNativeImage(dstFile, true)) {
-                        dstFile.delete()
-                        throw IOException("Failed to prepare native library: ${dstFile.name}")
-                    }
                     logFileOperation("Copied", lib)
                 } catch (e: Exception) {
                     logFileOperation("Failed to copy", lib, e = e)
@@ -494,10 +487,6 @@ class GamePackageManager private constructor(
                     try {
                         zip.getInputStream(entry).use { input ->
                             copyStreamToReadOnlyFile(input, output)
-                        }
-                        if (!processNativeImage(output, true)) {
-                            output.delete()
-                            throw IOException("Failed to prepare native library: ${output.name}")
                         }
                         extracted += libName
                         report("Extracted $libName from ${apkFile.name} for $abi")
@@ -641,21 +630,6 @@ class GamePackageManager private constructor(
         }
     }
 
-    private fun processNativeImage(file: File, force: Boolean = false): Boolean {
-        if (!file.name.endsWith(".so")) {
-            return true
-        }
-        return if (force) {
-            NativeImageGuard.processRequired(file)
-        } else {
-            NativeImageGuard.processIfNeeded(file)
-        }
-    }
-
-    private fun processNativeImages(dir: File) {
-        NativeImageGuard.processDirectory(dir)
-    }
-
     private fun getCacheRequiredLibs(): Array<String> {
         // The cache is "complete" only when every library the loader will open is present. The
         // version-gated libraries are loaded out of this same extracted directory by
@@ -783,32 +757,9 @@ class GamePackageManager private constructor(
         val startedAt = SystemClock.elapsedRealtime()
 
         if (systemLoadedLibs.contains(fileName)) {
-            val source = if (normalizedName == "gxcore") {
-                "launcher bundled bootstrap"
-            } else {
-                "launcher bundled library"
-            }
+            val source = "launcher bundled library"
             try {
-                if (normalizedName == "gxcore") {
-                    if (!NativeBridgeHelper.isGxCoreEnabled()) {
-                        mirrorLogcat('W', "gxcore verification disabled by feature flag — skipping bootstrap")
-                        return LibraryLoadResult(
-                            normalizedName,
-                            fileName,
-                            source,
-                            true,
-                            elapsedSince(startedAt),
-                            "skipped gxcore bootstrap (feature flag gxcoreEnabled=false)"
-                        )
-                    }
-                    if (!NativeBridgeHelper.bootstrapGxCore()) {
-                        val detail = "gxcore bootstrap failed"
-                        mirrorLogcat('E', "Failed to load $fileName from $source: $detail")
-                        return LibraryLoadResult(normalizedName, fileName, source, false, elapsedSince(startedAt), detail)
-                    }
-                } else {
-                    System.loadLibrary(normalizedName)
-                }
+                System.loadLibrary(normalizedName)
                 return LibraryLoadResult(
                     normalizedName,
                     fileName,
@@ -874,7 +825,7 @@ class GamePackageManager private constructor(
     ): List<LibraryLoadResult> {
         val deviceSupports64Bit = Build.SUPPORTED_64_BIT_ABIS.isNotEmpty()
         val allLibs = (requiredLibs + systemLoadedLibs).filterNot { lib ->
-            // PlayFab/maesdk/gxcore are arm64-only closed-source prebuilts; on a 32-bit
+            // PlayFab/maesdk are arm64-only closed-source prebuilts; on a 32-bit
             // device they aren't bundled, so exclude them up front instead of letting
             // System.loadLibrary fail mid-launch.
             systemLoadedLibs.contains(lib) && !deviceSupports64Bit
@@ -982,6 +933,15 @@ class GamePackageManager private constructor(
 
     companion object {
         private const val TAG = "GamePackageManager"
+
+        /**
+         * The extraction-manifest token.
+         *
+         * <p>It used to be {@code NativeImageGuard.TOKEN}, from a prebuilt-library helper that is
+         * no longer shipped. The value is kept verbatim so the manifest layout is unchanged and an
+         * existing cache is not invalidated by the removal alone.
+         */
+        private const val EXTRACTION_MANIFEST_TOKEN = "img_v4"
 
         @Volatile
         private var instance: GamePackageManager? = null
@@ -1173,7 +1133,7 @@ class GamePackageManager private constructor(
             ExtractionManifest.build(
                 ExtractionCachePolicy.EXTRACTOR_VERSION,
                 resolveDeviceAbi(version, apkFiles),
-                NativeImageGuard.TOKEN,
+                EXTRACTION_MANIFEST_TOKEN,
                 if (!version.isInstalled) "isolated" else "installed",
                 shouldLoadHttpClientStatic(version),
                 apkFiles.map { ExtractionManifest.ApkEntry.of(it) }

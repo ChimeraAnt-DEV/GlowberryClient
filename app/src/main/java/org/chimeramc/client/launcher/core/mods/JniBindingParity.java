@@ -21,10 +21,15 @@ import java.util.TreeSet;
  * {@code Java_<package with '_'>_<Class>_<method>}; an overloaded method also carries a
  * {@code __<signature>} suffix, so names are compared on the part before {@code __}.
  *
- * <p>The allowlist is for methods whose native implementation lives in a <em>prebuilt</em> library
- * with no source in this repository (the {@code libgxcore.so} / {@code libinbuiltmods.so} levimc
- * bindings). Those cannot be checked here and are excluded from the Java-side check; the C++-side
- * check still covers every export in the preloader source.
+ * <p>The Java allowlist is for methods whose native implementation lives in a <em>prebuilt</em>
+ * library with no source in this repository (the {@code libmtbinloader2.so} bindings). Those cannot
+ * be checked here and are excluded from the Java-side check; the C++-side check still covers every
+ * export in the preloader source.
+ *
+ * <p>The C++ allowlist is for the reverse case: an export in the preloader that no longer has a Java
+ * declaration because the declaring class was removed, where the preloader lives in a separate
+ * repository and its removal ships on its own schedule. An entry here is a promise that the export
+ * is dead, not a way to silence a real mismatch.
  */
 public final class JniBindingParity {
 
@@ -77,13 +82,34 @@ public final class JniBindingParity {
     public static List<Problem> compare(Collection<String> javaSymbols,
                                         Collection<String> cppSymbols,
                                         Set<String> javaAllowlist) {
+        return compare(javaSymbols, cppSymbols, javaAllowlist, null);
+    }
+
+    /**
+     * Compares the Java declarations against the C++ exports, with an allowlist on each side.
+     *
+     * @param javaSymbols    mangled names expected from the Java/Kotlin side (may include overloads)
+     * @param cppSymbols     mangled names actually exported by the C++ source (may include overloads)
+     * @param javaAllowlist  Java symbols whose implementation is in a prebuilt library (skipped)
+     * @param cppAllowlist   C++ exports with no Java declaration pending a separate repository's
+     *                       change (skipped); see the class docs
+     * @return the problems found; empty when the two sides agree
+     */
+    public static List<Problem> compare(Collection<String> javaSymbols,
+                                        Collection<String> cppSymbols,
+                                        Set<String> javaAllowlist,
+                                        Set<String> cppAllowlist) {
         Set<String> javaBases = new TreeSet<>();
         for (String symbol : javaSymbols) {
             String base = baseSymbol(symbol);
             if (javaAllowlist == null || !javaAllowlist.contains(base)) javaBases.add(base);
         }
         Set<String> cppBases = new TreeSet<>();
-        for (String symbol : cppSymbols) cppBases.add(baseSymbol(symbol));
+        for (String symbol : cppSymbols) {
+            String base = baseSymbol(symbol);
+            if (cppAllowlist != null && cppAllowlist.contains(base)) continue;
+            cppBases.add(base);
+        }
 
         List<Problem> problems = new ArrayList<>();
         for (String java : javaBases) {

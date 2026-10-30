@@ -10,7 +10,6 @@ public class FeatureSettings {
     private boolean lowInputDelayEnabled = false;
     private Boolean crashUploadEnabled = true;
     private boolean foregroundServiceEnabled = false;
-    private Boolean gxcoreEnabled = false;
     private boolean reduceNetworkLatencyEnabled = false;
     private boolean fpsOptimizerEnabled = false;
 
@@ -94,8 +93,6 @@ public class FeatureSettings {
     public boolean isForegroundServiceEnabled() { return foregroundServiceEnabled; }
     public void setForegroundServiceEnabled(boolean enabled) { this.foregroundServiceEnabled = enabled; autoSave(); }
 
-    public boolean isGxCoreEnabled() { return gxcoreEnabled != null && gxcoreEnabled; }
-    public void setGxCoreEnabled(boolean enabled) { this.gxcoreEnabled = enabled; autoSave(); }
 
     /**
      * Whether the FPS optimization module may quiet the host during a session.

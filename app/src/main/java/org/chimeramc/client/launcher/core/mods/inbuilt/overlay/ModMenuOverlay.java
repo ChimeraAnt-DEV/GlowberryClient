@@ -490,8 +490,8 @@ public class ModMenuOverlay {
         if (statsFps != null) {
             int fps = 0;
             try {
-                if (org.levimc.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeIsInitialized()) {
-                    fps = org.levimc.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeGetFps();
+                if (org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeIsInitialized()) {
+                    fps = org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeGetFps();
                 }
             } catch (Throwable ignored) {
                 // A native read must never take the menu down; the em dash is the honest fallback.

@@ -31,10 +31,9 @@ import java.util.stream.Stream;
  * disagree in either direction. It has already caught real mismatches in this repository's history
  * (a class moved to a different package while its export kept the old one).
  *
- * <p>Classes whose native implementation lives in a prebuilt library with no source here (the levimc
- * {@code libgxcore.so} / {@code libinbuiltmods.so} bindings and {@code libmtbinloader2.so}) are
- * excluded from the Java side, because there is no C++ source to compare against. That exclusion is
- * deliberately narrow and explicit.
+ * <p>Classes whose native implementation lives in a prebuilt library with no source here (the
+ * {@code libmtbinloader2.so} bindings) are excluded from the Java side, because there is no C++
+ * source to compare against. That exclusion is deliberately narrow and explicit.
  */
 public class JniBindingParityTest {
 
@@ -74,9 +73,9 @@ public class JniBindingParityTest {
 
     @Test
     public void theAllowlistExcludesPrebuiltOnlyDeclarations() {
-        Set<String> allow = new HashSet<>(Collections.singletonList("Java_org_levimc_X_nativeInit"));
+        Set<String> allow = new HashSet<>(Collections.singletonList("Java_a_b_Prebuilt_nativeInit"));
         List<JniBindingParity.Problem> problems = JniBindingParity.compare(
-                Collections.singletonList("Java_org_levimc_X_nativeInit"),
+                Collections.singletonList("Java_a_b_Prebuilt_nativeInit"),
                 Collections.emptyList(), allow);
         assertTrue("an allow-listed declaration needs no export", problems.isEmpty());
     }
@@ -88,16 +87,20 @@ public class JniBindingParityTest {
      * preloader source. Listed by FQN; excluded from the Java side of the comparison only.
      */
     private static final Set<String> PREBUILT_BOUND_CLASSES = new HashSet<>(Arrays.asList(
-            "io.bambosan.mbloader.launcherUtils.LibBindings",
-            "org.levimc.launcher.util.NativeBridgeHelper",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.AutoSprintMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.FpsMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.GyroMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.HotbarSlotMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.MoreButtonsMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.PojavControlsMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.SnaplookMod",
-            "org.levimc.launcher.core.mods.inbuilt.nativemod.ZoomMod"));
+            "io.bambosan.mbloader.launcherUtils.LibBindings"));
+
+    /**
+     * Preloader exports with no Java declaration, pending the removal in the preloader's own
+     * repository (which this repo does not have push access to, so the two land separately).
+     *
+     * <p>{@code nativeSetupRuntime} was declared by the deleted
+     * {@code org.levimc.launcher.core.minecraft.MinecraftRuntimePreparer} bridge, which only existed
+     * to satisfy the prebuilt {@code libgxcore.so}'s hardcoded JNI lookup. With that library and its
+     * declaring class gone the export is dead; it is listed here so the parity check still fails on
+     * any <em>new</em> mismatch. Remove the entry and the export together.
+     */
+    private static final Set<String> PENDING_PRELOADER_REMOVALS = new HashSet<>(Arrays.asList(
+            "Java_org_levimc_launcher_core_minecraft_MinecraftRuntimePreparer_nativeSetupRuntime"));
 
     @Test
     public void everyNativeDeclarationHasAMatchingExportAndViceVersa() throws IOException {
@@ -111,8 +114,21 @@ public class JniBindingParityTest {
         assertTrue("scan found too few C++ exports: " + cppSymbols.size(), cppSymbols.size() > 50);
 
         List<JniBindingParity.Problem> problems =
-                JniBindingParity.compare(javaSymbols, cppSymbols, Collections.emptySet());
+                JniBindingParity.compare(javaSymbols, cppSymbols, Collections.emptySet(),
+                        PENDING_PRELOADER_REMOVALS);
         assertTrue("JNI binding parity failed:\n" + join(problems), problems.isEmpty());
+    }
+
+    @Test
+    public void theCppAllowlistHidesOnlyItsOwnExports() {
+        Set<String> cppAllow = new HashSet<>(Collections.singletonList("Java_a_b_C_dead"));
+        List<JniBindingParity.Problem> problems = JniBindingParity.compare(
+                Collections.singletonList("Java_a_b_C_live"),
+                Arrays.asList("Java_a_b_C_dead", "Java_a_b_C_live", "Java_a_b_C_other"),
+                Collections.emptySet(), cppAllow);
+        assertEquals("only the allow-listed export is skipped", 1, problems.size());
+        assertEquals("stale-export", problems.get(0).kind);
+        assertEquals("Java_a_b_C_other", problems.get(0).symbol);
     }
 
     @Test

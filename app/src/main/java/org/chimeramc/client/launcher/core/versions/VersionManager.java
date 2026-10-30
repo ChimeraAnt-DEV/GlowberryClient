@@ -24,7 +24,6 @@ import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.ui.dialogs.LibsRepairDialog;
 import org.chimeramc.client.util.ApkUtils;
 import org.chimeramc.client.util.LauncherStorage;
-import org.levimc.launcher.util.NativeImageGuard;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -385,9 +384,6 @@ public class VersionManager {
                                                 lastPercent[0] = percent;
                                             }
                                         }
-                                    }
-                                    if (!NativeImageGuard.processRequired(outFile)) {
-                                        throw new IOException("Failed to prepare native library: " + outFile.getName());
                                     }
                                 }
                             }

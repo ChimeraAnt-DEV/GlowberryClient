@@ -13,7 +13,7 @@ import android.widget.ImageButton;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
-import org.levimc.launcher.core.mods.inbuilt.nativemod.PojavControlsMod;
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.PojavControlsMod;
 
 /**
  * Gyroscope camera control.

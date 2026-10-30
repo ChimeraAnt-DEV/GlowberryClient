@@ -455,10 +455,6 @@ public class SettingsActivity extends BaseActivity {
             org.chimeramc.client.launcher.controller.ControllerInputProcessor.reload(this);
         });
 
-        SwitchMaterial switchGxCore = findViewById(R.id.switch_gxcore);
-        switchGxCore.setChecked(fs.isGxCoreEnabled());
-        switchGxCore.setOnCheckedChangeListener((btn, checked) -> fs.setGxCoreEnabled(checked));
-
         SwitchMaterial switchReduceNetworkLatency = findViewById(R.id.switch_reduce_network_latency);
         switchReduceNetworkLatency.setChecked(fs.isReduceNetworkLatencyEnabled());
         switchReduceNetworkLatency.setOnCheckedChangeListener((btn, checked) -> {

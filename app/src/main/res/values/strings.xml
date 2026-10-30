@@ -735,8 +735,6 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="optifine_item_oreui_stripping_desc">Watches the in-game HUD updates so the launcher can tell the HUD is live. Advanced: installs a game hook, off by default.</string>
     <string name="playtime_label">%1$s played</string>
     <string name="recent_playtime_label">%1$s played on this instance</string>
-    <string name="gxcore_title">gxcore native bootstrap</string>
-    <string name="gxcore_desc">Off by default. Enable to run the closed-source gxcore verification stack. Leave off to skip it, which avoids a silent process exit right after "Loading native library: libgxcore.so" on devices where verification cannot complete</string>
     <string name="logcat_live">Logcat: <b>live</b></string>
     <string name="logcat_paused">Logcat: paused</string>
     <!-- Logcat Overlay i18n -->

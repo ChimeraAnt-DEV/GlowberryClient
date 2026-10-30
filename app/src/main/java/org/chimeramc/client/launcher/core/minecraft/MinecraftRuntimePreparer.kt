@@ -162,32 +162,6 @@ object MinecraftRuntimePreparer {
         fileListener.onProgress(78,"Loading enabled mods")
         fileListener.onLog("Loading native mods")
 
-        // Non-essential native extras (the inbuilt-mod library and the gyro pre-resolve). A device
-        // that cannot load one of these must still reach its world, so the failure is logged by
-        // cause rather than silently swallowed: "the launch continued but gyro never worked" was
-        // previously indistinguishable from "gyro is broken", and nothing reached the log.
-        try {
-            org.levimc.launcher.core.mods.inbuilt.nativemod.InbuiltModsNative.loadLibrary()
-            org.levimc.launcher.core.mods.inbuilt.nativemod.GyroMod.nativePreResolve()
-            trace.mark("Inbuilt native extras loaded")
-        } catch (error: Throwable) {
-            val reason = if (error is UnsatisfiedLinkError) {
-                "native library missing (ABI mismatch or a stale extraction)"
-            } else {
-                error.message ?: error.javaClass.simpleName
-            }
-            fileListener.onLog(
-                "Inbuilt native extras unavailable; the launch continues: $reason"
-            )
-            trace.warning("Inbuilt native extras unavailable", reason)
-        }
-
-        val modsDir = modManager.currentVersion?.modsDir?.absolutePath
-        if (modsDir.isNullOrEmpty()) {
-            fileListener.onLog("Skipped gxcore native runtime setup: no mods directory")
-        } else if (!org.levimc.launcher.core.minecraft.MinecraftRuntimePreparer.runNativeSetup(modsDir)) {
-            fileListener.onLog("gxcore native runtime setup failed")
-        }
         val nativeModResult = loadNativeMods(context, launchIntent, modManager, fileListener, trace)
 
         try {
@@ -413,11 +387,6 @@ object MinecraftRuntimePreparer {
             loadLibrary(gameManager, "fmod", 56, true, listener, trace)
             loadLibrary(gameManager, "MediaDecoders_Android", 62, true, listener, trace)
             loadLibrary(gameManager, "minecraftpe", 70, true, listener, trace)
-            // gxcore is a closed-source arm64-only prebuilt; on a 32-bit launcher
-            // build it is not bundled, so treat it as optional there instead of aborting.
-            val gxcoreRequired =
-                Build.SUPPORTED_64_BIT_ABIS.any { it.contains("arm64-v8a") || it.contains("x86_64") }
-            loadLibrary(gameManager, "gxcore", 74, gxcoreRequired, listener, trace)
         }
         trace.mark("Minecraft library loading finished")
     }

@@ -26,7 +26,10 @@ import org.chimeramc.client.core.crash.CrashReporter
 import org.chimeramc.client.core.mods.ModManager
 import org.chimeramc.client.core.mods.ModSafeMode
 import org.chimeramc.client.launcher.core.minecraft.LastLaunchFailure
-import org.levimc.launcher.core.mods.inbuilt.nativemod.PojavControlsMod
+import org.chimeramc.client.core.backend.AndroidGameInputHost
+import org.chimeramc.client.core.backend.GameBridge
+import org.chimeramc.client.core.backend.LauncherGameBackend
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.PojavControlsMod
 import org.chimeramc.client.core.mods.inbuilt.overlay.InbuiltOverlayManager
 import org.chimeramc.client.launcher.controller.ControllerInputProcessor
 import org.chimeramc.client.settings.PerformancePresetManager
@@ -183,6 +186,7 @@ class MinecraftActivity : MainActivity(), PojavControlsHost {
             if (!ControllerInputProcessor.applyInstanceBinding(this, storageProfileId)) {
                 ControllerInputProcessor.detectAndLoad(this)
             }
+            registerGameBackend()
             MinecraftActivityState.onCreated(this)
             startPlaytimeSession(storageProfileId)
             applyHighRefreshRateMode()
@@ -711,7 +715,28 @@ class MinecraftActivity : MainActivity(), PojavControlsHost {
         return !PreloaderInput.shouldForceGlobalModMenu() && !PreloaderInput.isHudScreenOpen()
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) {
+            // Losing focus must not leave a key or mouse button held down in the game: nothing will
+            // send the matching release once another app has the window.
+            GameBridge.releaseAll()
+        }
+    }
+
+    /**
+     * Registers the launcher's own input backend for this session.
+     *
+     * <p>It replaces the removed prebuilt-library wrappers: the backend builds the same key and
+     * mouse events a physical device would produce and dispatches them through this activity, which
+     * is the path the game's input handler already reads.
+     */
+    private fun registerGameBackend() {
+        GameBridge.register(LauncherGameBackend(AndroidGameInputHost(this)))
+    }
+
     override fun onPause() {
+        GameBridge.releaseAll()
         val shouldRestartAfterNormalExit = shouldRestartAfterNormalExit()
         if (shouldRestartAfterNormalExit) {
             PreloaderInput.cancelDocumentRequest("Minecraft closed")
@@ -736,6 +761,8 @@ class MinecraftActivity : MainActivity(), PojavControlsHost {
         previousInputFocus = null
         PreloaderInput.clearActivity()
         MinecraftActivityState.onDestroyed(this)
+        // The backend holds this activity; drop it so a destroyed session cannot be reached.
+        GameBridge.unregister()
         MinecraftLaunchSession.clear()
         stopInbuiltModServices()
         stopPlaytimeSession()
