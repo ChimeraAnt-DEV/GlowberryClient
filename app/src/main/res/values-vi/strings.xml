@@ -973,4 +973,77 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="inbuilt_mod_hotbar_slot">Ô thanh nhanh</string>
     <string name="inbuilt_mod_hotbar_slot_desc">Thêm các nút 1–9 riêng để chọn ô trên thanh nhanh</string>
     <string name="hotbar_slot_content_description">Ô thanh nhanh %1$d</string>
+
+
+    <!-- Priority batch: the first-run wizard, the launch-failure dialogs, the
+         error explanations and the navigation labels. See
+         scripts/translations_priority.json. -->
+    <string name="nav_back">Quay lại</string>
+    <string name="nav_library">Thư viện</string>
+    <string name="nav_installations">Cài đặt</string>
+    <string name="nav_mods">Mod</string>
+    <string name="nav_customize">Tùy chỉnh</string>
+    <string name="nav_voice">Thoại</string>
+    <string name="nav_replay">Phát lại</string>
+    <string name="nav_tab_selected">%1$s, đã chọn</string>
+    <string name="home_subtitle">Trình khởi chạy Minecraft: Bedrock Edition</string>
+    <string name="home_versions">Phiên bản</string>
+    <string name="home_mods">Mod</string>
+    <string name="home_content">Nội dung</string>
+    <string name="home_edition">Minecraft Bedrock Edition</string>
+    <string name="home_change">Thay đổi</string>
+    <string name="home_play">Chơi Minecraft</string>
+    <string name="home_active_mods">Mod đang bật</string>
+    <string name="home_manage">Quản lý</string>
+    <string name="home_no_mods">Chưa cài đặt mod nào</string>
+    <string name="home_content_library">Thư viện nội dung</string>
+    <string name="home_more">Thêm</string>
+    <string name="setup_step_import_title">Chào mừng đến với GlowberryClient</string>
+    <string name="setup_step_import_body">Nhập tệp trò chơi Minecraft của bạn để bắt đầu. Chọn APK bạn muốn chơi.</string>
+    <string name="setup_step_import_action">Nhập trò chơi</string>
+    <string name="setup_step_version_title">Chọn phiên bản của bạn</string>
+    <string name="setup_step_version_body">Chọn phiên bản Minecraft để chơi. Bạn có thể thêm sau từ Thư viện.</string>
+    <string name="setup_step_version_action">Chọn phiên bản</string>
+    <string name="setup_step_signin_title">Đăng nhập</string>
+    <string name="setup_step_signin_body">Đăng nhập bằng tài khoản Microsoft để chơi trực tuyến và lưu tiến trình.</string>
+    <string name="setup_step_signin_action">Đăng nhập</string>
+    <string name="setup_skip">Bỏ qua lúc này</string>
+    <string name="setup_import_failed">Nhập thất bại: %1$s</string>
+    <string name="launch_failure_title_play_store">Không thể mở bản cài Minecraft này</string>
+    <string name="launch_failure_title_game_files_missing">Thiếu tệp trò chơi</string>
+    <string name="launch_failure_title_abi">Bản dựng không được hỗ trợ</string>
+    <string name="launch_failure_title_stale_libs">Đang sửa thư viện gốc</string>
+    <string name="launch_failure_title_rules">Tương thích hạn chế</string>
+    <string name="launch_failure_title_unexpected">Không thể khởi chạy trò chơi</string>
+    <string name="launch_failure_title_not_installed">Không tìm thấy Minecraft</string>
+    <string name="launch_error_title_missing_game_library">Không đọc được thư viện trò chơi</string>
+    <string name="launch_error_title_missing_dependency">Thiếu một tệp bắt buộc</string>
+    <string name="launch_error_title_stale_libs">Tệp gốc cần được sửa</string>
+    <string name="launch_error_title_mod_failed">Một mod đã chặn khởi chạy</string>
+    <string name="launch_error_title_out_of_memory">Không đủ bộ nhớ</string>
+    <string name="launch_error_title_unknown">Không thể khởi chạy Minecraft</string>
+    <string name="launch_error_cause_label">Nguyên nhân:</string>
+    <string name="error_short_no_connection">không có kết nối internet</string>
+    <string name="error_short_connection_refused">máy chủ từ chối kết nối</string>
+    <string name="error_short_host_not_found">không tìm thấy địa chỉ máy chủ — hãy kiểm tra kết nối</string>
+    <string name="error_short_timeout">máy chủ phản hồi quá lâu</string>
+    <string name="error_short_secure_connection">không thể thiết lập kết nối bảo mật</string>
+    <string name="error_short_server_refused">nguồn đã từ chối yêu cầu</string>
+    <string name="error_short_server_error">máy chủ báo lỗi nội bộ</string>
+    <string name="error_short_bad_response">nguồn trả về nội dung không đọc được</string>
+    <string name="error_short_out_of_memory">trình khởi chạy hết bộ nhớ</string>
+    <string name="error_short_out_of_space">không đủ dung lượng trống</string>
+    <string name="error_short_permission_denied">quyền truy cập bộ nhớ bị từ chối</string>
+    <string name="error_short_corrupt_package">tệp bị hỏng hoặc không phải gói hợp lệ</string>
+    <string name="error_short_interrupted">quá trình truyền bị gián đoạn</string>
+    <string name="error_short_abi_incompatible">Bản dựng 32-bit không được hỗ trợ</string>
+    <string name="error_short_unknown">xem nhật ký để biết lỗi chính xác</string>
+
+    <string name="launch_failure_message_play_store">Đây là bản Minecraft từ Google Play, hoặc một phiên bản thiếu tệp cần thiết để khởi chạy trò chơi.\n\nTrình khởi chạy phải tải trực tiếp thư viện gốc của trò chơi, còn bản Play Store giữ nó bên trong ứng dụng đã cài, nơi trình khởi chạy này không thể truy cập.\n\nĐể chơi, hãy nhập APK Minecraft từ Thư viện. Bản cài từ Play Store có thể vẫn nằm trên thiết bị — bạn không cần gỡ nó.</string>
+    <string name="launch_failure_message_game_files_missing">Tệp trò chơi của bản cài này bị thiếu hoặc chưa đầy đủ. Hãy nhập lại phiên bản từ Thư viện, hoặc chạy Sửa bản cài trong Cài đặt \u2192 Chẩn đoán.</string>
+    <string name="launch_failure_message_abi">Phiên bản Minecraft này chỉ có thư viện gốc 32-bit, còn GlowberryClient chạy dưới dạng ứng dụng 64-bit. Hãy nhập bản dựng 64-bit của phiên bản này.</string>
+    <string name="launch_failure_message_stale_libs">Thư viện gốc đã giải nén thuộc phiên bản trình khởi chạy cũ hơn. Chúng sẽ được giải nén lại tự động ở lần khởi chạy tới. Nếu trò chơi vẫn không khởi động, hãy chạy Sửa bản cài trong Cài đặt \u2192 Chẩn đoán.</string>
+    <string name="launch_failure_message_rules">Chưa có định nghĩa hook cho bản dựng Minecraft này, nên lớp phủ và trang phục trong trò chơi bị tắt. Bản thân trò chơi vẫn chạy bình thường.</string>
+    <string name="launch_failure_message_unexpected">Trình khởi chạy không thể bắt đầu trò chơi và nguyên nhân không thuộc những gì nó nhận ra. Không có gì trên thiết bị của bạn bị thay đổi. Hãy mở lại trình khởi chạy và thử lại; nếu vẫn tiếp diễn, hãy chạy Sửa bản cài trong Cài đặt \u2192 Chẩn đoán.</string>
+    <string name="launch_failure_message_not_installed">Có vẻ như Minecraft chưa được cài trên thiết bị này. Hãy nhập APK Minecraft từ Thư viện — bản cài từ Google Play không thể được trình khởi chạy này khởi chạy, vì trò chơi giữ thư viện gốc bên trong ứng dụng đã cài, nơi trình khởi chạy không thể truy cập.</string>
 </resources>

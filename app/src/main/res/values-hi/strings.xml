@@ -971,4 +971,77 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="inbuilt_mod_hotbar_slot">हॉटबार स्लॉट</string>
     <string name="inbuilt_mod_hotbar_slot_desc">हॉटबार स्लॉट चुनने के लिए अलग-अलग 1–9 बटन जोड़ता है</string>
     <string name="hotbar_slot_content_description">हॉटबार स्लॉट %1$d</string>
+
+
+    <!-- Priority batch: the first-run wizard, the launch-failure dialogs, the
+         error explanations and the navigation labels. See
+         scripts/translations_priority.json. -->
+    <string name="nav_back">वापस</string>
+    <string name="nav_library">लाइब्रेरी</string>
+    <string name="nav_installations">इंस्टॉल</string>
+    <string name="nav_mods">मॉड्स</string>
+    <string name="nav_customize">अनुकूलित करें</string>
+    <string name="nav_voice">वॉइस</string>
+    <string name="nav_replay">रीप्ले</string>
+    <string name="nav_tab_selected">%1$s, चयनित</string>
+    <string name="home_subtitle">Minecraft: Bedrock Edition लॉन्चर</string>
+    <string name="home_versions">संस्करण</string>
+    <string name="home_mods">मॉड्स</string>
+    <string name="home_content">सामग्री</string>
+    <string name="home_edition">Minecraft Bedrock Edition</string>
+    <string name="home_change">बदलें</string>
+    <string name="home_play">Minecraft खेलें</string>
+    <string name="home_active_mods">सक्रिय मॉड्स</string>
+    <string name="home_manage">प्रबंधित करें</string>
+    <string name="home_no_mods">अभी तक कोई मॉड इंस्टॉल नहीं है</string>
+    <string name="home_content_library">सामग्री लाइब्रेरी</string>
+    <string name="home_more">और</string>
+    <string name="setup_step_import_title">GlowberryClient में आपका स्वागत है</string>
+    <string name="setup_step_import_body">शुरू करने के लिए अपनी Minecraft गेम फ़ाइलें इंपोर्ट करें। वह APK चुनें जिसे आप खेलना चाहते हैं।</string>
+    <string name="setup_step_import_action">गेम इंपोर्ट करें</string>
+    <string name="setup_step_version_title">अपना संस्करण चुनें</string>
+    <string name="setup_step_version_body">चुनें कि Minecraft का कौन-सा संस्करण खेलना है। आप बाद में लाइब्रेरी से और जोड़ सकते हैं।</string>
+    <string name="setup_step_version_action">संस्करण चुनें</string>
+    <string name="setup_step_signin_title">साइन इन करें</string>
+    <string name="setup_step_signin_body">ऑनलाइन खेलने और अपनी प्रगति सहेजने के लिए अपने Microsoft खाते से साइन इन करें।</string>
+    <string name="setup_step_signin_action">साइन इन करें</string>
+    <string name="setup_skip">अभी छोड़ें</string>
+    <string name="setup_import_failed">इंपोर्ट विफल: %1$s</string>
+    <string name="launch_failure_title_play_store">यह Minecraft इंस्टॉल नहीं खुल सकता</string>
+    <string name="launch_failure_title_game_files_missing">गेम फ़ाइलें गायब हैं</string>
+    <string name="launch_failure_title_abi">असमर्थित बिल्ड</string>
+    <string name="launch_failure_title_stale_libs">नेटिव लाइब्रेरी की मरम्मत हो रही है</string>
+    <string name="launch_failure_title_rules">सीमित संगतता</string>
+    <string name="launch_failure_title_unexpected">गेम शुरू नहीं हो सका</string>
+    <string name="launch_failure_title_not_installed">Minecraft नहीं मिला</string>
+    <string name="launch_error_title_missing_game_library">गेम लाइब्रेरी पढ़ी नहीं जा सकती</string>
+    <string name="launch_error_title_missing_dependency">एक आवश्यक फ़ाइल गायब है</string>
+    <string name="launch_error_title_stale_libs">नेटिव फ़ाइलों को मरम्मत चाहिए</string>
+    <string name="launch_error_title_mod_failed">एक मॉड ने लॉन्च रोक दिया</string>
+    <string name="launch_error_title_out_of_memory">पर्याप्त मेमोरी नहीं</string>
+    <string name="launch_error_title_unknown">Minecraft शुरू नहीं हो सका</string>
+    <string name="launch_error_cause_label">कारण:</string>
+    <string name="error_short_no_connection">इंटरनेट कनेक्शन नहीं है</string>
+    <string name="error_short_connection_refused">सर्वर ने कनेक्शन अस्वीकार कर दिया</string>
+    <string name="error_short_host_not_found">सर्वर का पता नहीं मिला — अपना कनेक्शन जाँचें</string>
+    <string name="error_short_timeout">सर्वर ने जवाब देने में बहुत समय लिया</string>
+    <string name="error_short_secure_connection">सुरक्षित कनेक्शन स्थापित नहीं हो सका</string>
+    <string name="error_short_server_refused">स्रोत ने अनुरोध अस्वीकार कर दिया</string>
+    <string name="error_short_server_error">सर्वर ने आंतरिक त्रुटि बताई</string>
+    <string name="error_short_bad_response">स्रोत ने कुछ अपठनीय लौटाया</string>
+    <string name="error_short_out_of_memory">लॉन्चर की मेमोरी खत्म हो गई</string>
+    <string name="error_short_out_of_space">पर्याप्त खाली जगह नहीं</string>
+    <string name="error_short_permission_denied">स्टोरेज अनुमति अस्वीकृत</string>
+    <string name="error_short_corrupt_package">फ़ाइल क्षतिग्रस्त है या मान्य पैकेज नहीं है</string>
+    <string name="error_short_interrupted">स्थानांतरण बीच में रुक गया</string>
+    <string name="error_short_abi_incompatible">असमर्थित 32-बिट बिल्ड</string>
+    <string name="error_short_unknown">सटीक त्रुटि के लिए लॉग देखें</string>
+
+    <string name="launch_failure_message_play_store">यह या तो Minecraft का Google Play संस्करण है, या ऐसा संस्करण जिसमें गेम शुरू करने के लिए ज़रूरी एक फ़ाइल नहीं है।\n\nलॉन्चर को गेम की नेटिव लाइब्रेरी सीधे लोड करनी होती है, और Play Store संस्करण उसे इंस्टॉल किए गए ऐप के अंदर रखता है, जहाँ यह लॉन्चर पहुँच नहीं सकता।\n\nखेलने के लिए लाइब्रेरी से Minecraft APK इंपोर्ट करें। Play Store इंस्टॉल आपके डिवाइस पर रह सकता है — उसे हटाना ज़रूरी नहीं है।</string>
+    <string name="launch_failure_message_game_files_missing">इस इंस्टेंस की गेम फ़ाइलें गायब या अधूरी हैं। लाइब्रेरी से संस्करण दोबारा इंपोर्ट करें, या सेटिंग्स \u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।</string>
+    <string name="launch_failure_message_abi">Minecraft का यह संस्करण केवल 32-बिट नेटिव लाइब्रेरी देता है, और GlowberryClient 64-बिट ऐप के रूप में चलता है। इसके बजाय इस संस्करण का 64-बिट बिल्ड इंपोर्ट करें।</string>
+    <string name="launch_failure_message_stale_libs">निकाली गई नेटिव लाइब्रेरी लॉन्चर के पुराने संस्करण की हैं। अगले लॉन्च पर इन्हें अपने आप दोबारा निकाला जाएगा। अगर गेम फिर भी शुरू न हो, तो सेटिंग्स \u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।</string>
+    <string name="launch_failure_message_rules">Minecraft के इस बिल्ड के लिए अभी कोई हुक परिभाषा नहीं है, इसलिए इन-गेम ओवरले और कॉस्मेटिक्स बंद हैं। गेम स्वयं सामान्य रूप से चलेगा।</string>
+    <string name="launch_failure_message_unexpected">लॉन्चर गेम शुरू नहीं कर सका और कारण उनमें से नहीं है जिन्हें वह पहचानता है। आपके डिवाइस पर कुछ नहीं बदला गया। लॉन्चर दोबारा खोलें और पुनः प्रयास करें; अगर ऐसा बार-बार हो, तो सेटिंग्स \u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।</string>
+    <string name="launch_failure_message_not_installed">इस डिवाइस पर Minecraft इंस्टॉल नहीं दिखता। लाइब्रेरी से Minecraft APK इंपोर्ट करें — Google Play इंस्टॉल को यह लॉन्चर शुरू नहीं कर सकता, क्योंकि गेम अपनी नेटिव लाइब्रेरी इंस्टॉल किए गए ऐप के अंदर रखता है, जहाँ लॉन्चर पहुँच नहीं सकता।</string>
 </resources>

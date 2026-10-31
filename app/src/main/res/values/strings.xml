@@ -1,6 +1,6 @@
 <resources>
     <!-- Common -->
-    <string name="app_name">GlowberryClient</string>
+    <string name="app_name" translatable="false">GlowberryClient</string>
     <string name="minecraft">Minecraft</string>
     <string name="launch">Launch</string>
     <string name="beta_badge">Beta</string>
@@ -42,11 +42,11 @@
     <string name="about_title">About</string>
     <string name="copyright">©2024–2026 GlowberryClient. Licensed under the Apache License 2.0.</string>
     <string name="font_license">This app uses the Misans font.</string>
-    <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
+    <string name="about_footer_github" translatable="false">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Quick Actions</string>
 
     <!-- Home screen -->
-    <string name="home_app_title">GlowberryClient</string>
+    <string name="home_app_title" translatable="false">GlowberryClient</string>
     <string name="home_subtitle">Minecraft: Bedrock Edition launcher</string>
     <string name="home_versions">Versions</string>
     <string name="home_mods">Mods</string>
@@ -283,7 +283,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_import_from_file">Choose a file</string>
     <string name="mod_import_from_link">Use a link</string>
     <string name="mod_import_link_message">Paste the link to an .antegg package. If you copied a whole message, the link inside it is found for you.</string>
-    <string name="mod_import_link_hint">https://example.com/mod.antegg</string>
+    <string name="mod_import_link_hint" translatable="false">https://example.com/mod.antegg</string>
     <string name="mod_import_link_go">Import</string>
     <string name="mod_import_link_invalid">That text does not contain a link to an .antegg package.</string>
     <string name="mod_import_link_downloading">Downloading the package…</string>
@@ -477,6 +477,7 @@ GlowberryClient must complete the migration before continuing.</string>
 
     <!-- Custom Flat World -->
     <string name="custom_flat_world">Custom Flat World</string>
+    <string name="flat_world_block_hint" translatable="false">minecraft:stone</string>
     <string name="world_name">World Name</string>
     <string name="enter_world_name">Enter world name</string>
     <string name="biome">Biome</string>
@@ -538,7 +539,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_config_expand">Expand</string>
     <string name="mod_config_collapse">Collapse</string>
     <string name="mod_config_raw_json">Edit Raw JSON</string>
-    <string name="mod_config_raw_json_short">JSON</string>
+    <string name="mod_config_raw_json_short" translatable="false">JSON</string>
     <string name="mod_config_item_label">Item %1$s</string>
     <string name="mod_config_object_desc">Group of related settings</string>
     <string name="mod_config_array_desc">List of values</string>
@@ -585,7 +586,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="microsoft_accounts">Microsoft Accounts</string>
     <string name="manage_accounts">Manage accounts</string>
     <string name="not_signed_in">Not signed in</string>
-    <string name="xuid">XUID</string>
+    <string name="xuid" translatable="false">XUID</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
     <string name="accounts_active_privilege">Signed in</string>
@@ -1231,7 +1232,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="world_name_hint">World Name</string>
     <string name="command_hint">Command (without /)</string>
     <string name="command_warning">Note: This will disconnect you if used in a local world</string>
-    <string name="uri_hint">minecraft://…</string>
+    <string name="uri_hint" translatable="false">minecraft://…</string>
     <string name="custom_uri_hint">Enter a full minecraft:// URI. Examples:\nminecraft://openStore\nminecraft://?showStoreOffer=UUID</string>
     <string name="select_tab">Select Tab:</string>
 
@@ -1502,7 +1503,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_field_device">Device</string>
     <string name="diagnostics_field_sdk_build">Target SDK</string>
     <string name="diagnostics_field_min_sdk">Min SDK</string>
-    <string name="diagnostics_field_abi">ABI</string>
+    <string name="diagnostics_field_abi" translatable="false">ABI</string>
     <string name="diagnostics_field_launcher_abi">Launch ABI</string>
     <string name="diagnostics_field_selected_version">Selected version</string>
     <string name="diagnostics_section_readiness">Launch readiness</string>
@@ -1543,8 +1544,8 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="about_afdian">Afdian</string>
     <string name="about_patreon">Patreon</string>
     <string name="about_source_title">Source Code &amp; Open Source</string>
-    <string name="about_github_repo">GitHub · GlowberryClient</string>
-    <string name="about_github_org">ChimeraAnt-DEV</string>
+    <string name="about_github_repo" translatable="false">GitHub · GlowberryClient</string>
+    <string name="about_github_org" translatable="false">ChimeraAnt-DEV</string>
     <string name="about_license_note">See LICENSE in the repository for license details.</string>
     <string name="about_contribute_title">Contribute</string>
     <string name="about_contribute_desc">Contributions via Issues or Pull Requests are welcome to improve GlowberryClient.</string>
@@ -1787,7 +1788,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_config_offhand_keybind">Hardware keybind</string>
     <string name="offhand_scope_note">Bedrock has no swap-to-off-hand key. The off-hand slot is filled from your inventory, and only shields, arrows, firework rockets, totems of undying, maps and nautilus shells can go in it. This button opens the inventory for you (or uses the off-hand item), and works the same in a world, a Realm or a server.</string>
     <string name="changelog_title">What’s new</string>
-    <string name="changelog_version">GlowberryClient %1$s</string>
+    <string name="changelog_version" translatable="false">GlowberryClient %1$s</string>
     <string name="changelog_continue">Continue</string>
     <string name="foreground_service_channel">Minecraft</string>
     <string name="foreground_service_notification_title">Minecraft is running</string>

@@ -943,4 +943,77 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="inbuilt_mod_hotbar_slot">Emplacement de barre rapide</string>
     <string name="inbuilt_mod_hotbar_slot_desc">Ajoute des boutons séparés de 1 à 9 pour sélectionner les emplacements de la barre rapide</string>
     <string name="hotbar_slot_content_description">Emplacement de barre rapide %1$d</string>
+
+
+    <!-- Priority batch: the first-run wizard, the launch-failure dialogs, the
+         error explanations and the navigation labels. See
+         scripts/translations_priority.json. -->
+    <string name="nav_back">Retour</string>
+    <string name="nav_library">Bibliothèque</string>
+    <string name="nav_installations">Installer</string>
+    <string name="nav_mods">Mods</string>
+    <string name="nav_customize">Personnaliser</string>
+    <string name="nav_voice">Voix</string>
+    <string name="nav_replay">Rediffusions</string>
+    <string name="nav_tab_selected">%1$s, sélectionné</string>
+    <string name="home_subtitle">Lanceur Minecraft : Bedrock Edition</string>
+    <string name="home_versions">Versions</string>
+    <string name="home_mods">Mods</string>
+    <string name="home_content">Contenu</string>
+    <string name="home_edition">Minecraft Bedrock Edition</string>
+    <string name="home_change">Changer</string>
+    <string name="home_play">Jouer à Minecraft</string>
+    <string name="home_active_mods">Mods actifs</string>
+    <string name="home_manage">Gérer</string>
+    <string name="home_no_mods">Aucun mod installé pour l’instant</string>
+    <string name="home_content_library">Bibliothèque de contenu</string>
+    <string name="home_more">Plus</string>
+    <string name="setup_step_import_title">Bienvenue dans GlowberryClient</string>
+    <string name="setup_step_import_body">Importez vos fichiers Minecraft pour commencer. Choisissez l’APK auquel vous voulez jouer.</string>
+    <string name="setup_step_import_action">Importer le jeu</string>
+    <string name="setup_step_version_title">Choisissez votre version</string>
+    <string name="setup_step_version_body">Choisissez la version de Minecraft à jouer. Vous pourrez en ajouter d’autres plus tard depuis la Bibliothèque.</string>
+    <string name="setup_step_version_action">Choisir la version</string>
+    <string name="setup_step_signin_title">Se connecter</string>
+    <string name="setup_step_signin_body">Connectez-vous avec votre compte Microsoft pour jouer en ligne et conserver votre progression.</string>
+    <string name="setup_step_signin_action">Se connecter</string>
+    <string name="setup_skip">Ignorer pour l’instant</string>
+    <string name="setup_import_failed">Échec de l’importation : %1$s</string>
+    <string name="launch_failure_title_play_store">Impossible d’ouvrir cette installation de Minecraft</string>
+    <string name="launch_failure_title_game_files_missing">Fichiers du jeu manquants</string>
+    <string name="launch_failure_title_abi">Version non prise en charge</string>
+    <string name="launch_failure_title_stale_libs">Réparation des bibliothèques natives</string>
+    <string name="launch_failure_title_rules">Compatibilité limitée</string>
+    <string name="launch_failure_title_unexpected">Impossible de démarrer le jeu</string>
+    <string name="launch_failure_title_not_installed">Minecraft introuvable</string>
+    <string name="launch_error_title_missing_game_library">Bibliothèque du jeu illisible</string>
+    <string name="launch_error_title_missing_dependency">Un fichier requis est manquant</string>
+    <string name="launch_error_title_stale_libs">Les fichiers natifs doivent être réparés</string>
+    <string name="launch_error_title_mod_failed">Un mod a empêché le démarrage</string>
+    <string name="launch_error_title_out_of_memory">Mémoire insuffisante</string>
+    <string name="launch_error_title_unknown">Impossible de démarrer Minecraft</string>
+    <string name="launch_error_cause_label">Cause :</string>
+    <string name="error_short_no_connection">pas de connexion internet</string>
+    <string name="error_short_connection_refused">le serveur a refusé la connexion</string>
+    <string name="error_short_host_not_found">l’adresse du serveur est introuvable — vérifiez votre connexion</string>
+    <string name="error_short_timeout">le serveur a mis trop de temps à répondre</string>
+    <string name="error_short_secure_connection">une connexion sécurisée n’a pas pu être établie</string>
+    <string name="error_short_server_refused">la source a refusé la requête</string>
+    <string name="error_short_server_error">le serveur a signalé une erreur interne</string>
+    <string name="error_short_bad_response">la source a renvoyé une réponse illisible</string>
+    <string name="error_short_out_of_memory">le lanceur a manqué de mémoire</string>
+    <string name="error_short_out_of_space">espace libre insuffisant</string>
+    <string name="error_short_permission_denied">autorisation de stockage refusée</string>
+    <string name="error_short_corrupt_package">le fichier est endommagé ou n’est pas un paquet valide</string>
+    <string name="error_short_interrupted">le transfert a été interrompu</string>
+    <string name="error_short_abi_incompatible">Version 32 bits non prise en charge</string>
+    <string name="error_short_unknown">consultez le journal pour l’erreur exacte</string>
+
+    <string name="launch_failure_message_play_store">Il s’agit soit d’une version Google Play de Minecraft, soit d’une version à laquelle il manque un fichier nécessaire au lancement du jeu.\n\nLe lanceur doit charger directement la bibliothèque native du jeu, et la version Play Store la garde à l’intérieur de l’application installée, où ce lanceur ne peut pas l’atteindre.\n\nPour jouer, importez un APK Minecraft depuis la Bibliothèque. Une installation Play Store peut rester sur votre appareil : vous n’avez pas à la supprimer.</string>
+    <string name="launch_failure_message_game_files_missing">Les fichiers de jeu de cette instance sont manquants ou incomplets. Réimportez la version depuis la Bibliothèque, ou lancez Réparer l’installation dans Paramètres \u2192 Diagnostic.</string>
+    <string name="launch_failure_message_abi">Cette version de Minecraft ne fournit que des bibliothèques natives 32 bits, et GlowberryClient s’exécute en 64 bits. Importez plutôt une version 64 bits de cette version du jeu.</string>
+    <string name="launch_failure_message_stale_libs">Les bibliothèques natives extraites proviennent d’une version plus ancienne du lanceur. Elles seront réextraites automatiquement au prochain lancement. Si le jeu ne démarre toujours pas, lancez Réparer l’installation dans Paramètres \u2192 Diagnostic.</string>
+    <string name="launch_failure_message_rules">Il n’existe pas encore de définitions de hooks pour cette version de Minecraft, donc les superpositions et les cosmétiques en jeu sont désactivés. Le jeu lui-même fonctionnera normalement.</string>
+    <string name="launch_failure_message_unexpected">Le lanceur n’a pas pu démarrer le jeu et la cause ne fait pas partie de celles qu’il reconnaît. Rien n’a été modifié sur votre appareil. Rouvrez le lanceur et réessayez ; si cela se reproduit, lancez Réparer l’installation dans Paramètres \u2192 Diagnostic.</string>
+    <string name="launch_failure_message_not_installed">Minecraft ne semble pas installé sur cet appareil. Importez un APK Minecraft depuis la Bibliothèque : une installation Google Play ne peut pas être lancée par ce lanceur, car le jeu conserve sa bibliothèque native à l’intérieur de l’application installée, hors de portée du lanceur.</string>
 </resources>

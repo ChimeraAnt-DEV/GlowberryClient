@@ -48,7 +48,7 @@ public class LayoutResourceTest {
      * sample that never reaches a device, and it is where these values now live.
      */
     private static final Pattern LITERAL_TEXT =
-            Pattern.compile("android:text=\"(?!@string|@android:string)([^\"]+)\"");
+            Pattern.compile("android:(?:text|hint)=\"(?!@string|@android:string)([^\"]+)\"");
 
     /**
      * Values that are not words: a count, a percentage, a separator glyph. They are not sent to a

@@ -940,4 +940,77 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="inbuilt_mod_hotbar_slot">ホットバースロット</string>
     <string name="inbuilt_mod_hotbar_slot_desc">ホットバースロットを選択するための1～9の個別ボタンを追加します</string>
     <string name="hotbar_slot_content_description">ホットバースロット %1$d</string>
+
+
+    <!-- Priority batch: the first-run wizard, the launch-failure dialogs, the
+         error explanations and the navigation labels. See
+         scripts/translations_priority.json. -->
+    <string name="nav_back">戻る</string>
+    <string name="nav_library">ライブラリ</string>
+    <string name="nav_installations">インストール</string>
+    <string name="nav_mods">Mod</string>
+    <string name="nav_customize">カスタマイズ</string>
+    <string name="nav_voice">ボイス</string>
+    <string name="nav_replay">リプレイ</string>
+    <string name="nav_tab_selected">%1$s、選択中</string>
+    <string name="home_subtitle">Minecraft: Bedrock Edition ランチャー</string>
+    <string name="home_versions">バージョン</string>
+    <string name="home_mods">Mod</string>
+    <string name="home_content">コンテンツ</string>
+    <string name="home_edition">Minecraft Bedrock Edition</string>
+    <string name="home_change">変更</string>
+    <string name="home_play">Minecraft をプレイ</string>
+    <string name="home_active_mods">有効な Mod</string>
+    <string name="home_manage">管理</string>
+    <string name="home_no_mods">まだ Mod がインストールされていません</string>
+    <string name="home_content_library">コンテンツライブラリ</string>
+    <string name="home_more">その他</string>
+    <string name="setup_step_import_title">GlowberryClient へようこそ</string>
+    <string name="setup_step_import_body">始めるには Minecraft のゲームファイルを読み込んでください。プレイしたい APK を選びます。</string>
+    <string name="setup_step_import_action">ゲームを読み込む</string>
+    <string name="setup_step_version_title">バージョンを選ぶ</string>
+    <string name="setup_step_version_body">プレイする Minecraft のバージョンを選びます。あとからライブラリで追加できます。</string>
+    <string name="setup_step_version_action">バージョンを選択</string>
+    <string name="setup_step_signin_title">サインイン</string>
+    <string name="setup_step_signin_body">Microsoft アカウントでサインインすると、オンラインでプレイでき、進行状況が保存されます。</string>
+    <string name="setup_step_signin_action">サインイン</string>
+    <string name="setup_skip">今はスキップ</string>
+    <string name="setup_import_failed">読み込みに失敗しました: %1$s</string>
+    <string name="launch_failure_title_play_store">この Minecraft を開けません</string>
+    <string name="launch_failure_title_game_files_missing">ゲームファイルがありません</string>
+    <string name="launch_failure_title_abi">未対応のビルド</string>
+    <string name="launch_failure_title_stale_libs">ネイティブライブラリを修復中</string>
+    <string name="launch_failure_title_rules">互換性は限定的です</string>
+    <string name="launch_failure_title_unexpected">ゲームを起動できませんでした</string>
+    <string name="launch_failure_title_not_installed">Minecraft が見つかりません</string>
+    <string name="launch_error_title_missing_game_library">ゲームライブラリを読み込めません</string>
+    <string name="launch_error_title_missing_dependency">必要なファイルがありません</string>
+    <string name="launch_error_title_stale_libs">ネイティブファイルの修復が必要です</string>
+    <string name="launch_error_title_mod_failed">Mod が起動を止めました</string>
+    <string name="launch_error_title_out_of_memory">メモリが足りません</string>
+    <string name="launch_error_title_unknown">Minecraft を起動できませんでした</string>
+    <string name="launch_error_cause_label">原因:</string>
+    <string name="error_short_no_connection">インターネット接続がありません</string>
+    <string name="error_short_connection_refused">サーバーが接続を拒否しました</string>
+    <string name="error_short_host_not_found">サーバーのアドレスが見つかりません — 接続を確認してください</string>
+    <string name="error_short_timeout">サーバーの応答に時間がかかりすぎました</string>
+    <string name="error_short_secure_connection">安全な接続を確立できませんでした</string>
+    <string name="error_short_server_refused">配布元がリクエストを拒否しました</string>
+    <string name="error_short_server_error">サーバーが内部エラーを報告しました</string>
+    <string name="error_short_bad_response">配布元が読み取れない応答を返しました</string>
+    <string name="error_short_out_of_memory">ランチャーのメモリが不足しました</string>
+    <string name="error_short_out_of_space">空き容量が足りません</string>
+    <string name="error_short_permission_denied">ストレージの権限が拒否されました</string>
+    <string name="error_short_corrupt_package">ファイルが破損しているか、有効なパッケージではありません</string>
+    <string name="error_short_interrupted">転送が中断されました</string>
+    <string name="error_short_abi_incompatible">未対応の 32 ビットビルド</string>
+    <string name="error_short_unknown">正確なエラーはログを確認してください</string>
+
+    <string name="launch_failure_message_play_store">これは Google Play 版の Minecraft か、ゲームの起動に必要なファイルが欠けているバージョンです。\n\nランチャーはゲームのネイティブライブラリを直接読み込む必要がありますが、Play ストア版はそれをインストール済みアプリの内部に保持しており、このランチャーからはアクセスできません。\n\nプレイするには、ライブラリから Minecraft の APK を読み込んでください。Play ストア版は端末に残したままでかまいません。削除する必要はありません。</string>
+    <string name="launch_failure_message_game_files_missing">このインスタンスのゲームファイルが欠けているか不完全です。ライブラリからバージョンを読み込み直すか、設定 \u2192 診断 で「インストールを修復」を実行してください。</string>
+    <string name="launch_failure_message_abi">この Minecraft のバージョンは 32 ビットのネイティブライブラリしか含んでおらず、GlowberryClient は 64 ビットアプリとして動作します。代わりにこのバージョンの 64 ビットビルドを読み込んでください。</string>
+    <string name="launch_failure_message_stale_libs">展開されたネイティブライブラリが古いバージョンのランチャーのものです。次回の起動時に自動で展開し直されます。それでもゲームが起動しない場合は、設定 \u2192 診断 で「インストールを修復」を実行してください。</string>
+    <string name="launch_failure_message_rules">この Minecraft ビルド用のフック定義がまだないため、ゲーム内オーバーレイとコスメティックは無効です。ゲーム自体は通常どおり動作します。</string>
+    <string name="launch_failure_message_unexpected">ランチャーがゲームを起動できず、原因はランチャーが認識するものではありませんでした。端末上の何も変更されていません。ランチャーを開き直して再試行してください。繰り返す場合は、設定 \u2192 診断 で「インストールを修復」を実行してください。</string>
+    <string name="launch_failure_message_not_installed">この端末に Minecraft がインストールされていないようです。ライブラリから Minecraft の APK を読み込んでください。Google Play 版はこのランチャーでは起動できません。ゲームがネイティブライブラリをインストール済みアプリの内部に保持しており、ランチャーからアクセスできないためです。</string>
 </resources>

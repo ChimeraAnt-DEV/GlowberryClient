@@ -970,4 +970,77 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="inbuilt_mod_hotbar_slot">Hızlı Erişim Yuvası</string>
     <string name="inbuilt_mod_hotbar_slot_desc">Hızlı erişim yuvalarını seçmek için ayrı 1–9 düğmeleri ekler</string>
     <string name="hotbar_slot_content_description">Hızlı erişim yuvası %1$d</string>
+
+
+    <!-- Priority batch: the first-run wizard, the launch-failure dialogs, the
+         error explanations and the navigation labels. See
+         scripts/translations_priority.json. -->
+    <string name="nav_back">Geri</string>
+    <string name="nav_library">Kitaplık</string>
+    <string name="nav_installations">Yükle</string>
+    <string name="nav_mods">Modlar</string>
+    <string name="nav_customize">Özelleştir</string>
+    <string name="nav_voice">Ses</string>
+    <string name="nav_replay">Tekrarlar</string>
+    <string name="nav_tab_selected">%1$s, seçili</string>
+    <string name="home_subtitle">Minecraft: Bedrock Edition başlatıcısı</string>
+    <string name="home_versions">Sürümler</string>
+    <string name="home_mods">Modlar</string>
+    <string name="home_content">İçerik</string>
+    <string name="home_edition">Minecraft Bedrock Edition</string>
+    <string name="home_change">Değiştir</string>
+    <string name="home_play">Minecraft Oyna</string>
+    <string name="home_active_mods">Etkin modlar</string>
+    <string name="home_manage">Yönet</string>
+    <string name="home_no_mods">Henüz mod yüklenmedi</string>
+    <string name="home_content_library">İçerik kitaplığı</string>
+    <string name="home_more">Daha fazla</string>
+    <string name="setup_step_import_title">GlowberryClient’a hoş geldiniz</string>
+    <string name="setup_step_import_body">Başlamak için Minecraft oyun dosyalarınızı içe aktarın. Oynamak istediğiniz APK’yı seçin.</string>
+    <string name="setup_step_import_action">Oyunu içe aktar</string>
+    <string name="setup_step_version_title">Sürümünüzü seçin</string>
+    <string name="setup_step_version_body">Oynayacağınız Minecraft sürümünü seçin. Sonradan Kitaplık’tan daha fazla ekleyebilirsiniz.</string>
+    <string name="setup_step_version_action">Sürüm seç</string>
+    <string name="setup_step_signin_title">Oturum aç</string>
+    <string name="setup_step_signin_body">Çevrimiçi oynamak ve ilerlemenizi korumak için Microsoft hesabınızla oturum açın.</string>
+    <string name="setup_step_signin_action">Oturum aç</string>
+    <string name="setup_skip">Şimdilik atla</string>
+    <string name="setup_import_failed">İçe aktarma başarısız: %1$s</string>
+    <string name="launch_failure_title_play_store">Bu Minecraft kurulumu açılamıyor</string>
+    <string name="launch_failure_title_game_files_missing">Oyun dosyaları eksik</string>
+    <string name="launch_failure_title_abi">Desteklenmeyen derleme</string>
+    <string name="launch_failure_title_stale_libs">Yerel kitaplıklar onarılıyor</string>
+    <string name="launch_failure_title_rules">Sınırlı uyumluluk</string>
+    <string name="launch_failure_title_unexpected">Oyun başlatılamadı</string>
+    <string name="launch_failure_title_not_installed">Minecraft bulunamadı</string>
+    <string name="launch_error_title_missing_game_library">Oyun kitaplığı okunamıyor</string>
+    <string name="launch_error_title_missing_dependency">Gerekli bir dosya eksik</string>
+    <string name="launch_error_title_stale_libs">Yerel dosyaların onarılması gerekiyor</string>
+    <string name="launch_error_title_mod_failed">Bir mod başlatmayı durdurdu</string>
+    <string name="launch_error_title_out_of_memory">Yeterli bellek yok</string>
+    <string name="launch_error_title_unknown">Minecraft başlatılamadı</string>
+    <string name="launch_error_cause_label">Neden:</string>
+    <string name="error_short_no_connection">internet bağlantısı yok</string>
+    <string name="error_short_connection_refused">sunucu bağlantıyı reddetti</string>
+    <string name="error_short_host_not_found">sunucu adresi bulunamadı — bağlantınızı kontrol edin</string>
+    <string name="error_short_timeout">sunucu yanıt vermekte çok yavaş kaldı</string>
+    <string name="error_short_secure_connection">güvenli bir bağlantı kurulamadı</string>
+    <string name="error_short_server_refused">kaynak isteği reddetti</string>
+    <string name="error_short_server_error">sunucu bir iç hata bildirdi</string>
+    <string name="error_short_bad_response">kaynak okunamayan bir yanıt döndürdü</string>
+    <string name="error_short_out_of_memory">başlatıcının belleği tükendi</string>
+    <string name="error_short_out_of_space">yeterli boş alan yok</string>
+    <string name="error_short_permission_denied">depolama izni reddedildi</string>
+    <string name="error_short_corrupt_package">dosya bozuk veya geçerli bir paket değil</string>
+    <string name="error_short_interrupted">aktarım kesintiye uğradı</string>
+    <string name="error_short_abi_incompatible">Desteklenmeyen 32 bit derleme</string>
+    <string name="error_short_unknown">tam hata için günlüğe bakın</string>
+
+    <string name="launch_failure_message_play_store">Bu ya Google Play sürümü bir Minecraft ya da oyunu başlatmak için gereken bir dosyası eksik bir sürüm.\n\nBaşlatıcı, oyunun yerel kitaplığını doğrudan yüklemek zorunda, ancak Play Store sürümü onu yüklü uygulamanın içinde tutar ve bu başlatıcı oraya erişemez.\n\nOynamak için Kitaplık’tan bir Minecraft APK’sı içe aktarın. Play Store kurulumu cihazınızda kalabilir — kaldırmanız gerekmez.</string>
+    <string name="launch_failure_message_game_files_missing">Bu örneğin oyun dosyaları eksik veya tamamlanmamış. Sürümü Kitaplık’tan yeniden içe aktarın ya da Ayarlar \u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.</string>
+    <string name="launch_failure_message_abi">Bu Minecraft sürümü yalnızca 32 bit yerel kitaplıklar içeriyor ve GlowberryClient 64 bit uygulama olarak çalışıyor. Bunun yerine bu sürümün 64 bit derlemesini içe aktarın.</string>
+    <string name="launch_failure_message_stale_libs">Çıkarılan yerel kitaplıklar başlatıcının daha eski bir sürümüne ait. Bir sonraki başlatmada otomatik olarak yeniden çıkarılacaklar. Oyun yine başlamazsa Ayarlar \u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.</string>
+    <string name="launch_failure_message_rules">Bu Minecraft derlemesi için henüz kanca tanımı yok, bu yüzden oyun içi katmanlar ve kozmetikler kapalı. Oyunun kendisi normal çalışacak.</string>
+    <string name="launch_failure_message_unexpected">Başlatıcı oyunu başlatamadı ve neden, tanıdığı nedenlerden biri değil. Cihazınızda hiçbir şey değiştirilmedi. Başlatıcıyı yeniden açıp tekrar deneyin; sürerse Ayarlar \u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.</string>
+    <string name="launch_failure_message_not_installed">Minecraft bu cihazda yüklü görünmüyor. Kitaplık’tan bir Minecraft APK’sı içe aktarın — Google Play kurulumu bu başlatıcıyla başlatılamaz, çünkü oyun yerel kitaplığını yüklü uygulamanın içinde tutar ve başlatıcı oraya erişemez.</string>
 </resources>

@@ -30,7 +30,7 @@
         android:layout_weight="1"
         android:background="@drawable/bg_edit_text"
         android:fontFamily="@font/misans"
-        android:hint="minecraft:stone"
+        android:hint="@string/flat_world_block_hint"
         android:inputType="text"
         android:maxLines="1"
         android:padding="@dimen/space_2"

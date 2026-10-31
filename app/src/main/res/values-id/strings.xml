@@ -967,4 +967,77 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="inbuilt_mod_hotbar_slot">Slot Hotbar</string>
     <string name="inbuilt_mod_hotbar_slot_desc">Menambahkan tombol 1–9 terpisah untuk memilih slot hotbar</string>
     <string name="hotbar_slot_content_description">Slot hotbar %1$d</string>
+
+
+    <!-- Priority batch: the first-run wizard, the launch-failure dialogs, the
+         error explanations and the navigation labels. See
+         scripts/translations_priority.json. -->
+    <string name="nav_back">Kembali</string>
+    <string name="nav_library">Pustaka</string>
+    <string name="nav_installations">Pasang</string>
+    <string name="nav_mods">Mod</string>
+    <string name="nav_customize">Sesuaikan</string>
+    <string name="nav_voice">Suara</string>
+    <string name="nav_replay">Tayangan ulang</string>
+    <string name="nav_tab_selected">%1$s, dipilih</string>
+    <string name="home_subtitle">Peluncur Minecraft: Bedrock Edition</string>
+    <string name="home_versions">Versi</string>
+    <string name="home_mods">Mod</string>
+    <string name="home_content">Konten</string>
+    <string name="home_edition">Minecraft Bedrock Edition</string>
+    <string name="home_change">Ubah</string>
+    <string name="home_play">Mainkan Minecraft</string>
+    <string name="home_active_mods">Mod aktif</string>
+    <string name="home_manage">Kelola</string>
+    <string name="home_no_mods">Belum ada mod yang dipasang</string>
+    <string name="home_content_library">Pustaka konten</string>
+    <string name="home_more">Lainnya</string>
+    <string name="setup_step_import_title">Selamat datang di GlowberryClient</string>
+    <string name="setup_step_import_body">Impor file game Minecraft Anda untuk memulai. Pilih APK yang ingin Anda mainkan.</string>
+    <string name="setup_step_import_action">Impor game</string>
+    <string name="setup_step_version_title">Pilih versi Anda</string>
+    <string name="setup_step_version_body">Pilih versi Minecraft yang ingin dimainkan. Anda bisa menambahkannya nanti dari Pustaka.</string>
+    <string name="setup_step_version_action">Pilih versi</string>
+    <string name="setup_step_signin_title">Masuk</string>
+    <string name="setup_step_signin_body">Masuk dengan akun Microsoft Anda untuk bermain online dan menyimpan kemajuan.</string>
+    <string name="setup_step_signin_action">Masuk</string>
+    <string name="setup_skip">Lewati dulu</string>
+    <string name="setup_import_failed">Impor gagal: %1$s</string>
+    <string name="launch_failure_title_play_store">Tidak dapat membuka pemasangan Minecraft ini</string>
+    <string name="launch_failure_title_game_files_missing">File game tidak ada</string>
+    <string name="launch_failure_title_abi">Build tidak didukung</string>
+    <string name="launch_failure_title_stale_libs">Memperbaiki pustaka native</string>
+    <string name="launch_failure_title_rules">Kompatibilitas terbatas</string>
+    <string name="launch_failure_title_unexpected">Tidak dapat memulai game</string>
+    <string name="launch_failure_title_not_installed">Minecraft tidak ditemukan</string>
+    <string name="launch_error_title_missing_game_library">Pustaka game tidak terbaca</string>
+    <string name="launch_error_title_missing_dependency">File yang diperlukan tidak ada</string>
+    <string name="launch_error_title_stale_libs">File native perlu diperbaiki</string>
+    <string name="launch_error_title_mod_failed">Sebuah mod menghentikan peluncuran</string>
+    <string name="launch_error_title_out_of_memory">Memori tidak cukup</string>
+    <string name="launch_error_title_unknown">Tidak dapat memulai Minecraft</string>
+    <string name="launch_error_cause_label">Penyebab:</string>
+    <string name="error_short_no_connection">tidak ada koneksi internet</string>
+    <string name="error_short_connection_refused">server menolak koneksi</string>
+    <string name="error_short_host_not_found">alamat server tidak ditemukan — periksa koneksi Anda</string>
+    <string name="error_short_timeout">server terlalu lama menjawab</string>
+    <string name="error_short_secure_connection">koneksi aman tidak dapat dibuat</string>
+    <string name="error_short_server_refused">sumber menolak permintaan</string>
+    <string name="error_short_server_error">server melaporkan kesalahan internal</string>
+    <string name="error_short_bad_response">sumber mengembalikan sesuatu yang tidak terbaca</string>
+    <string name="error_short_out_of_memory">peluncur kehabisan memori</string>
+    <string name="error_short_out_of_space">ruang kosong tidak cukup</string>
+    <string name="error_short_permission_denied">izin penyimpanan ditolak</string>
+    <string name="error_short_corrupt_package">file rusak atau bukan paket yang valid</string>
+    <string name="error_short_interrupted">transfer terputus</string>
+    <string name="error_short_abi_incompatible">Build 32-bit tidak didukung</string>
+    <string name="error_short_unknown">lihat log untuk kesalahan yang tepat</string>
+
+    <string name="launch_failure_message_play_store">Ini adalah versi Minecraft dari Google Play, atau versi yang kehilangan file tertentu yang diperlukan untuk memulai game.\n\nPeluncur harus memuat pustaka native game secara langsung, dan versi Play Store menyimpannya di dalam aplikasi yang terpasang, tempat peluncur ini tidak dapat menjangkaunya.\n\nUntuk bermain, impor APK Minecraft dari Pustaka. Pemasangan dari Play Store boleh tetap ada di perangkat Anda — Anda tidak perlu menghapusnya.</string>
+    <string name="launch_failure_message_game_files_missing">File game instans ini hilang atau tidak lengkap. Impor ulang versinya dari Pustaka, atau jalankan Perbaiki pemasangan di Pengaturan \u2192 Diagnostik.</string>
+    <string name="launch_failure_message_abi">Versi Minecraft ini hanya menyertakan pustaka native 32-bit, sedangkan GlowberryClient berjalan sebagai aplikasi 64-bit. Impor build 64-bit dari versi ini sebagai gantinya.</string>
+    <string name="launch_failure_message_stale_libs">Pustaka native yang diekstrak berasal dari versi peluncur yang lebih lama. Pustaka itu akan diekstrak ulang secara otomatis pada peluncuran berikutnya. Jika game tetap gagal dimulai, jalankan Perbaiki pemasangan di Pengaturan \u2192 Diagnostik.</string>
+    <string name="launch_failure_message_rules">Belum ada definisi hook untuk build Minecraft ini, jadi overlay dan kosmetik dalam game dinonaktifkan. Gamenya sendiri akan berjalan normal.</string>
+    <string name="launch_failure_message_unexpected">Peluncur tidak dapat memulai game dan penyebabnya bukan salah satu yang dikenali. Tidak ada yang diubah di perangkat Anda. Buka kembali peluncur dan coba lagi; jika terus terjadi, jalankan Perbaiki pemasangan di Pengaturan \u2192 Diagnostik.</string>
+    <string name="launch_failure_message_not_installed">Minecraft tampaknya tidak terpasang di perangkat ini. Impor APK Minecraft dari Pustaka — pemasangan dari Google Play tidak dapat diluncurkan peluncur ini, karena game menyimpan pustaka nativenya di dalam aplikasi yang terpasang, tempat peluncur tidak dapat menjangkaunya.</string>
 </resources>
