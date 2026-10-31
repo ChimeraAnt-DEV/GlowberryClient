@@ -301,7 +301,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <View
@@ -333,7 +333,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <TextView
@@ -376,7 +376,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <View
@@ -423,7 +423,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <View
@@ -470,7 +470,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <View
@@ -517,7 +517,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <View
@@ -636,7 +636,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -1441,7 +1441,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
 
@@ -1490,7 +1490,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <!-- Dynamic Color Toggle -->
@@ -1538,7 +1538,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <!-- Reset Button -->
@@ -1849,7 +1849,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/space_3"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <TextView
@@ -1970,7 +1970,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/space_3"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <TextView

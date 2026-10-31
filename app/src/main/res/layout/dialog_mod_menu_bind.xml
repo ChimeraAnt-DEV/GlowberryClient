@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/mod_menu_controller_bind"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/overlay_text_primary"
         android:textAppearance="@style/TextAppearance.Glowberry.Title"
         android:textStyle="bold" />
 

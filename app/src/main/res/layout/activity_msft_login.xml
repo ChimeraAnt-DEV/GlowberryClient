@@ -115,7 +115,7 @@
                         android:gravity="center"
                         android:maxWidth="720dp"
                         android:padding="@dimen/space_3"
-                        android:textColor="#D32F2F"
+                        android:textColor="@color/status_danger_dark"
                         android:textAppearance="@style/TextAppearance.Glowberry.Body"
                         android:visibility="gone" />
 
@@ -412,7 +412,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="1dp"
                                     android:layout_marginTop="@dimen/space_3"
-                                    android:background="#20888888" />
+                                    android:background="@color/wash_grey_13" />
 
                                 <TextView
                                     android:id="@+id/msft_device_url"
@@ -648,7 +648,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/misans"
-                                android:text="Microsoft Account Sign-In"
+                                android:text="@string/ms_login_card_title"
                                 android:textColor="@color/on_surface"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Title"
                                 android:textStyle="bold" />
@@ -658,7 +658,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="@dimen/space_1"
                                 android:fontFamily="@font/misans"
-                                android:text="Official Microsoft Authentication Library (MSAL) integration"
+                                android:text="@string/ms_login_card_subtitle"
                                 android:textColor="@color/text_secondary"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Label" />
 
@@ -728,8 +728,8 @@
                         android:fontFamily="@font/misans"
                         android:gravity="center"
                         android:maxWidth="620dp"
-                        android:text="Note: You must register your own Azure AD application and replace the client ID in the code."
-                        android:textColor="#FF9800"
+                        android:text="@string/ms_login_azure_note"
+                        android:textColor="@color/status_warning"
                         android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                 </LinearLayout>
             </ScrollView>
@@ -740,7 +740,7 @@
         android:id="@+id/msft_progress_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#D9000000"
+        android:background="@color/wash_black_85"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"

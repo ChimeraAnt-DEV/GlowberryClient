@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:thumbTint="@color/primary"
-            android:trackTint="#555555" />
+            android:trackTint="@color/track_inactive" />
     </LinearLayout>
 
     <View

@@ -167,4 +167,33 @@
     <color name="glass_panel_stroke">#33FFFFFF</color>
     <color name="glass_panel_bg_light">#F2FFFFFF</color>
     <color name="glass_panel_stroke_light">#22000000</color>
+    <!-- Fixed-palette tokens for surfaces that are not on the app's theme surface: the in-game
+         overlays (which sit over the game frame and must stay light-on-dark in both themes), the
+         launcher's dark plates, and the status colours. Layouts reference these instead of raw
+         hex, so a colour has one definition and can be retuned in one place. -->
+    <color name="transparent">#00000000</color>
+
+    <color name="overlay_text_primary">#FFFFFF</color>
+    <color name="overlay_text_muted">#AAAAAA</color>
+    <color name="overlay_text_hint">#80FFFFFF</color>
+    <color name="overlay_scrim">#CC000000</color>
+    <color name="overlay_scrim_soft">#66070A0F</color>
+    <color name="overlay_panel">#1E1E1E</color>
+    <color name="overlay_panel_border">#2D2D2D</color>
+
+    <color name="track_inactive">#555555</color>
+    <color name="muted_text">#888888</color>
+
+    <color name="status_danger">#E53935</color>
+    <color name="status_danger_dark">#D32F2F</color>
+    <color name="status_danger_soft">#FF5252</color>
+    <color name="status_warning">#FF9800</color>
+    <color name="status_accent_pink">#E91E63</color>
+
+    <color name="wash_black_10">#1A000000</color>
+    <color name="wash_black_85">#D9000000</color>
+    <color name="wash_scrim_50">#80000000</color>
+    <color name="wash_grey_10">#1A888888</color>
+    <color name="wash_grey_13">#20888888</color>
+    <color name="wash_grey_20">#33888888</color>
 </resources>

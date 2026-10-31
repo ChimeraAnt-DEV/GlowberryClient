@@ -19,7 +19,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/ic_settings"
-            app:tint="#888888"
+            app:tint="@color/muted_text"
             android:layout_marginBottom="@dimen/space_4"/>
 
         <TextView
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:text="@string/ms_feature_disabled_desc"
             android:textAppearance="@style/TextAppearance.Glowberry.Body"
-            android:textColor="#888888"
+            android:textColor="@color/muted_text"
             android:textAlignment="center"
             android:layout_marginTop="@dimen/space_2"
             android:fontFamily="@font/misans" />
@@ -91,7 +91,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/not_signed_in"
                             android:textAppearance="@style/TextAppearance.Glowberry.Title"
-                            android:textColor="#888888"
+                            android:textColor="@color/muted_text"
                             android:fontFamily="@font/misans"/>
                     </LinearLayout>
                 </FrameLayout>
@@ -167,7 +167,7 @@
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textAppearance="@style/TextAppearance.Glowberry.Body"
-                    android:textColor="#888888"
+                    android:textColor="@color/muted_text"
                     android:textAlignment="center"
                     android:layout_marginTop="@dimen/space_1"
                     android:fontFamily="@font/misans"/>
@@ -175,7 +175,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#33888888"
+                    android:background="@color/wash_grey_20"
                     android:layout_marginTop="@dimen/space_4"
                     android:layout_marginBottom="@dimen/space_4"/>
 
@@ -189,7 +189,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/xuid"
-                        android:textColor="#888888"
+                        android:textColor="@color/muted_text"
                         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:fontFamily="@font/misans"/>
 

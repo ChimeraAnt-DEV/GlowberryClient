@@ -51,7 +51,7 @@
             android:id="@+id/account_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#888888"
+            android:textColor="@color/muted_text"
             android:textAppearance="@style/TextAppearance.Glowberry.Caption"
             android:fontFamily="@font/misans"
             android:layout_marginTop="@dimen/space_hairline"
@@ -90,7 +90,7 @@
             android:src="@drawable/ic_close"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/ms_delete"
-            android:tint="#D32F2F"/>
+            android:tint="@color/status_danger_dark"/>
 
     </LinearLayout>
 

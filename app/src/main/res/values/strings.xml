@@ -2441,4 +2441,13 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_short_abi_incompatible">Unsupported 32-bit build</string>
     <string name="error_short_unknown">see the log for the exact error</string>
 
+    <!-- Microsoft sign-in card (moved out of the layout so it can be translated). -->
+    <string name="ms_login_card_title">Microsoft Account Sign-In</string>
+    <string name="ms_login_card_subtitle">Official Microsoft Authentication Library (MSAL) integration</string>
+    <string name="ms_login_azure_note">Note: You must register your own Azure AD application and replace the client ID in the code.</string>
+    <string name="shader_compat_title">Shader compatibility fixer</string>
+    <string name="shader_compat_desc">Fixes shader/materialbin compatibility for resource packs</string>
+    <string name="about_maintainer_name">MrPokeG</string>
+    <string name="server_sample_address">play.example.com</string>
+
 </resources>

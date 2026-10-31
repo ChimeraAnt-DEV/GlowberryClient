@@ -111,7 +111,7 @@
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textColor="@android:color/white"
-                android:textColorHint="#80FFFFFF" />
+                android:textColorHint="@color/overlay_text_hint" />
 
             <EditText
                 android:id="@+id/exclude_input"
@@ -122,7 +122,7 @@
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                 android:textColor="@android:color/white"
-                android:textColorHint="#80FFFFFF" />
+                android:textColorHint="@color/overlay_text_hint" />
 
             <ImageButton
                 android:id="@+id/btn_filter_clear"

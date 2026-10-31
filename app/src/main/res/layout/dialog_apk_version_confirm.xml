@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/name_invalid"
-        android:textColor="#FF5252"
+        android:textColor="@color/status_danger_soft"
         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
         android:visibility="gone"
         android:layout_marginTop="@dimen/space_1" />
