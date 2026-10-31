@@ -849,20 +849,28 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * The two-colour state list every destination is tinted from (item 88).
+     * The state list every destination is tinted from (item 88), with the focus state added so a
+     * D-pad or keyboard user can see where focus is (item 76).
      *
      * <p>Building it here rather than branching inside the update loop means the text colour, the
      * compound icon and anything else state-aware all recolour from the tab's own
      * {@code selected} flag: one state list, one place the colours are defined, and no per-state
      * colour arithmetic at each update.
+     *
+     * <p>Order matters: {@code selected} is declared before {@code focused}, because Android picks
+     * the first entry whose state set is satisfied and the selected tab must keep its accent even
+     * while it also holds focus. A focused-but-not-selected tab shows the accent too - that is the
+     * visible focus ring for a controller - and the two states therefore look the same, which is
+     * the honest presentation while a tab has only one "highlighted" look.
      */
     private ColorStateList navTabTint(int accentColor, int inactiveColor) {
         return new ColorStateList(
                 new int[][]{
                         new int[]{android.R.attr.state_selected},
+                        new int[]{android.R.attr.state_focused},
                         new int[]{},
                 },
-                new int[]{accentColor, inactiveColor});
+                new int[]{accentColor, accentColor, inactiveColor});
     }
 
     /**

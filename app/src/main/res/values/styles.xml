@@ -48,6 +48,13 @@
         <item name="android:ellipsize">end</item>
         <item name="android:drawablePadding">@dimen/nav_tab_drawable_padding</item>
         <item name="android:background">?attr/selectableItemBackground</item>
+        <!--
+            A tab must be reachable without touch (item 76): a Chromebook, a controller's D-pad and
+            TalkBack all move focus, and a clickable-but-unfocusable row is a dead end for them.
+            The focus state is drawn by the tab's own ColorStateList (see BaseActivity.navTabTint),
+            not by a background swap, so the ripple and the press feedback are untouched.
+        -->
+        <item name="android:focusable">true</item>
     </style>
 
     <!--
@@ -71,6 +78,8 @@
         <item name="android:ellipsize">end</item>
         <item name="android:drawablePadding">@dimen/nav_rail_tab_drawable_padding</item>
         <item name="android:background">?attr/selectableItemBackground</item>
+        <!-- Reachable without touch, as on the top bar (item 76). -->
+        <item name="android:focusable">true</item>
     </style>
 
     <!--
