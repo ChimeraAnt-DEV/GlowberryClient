@@ -1046,4 +1046,8 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="keyboard_connected_message">Bağlandı! Klavye kontrolleri etkin.</string>
     <string name="keyboard_disconnected_message">Bağlantı kesildi. Klavye kontrolleri bırakıldı.</string>
     <string name="keyboard_title">Klavye</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Neyi özelleştirmek istersiniz?</string>
+    <string name="wheel_customize_mod_settings">Mod Menüsü Ayarları</string>
+    <string name="wheel_customize_cosmetics">Kozmetikler</string>
 </resources>

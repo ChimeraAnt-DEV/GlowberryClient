@@ -328,28 +328,34 @@ public class ModMenuButton {
                     .RadialMenuOverlay.Destinations() {
                 @Override
                 public void openMods() {
-                    openMenuSection(
-                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuPage.GENERAL);
+                    openMenuFiltered(
+                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuOverlay
+                                    .ModuleFilter.ALL);
                 }
 
                 @Override
-                public void openCloset() {
-                    openMenuSection(
-                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuPage.COSMETICS);
+                public void openHud() {
+                    // The HUD sector is a filter over the one module list, so it lands on the same
+                    // rows the HUD chip shows rather than a second, hand-built list.
+                    openMenuFiltered(
+                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuOverlay
+                                    .ModuleFilter.HUD);
+                }
+
+                @Override
+                public void openCustomize() {
+                    new org.chimeramc.client.core.mods.inbuilt.overlay.CustomizeChooser(
+                            activity,
+                            () -> openMenuSection(org.chimeramc.client.core.mods.inbuilt.overlay
+                                    .ModMenuPage.SETTINGS),
+                            () -> openMenuSection(org.chimeramc.client.core.mods.inbuilt.overlay
+                                    .ModMenuPage.COSMETICS)).show();
                 }
 
                 @Override
                 public void openSettings() {
                     openMenuSection(
                             org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuPage.SETTINGS);
-                }
-
-                @Override
-                public void openHudEditor() {
-                    InbuiltOverlayManager manager = InbuiltOverlayManager.getInstance();
-                    if (manager != null) {
-                        manager.setMoreButtonsEditorOpen(true);
-                    }
                 }
             });
         }
@@ -368,6 +374,22 @@ public class ModMenuButton {
             menuOverlay.setCallback(new ModMenuCallback());
         }
         menuOverlay.showPage(page);
+    }
+
+    /**
+     * Opens the one Mod Menu's module list already filtered to a section.
+     *
+     * <p>The wheel's MODS and HUD sectors route here, so the wheel lands on the same filtered rows
+     * the filter chip shows. The menu is created lazily and the filter is applied on the first
+     * frame, so a cold open and an already-open menu behave identically.
+     */
+    private void openMenuFiltered(
+            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuOverlay.ModuleFilter filter) {
+        if (menuOverlay == null) {
+            menuOverlay = new ModMenuOverlay(activity);
+            menuOverlay.setCallback(new ModMenuCallback());
+        }
+        menuOverlay.showModulesFiltered(filter);
     }
 
     /** The callback the overlay calls back into, kept in one place so both paths share it. */

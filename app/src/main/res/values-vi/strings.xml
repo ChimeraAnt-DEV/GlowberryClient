@@ -1049,4 +1049,8 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="keyboard_connected_message">Đã kết nối! Điều khiển bàn phím đang hoạt động.</string>
     <string name="keyboard_disconnected_message">Đã ngắt kết nối. Đã giải phóng điều khiển bàn phím.</string>
     <string name="keyboard_title">Bàn phím</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Bạn muốn tùy chỉnh gì?</string>
+    <string name="wheel_customize_mod_settings">Cài đặt Menu Mod</string>
+    <string name="wheel_customize_cosmetics">Trang phục</string>
 </resources>

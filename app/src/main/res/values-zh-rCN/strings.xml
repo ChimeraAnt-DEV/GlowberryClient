@@ -1040,4 +1040,8 @@
     <string name="keyboard_connected_message">已连接！键盘控制已启用。</string>
     <string name="keyboard_disconnected_message">已断开连接。已释放键盘控制。</string>
     <string name="keyboard_title">键盘</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">你想自定义什么？</string>
+    <string name="wheel_customize_mod_settings">模组菜单设置</string>
+    <string name="wheel_customize_cosmetics">外观</string>
 </resources>

@@ -887,6 +887,10 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_menu_filter_external">External</string>
     <string name="mod_menu_filter_pvp">PvP</string>
     <string name="mod_menu_group_pvp">PvP</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Which thing would you like to customize?</string>
+    <string name="wheel_customize_mod_settings">Mod Menu Settings</string>
+    <string name="wheel_customize_cosmetics">Cosmetics</string>
     <string name="mod_menu_search_hint">Search mods…</string>
     <string name="mod_stats_fps_placeholder">— FPS</string>
     <string name="mod_stats_ping_placeholder">— ms</string>

@@ -1175,7 +1175,7 @@ public class RadialMenuView extends View {
     private static String sectorLabel(Sector s) {
         switch (s) {
             case MODS: return "MODS";
-            case CLOSET: return "CLOSET";
+            case CLOSET: return "CUSTOMIZE";
             case SETTINGS: return "SETTINGS";
             case HUD: return "HUD";
             default: return "";

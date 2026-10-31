@@ -1047,4 +1047,8 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="keyboard_connected_message">कनेक्ट हो गया! कीबोर्ड नियंत्रण सक्रिय।</string>
     <string name="keyboard_disconnected_message">डिस्कनेक्ट हो गया। कीबोर्ड नियंत्रण जारी किए गए।</string>
     <string name="keyboard_title">कीबोर्ड</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">आप किसे अनुकूलित करना चाहेंगे?</string>
+    <string name="wheel_customize_mod_settings">मॉड मेनू सेटिंग्स</string>
+    <string name="wheel_customize_cosmetics">कॉस्मेटिक्स</string>
 </resources>

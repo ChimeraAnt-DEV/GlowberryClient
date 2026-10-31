@@ -1016,4 +1016,8 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="keyboard_connected_message">接続しました！キーボード操作が有効です。</string>
     <string name="keyboard_disconnected_message">切断しました。キーボード操作を解除しました。</string>
     <string name="keyboard_title">キーボード</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">何をカスタマイズしますか？</string>
+    <string name="wheel_customize_mod_settings">Mod メニュー設定</string>
+    <string name="wheel_customize_cosmetics">コスメ</string>
 </resources>

@@ -1043,4 +1043,8 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="keyboard_connected_message">Terhubung! Kontrol papan ketik aktif.</string>
     <string name="keyboard_disconnected_message">Terputus. Kontrol papan ketik dilepas.</string>
     <string name="keyboard_title">Papan ketik</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Apa yang ingin Anda sesuaikan?</string>
+    <string name="wheel_customize_mod_settings">Pengaturan Menu Mod</string>
+    <string name="wheel_customize_cosmetics">Kosmetik</string>
 </resources>

@@ -485,6 +485,22 @@
                                 android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
+                                android:id="@+id/filter_hud"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:minHeight="30dp"
+                                android:layout_marginEnd="@dimen/space_2"
+                                android:background="@drawable/bg_search_field"
+                                android:defaultFocusHighlightEnabled="false"
+                                android:gravity="center"
+                                android:minWidth="58dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
+                                android:text="@string/mod_menu_filter_hud"
+                                android:textColor="@color/mod_menu_text_secondary"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
+
+                            <TextView
                                 android:id="@+id/module_count_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

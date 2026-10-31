@@ -1019,4 +1019,8 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="keyboard_connected_message">Connecté ! Commandes clavier actives.</string>
     <string name="keyboard_disconnected_message">Déconnecté. Commandes clavier libérées.</string>
     <string name="keyboard_title">Clavier</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Que souhaitez-vous personnaliser ?</string>
+    <string name="wheel_customize_mod_settings">Paramètres du menu de mods</string>
+    <string name="wheel_customize_cosmetics">Cosmétiques</string>
 </resources>

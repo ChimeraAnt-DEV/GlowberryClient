@@ -9,6 +9,13 @@ public final class ModIds {
     /** Group id for social modules (proximity voice), so the menu can section them apart. */
     public static final String GROUP_VOICE = "voice";
 
+    /**
+     * Group id for the HUD section, so the radial wheel's HUD sector and the Mod Menu's HUD filter
+     * describe the same set. It is a section id, not a new store: every HUD module keeps its own
+     * {@code ModIds} id and stays {@code Source.INBUILT}, so the Inbuilt filter still finds it.
+     */
+    public static final String GROUP_HUD = "hud";
+
     public static final String QUICK_DROP = "quick_drop";
     public static final String CAMERA_PERSPECTIVE = "camera_perspective";
     public static final String TOGGLE_HUD = "toggle_hud";
@@ -121,6 +128,31 @@ public final class ModIds {
 
     public static boolean isVoiceModule(String modId) {
         return modId != null && VOICE_MODULES.contains(modId);
+    }
+
+    /**
+     * The HUD section's module ids.
+     *
+     * <p>The radial wheel's HUD sector opens this section, and the Mod Menu's HUD filter shows
+     * exactly it, so the two cannot disagree about what "HUD related" means. These are the modules
+     * whose whole output is a widget drawn on the player's own screen; a module that changes the
+     * world or the sent input is not here.
+     */
+    private static final java.util.Set<String> HUD_MODULES = Api28Compat.setOf(
+            FPS_DISPLAY, CPS_DISPLAY, ARMOR_HUD, HIT_TIMING, HITBOX, AIM_SETTINGS,
+            TOGGLE_HUD, LIST_PLAYERS, DEBUG_MENU, VIRTUAL_CURSOR, HOTBAR_SLOT, CHICK_PET,
+            REACH_INDICATOR, HIT_PREDICTION, TRAJECTORY_PREDICTION, KILL_EFFECTS);
+
+    /** True for a module that belongs to the HUD section. */
+    public static boolean isHudModule(String modId) {
+        return modId != null && HUD_MODULES.contains(modId);
+    }
+
+    /** The HUD section's ids, in a stable order, for a caller that must assert against the set. */
+    public static java.util.List<String> hudModuleIds() {
+        return Api28Compat.listOf(FPS_DISPLAY, CPS_DISPLAY, ARMOR_HUD, HIT_TIMING, HITBOX,
+                AIM_SETTINGS, TOGGLE_HUD, LIST_PLAYERS, DEBUG_MENU, VIRTUAL_CURSOR, HOTBAR_SLOT,
+                CHICK_PET, REACH_INDICATOR, HIT_PREDICTION, TRAJECTORY_PREDICTION, KILL_EFFECTS);
     }
 
     /**

@@ -55,19 +55,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class ModMenuOverlay {
-    private enum ModuleFilter {
-        ALL,
-        FAVORITES,
-        ENABLED,
-        INBUILT,
-        EXTERNAL,
-        PVP,
-        // The category split the VIP window used to own. With one menu (U4) they are filters of
-        // this menu, and their predicates come from the tested ModCategory rather than a second
-        // implementation.
-        VISUALS,
-        MISC
-    }
 
     private final Activity activity;
     private View overlayView;
@@ -87,6 +74,8 @@ public class ModMenuOverlay {
     private ModMenuPage activePage;
     /** The page to open on, set when showPage() has to open the menu first. */
     private ModMenuPage pendingPage;
+    /** A section filter asked for before the views existed; consumed by {@link #setupViews}. */
+    private ModuleFilter pendingFilter;
     private boolean hasStaggeredOnce = false;
     private EditText searchInput;
     private ImageButton clearSearchBtn;
@@ -95,7 +84,7 @@ public class ModMenuOverlay {
     /** The icon rail. Built from ModMenuPage.pages(), the one page registry the whole menu reads. */
     private ModMenuRail rail;
     private TextView filterAll, filterFavorites, filterEnabled, filterInbuilt, filterExternal,
-            filterPvp, filterVisuals, filterMisc;
+            filterPvp, filterVisuals, filterMisc, filterHud;
     private TextView moduleCountText, emptyStateText;
     private TextView compactFilterSelector, compactModuleCount;
 
@@ -340,6 +329,45 @@ public class ModMenuOverlay {
             return;
         }
         selectPage(target);
+    }
+
+    /**
+     * Opens the module list already filtered to a section, for the radial wheel's MODS and HUD
+     * sectors.
+     *
+     * <p>The wheel and the menu are two views of one screen, so a sector must land on the same
+     * filtered list the filter chip would produce rather than a second, hand-built list. The filter
+     * is applied after the views exist (a pending filter is honoured by {@link #setupViews}), so a
+     * cold open and an already-open menu behave identically.
+     */
+    public void showModulesFiltered(ModuleFilter filter) {
+        ModuleFilter target = filter == null ? ModuleFilter.ALL : filter;
+        if (!isShowing) {
+            pendingPage = ModMenuPage.GENERAL;
+            pendingFilter = target;
+            show();
+            return;
+        }
+        selectPage(ModMenuPage.GENERAL);
+        setModuleFilter(target);
+    }
+
+    /** The section filters a caller outside this class may ask for. */
+    public enum ModuleFilter {
+        ALL,
+        FAVORITES,
+        ENABLED,
+        INBUILT,
+        EXTERNAL,
+        PVP,
+        // The category split the VIP window used to own. With one menu (U4) they are filters of
+        // this menu, and their predicates come from the tested ModCategory rather than a second
+        // implementation.
+        VISUALS,
+        MISC,
+        // The HUD section. Its predicate is ModIds.isHudModule, so the radial wheel's HUD sector
+        // and this filter name the same set and cannot drift apart.
+        HUD
     }
 
     private void showInternal() {
@@ -596,6 +624,7 @@ public class ModMenuOverlay {
         filterPvp = overlayView.findViewById(R.id.filter_pvp);
         filterVisuals = overlayView.findViewById(R.id.filter_visuals);
         filterMisc = overlayView.findViewById(R.id.filter_misc);
+        filterHud = overlayView.findViewById(R.id.filter_hud);
         moduleCountText = overlayView.findViewById(R.id.module_count_text);
         statsFps = overlayView.findViewById(R.id.mod_stats_fps);
         statsPing = overlayView.findViewById(R.id.mod_stats_ping);
@@ -905,6 +934,14 @@ public class ModMenuOverlay {
         ModMenuPage initial = pendingPage;
         pendingPage = null;
         selectPage(initial == null ? ModMenuPage.GENERAL : initial);
+        // A caller that also asked for a section filter (the wheel's MODS/HUD sectors) has it
+        // applied last, so the list is filtered on the first frame rather than after a flash of
+        // the unfiltered list.
+        ModuleFilter initialFilter = pendingFilter;
+        pendingFilter = null;
+        if (initialFilter != null) {
+            setModuleFilter(initialFilter);
+        }
     }
 
     private void showModulesSection() {
@@ -2123,6 +2160,7 @@ public class ModMenuOverlay {
         popup.getMenu().add(0, 105, 5, R.string.mod_menu_filter_pvp);
         popup.getMenu().add(0, 106, 6, R.string.vip_category_visuals);
         popup.getMenu().add(0, 107, 7, R.string.vip_category_misc);
+        popup.getMenu().add(0, 108, 8, R.string.mod_menu_filter_hud);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case 101:
@@ -2145,6 +2183,9 @@ public class ModMenuOverlay {
                     break;
                 case 107:
                     setModuleFilter(ModuleFilter.MISC);
+                    break;
+                case 108:
+                    setModuleFilter(ModuleFilter.HUD);
                     break;
                 case 100:
                 default:
@@ -2262,6 +2303,8 @@ public class ModMenuOverlay {
                 return R.string.vip_category_visuals;
             case MISC:
                 return R.string.vip_category_misc;
+            case HUD:
+                return R.string.mod_menu_filter_hud;
             case ALL:
             default:
                 return R.string.filter_all;
@@ -2296,6 +2339,9 @@ public class ModMenuOverlay {
         }
         if (filterMisc != null) {
             filterMisc.setOnClickListener(v -> setModuleFilter(ModuleFilter.MISC));
+        }
+        if (filterHud != null) {
+            filterHud.setOnClickListener(v -> setModuleFilter(ModuleFilter.HUD));
         }
         updateFilterButtons();
     }
@@ -2388,6 +2434,8 @@ public class ModMenuOverlay {
                 return ModCategory.matches(ModCategory.Tab.VISUALS, mod, null);
             case MISC:
                 return ModCategory.matches(ModCategory.Tab.MISC, mod, null);
+            case HUD:
+                return ModIds.isHudModule(mod.getId());
             case ALL:
             default:
                 return true;
@@ -2424,6 +2472,7 @@ public class ModMenuOverlay {
         updateFilterButton(filterPvp, activeFilter == ModuleFilter.PVP);
         updateFilterButton(filterVisuals, activeFilter == ModuleFilter.VISUALS);
         updateFilterButton(filterMisc, activeFilter == ModuleFilter.MISC);
+        updateFilterButton(filterHud, activeFilter == ModuleFilter.HUD);
         updateCompactFilterSelector();
     }
 

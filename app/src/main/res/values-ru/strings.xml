@@ -1050,4 +1050,8 @@
     <string name="keyboard_connected_message">Подключено! Управление с клавиатуры активно.</string>
     <string name="keyboard_disconnected_message">Отключено. Управление с клавиатуры освобождено.</string>
     <string name="keyboard_title">Клавиатура</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Что вы хотите настроить?</string>
+    <string name="wheel_customize_mod_settings">Настройки меню модов</string>
+    <string name="wheel_customize_cosmetics">Косметика</string>
 </resources>
