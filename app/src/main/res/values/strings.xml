@@ -676,6 +676,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="crash_details_title">Crash details</string>
     <string name="crash_back_to_main">Back to Home</string>
     <string name="crash_share_log">Share Log</string>
+    <string name="session_restart_loop_message">Stopped restarting: this session has restarted %1$d times in a row. Launch again from the home screen, or disable the mods you added most recently.</string>
     <string name="crash_exit_reason_label">Last exit reason:</string>
     <string name="crash_disable_last_mod">Disable the mod that crashed</string>
     <string name="crash_disable_no_suspects">No mods were recorded for this crash.</string>

@@ -36,6 +36,8 @@ public final class MinecraftSessionRestarter {
     private static final String PREFS = "minecraft_session_restart";
     private static final String KEY_PENDING = "pending_relaunch";
     private static final String KEY_PENDING_AT = "pending_relaunch_at";
+    /** The timestamps of recent relaunches, so a crash loop cannot restart forever (item 274). */
+    private static final String KEY_RELAUNCH_HISTORY = "relaunch_history";
     /** A request older than this is ignored, so a failed relaunch cannot auto-start a later cold boot. */
     private static final long PENDING_MAX_AGE_MS = 120_000L;
 
@@ -60,9 +62,28 @@ public final class MinecraftSessionRestarter {
         }
         if (version == null) return false;
 
+        // Item 274: refuse an unbounded relaunch loop. If the game dies immediately after every
+        // relaunch, an unlimited auto-restart would burn battery forever and never show the user the
+        // problem. The budget is checked before anything is written, so a refusal is a clean no-op.
+        Context appContextForBudget = activity.getApplicationContext();
+        long now = System.currentTimeMillis();
+        java.util.List<Long> history = readRelaunchHistory(appContextForBudget);
+        if (RelaunchBudget.decide(history, now) == RelaunchBudget.Decision.REFUSED_TOO_MANY) {
+            // A toast, not a dialog: this runs over the running game, whose activity uses a
+            // full-screen theme a dialog would fight with, and the message is short.
+            final Context toastContext = activity.getApplicationContext();
+            final int max = RelaunchBudget.MAX_IN_WINDOW;
+            MAIN.post(() -> android.widget.Toast.makeText(toastContext,
+                    toastContext.getString(org.chimeramc.client.R.string.session_restart_loop_message,
+                            max),
+                    android.widget.Toast.LENGTH_LONG).show());
+            return false;
+        }
+
         // Persisted, not a static: the relaunch kills this process, so in-memory state would be
         // gone before the fresh launcher could read it.
         setPendingRelaunch(activity);
+        recordRelaunch(appContextForBudget, now);
         final Context appContext = activity.getApplicationContext();
         MAIN.post(() -> MinecraftProcessRestarter.INSTANCE
                 .restartLauncherAfterMinecraftExit(appContext));
@@ -98,6 +119,41 @@ public final class MinecraftSessionRestarter {
         try {
             context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                     .edit().putBoolean(KEY_PENDING, false).remove(KEY_PENDING_AT).apply();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** The timestamps of relaunches inside the budget window, newest last. Never null. */
+    private static java.util.List<Long> readRelaunchHistory(Context context) {
+        java.util.List<Long> out = new java.util.ArrayList<>();
+        try {
+            String raw = context.getApplicationContext()
+                    .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .getString(KEY_RELAUNCH_HISTORY, "");
+            if (raw == null || raw.isEmpty()) return out;
+            for (String part : raw.split(",")) {
+                try {
+                    out.add(Long.parseLong(part.trim()));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return out;
+    }
+
+    /** Records a relaunch and prunes anything outside the window, so the file cannot grow. */
+    private static void recordRelaunch(Context context, long nowMs) {
+        try {
+            java.util.Deque<Long> kept = RelaunchBudget.pruned(readRelaunchHistory(context), nowMs);
+            kept.addLast(nowMs);
+            StringBuilder joined = new StringBuilder();
+            for (Long at : kept) {
+                if (joined.length() > 0) joined.append(',');
+                joined.append(at);
+            }
+            context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .edit().putString(KEY_RELAUNCH_HISTORY, joined.toString()).apply();
         } catch (Throwable ignored) {
         }
     }

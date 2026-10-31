@@ -1081,4 +1081,5 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="crash_disable_last_mod">Tắt mod gây lỗi</string>
     <string name="crash_disable_no_suspects">Không có mod nào được ghi nhận cho lỗi này.</string>
     <string name="crash_disable_done">Đã tắt %1$d mod. Hãy khởi chạy lại để thử mà không có chúng.</string>
+    <string name="session_restart_loop_message">Đã dừng khởi động lại: phiên này đã khởi động lại %1$d lần liên tiếp. Hãy khởi chạy lại từ màn hình chính hoặc tắt các mod bạn vừa thêm.</string>
 </resources>

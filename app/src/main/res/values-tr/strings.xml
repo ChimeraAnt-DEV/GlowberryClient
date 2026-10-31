@@ -1078,4 +1078,5 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="crash_disable_last_mod">Çökmeye neden olan modu devre dışı bırak</string>
     <string name="crash_disable_no_suspects">Bu çökme için kayıtlı mod yok.</string>
     <string name="crash_disable_done">%1$d mod devre dışı bırakıldı. Onlar olmadan denemek için yeniden başlatın.</string>
+    <string name="session_restart_loop_message">Yeniden başlatma durduruldu: bu oturum üst üste %1$d kez yeniden başladı. Ana ekrandan yeniden başlatın veya son eklediğiniz modları devre dışı bırakın.</string>
 </resources>

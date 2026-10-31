@@ -1051,4 +1051,5 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
     <string name="crash_disable_last_mod">Desativar o mod que travou</string>
     <string name="crash_disable_no_suspects">Nenhum mod foi registrado para esta falha.</string>
     <string name="crash_disable_done">%1$d mod(s) desativado(s). Inicie novamente para testar sem eles.</string>
+    <string name="session_restart_loop_message">Reinícios interrompidos: esta sessão reiniciou %1$d vezes seguidas. Inicie novamente na tela inicial ou desative os mods que você adicionou recentemente.</string>
 </resources>

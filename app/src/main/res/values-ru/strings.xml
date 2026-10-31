@@ -1082,4 +1082,5 @@
     <string name="crash_disable_last_mod">Отключить мод, вызвавший сбой</string>
     <string name="crash_disable_no_suspects">Для этого сбоя не зарегистрировано ни одного мода.</string>
     <string name="crash_disable_done">Отключено модов: %1$d. Запустите снова, чтобы попробовать без них.</string>
+    <string name="session_restart_loop_message">Перезапуск остановлен: этот сеанс перезапускался %1$d раза подряд. Запустите снова с главного экрана или отключите недавно добавленные моды.</string>
 </resources>

@@ -94,7 +94,8 @@
     "crash_exit_reason_label": "Motivo de la última salida:",
     "crash_disable_last_mod": "Desactivar el mod que provocó el fallo",
     "crash_disable_no_suspects": "No se registraron mods para este fallo.",
-    "crash_disable_done": "Se desactivaron %1$d mod(s). Vuelve a iniciar para probar sin ellos."
+    "crash_disable_done": "Se desactivaron %1$d mod(s). Vuelve a iniciar para probar sin ellos.",
+    "session_restart_loop_message": "Dejó de reiniciar: esta sesión se reinició %1$d veces seguidas. Inicia de nuevo desde la pantalla de inicio o desactiva los mods que añadiste recientemente."
   },
   "fr": {
     "nav_back": "Retour",
@@ -191,7 +192,8 @@
     "crash_exit_reason_label": "Raison de la dernière fermeture :",
     "crash_disable_last_mod": "Désactiver le mod qui a planté",
     "crash_disable_no_suspects": "Aucun mod n\\'a été enregistré pour ce plantage.",
-    "crash_disable_done": "%1$d mod(s) désactivé(s). Relancez pour essayer sans eux."
+    "crash_disable_done": "%1$d mod(s) désactivé(s). Relancez pour essayer sans eux.",
+    "session_restart_loop_message": "Redémarrage arrêté : cette session a redémarré %1$d fois de suite. Relancez depuis l\\'écran d\\'accueil ou désactivez les mods ajoutés récemment."
   },
   "hi": {
     "nav_back": "वापस",
@@ -288,7 +290,8 @@
     "crash_exit_reason_label": "पिछले बंद होने का कारण:",
     "crash_disable_last_mod": "क्रैश करने वाले मॉड को बंद करें",
     "crash_disable_no_suspects": "इस क्रैश के लिए कोई मॉड दर्ज नहीं हुआ।",
-    "crash_disable_done": "%1$d मॉड बंद किए गए। इनके बिना आज़माने के लिए फिर से लॉन्च करें।"
+    "crash_disable_done": "%1$d मॉड बंद किए गए। इनके बिना आज़माने के लिए फिर से लॉन्च करें।",
+    "session_restart_loop_message": "पुनः आरंभ करना बंद: यह सत्र लगातार %1$d बार पुनः आरंभ हुआ। होम स्क्रीन से फिर से लॉन्च करें, या हाल ही में जोड़े गए मॉड बंद करें।"
   },
   "id": {
     "nav_back": "Kembali",
@@ -385,7 +388,8 @@
     "crash_exit_reason_label": "Alasan keluar terakhir:",
     "crash_disable_last_mod": "Nonaktifkan mod yang menyebabkan crash",
     "crash_disable_no_suspects": "Tidak ada mod yang tercatat untuk crash ini.",
-    "crash_disable_done": "%1$d mod dinonaktifkan. Luncurkan lagi untuk mencoba tanpa mod tersebut."
+    "crash_disable_done": "%1$d mod dinonaktifkan. Luncurkan lagi untuk mencoba tanpa mod tersebut.",
+    "session_restart_loop_message": "Berhenti memulai ulang: sesi ini memulai ulang %1$d kali berturut-turut. Luncurkan lagi dari layar utama, atau nonaktifkan mod yang baru Anda tambahkan."
   },
   "ja": {
     "nav_back": "戻る",
@@ -482,7 +486,8 @@
     "crash_exit_reason_label": "前回の終了理由:",
     "crash_disable_last_mod": "クラッシュしたModを無効にする",
     "crash_disable_no_suspects": "このクラッシュに記録されたModはありません。",
-    "crash_disable_done": "%1$d個のModを無効にしました。もう一度起動して試してください。"
+    "crash_disable_done": "%1$d個のModを無効にしました。もう一度起動して試してください。",
+    "session_restart_loop_message": "再起動を停止しました: このセッションは連続して%1$d回再起動しました。ホーム画面から再度起動するか、最近追加したModを無効にしてください。"
   },
   "pt": {
     "nav_back": "Voltar",
@@ -579,7 +584,8 @@
     "crash_exit_reason_label": "Motivo da última saída:",
     "crash_disable_last_mod": "Desativar o mod que travou",
     "crash_disable_no_suspects": "Nenhum mod foi registrado para esta falha.",
-    "crash_disable_done": "%1$d mod(s) desativado(s). Inicie novamente para testar sem eles."
+    "crash_disable_done": "%1$d mod(s) desativado(s). Inicie novamente para testar sem eles.",
+    "session_restart_loop_message": "Reinícios interrompidos: esta sessão reiniciou %1$d vezes seguidas. Inicie novamente na tela inicial ou desative os mods que você adicionou recentemente."
   },
   "ru": {
     "nav_back": "Назад",
@@ -676,7 +682,8 @@
     "crash_exit_reason_label": "Причина последнего завершения:",
     "crash_disable_last_mod": "Отключить мод, вызвавший сбой",
     "crash_disable_no_suspects": "Для этого сбоя не зарегистрировано ни одного мода.",
-    "crash_disable_done": "Отключено модов: %1$d. Запустите снова, чтобы попробовать без них."
+    "crash_disable_done": "Отключено модов: %1$d. Запустите снова, чтобы попробовать без них.",
+    "session_restart_loop_message": "Перезапуск остановлен: этот сеанс перезапускался %1$d раза подряд. Запустите снова с главного экрана или отключите недавно добавленные моды."
   },
   "tr": {
     "nav_back": "Geri",
@@ -773,7 +780,8 @@
     "crash_exit_reason_label": "Son çıkış nedeni:",
     "crash_disable_last_mod": "Çökmeye neden olan modu devre dışı bırak",
     "crash_disable_no_suspects": "Bu çökme için kayıtlı mod yok.",
-    "crash_disable_done": "%1$d mod devre dışı bırakıldı. Onlar olmadan denemek için yeniden başlatın."
+    "crash_disable_done": "%1$d mod devre dışı bırakıldı. Onlar olmadan denemek için yeniden başlatın.",
+    "session_restart_loop_message": "Yeniden başlatma durduruldu: bu oturum üst üste %1$d kez yeniden başladı. Ana ekrandan yeniden başlatın veya son eklediğiniz modları devre dışı bırakın."
   },
   "vi": {
     "nav_back": "Quay lại",
@@ -870,7 +878,8 @@
     "crash_exit_reason_label": "Lý do thoát lần trước:",
     "crash_disable_last_mod": "Tắt mod gây lỗi",
     "crash_disable_no_suspects": "Không có mod nào được ghi nhận cho lỗi này.",
-    "crash_disable_done": "Đã tắt %1$d mod. Hãy khởi chạy lại để thử mà không có chúng."
+    "crash_disable_done": "Đã tắt %1$d mod. Hãy khởi chạy lại để thử mà không có chúng.",
+    "session_restart_loop_message": "Đã dừng khởi động lại: phiên này đã khởi động lại %1$d lần liên tiếp. Hãy khởi chạy lại từ màn hình chính hoặc tắt các mod bạn vừa thêm."
   },
   "zh-rCN": {
     "nav_back": "返回",
@@ -967,6 +976,7 @@
     "crash_exit_reason_label": "上次退出的原因：",
     "crash_disable_last_mod": "禁用导致崩溃的模组",
     "crash_disable_no_suspects": "此次崩溃没有记录任何模组。",
-    "crash_disable_done": "已禁用 %1$d 个模组。请重新启动以在不加载它们的情况下尝试。"
+    "crash_disable_done": "已禁用 %1$d 个模组。请重新启动以在不加载它们的情况下尝试。",
+    "session_restart_loop_message": "已停止重启：本次会话已连续重启 %1$d 次。请从主屏幕重新启动，或禁用你最近添加的模组。"
   }
 }

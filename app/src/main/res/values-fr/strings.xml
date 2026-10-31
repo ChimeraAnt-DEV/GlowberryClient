@@ -1051,4 +1051,5 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="crash_disable_last_mod">Désactiver le mod qui a planté</string>
     <string name="crash_disable_no_suspects">Aucun mod n\'a été enregistré pour ce plantage.</string>
     <string name="crash_disable_done">%1$d mod(s) désactivé(s). Relancez pour essayer sans eux.</string>
+    <string name="session_restart_loop_message">Redémarrage arrêté : cette session a redémarré %1$d fois de suite. Relancez depuis l\'écran d\'accueil ou désactivez les mods ajoutés récemment.</string>
 </resources>
