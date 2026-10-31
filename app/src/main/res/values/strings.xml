@@ -1565,6 +1565,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="about_github_repo" translatable="false">GitHub · GlowberryClient</string>
     <string name="about_github_org" translatable="false">ChimeraAnt-DEV</string>
     <string name="about_license_note">See LICENSE in the repository for license details.</string>
+    <string name="about_backend_status">Backend: %1$s</string>
     <string name="about_contribute_title">Contribute</string>
     <string name="about_contribute_desc">Contributions via Issues or Pull Requests are welcome to improve GlowberryClient.</string>
     <string name="about_issues">Issue</string>

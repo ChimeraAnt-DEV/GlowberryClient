@@ -1069,4 +1069,5 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="wheel_manager_add_entry">प्रविष्टि जोड़ें</string>
     <string name="wheel_manager_pick_action">क्रिया चुनें</string>
     <string name="diagnostics_field_berry_api">BerryAPI बैकएंड</string>
+    <string name="about_backend_status">बैकएंड: %1$s</string>
 </resources>

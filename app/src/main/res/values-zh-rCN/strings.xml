@@ -1062,4 +1062,5 @@
     <string name="wheel_manager_add_entry">添加菜单项</string>
     <string name="wheel_manager_pick_action">选择操作</string>
     <string name="diagnostics_field_berry_api">BerryAPI 后端</string>
+    <string name="about_backend_status">后端：%1$s</string>
 </resources>

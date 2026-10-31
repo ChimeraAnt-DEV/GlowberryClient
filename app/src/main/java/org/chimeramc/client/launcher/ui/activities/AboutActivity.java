@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.preloader.BerryApi;
 
 public class AboutActivity extends BaseActivity {
 
@@ -64,6 +65,7 @@ public class AboutActivity extends BaseActivity {
         loadAvatars();
         setupLinks();
         styleBadges();
+        showBackendStatus();
 
         DynamicAnim.applyPressScaleRecursively(findViewById(android.R.id.content));
     }
@@ -88,6 +90,19 @@ public class AboutActivity extends BaseActivity {
                 maintainerBadge.setTextColor(android.graphics.Color.WHITE);
             }
         }
+    }
+
+    /**
+     * Shows which script/runtime backend the launcher found.
+     *
+     * <p>BerryAPI is a separate native library, so the About page reports it rather than assuming it
+     * is present: with none registered the line says so, and the script-driven features are known to
+     * be inactive before a launch rather than after a silent no-op.
+     */
+    private void showBackendStatus() {
+        TextView status = findViewById(R.id.about_backend_status);
+        if (status == null) return;
+        status.setText(getString(R.string.about_backend_status, BerryApi.summary()));
     }
 
     private void setupNavBar() {

@@ -84,7 +84,8 @@
     "wheel_manager_no_entries": "Aún no hay entradas. Añade una para poner una acción en este menú.",
     "wheel_manager_add_entry": "Añadir entrada",
     "wheel_manager_pick_action": "Elige una acción",
-    "diagnostics_field_berry_api": "Backend de BerryAPI"
+    "diagnostics_field_berry_api": "Backend de BerryAPI",
+    "about_backend_status": "Backend: %1$s"
   },
   "fr": {
     "nav_back": "Retour",
@@ -171,7 +172,8 @@
     "wheel_manager_no_entries": "Aucune entrée. Ajoutez-en une pour placer une action sur ce menu.",
     "wheel_manager_add_entry": "Ajouter une entrée",
     "wheel_manager_pick_action": "Choisir une action",
-    "diagnostics_field_berry_api": "Backend BerryAPI"
+    "diagnostics_field_berry_api": "Backend BerryAPI",
+    "about_backend_status": "Backend : %1$s"
   },
   "hi": {
     "nav_back": "वापस",
@@ -258,7 +260,8 @@
     "wheel_manager_no_entries": "अभी कोई प्रविष्टि नहीं। इस मेनू पर क्रिया डालने के लिए एक जोड़ें।",
     "wheel_manager_add_entry": "प्रविष्टि जोड़ें",
     "wheel_manager_pick_action": "क्रिया चुनें",
-    "diagnostics_field_berry_api": "BerryAPI बैकएंड"
+    "diagnostics_field_berry_api": "BerryAPI बैकएंड",
+    "about_backend_status": "बैकएंड: %1$s"
   },
   "id": {
     "nav_back": "Kembali",
@@ -345,7 +348,8 @@
     "wheel_manager_no_entries": "Belum ada entri. Tambahkan satu untuk menaruh aksi di menu ini.",
     "wheel_manager_add_entry": "Tambah entri",
     "wheel_manager_pick_action": "Pilih aksi",
-    "diagnostics_field_berry_api": "Backend BerryAPI"
+    "diagnostics_field_berry_api": "Backend BerryAPI",
+    "about_backend_status": "Backend: %1$s"
   },
   "ja": {
     "nav_back": "戻る",
@@ -432,7 +436,8 @@
     "wheel_manager_no_entries": "項目がまだありません。このメニューにアクションを追加してください。",
     "wheel_manager_add_entry": "項目を追加",
     "wheel_manager_pick_action": "アクションを選択",
-    "diagnostics_field_berry_api": "BerryAPIバックエンド"
+    "diagnostics_field_berry_api": "BerryAPIバックエンド",
+    "about_backend_status": "バックエンド: %1$s"
   },
   "pt": {
     "nav_back": "Voltar",
@@ -519,7 +524,8 @@
     "wheel_manager_no_entries": "Ainda não há entradas. Adicione uma para colocar uma ação neste menu.",
     "wheel_manager_add_entry": "Adicionar entrada",
     "wheel_manager_pick_action": "Escolha uma ação",
-    "diagnostics_field_berry_api": "Backend BerryAPI"
+    "diagnostics_field_berry_api": "Backend BerryAPI",
+    "about_backend_status": "Backend: %1$s"
   },
   "ru": {
     "nav_back": "Назад",
@@ -606,7 +612,8 @@
     "wheel_manager_no_entries": "Записей пока нет. Добавьте, чтобы поместить действие в это меню.",
     "wheel_manager_add_entry": "Добавить запись",
     "wheel_manager_pick_action": "Выберите действие",
-    "diagnostics_field_berry_api": "Бэкенд BerryAPI"
+    "diagnostics_field_berry_api": "Бэкенд BerryAPI",
+    "about_backend_status": "Бэкенд: %1$s"
   },
   "tr": {
     "nav_back": "Geri",
@@ -693,7 +700,8 @@
     "wheel_manager_no_entries": "Henüz girdi yok. Bu menüye bir eylem koymak için bir tane ekleyin.",
     "wheel_manager_add_entry": "Girdi ekle",
     "wheel_manager_pick_action": "Bir eylem seç",
-    "diagnostics_field_berry_api": "BerryAPI arka ucu"
+    "diagnostics_field_berry_api": "BerryAPI arka ucu",
+    "about_backend_status": "Arka uç: %1$s"
   },
   "vi": {
     "nav_back": "Quay lại",
@@ -780,7 +788,8 @@
     "wheel_manager_no_entries": "Chưa có mục nào. Thêm một mục để đặt hành động vào menu này.",
     "wheel_manager_add_entry": "Thêm mục",
     "wheel_manager_pick_action": "Chọn một hành động",
-    "diagnostics_field_berry_api": "Phần nền BerryAPI"
+    "diagnostics_field_berry_api": "Phần nền BerryAPI",
+    "about_backend_status": "Phần nền: %1$s"
   },
   "zh-rCN": {
     "nav_back": "返回",
@@ -867,6 +876,7 @@
     "wheel_manager_no_entries": "还没有菜单项。添加一个以在此菜单上放置操作。",
     "wheel_manager_add_entry": "添加菜单项",
     "wheel_manager_pick_action": "选择操作",
-    "diagnostics_field_berry_api": "BerryAPI 后端"
+    "diagnostics_field_berry_api": "BerryAPI 后端",
+    "about_backend_status": "后端：%1$s"
   }
 }

@@ -1068,4 +1068,5 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="wheel_manager_add_entry">Girdi ekle</string>
     <string name="wheel_manager_pick_action">Bir eylem seç</string>
     <string name="diagnostics_field_berry_api">BerryAPI arka ucu</string>
+    <string name="about_backend_status">Arka uç: %1$s</string>
 </resources>
