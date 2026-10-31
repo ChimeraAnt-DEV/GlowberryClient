@@ -302,6 +302,10 @@ public class CustomAlertDialog extends Dialog {
                 try {
                     super.dismiss();
                 } catch (Exception ignored) {
+                    // Dismissing a dialog whose window is already detached throws on some builds;
+                    // there is nothing to recover, but a silent swallow hid state bugs (item 117).
+                    AppLog.warnOnce(TAG, "dialog-dismiss-detached",
+                            "Dismissing a detached dialog failed", ignored);
                 } finally {
                     notifyDismissAnimationEnd();
                 }
@@ -321,6 +325,8 @@ public class CustomAlertDialog extends Dialog {
                             }
                         }
                     } catch (Exception ignored) {
+                        AppLog.warnOnce(TAG, "dialog-dismiss-anim",
+                                "Dismissing the dialog with an animation failed", ignored);
                     } finally {
                         notifyDismissAnimationEnd();
                     }

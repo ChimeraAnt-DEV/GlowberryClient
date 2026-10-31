@@ -253,6 +253,9 @@ public class VersionManager {
                 return pi.versionName;
             }
         } catch (Exception ignored) {
+            // An APK whose manifest cannot be read has no readable version name; the caller falls
+            // back to the directory name. Logged once so a package that always fails is visible.
+            AppLog.warnOnce(TAG, "apk-version-name", "Reading a version name from an APK failed", ignored);
         }
         return "unknown";
     }
@@ -536,6 +539,10 @@ public class VersionManager {
 
             installedVersions.add(gv);
         } catch (PackageManager.NameNotFoundException ignored) {
+            // A directory holding no installed package is skipped rather than listed; the skip is
+            // deliberate, but a repeated failure means an instance that will never load.
+            AppLog.warnOnce(TAG, "load-package-missing",
+                    "Skipped a version directory with no matching installed package", ignored);
         }
 
         File[] dirs = baseDir.listFiles(File::isDirectory);
@@ -704,6 +711,8 @@ public class VersionManager {
                         }
                 );
             } catch (IOException ignored) {
+                AppLog.warnOnce(TAG, "load-profile-id",
+                        "Could not persist a profile id while loading versions", ignored);
             }
         }
         String versionCode = safeValue(metadata.versionName, dir.getName());

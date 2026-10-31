@@ -772,6 +772,10 @@ public class PersonalizationManager {
                 }
             }
         } catch (Throwable ignored) {
+            // A StateListDrawable that is not a DrawableContainerState has no children to walk; the
+            // empty list is correct, but a repeated failure means the walk needs revisiting.
+            AppLog.warnOnce(TAG, "state-list-walk",
+                    "Walking a StateListDrawable's children failed", ignored);
         }
         return out;
     }
@@ -949,6 +953,10 @@ public class PersonalizationManager {
                 return value.data;
             }
         } catch (Throwable ignored) {
+            // Called for every tinted view, so warn-once: an attribute that cannot be resolved
+            // falls back to the brand accent rather than failing the whole tint pass.
+            AppLog.warnOnce(TAG, "resolve-theme-color",
+                    "Resolving a theme colour attribute failed", ignored);
         }
         return ContextCompat.getColor(ctx, fallbackRes);
     }
