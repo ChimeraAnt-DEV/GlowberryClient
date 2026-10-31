@@ -129,6 +129,9 @@ public class RadialMenuView extends View {
     /** True while the cursor is visible (a touch hides it). */
     private boolean cursorVisible;
 
+    /** Tracks release velocity so a flick toward a slice can commit it (R: flick-to-select). */
+    private android.view.VelocityTracker flickTracker;
+
     private float density;
 
     private Bitmap skinHead;
@@ -551,6 +554,7 @@ public class RadialMenuView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         cancelAnimators();
+        stopFlickTracker();
     }
 
     // --- Geometry helpers (shared by draw and touch) ----------------------------------------
@@ -1515,6 +1519,7 @@ public class RadialMenuView extends View {
                     return true;
                 }
                 setCancelArmed(false);
+                startFlickTracker(event);
                 if (activeProfile != null) {
                     highlightedEntry = profileEntryAt(event.getX(), event.getY());
                 } else {
@@ -1533,6 +1538,7 @@ public class RadialMenuView extends View {
                     updateHeadLook(event.getX(), event.getY(), 1f / 60f);
                     return true;
                 }
+                if (flickTracker != null) flickTracker.addMovement(event);
                 if (activeProfile != null) {
                     highlightedEntry = profileEntryAt(event.getX(), event.getY());
                     invalidate();
@@ -1544,6 +1550,7 @@ public class RadialMenuView extends View {
                 return true;
             case MotionEvent.ACTION_UP:
                 if (cancelArmed) {
+                    stopFlickTracker();
                     setCancelArmed(false);
                     highlighted = Sector.NONE;
                     highlightedEntry = -1;
@@ -1552,6 +1559,11 @@ public class RadialMenuView extends View {
                     if (listener != null) listener.onDismiss();
                     return true;
                 }
+                // A flick toward a slice commits it even if the pointer stopped short of the ring;
+                // a slow release falls through to the sector under the pointer, which is the click
+                // path. Profile wheels resolve by the entry under the pointer, so the flick only
+                // applies to the fixed wheel, where the slices are the four fixed destinations.
+                Sector flicked = activeProfile == null ? takeFlickSector(outer, gapPx) : Sector.NONE;
                 if (activeProfile != null) {
                     int hit = profileEntryAt(event.getX(), event.getY());
                     highlightedEntry = -1;
@@ -1563,7 +1575,7 @@ public class RadialMenuView extends View {
                     }
                     return true;
                 }
-                Sector s = RadialWheelLayout.sectorAtLinear(
+                Sector s = flicked != Sector.NONE ? flicked : RadialWheelLayout.sectorAtLinear(
                         event.getX() - cx, event.getY() - cy, inner, outer, gapPx);
                 highlighted = Sector.NONE;
                 animateHover(null);
@@ -1579,6 +1591,7 @@ public class RadialMenuView extends View {
                 }
                 return true;
             case MotionEvent.ACTION_CANCEL:
+                stopFlickTracker();
                 setCancelArmed(false);
                 highlighted = Sector.NONE;
                 highlightedEntry = -1;
@@ -1587,6 +1600,41 @@ public class RadialMenuView extends View {
             default:
                 return super.onTouchEvent(event);
         }
+    }
+
+    /** Starts tracking a gesture's velocity for the flick test. */
+    private void startFlickTracker(MotionEvent event) {
+        if (flickTracker == null) {
+            flickTracker = android.view.VelocityTracker.obtain();
+        } else {
+            flickTracker.clear();
+        }
+        flickTracker.addMovement(event);
+    }
+
+    /** Stops and recycles the flick tracker. */
+    private void stopFlickTracker() {
+        if (flickTracker != null) {
+            flickTracker.recycle();
+            flickTracker = null;
+        }
+    }
+
+    /**
+     * The sector a release flick selects, or {@link Sector#NONE} for a slow release.
+     *
+     * <p>The velocity is read before the tracker is recycled so the rule sees the real release
+     * speed. Everything else is {@link RadialWheelLayout#flickSector}, which owns the threshold and
+     * the gap so the flick and the pointer hit test cannot disagree.
+     */
+    private Sector takeFlickSector(float outer, float gapPx) {
+        if (flickTracker == null) return Sector.NONE;
+        flickTracker.computeCurrentVelocity(1000);
+        float vx = flickTracker.getXVelocity();
+        float vy = flickTracker.getYVelocity();
+        Sector sector = RadialWheelLayout.flickSector(vx, vy, outer, gapPx);
+        stopFlickTracker();
+        return sector;
     }
 
     /** The profile-entry index under a point, or -1. */

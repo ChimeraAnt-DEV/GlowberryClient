@@ -73,6 +73,38 @@ public final class RadialWheelLayout {
     }
 
     /**
+     * The minimum pointer speed, in px/s, that counts as a flick rather than a placement.
+     *
+     * <p>Below this a release is a click and the sector under the pointer wins; above it the
+     * flick's own direction picks the sector, so a quick throw toward a slice commits it even if the
+     * pointer stopped short of the ring. Set so a deliberate throw is a flick and a slow drag is not.
+     */
+    public static final float FLICK_MIN_SPEED_PX_S = 900f;
+
+    /**
+     * The sector a flick selects, from the release velocity.
+     *
+     * <p>Spec: "make a selection by flicking your mouse toward a segment or by clicking it
+     * directly." A flick is resolved by the velocity's direction only: its magnitude must clear
+     * {@link #FLICK_MIN_SPEED_PX_S}, and the direction must leave the hub so an ambiguous throw at
+     * the centre does not pick a slice. The angular gap is applied the same way the pointer path
+     * applies it, so a flick straight at a boundary reads as no selection rather than a coin flip.
+     *
+     * @param vx,vy  release velocity in px/s (screen space, y down)
+     * @param radius the ring radius used for the angular gap, so the flick and the pointer agree
+     * @param gapPx  the constant linear gap between sectors
+     * @return the flicked sector, or {@link Sector#NONE} when the throw is too slow or too central
+     */
+    public static Sector flickSector(float vx, float vy, float radius, float gapPx) {
+        float speed = (float) Math.hypot(vx, vy);
+        if (!(speed >= FLICK_MIN_SPEED_PX_S)) return Sector.NONE;
+        double deg = Math.toDegrees(Math.atan2(vy, vx));
+        if (deg < -180.0) deg += 360.0;
+        if (nearestBoundaryDistance(deg) < angularHalfGapDegrees(radius, gapPx)) return Sector.NONE;
+        return quadrantFor(deg);
+    }
+
+    /**
      * The angular half-gap at a radius for a constant linear gap. A fixed linear gap is
      * parallel-sided; a fixed angular gap widens with radius (the cheap pie-chart look).
      */
