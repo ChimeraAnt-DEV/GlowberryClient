@@ -50,7 +50,7 @@ public class PreloaderInput {
      *
      * <p>This is the native-cosmetics capability probe: the render hook is only useful if the
      * renderer is actually running, so the launcher treats "hook live" as "the native path can
-     * drive cape/pet motion this session" and otherwise keeps the resource-pack path.
+     * draw cosmetics this session" and otherwise reports the pieces as preview-only.
      */
     public static native boolean nativeIsPlayerRenderHookLive();
 

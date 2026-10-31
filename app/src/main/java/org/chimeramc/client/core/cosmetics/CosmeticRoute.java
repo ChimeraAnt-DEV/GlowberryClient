@@ -5,11 +5,11 @@ package org.chimeramc.client.core.cosmetics;
  * every piece is live.
  *
  * <p>Phase 3 asked whether the local player's <em>geometry</em> can be replaced so the game draws a
- * hat. The answer from the shipped binary is no: game classes export no symbols, the render entry's
- * arguments are an opaque ABI, and the only supported engine-geometry path is the resource pack this
- * project moved away from (see {@code docs/native-cosmetic-render-route.md}). A hat is therefore
- * drawn the same way as the cape and the pet - as its own mesh from the native player-render hook -
- * and on a build where that hook is unavailable it shows in the preview only.
+ * hat. The answer from the shipped binary is no: game classes export no symbols and the render
+ * entry's arguments are an opaque ABI, so there is no way to inject a hat into the engine's own
+ * player model (see {@code docs/native-cosmetic-render-route.md}). A hat is therefore drawn the
+ * same way as the pet - as its own mesh from the native player-render hook - and on a build where
+ * that hook is unavailable it shows in the preview only.
  *
  * <p>The cape is the one piece with a second route: since Phase 2.1 it reaches the game as a texture
  * swap at the engine's image loader, which does not need the GL renderer and so survives a

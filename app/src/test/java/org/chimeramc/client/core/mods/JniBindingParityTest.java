@@ -90,17 +90,12 @@ public class JniBindingParityTest {
             "io.bambosan.mbloader.launcherUtils.LibBindings"));
 
     /**
-     * Preloader exports with no Java declaration, pending the removal in the preloader's own
-     * repository (which this repo does not have push access to, so the two land separately).
-     *
-     * <p>{@code nativeSetupRuntime} was declared by the deleted
-     * {@code org.levimc.launcher.core.minecraft.MinecraftRuntimePreparer} bridge, which only existed
-     * to satisfy the prebuilt {@code libgxcore.so}'s hardcoded JNI lookup. With that library and its
-     * declaring class gone the export is dead; it is listed here so the parity check still fails on
-     * any <em>new</em> mismatch. Remove the entry and the export together.
+     * Preloader exports with no Java declaration. Empty: the last entry ({@code nativeSetupRuntime},
+     * declared by the deleted {@code org.levimc} bridge for the prebuilt {@code libgxcore.so}) was
+     * removed from the preloader together with the class that declared it, so the parity check now
+     * runs with no C++ exemption at all.
      */
-    private static final Set<String> PENDING_PRELOADER_REMOVALS = new HashSet<>(Arrays.asList(
-            "Java_org_levimc_launcher_core_minecraft_MinecraftRuntimePreparer_nativeSetupRuntime"));
+    private static final Set<String> PENDING_PRELOADER_REMOVALS = Collections.emptySet();
 
     @Test
     public void everyNativeDeclarationHasAMatchingExportAndViceVersa() throws IOException {
