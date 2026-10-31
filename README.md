@@ -269,15 +269,15 @@ GlowberryClient is an independent project that stands on the shoulders of the op
 
 <div align="center">
 
-<a href="https://github.com/ChimeraAnt-DEV/GlowberryClient/releases/latest"><img src="https://img.shields.io/badge/⬇%20DOWNLOAD-LATEST%20RELEASE-7E32AA?style=for-the-badge&logo=github&logoColor=white" alt="Download"></a>
-<a href="docs/guide/getting-started.md"><img src="https://img.shields.io/badge/📖%20READ-THE%20DOCS-0F5BE4?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Docs"></a>
-<a href="https://github.com/ChimeraAnt-DEV/GlowberryClient/issues/new"><img src="https://img.shields.io/badge/🐛%20REPORT-A%20BUG-FF5C5C?style=for-the-badge&logo=github&logoColor=white" alt="Report a bug"></a>
+<a href="https://github.com/ChimeraAnt-DEV/GlowberryClient/releases/latest"><img src="https://img.shields.io/badge/DOWNLOAD-LATEST%20RELEASE-7E32AA?style=for-the-badge&logo=github&logoColor=white" alt="Download"></a>
+<a href="docs/guide/getting-started.md"><img src="https://img.shields.io/badge/READ-THE%20DOCS-0F5BE4?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Docs"></a>
+<a href="https://github.com/ChimeraAnt-DEV/GlowberryClient/issues/new"><img src="https://img.shields.io/badge/REPORT-A%20BUG-FF5C5C?style=for-the-badge&logo=github&logoColor=white" alt="Report a bug"></a>
 
 <img src="docs/assets/glowberry_mark.png" alt="GlowberryClient" width="72">
 
 [![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/ChimeraAnt-DEV/badge.svg)](https://hub.xerj.org/contributors/ChimeraAnt-DEV)
 
-**Made with ❤️ by the Chimera Team Community**
+**Made by the Chimera Team Community**
 
 <sub>Licensed under the Apache License 2.0.</sub>
 <sub>This account is shared among the 20 members of the Official ChimeraTeam.</sub>
