@@ -9,8 +9,11 @@ import android.widget.FrameLayout;
 
 import org.chimeramc.client.core.mods.inbuilt.ExternalModBridge;
 import org.chimeramc.client.core.mods.inbuilt.ExternalModBridge.DrawCommand;
+import org.chimeramc.client.util.AppLog;
 
 public class HudOverlay extends View {
+
+    private static final String TAG = "HudOverlay";
     private boolean isShowing = false;
     private final Paint paint = new Paint();
 
@@ -41,7 +44,7 @@ public class HudOverlay extends View {
                 typefaceCache.put(fontId, tf);
                 return tf;
             } catch (Exception e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "Failed to resolve a registered font", e);
             }
         }
         typefaceCache.put(fontId, null);
@@ -142,7 +145,7 @@ public class HudOverlay extends View {
                         postFrameCallback();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    AppLog.warn(TAG, "Failed to attach the HUD overlay", e);
                 }
             }
         }, 100);
@@ -160,7 +163,7 @@ public class HudOverlay extends View {
                 rootView.removeView(this);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Failed to detach the HUD overlay", e);
         }
         isShowing = false;
         android.view.Choreographer.getInstance().removeFrameCallback(frameCallback);

@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import org.chimeramc.client.util.AppLog;
 
 public class ContentListActivity extends BaseActivity {
 
@@ -796,7 +797,7 @@ public class ContentListActivity extends BaseActivity {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "Opening the content link failed", e);
             }
             runOnUiThread(() -> {
                 showLoading(false);

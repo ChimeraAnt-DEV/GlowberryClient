@@ -51,9 +51,12 @@ import java.util.regex.Pattern;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.chimeramc.client.util.AppLog;
 
 
 public class LogcatOverlay extends FrameLayout {
+
+    private static final String TAG = "LogcatOverlay";
 
     private View overlayContainer;
     private RecyclerView recyclerView;
@@ -447,7 +450,7 @@ public class LogcatOverlay extends FrameLayout {
                     if (!paused) pendingLines.offer(line);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "The logcat reader stopped unexpectedly", e);
             }
         }, "LogcatReader");
         readerThread.start();
@@ -457,7 +460,9 @@ public class LogcatOverlay extends FrameLayout {
         try {
             if (logcatProc != null) logcatProc.destroy();
             if (readerThread != null && readerThread.isAlive()) readerThread.interrupt();
-        } catch (Throwable ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "logcat-stop", "Stopping the logcat reader failed", ignored);
+        }
         logcatProc = null;
         readerThread = null;
     }
@@ -818,7 +823,9 @@ public class LogcatOverlay extends FrameLayout {
                         pendingHistoryTrimLines = 0;
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "logcat-trim", "Trimming the persisted logcat history failed", ignored);
+            }
         }
     }
 
@@ -886,7 +893,9 @@ public class LogcatOverlay extends FrameLayout {
                     }
                     pendingHistoryTrimLines = 0;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "logcat-trim2", "Trimming the persisted logcat history failed", ignored);
+            }
         }
     }
 

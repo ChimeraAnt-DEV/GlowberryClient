@@ -9,7 +9,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.chimeramc.client.util.AppLog;
+
 public class ServerManager {
+
+    private static final String TAG = "ServerManager";
 
     /**
      * The outcome of adding a server, so the caller can say which one happened.
@@ -76,7 +80,7 @@ public class ServerManager {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "Reading the server list failed", e);
             }
         }
         if (exists) return AddResult.DUPLICATE;
@@ -91,7 +95,7 @@ public class ServerManager {
             }
             return AddResult.ADDED;
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Writing the server list failed", e);
         }
         return AddResult.FAILED;
     }
@@ -113,10 +117,12 @@ public class ServerManager {
                         items.add(new ServerItem(name, ip, port));
                     }
                 } catch (Exception e) {
+                    // A malformed row is skipped, not fatal: one bad line must not hide the rest.
+                    AppLog.warn(TAG, "Skipping a malformed server row", e);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Reading the server list failed", e);
         }
 
         return items;
@@ -144,7 +150,7 @@ public class ServerManager {
                 lines.add(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Reading the server list failed", e);
             return false;
         }
 
@@ -156,7 +162,7 @@ public class ServerManager {
                 }
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "Writing the server list failed", e);
             }
         }
 
@@ -191,7 +197,7 @@ public class ServerManager {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "Reading the server list failed", e);
             }
         }
 
@@ -208,7 +214,7 @@ public class ServerManager {
             }
             return AddResult.ADDED;
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Writing the server list failed", e);
         }
         return AddResult.FAILED;
     }

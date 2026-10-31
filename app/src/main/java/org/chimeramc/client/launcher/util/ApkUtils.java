@@ -18,8 +18,11 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import org.chimeramc.client.util.AppLog;
 
 public class ApkUtils {
+
+    private static final String TAG = "ApkUtils";
     public interface LibExtractProgressCallback {
         void onBytesExtracted(int bytesExtracted);
     }
@@ -61,7 +64,7 @@ public class ApkUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Reading the APK label failed", e);
         } finally {
             if (tempFile != null && tempFile.exists()) {
                 tempFile.delete();
@@ -102,7 +105,7 @@ public class ApkUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Reading the APK package failed", e);
         } finally {
             if (tempApkFile != null && tempApkFile.exists()) {
                 tempApkFile.delete();

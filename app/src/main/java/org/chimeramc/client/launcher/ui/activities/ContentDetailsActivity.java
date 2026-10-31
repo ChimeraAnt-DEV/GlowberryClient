@@ -50,8 +50,11 @@ import java.util.concurrent.Executors;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.chimeramc.client.util.AppLog;
 
 public class ContentDetailsActivity extends BaseActivity {
+
+    private static final String TAG = "ContentDetailsActivity";
 
     public static final String EXTRA_CONTENT = "extra_content";
 
@@ -163,7 +166,7 @@ public class ContentDetailsActivity extends BaseActivity {
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(ContentDetailsActivity.this, getString(R.string.cannot_open_link, uri.toString()), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    AppLog.warn(TAG, "Opening the content link failed", e);
                 }
                 return true;
             }

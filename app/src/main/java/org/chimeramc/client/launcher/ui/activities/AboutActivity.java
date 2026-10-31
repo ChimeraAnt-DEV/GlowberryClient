@@ -16,8 +16,11 @@ import java.util.concurrent.Executors;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.chimeramc.client.util.AppLog;
 
 public class AboutActivity extends BaseActivity {
+
+    private static final String TAG = "AboutActivity";
 
     private static final String AVATAR_URL = "https://avatars.githubusercontent.com/u/62042544?v=4";
     private static final String URL_AFDIAN = "https://afdian.com/a/DreamGuXiang";
@@ -114,7 +117,9 @@ public class AboutActivity extends BaseActivity {
                         }
                     }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "about-fetch", "Fetching the contributor list failed", ignored);
+            }
 
             try {
                 if (maintainerAvatar != null) {
@@ -128,7 +133,9 @@ public class AboutActivity extends BaseActivity {
                         }
                     }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "about-fetch2", "Fetching the contributor list failed", ignored);
+            }
         });
     }
 
@@ -148,7 +155,9 @@ public class AboutActivity extends BaseActivity {
         btn.setOnClickListener(v -> {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-            } catch (Throwable ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "about-link", "Opening a link failed", ignored);
+            }
         });
         DynamicAnim.applyPressScale(btn);
     }

@@ -29,6 +29,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.chimeramc.client.util.AppLog;
 
 public final class MoreButtonsManager {
     private static final String TAG = "MoreButtonsManager";
@@ -274,11 +275,11 @@ public final class MoreButtonsManager {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
-            try { factory.setXIncludeAware(false); } catch (Exception ignored) {}
-            try { factory.setExpandEntityReferences(false); } catch (Exception ignored) {}
-            try { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); } catch (Exception ignored) {}
-            try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false); } catch (Exception ignored) {}
-            try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false); } catch (Exception ignored) {}
+            try { factory.setXIncludeAware(false); } catch (Exception ignored) { AppLog.warnOnce(TAG, "xml-xinclude", "The XML parser refused to disable XInclude", ignored); }
+            try { factory.setExpandEntityReferences(false); } catch (Exception ignored) { AppLog.warnOnce(TAG, "xml-entities", "The XML parser refused to disable entity expansion", ignored); }
+            try { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); } catch (Exception ignored) { AppLog.warnOnce(TAG, "xml-doctype", "The XML parser refused to disallow DOCTYPE declarations", ignored); }
+            try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false); } catch (Exception ignored) { AppLog.warnOnce(TAG, "xml-extgen", "The XML parser refused to disable external general entities", ignored); }
+            try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false); } catch (Exception ignored) { AppLog.warnOnce(TAG, "xml-extparam", "The XML parser refused to disable external parameter entities", ignored); }
             Document document = factory.newDocumentBuilder().parse(new InputSource(new StringReader(svg)));
             Element root = document.getDocumentElement();
             if (root == null) return svg;

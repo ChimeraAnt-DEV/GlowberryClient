@@ -58,6 +58,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import org.chimeramc.client.util.AppLog;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -1498,7 +1499,7 @@ public class SettingsActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Opening the Easter-egg link failed", e);
         }
     }
 

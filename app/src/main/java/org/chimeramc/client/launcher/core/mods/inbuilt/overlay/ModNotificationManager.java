@@ -19,8 +19,11 @@ import org.chimeramc.client.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.chimeramc.client.util.AppLog;
 
 public class ModNotificationManager {
+
+    private static final String TAG = "ModNotificationManager";
     private static final int DISPLAY_DURATION = 2500;
     private static final int SLIDE_DURATION = 200;
     private static final int NOTIFICATION_HEIGHT_DP = 70;
@@ -91,7 +94,7 @@ public class ModNotificationManager {
             entry.dismissRunnable = () -> dismissNotification(entry);
             handler.postDelayed(entry.dismissRunnable, DISPLAY_DURATION);
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Showing a mod notification failed", e);
         }
     }
 
@@ -109,10 +112,14 @@ public class ModNotificationManager {
                         entry.view.setTranslationY(0);
                         try {
                             windowManager.updateViewLayout(entry.view, entry.params);
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            AppLog.warnOnce(TAG, "notif-relayout", "Relaying out a notification failed", ignored);
+                        }
                     })
                     .start();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "notif-relayout2", "Relaying out a notification failed", ignored);
+            }
         }
     }
 
@@ -154,7 +161,9 @@ public class ModNotificationManager {
     private void removeNotification(NotificationEntry entry) {
         try {
             windowManager.removeView(entry.view);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "notif-remove", "Removing a notification view failed", ignored);
+        }
         activeNotifications.remove(entry);
     }
 
@@ -175,7 +184,9 @@ public class ModNotificationManager {
                 }
                 try {
                     windowManager.removeView(entry.view);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    AppLog.warnOnce(TAG, "notif-remove2", "Removing a notification view failed", ignored);
+                }
             }
             activeNotifications.clear();
         });

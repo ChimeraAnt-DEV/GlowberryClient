@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
+import org.chimeramc.client.util.AppLog;
 
 public class VersionManager {
     private static final String TAG = "VersionManager";
@@ -741,7 +742,9 @@ public class VersionManager {
                     metadataDefaults(version.isInstalled, version.directoryName, version.packageName, version.versionCode),
                     metadata -> metadata.versionIsolation = enabled
             );
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "meta-isolation", "Persisting the per-instance isolation flag failed", ignored);
+        }
     }
 
     public void setInstanceLaunchVertically(GameVersion version, boolean enabled) {
@@ -755,7 +758,9 @@ public class VersionManager {
                     metadataDefaults(version.isInstalled, version.directoryName, version.packageName, version.versionCode),
                     metadata -> metadata.launchVertically = enabled
             );
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "meta-vertical", "Persisting the per-instance launch orientation failed", ignored);
+        }
     }
 
     public void setInstanceShaderCompatEnabled(GameVersion version, boolean enabled) {
@@ -769,7 +774,9 @@ public class VersionManager {
                     metadataDefaults(version.isInstalled, version.directoryName, version.packageName, version.versionCode),
                     metadata -> metadata.shaderCompatEnabled = enabled
             );
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "meta-shader", "Persisting the per-instance shader compatibility flag failed", ignored);
+        }
     }
 
     /**
@@ -790,7 +797,9 @@ public class VersionManager {
                     metadataDefaults(version.isInstalled, version.directoryName, version.packageName, version.versionCode),
                     metadata -> metadata.inGamePackChangerEnabled = enabled
             );
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "meta-packchanger", "Persisting the per-instance pack-changer flag failed", ignored);
+        }
     }
 
     public boolean isInstanceInGamePackChangerEnabled(GameVersion version) {
@@ -818,7 +827,9 @@ public class VersionManager {
                     metadataDefaults(version.isInstalled, version.directoryName, version.packageName, version.versionCode),
                     metadata -> metadata.boundAccountId = value
             );
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "meta-account", "Persisting the per-instance account binding failed", ignored);
+        }
     }
 
     /** The account id bound to an instance, or null when it uses the active account. */
@@ -1266,7 +1277,7 @@ public class VersionManager {
                     callback.onError("Unsupported file format. Please use .apk or .xapk files.");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                AppLog.error(TAG, "Importing the game file failed", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Import failed", e.getMessage()));
             }
         }).start();
@@ -1423,7 +1434,7 @@ public class VersionManager {
                 fos.write(buffer, 0, len);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Copying " + source.getName() + " failed", e);
         }
     }
 
