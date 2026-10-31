@@ -299,11 +299,9 @@ public class BaseActivity extends AppCompatActivity {
             // of the two on each edge is what actually needs clearing.
             androidx.core.graphics.Insets cutout =
                     compat.getInsets(WindowInsetsCompat.Type.displayCutout());
-            EdgeToEdgeInsets.Insets insets = new EdgeToEdgeInsets.Insets(
-                    Math.max(bars.left, cutout.left),
-                    Math.max(bars.top, cutout.top),
-                    Math.max(bars.right, cutout.right),
-                    Math.max(bars.bottom, cutout.bottom));
+            EdgeToEdgeInsets.Insets insets = EdgeToEdgeInsets.from(
+                    bars.left, bars.top, bars.right, bars.bottom,
+                    cutout.left, cutout.top, cutout.right, cutout.bottom);
             EdgeToEdgeInsets.Padding navPadding = EdgeToEdgeInsets.forNavBar(rail, insets);
             view.setPadding(navBaseLeft + navPadding.left, navBaseTop + navPadding.top,
                     navBaseRight + navPadding.right, navBaseBottom + navPadding.bottom);

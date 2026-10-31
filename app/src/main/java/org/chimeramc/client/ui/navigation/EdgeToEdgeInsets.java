@@ -62,6 +62,23 @@ public final class EdgeToEdgeInsets {
         }
     }
 
+    /**
+     * The single reader of a window's insets (item 93).
+     *
+     * <p>Every screen used to build this object inline from two {@code WindowInsetsCompat} calls,
+     * which put an untested {@code Math.max} at each call site. The union lives here instead, so the
+     * rule that a cutout larger than the system bar wins on each edge is stated once and pinned by
+     * {@link EdgeToEdgeInsetsTest}.
+     */
+    public static Insets from(int barLeft, int barTop, int barRight, int barBottom,
+                              int cutoutLeft, int cutoutTop, int cutoutRight, int cutoutBottom) {
+        return new Insets(
+                Math.max(barLeft, cutoutLeft),
+                Math.max(barTop, cutoutTop),
+                Math.max(barRight, cutoutRight),
+                Math.max(barBottom, cutoutBottom));
+    }
+
     /** Padding for the navigation view, given its shape and the window insets. */
     public static Padding forNavBar(boolean rail, Insets insets) {
         if (insets == null) {
