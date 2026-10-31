@@ -59,7 +59,10 @@
     "error_short_corrupt_package": "el archivo está dañado o no es un paquete válido",
     "error_short_interrupted": "la transferencia se interrumpió",
     "error_short_abi_incompatible": "Compilación de 32 bits no compatible",
-    "error_short_unknown": "consulta el registro para ver el error exacto"
+    "error_short_unknown": "consulta el registro para ver el error exacto",
+    "keyboard_connected_message": "¡Conectado! Controles de teclado activos.",
+    "keyboard_disconnected_message": "Desconectado. Controles de teclado liberados.",
+    "keyboard_title": "Teclado"
   },
   "fr": {
     "nav_back": "Retour",
@@ -121,7 +124,10 @@
     "error_short_corrupt_package": "le fichier est endommagé ou n’est pas un paquet valide",
     "error_short_interrupted": "le transfert a été interrompu",
     "error_short_abi_incompatible": "Version 32 bits non prise en charge",
-    "error_short_unknown": "consultez le journal pour l’erreur exacte"
+    "error_short_unknown": "consultez le journal pour l’erreur exacte",
+    "keyboard_connected_message": "Connecté ! Commandes clavier actives.",
+    "keyboard_disconnected_message": "Déconnecté. Commandes clavier libérées.",
+    "keyboard_title": "Clavier"
   },
   "hi": {
     "nav_back": "वापस",
@@ -183,7 +189,10 @@
     "error_short_corrupt_package": "फ़ाइल क्षतिग्रस्त है या मान्य पैकेज नहीं है",
     "error_short_interrupted": "स्थानांतरण बीच में रुक गया",
     "error_short_abi_incompatible": "असमर्थित 32-बिट बिल्ड",
-    "error_short_unknown": "सटीक त्रुटि के लिए लॉग देखें"
+    "error_short_unknown": "सटीक त्रुटि के लिए लॉग देखें",
+    "keyboard_connected_message": "कनेक्ट हो गया! कीबोर्ड नियंत्रण सक्रिय।",
+    "keyboard_disconnected_message": "डिस्कनेक्ट हो गया। कीबोर्ड नियंत्रण जारी किए गए।",
+    "keyboard_title": "कीबोर्ड"
   },
   "id": {
     "nav_back": "Kembali",
@@ -245,7 +254,10 @@
     "error_short_corrupt_package": "file rusak atau bukan paket yang valid",
     "error_short_interrupted": "transfer terputus",
     "error_short_abi_incompatible": "Build 32-bit tidak didukung",
-    "error_short_unknown": "lihat log untuk kesalahan yang tepat"
+    "error_short_unknown": "lihat log untuk kesalahan yang tepat",
+    "keyboard_connected_message": "Terhubung! Kontrol papan ketik aktif.",
+    "keyboard_disconnected_message": "Terputus. Kontrol papan ketik dilepas.",
+    "keyboard_title": "Papan ketik"
   },
   "ja": {
     "nav_back": "戻る",
@@ -307,7 +319,10 @@
     "error_short_corrupt_package": "ファイルが破損しているか、有効なパッケージではありません",
     "error_short_interrupted": "転送が中断されました",
     "error_short_abi_incompatible": "未対応の 32 ビットビルド",
-    "error_short_unknown": "正確なエラーはログを確認してください"
+    "error_short_unknown": "正確なエラーはログを確認してください",
+    "keyboard_connected_message": "接続しました！キーボード操作が有効です。",
+    "keyboard_disconnected_message": "切断しました。キーボード操作を解除しました。",
+    "keyboard_title": "キーボード"
   },
   "pt": {
     "nav_back": "Voltar",
@@ -369,7 +384,10 @@
     "error_short_corrupt_package": "o arquivo está danificado ou não é um pacote válido",
     "error_short_interrupted": "a transferência foi interrompida",
     "error_short_abi_incompatible": "Compilação de 32 bits não compatível",
-    "error_short_unknown": "consulte o log para ver o erro exato"
+    "error_short_unknown": "consulte o log para ver o erro exato",
+    "keyboard_connected_message": "Conectado! Controles de teclado ativos.",
+    "keyboard_disconnected_message": "Desconectado. Controles de teclado liberados.",
+    "keyboard_title": "Teclado"
   },
   "ru": {
     "nav_back": "Назад",
@@ -431,7 +449,10 @@
     "error_short_corrupt_package": "файл повреждён или не является допустимым пакетом",
     "error_short_interrupted": "передача была прервана",
     "error_short_abi_incompatible": "Неподдерживаемая 32-битная сборка",
-    "error_short_unknown": "точная ошибка указана в журнале"
+    "error_short_unknown": "точная ошибка указана в журнале",
+    "keyboard_connected_message": "Подключено! Управление с клавиатуры активно.",
+    "keyboard_disconnected_message": "Отключено. Управление с клавиатуры освобождено.",
+    "keyboard_title": "Клавиатура"
   },
   "tr": {
     "nav_back": "Geri",
@@ -493,7 +514,10 @@
     "error_short_corrupt_package": "dosya bozuk veya geçerli bir paket değil",
     "error_short_interrupted": "aktarım kesintiye uğradı",
     "error_short_abi_incompatible": "Desteklenmeyen 32 bit derleme",
-    "error_short_unknown": "tam hata için günlüğe bakın"
+    "error_short_unknown": "tam hata için günlüğe bakın",
+    "keyboard_connected_message": "Bağlandı! Klavye kontrolleri etkin.",
+    "keyboard_disconnected_message": "Bağlantı kesildi. Klavye kontrolleri bırakıldı.",
+    "keyboard_title": "Klavye"
   },
   "vi": {
     "nav_back": "Quay lại",
@@ -555,7 +579,10 @@
     "error_short_corrupt_package": "tệp bị hỏng hoặc không phải gói hợp lệ",
     "error_short_interrupted": "quá trình truyền bị gián đoạn",
     "error_short_abi_incompatible": "Bản dựng 32-bit không được hỗ trợ",
-    "error_short_unknown": "xem nhật ký để biết lỗi chính xác"
+    "error_short_unknown": "xem nhật ký để biết lỗi chính xác",
+    "keyboard_connected_message": "Đã kết nối! Điều khiển bàn phím đang hoạt động.",
+    "keyboard_disconnected_message": "Đã ngắt kết nối. Đã giải phóng điều khiển bàn phím.",
+    "keyboard_title": "Bàn phím"
   },
   "zh-rCN": {
     "nav_back": "返回",
@@ -617,6 +644,9 @@
     "error_short_corrupt_package": "文件已损坏或不是有效的安装包",
     "error_short_interrupted": "传输被中断",
     "error_short_abi_incompatible": "不受支持的 32 位构建",
-    "error_short_unknown": "查看日志以获取确切错误"
+    "error_short_unknown": "查看日志以获取确切错误",
+    "keyboard_connected_message": "已连接！键盘控制已启用。",
+    "keyboard_disconnected_message": "已断开连接。已释放键盘控制。",
+    "keyboard_title": "键盘"
   }
 }

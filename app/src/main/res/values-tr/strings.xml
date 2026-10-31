@@ -1043,4 +1043,7 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="launch_failure_message_rules">Bu Minecraft derlemesi için henüz kanca tanımı yok, bu yüzden oyun içi katmanlar ve kozmetikler kapalı. Oyunun kendisi normal çalışacak.</string>
     <string name="launch_failure_message_unexpected">Başlatıcı oyunu başlatamadı ve neden, tanıdığı nedenlerden biri değil. Cihazınızda hiçbir şey değiştirilmedi. Başlatıcıyı yeniden açıp tekrar deneyin; sürerse Ayarlar \u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.</string>
     <string name="launch_failure_message_not_installed">Minecraft bu cihazda yüklü görünmüyor. Kitaplık’tan bir Minecraft APK’sı içe aktarın — Google Play kurulumu bu başlatıcıyla başlatılamaz, çünkü oyun yerel kitaplığını yüklü uygulamanın içinde tutar ve başlatıcı oraya erişemez.</string>
+    <string name="keyboard_connected_message">Bağlandı! Klavye kontrolleri etkin.</string>
+    <string name="keyboard_disconnected_message">Bağlantı kesildi. Klavye kontrolleri bırakıldı.</string>
+    <string name="keyboard_title">Klavye</string>
 </resources>

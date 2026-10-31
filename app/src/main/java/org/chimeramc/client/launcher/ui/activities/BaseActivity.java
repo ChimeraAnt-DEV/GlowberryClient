@@ -76,6 +76,22 @@ public class BaseActivity extends AppCompatActivity {
                     ControllerToastView.showDisconnected(BaseActivity.this, name);
                 }
             };
+
+    /** Shows the keyboard pill for whichever screen is in front (Phase 12). */
+    private final ControllerConnectionMonitor.KeyboardListener keyboardListener =
+            new ControllerConnectionMonitor.KeyboardListener() {
+                @Override
+                public void onKeyboardConnected(String name) {
+                    if (isFinishing()) return;
+                    ControllerToastView.showKeyboardConnected(BaseActivity.this, name);
+                }
+
+                @Override
+                public void onKeyboardDisconnected(String name) {
+                    if (isFinishing()) return;
+                    ControllerToastView.showKeyboardDisconnected(BaseActivity.this, name);
+                }
+            };
     private boolean navBarInjected = false;
     /** Which adaptive navigation shape this window is using (U5). */
     private NavLayoutMode navLayoutMode = NavLayoutMode.BOTTOM_NAV;
@@ -822,6 +838,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onStart();
         ControllerConnectionMonitor monitor = controllerMonitor();
         monitor.setListener(controllerListener);
+        monitor.setKeyboardListener(keyboardListener);
         monitor.start();
     }
 
@@ -863,6 +880,7 @@ public class BaseActivity extends AppCompatActivity {
         // incoming screen (or the game) was already in front, so a pad plugged in during a tab
         // change was never seen.
         controllerMonitor().clearListener(controllerListener);
+        controllerMonitor().clearKeyboardListener(keyboardListener);
         super.onStop();
     }
 

@@ -1044,4 +1044,7 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="launch_failure_message_rules">Minecraft के इस बिल्ड के लिए अभी कोई हुक परिभाषा नहीं है, इसलिए इन-गेम ओवरले और कॉस्मेटिक्स बंद हैं। गेम स्वयं सामान्य रूप से चलेगा।</string>
     <string name="launch_failure_message_unexpected">लॉन्चर गेम शुरू नहीं कर सका और कारण उनमें से नहीं है जिन्हें वह पहचानता है। आपके डिवाइस पर कुछ नहीं बदला गया। लॉन्चर दोबारा खोलें और पुनः प्रयास करें; अगर ऐसा बार-बार हो, तो सेटिंग्स \u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।</string>
     <string name="launch_failure_message_not_installed">इस डिवाइस पर Minecraft इंस्टॉल नहीं दिखता। लाइब्रेरी से Minecraft APK इंपोर्ट करें — Google Play इंस्टॉल को यह लॉन्चर शुरू नहीं कर सकता, क्योंकि गेम अपनी नेटिव लाइब्रेरी इंस्टॉल किए गए ऐप के अंदर रखता है, जहाँ लॉन्चर पहुँच नहीं सकता।</string>
+    <string name="keyboard_connected_message">कनेक्ट हो गया! कीबोर्ड नियंत्रण सक्रिय।</string>
+    <string name="keyboard_disconnected_message">डिस्कनेक्ट हो गया। कीबोर्ड नियंत्रण जारी किए गए।</string>
+    <string name="keyboard_title">कीबोर्ड</string>
 </resources>

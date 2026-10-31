@@ -1013,4 +1013,7 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="launch_failure_message_rules">この Minecraft ビルド用のフック定義がまだないため、ゲーム内オーバーレイとコスメティックは無効です。ゲーム自体は通常どおり動作します。</string>
     <string name="launch_failure_message_unexpected">ランチャーがゲームを起動できず、原因はランチャーが認識するものではありませんでした。端末上の何も変更されていません。ランチャーを開き直して再試行してください。繰り返す場合は、設定 \u2192 診断 で「インストールを修復」を実行してください。</string>
     <string name="launch_failure_message_not_installed">この端末に Minecraft がインストールされていないようです。ライブラリから Minecraft の APK を読み込んでください。Google Play 版はこのランチャーでは起動できません。ゲームがネイティブライブラリをインストール済みアプリの内部に保持しており、ランチャーからアクセスできないためです。</string>
+    <string name="keyboard_connected_message">接続しました！キーボード操作が有効です。</string>
+    <string name="keyboard_disconnected_message">切断しました。キーボード操作を解除しました。</string>
+    <string name="keyboard_title">キーボード</string>
 </resources>

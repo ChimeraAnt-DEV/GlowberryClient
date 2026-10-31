@@ -62,9 +62,35 @@ public final class ControllerToastView {
                 null, null, false);
     }
 
+    /**
+     * Shows the keyboard-connected pill (Phase 12).
+     *
+     * <p>The same pill as a pad, with the keyboard glyph and no profile chip: a keyboard has no
+     * vendor mapping or dead zone, so there is no profile to name. Tapping does not open the
+     * controller settings for the same reason.
+     */
+    public static void showKeyboardConnected(Activity activity, String keyboardName) {
+        show(activity, keyboardName,
+                activity.getString(R.string.keyboard_connected_message),
+                null, null, false, true);
+    }
+
+    /** Shows the keyboard-disconnected pill. */
+    public static void showKeyboardDisconnected(Activity activity, String keyboardName) {
+        show(activity, keyboardName,
+                activity.getString(R.string.keyboard_disconnected_message),
+                null, null, false, true);
+    }
+
     private static void show(final Activity activity, final String title, final String message,
                              final String profileName, final ControllerType type,
                              final boolean allowTapToSettings) {
+        show(activity, title, message, profileName, type, allowTapToSettings, false);
+    }
+
+    private static void show(final Activity activity, final String title, final String message,
+                             final String profileName, final ControllerType type,
+                             final boolean allowTapToSettings, final boolean keyboard) {
         if (activity == null || activity.isFinishing()) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed()) {
             return;
@@ -76,7 +102,7 @@ public final class ControllerToastView {
 
         final ControllerToastView toast = new ControllerToastView(activity);
         current = toast;
-        toast.attach(root, title, message, profileName, type, allowTapToSettings);
+        toast.attach(root, title, message, profileName, type, allowTapToSettings, keyboard);
     }
 
     private static void dismissCurrent() {
@@ -87,18 +113,18 @@ public final class ControllerToastView {
     }
 
     private void attach(ViewGroup root, String title, String message, String profileName,
-                        ControllerType type, boolean allowTapToSettings) {
+                        ControllerType type, boolean allowTapToSettings, boolean keyboard) {
         view = LayoutInflater.from(activity).inflate(R.layout.overlay_controller_toast, root, false);
         tint();
         ((TextView) view.findViewById(R.id.controller_toast_title)).setText(title);
         ((TextView) view.findViewById(R.id.controller_toast_message)).setText(message);
 
+        // The glyph says which kind of device arrived; a pad and a keyboard are otherwise the same
+        // pill, so without it the message would be the only cue.
         ImageView icon = view.findViewById(R.id.controller_toast_icon);
-        if (type == null) {
-            icon.setImageResource(R.drawable.ic_nav_controller);
-        } else {
-            icon.setImageResource(R.drawable.ic_nav_controller);
-        }
+        icon.setImageResource(keyboard ? R.drawable.ic_keyboard : R.drawable.ic_nav_controller);
+        icon.setContentDescription(activity.getString(
+                keyboard ? R.string.keyboard_title : R.string.controller_title));
 
         TextView chip = view.findViewById(R.id.controller_toast_chip);
         if (profileName != null && !profileName.trim().isEmpty()) {

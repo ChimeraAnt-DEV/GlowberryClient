@@ -1304,6 +1304,10 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="controller_title">Controller</string>
     <string name="controller_detected_message">has been connected and detected! Settings loaded.</string>
     <string name="controller_disconnected_message">disconnected. Touch controls active.</string>
+    <!-- Phase 12: keyboard connect/disconnect pills, the keyboard twin of the controller pill. -->
+    <string name="keyboard_connected_message">has been connected! Keyboard controls active.</string>
+    <string name="keyboard_disconnected_message">disconnected. Keyboard controls released.</string>
+    <string name="keyboard_title">Keyboard</string>
     <string name="controller_profile_chip_default">Default</string>
     <string name="controller_empty_hint">Controller setup is coming soon. Connect a supported gamepad to begin.</string>
     <string name="controller_status_none">No controller detected</string>

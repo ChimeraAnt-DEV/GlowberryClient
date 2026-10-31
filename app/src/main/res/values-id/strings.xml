@@ -1040,4 +1040,7 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="launch_failure_message_rules">Belum ada definisi hook untuk build Minecraft ini, jadi overlay dan kosmetik dalam game dinonaktifkan. Gamenya sendiri akan berjalan normal.</string>
     <string name="launch_failure_message_unexpected">Peluncur tidak dapat memulai game dan penyebabnya bukan salah satu yang dikenali. Tidak ada yang diubah di perangkat Anda. Buka kembali peluncur dan coba lagi; jika terus terjadi, jalankan Perbaiki pemasangan di Pengaturan \u2192 Diagnostik.</string>
     <string name="launch_failure_message_not_installed">Minecraft tampaknya tidak terpasang di perangkat ini. Impor APK Minecraft dari Pustaka — pemasangan dari Google Play tidak dapat diluncurkan peluncur ini, karena game menyimpan pustaka nativenya di dalam aplikasi yang terpasang, tempat peluncur tidak dapat menjangkaunya.</string>
+    <string name="keyboard_connected_message">Terhubung! Kontrol papan ketik aktif.</string>
+    <string name="keyboard_disconnected_message">Terputus. Kontrol papan ketik dilepas.</string>
+    <string name="keyboard_title">Papan ketik</string>
 </resources>

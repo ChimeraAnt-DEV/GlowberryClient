@@ -1037,4 +1037,7 @@
     <string name="launch_failure_message_rules">此 Minecraft 构建尚无钩子定义，因此游戏内叠加层和装饰已禁用。游戏本身仍可正常运行。</string>
     <string name="launch_failure_message_unexpected">启动器无法开始启动游戏，且原因不在它能识别的范围内。你的设备上没有任何改动。请重新打开启动器再试；若问题持续，请在“设置 \u2192 诊断”中运行“修复安装”。</string>
     <string name="launch_failure_message_not_installed">此设备上似乎未安装 Minecraft。请从资源库导入 Minecraft APK——Google Play 安装无法由此启动器启动，因为游戏将本机库保留在已安装的应用内部，启动器无法访问。</string>
+    <string name="keyboard_connected_message">已连接！键盘控制已启用。</string>
+    <string name="keyboard_disconnected_message">已断开连接。已释放键盘控制。</string>
+    <string name="keyboard_title">键盘</string>
 </resources>

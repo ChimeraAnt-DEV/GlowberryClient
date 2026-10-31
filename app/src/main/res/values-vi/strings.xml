@@ -1046,4 +1046,7 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="launch_failure_message_rules">Chưa có định nghĩa hook cho bản dựng Minecraft này, nên lớp phủ và trang phục trong trò chơi bị tắt. Bản thân trò chơi vẫn chạy bình thường.</string>
     <string name="launch_failure_message_unexpected">Trình khởi chạy không thể bắt đầu trò chơi và nguyên nhân không thuộc những gì nó nhận ra. Không có gì trên thiết bị của bạn bị thay đổi. Hãy mở lại trình khởi chạy và thử lại; nếu vẫn tiếp diễn, hãy chạy Sửa bản cài trong Cài đặt \u2192 Chẩn đoán.</string>
     <string name="launch_failure_message_not_installed">Có vẻ như Minecraft chưa được cài trên thiết bị này. Hãy nhập APK Minecraft từ Thư viện — bản cài từ Google Play không thể được trình khởi chạy này khởi chạy, vì trò chơi giữ thư viện gốc bên trong ứng dụng đã cài, nơi trình khởi chạy không thể truy cập.</string>
+    <string name="keyboard_connected_message">Đã kết nối! Điều khiển bàn phím đang hoạt động.</string>
+    <string name="keyboard_disconnected_message">Đã ngắt kết nối. Đã giải phóng điều khiển bàn phím.</string>
+    <string name="keyboard_title">Bàn phím</string>
 </resources>

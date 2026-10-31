@@ -1016,4 +1016,7 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
     <string name="launch_failure_message_rules">Aún no hay definiciones de enganche para esta compilación de Minecraft, así que las superposiciones y los cosméticos del juego están desactivados. El juego en sí funcionará con normalidad.</string>
     <string name="launch_failure_message_unexpected">El lanzador no pudo iniciar la partida y la causa no es una que reconozca. No se cambió nada en tu dispositivo. Vuelve a abrir el lanzador e inténtalo de nuevo; si sigue ocurriendo, ejecuta Reparar instalación en Ajustes \u2192 Diagnóstico.</string>
     <string name="launch_failure_message_not_installed">Minecraft no parece estar instalado en este dispositivo. Importa un APK de Minecraft desde la Biblioteca: una instalación de Google Play no puede iniciarla este lanzador, porque el juego guarda su biblioteca nativa dentro de la app instalada, donde el lanzador no puede acceder.</string>
+    <string name="keyboard_connected_message">¡Conectado! Controles de teclado activos.</string>
+    <string name="keyboard_disconnected_message">Desconectado. Controles de teclado liberados.</string>
+    <string name="keyboard_title">Teclado</string>
 </resources>

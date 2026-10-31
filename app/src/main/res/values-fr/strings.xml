@@ -1016,4 +1016,7 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="launch_failure_message_rules">Il n’existe pas encore de définitions de hooks pour cette version de Minecraft, donc les superpositions et les cosmétiques en jeu sont désactivés. Le jeu lui-même fonctionnera normalement.</string>
     <string name="launch_failure_message_unexpected">Le lanceur n’a pas pu démarrer le jeu et la cause ne fait pas partie de celles qu’il reconnaît. Rien n’a été modifié sur votre appareil. Rouvrez le lanceur et réessayez ; si cela se reproduit, lancez Réparer l’installation dans Paramètres \u2192 Diagnostic.</string>
     <string name="launch_failure_message_not_installed">Minecraft ne semble pas installé sur cet appareil. Importez un APK Minecraft depuis la Bibliothèque : une installation Google Play ne peut pas être lancée par ce lanceur, car le jeu conserve sa bibliothèque native à l’intérieur de l’application installée, hors de portée du lanceur.</string>
+    <string name="keyboard_connected_message">Connecté ! Commandes clavier actives.</string>
+    <string name="keyboard_disconnected_message">Déconnecté. Commandes clavier libérées.</string>
+    <string name="keyboard_title">Clavier</string>
 </resources>

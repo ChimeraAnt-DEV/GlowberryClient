@@ -31,11 +31,27 @@ public final class ControllerConnectionMonitor {
         void onControllerDisconnected(String name);
     }
 
+    /**
+     * What the app wants to do when a keyboard arrives or leaves (Phase 12).
+     *
+     * <p>A separate interface rather than two more methods on {@link Listener}: a keyboard has no
+     * profile, no vendor mapping and no dead zone, so a screen that only cares about pads should
+     * not be forced to write two empty methods to satisfy the type.
+     */
+    public interface KeyboardListener {
+        /** Always called on the main thread. */
+        void onKeyboardConnected(String name);
+
+        /** Always called on the main thread. */
+        void onKeyboardDisconnected(String name);
+    }
+
     private final Context appContext;
     private final InputManager inputManager;
     private final Handler mainHandler = MainThread.handler();
 
     private Listener listener;
+    private KeyboardListener keyboardListener;
     private boolean registered;
 
     private static volatile ControllerConnectionMonitor shared;
@@ -115,6 +131,21 @@ public final class ControllerConnectionMonitor {
         }
     }
 
+    /** Attaches the keyboard callback (Phase 12). Re-announces a keyboard already attached. */
+    public void setKeyboardListener(KeyboardListener listener) {
+        this.keyboardListener = listener;
+        if (listener != null) {
+            mainHandler.post(this::announceExistingKeyboards);
+        }
+    }
+
+    /** Detaches a keyboard callback, but only if it is still the current one. */
+    public void clearKeyboardListener(KeyboardListener listener) {
+        if (this.keyboardListener == listener) {
+            this.keyboardListener = null;
+        }
+    }
+
     /** Registers the listener once; repeated calls are ignored. */
     public void start() {
         if (registered || inputManager == null) return;
@@ -145,8 +176,14 @@ public final class ControllerConnectionMonitor {
     private void handleAdded(int deviceId) {
         if (isDebounced(deviceId)) return;
         InputDevice device = InputDevice.getDevice(deviceId);
-        if (device == null || !isGamepad(device)) return;
-        announce(device);
+        if (device == null) return;
+        if (isGamepad(device)) {
+            announce(device);
+            return;
+        }
+        if (isKeyboard(device)) {
+            announceKeyboard(device);
+        }
     }
 
     private void handleRemoved(int deviceId) {
@@ -156,8 +193,15 @@ public final class ControllerConnectionMonitor {
         // The device is already gone, so its name cannot be read now; the last known id is all
         // we have. A generic label is used when nothing was cached for it.
         String name = lastKnownNames.remove(deviceId);
-        if (name == null) name = "Controller";
+        boolean wasKeyboard = keyboardIds.remove(deviceId);
+        if (name == null) name = wasKeyboard ? "Keyboard" : "Controller";
         final String reported = name;
+        if (wasKeyboard) {
+            mainHandler.post(() -> {
+                if (keyboardListener != null) keyboardListener.onKeyboardDisconnected(reported);
+            });
+            return;
+        }
         mainHandler.post(() -> {
             if (listener != null) listener.onControllerDisconnected(reported);
         });
@@ -194,6 +238,63 @@ public final class ControllerConnectionMonitor {
             if (device == null || !isGamepad(device)) continue;
             announce(device);
         }
+    }
+
+    /** Device ids announced as keyboards, so a disconnect names the right thing. */
+    private final java.util.Set<Integer> keyboardIds = new java.util.HashSet<>();
+
+    /**
+     * Announces a keyboard that was already attached when a listener arrived (Phase 12).
+     *
+     * <p>Same reasoning as {@link #announceExisting}: the platform only delivers an add callback at
+     * the moment of the add, so a keyboard plugged in before the app started would otherwise never
+     * be announced. First sight only, so switching tabs does not re-show the pill.
+     */
+    private void announceExistingKeyboards() {
+        if (keyboardListener == null || inputManager == null) return;
+        int[] ids;
+        try {
+            ids = inputManager.getInputDeviceIds();
+        } catch (Exception e) {
+            return;
+        }
+        if (ids == null) return;
+        for (int id : ids) {
+            if (announcedIds.contains(id) || keyboardIds.contains(id)) continue;
+            InputDevice device = InputDevice.getDevice(id);
+            if (device == null || !isKeyboard(device)) continue;
+            announceKeyboard(device);
+        }
+    }
+
+    /** Delivers the keyboard-connected callback. */
+    private void announceKeyboard(InputDevice device) {
+        keyboardIds.add(device.getId());
+        announcedIds.add(device.getId());
+        String name = device.getName();
+        if (name == null || name.trim().isEmpty()) name = "Keyboard";
+        lastKnownNames.put(device.getId(), name);
+        final String reported = name;
+        mainHandler.post(() -> {
+            if (keyboardListener != null) keyboardListener.onKeyboardConnected(reported);
+        });
+    }
+
+    /** True for a device that is a keyboard and not a pad (a pad reports both sources). */
+    public static boolean isKeyboard(InputDevice device) {
+        return device != null && isKeyboardSource(device.getSources());
+    }
+
+    /**
+     * Checks a source bitfield for a keyboard that is not also a gamepad.
+     *
+     * <p>A combined {@code SOURCE_GAMEPAD | SOURCE_KEYBOARD} device is a pad with keys (a gamepad
+     * with a chat pad, or a controller's media keys) and belongs on the pad path, which already
+     * announced it — so it must not also fire the keyboard toast.
+     */
+    public static boolean isKeyboardSource(int sources) {
+        return (sources & InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD
+                && !isGamepadSource(sources);
     }
 
     /** Classifies a pad, loads its profile and delivers the connected callback. */
