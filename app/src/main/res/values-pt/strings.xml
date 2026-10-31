@@ -1036,4 +1036,8 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
     <string name="wheel_manager_root_label">Abre com a tecla</string>
     <string name="wheel_manager_entry_count">%1$d entradas</string>
     <string name="wheel_manager_last_note">O último menu não pode ser excluído; a tecla precisa de um para abrir.</string>
+    <string name="wheel_manager_entries_title">Editar entradas do menu</string>
+    <string name="wheel_manager_no_entries">Ainda não há entradas. Adicione uma para colocar uma ação neste menu.</string>
+    <string name="wheel_manager_add_entry">Adicionar entrada</string>
+    <string name="wheel_manager_pick_action">Escolha uma ação</string>
 </resources>

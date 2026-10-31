@@ -1057,4 +1057,8 @@
     <string name="wheel_manager_root_label">随按键打开</string>
     <string name="wheel_manager_entry_count">%1$d 项</string>
     <string name="wheel_manager_last_note">无法删除最后一个菜单；按键需要一个菜单才能打开。</string>
+    <string name="wheel_manager_entries_title">编辑菜单项</string>
+    <string name="wheel_manager_no_entries">还没有菜单项。添加一个以在此菜单上放置操作。</string>
+    <string name="wheel_manager_add_entry">添加菜单项</string>
+    <string name="wheel_manager_pick_action">选择操作</string>
 </resources>

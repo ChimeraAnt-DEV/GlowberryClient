@@ -1033,4 +1033,8 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="wheel_manager_root_label">キーで開く</string>
     <string name="wheel_manager_entry_count">%1$d 項目</string>
     <string name="wheel_manager_last_note">最後のメニューは削除できません。開くにはキーが必要です。</string>
+    <string name="wheel_manager_entries_title">メニュー項目を編集</string>
+    <string name="wheel_manager_no_entries">項目がまだありません。このメニューにアクションを追加してください。</string>
+    <string name="wheel_manager_add_entry">項目を追加</string>
+    <string name="wheel_manager_pick_action">アクションを選択</string>
 </resources>

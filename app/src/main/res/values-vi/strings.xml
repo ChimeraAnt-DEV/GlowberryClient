@@ -1066,4 +1066,8 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="wheel_manager_root_label">Mở bằng phím</string>
     <string name="wheel_manager_entry_count">%1$d mục</string>
     <string name="wheel_manager_last_note">Không thể xóa menu cuối cùng; phím cần một menu để mở.</string>
+    <string name="wheel_manager_entries_title">Sửa mục menu</string>
+    <string name="wheel_manager_no_entries">Chưa có mục nào. Thêm một mục để đặt hành động vào menu này.</string>
+    <string name="wheel_manager_add_entry">Thêm mục</string>
+    <string name="wheel_manager_pick_action">Chọn một hành động</string>
 </resources>

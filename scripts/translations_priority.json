@@ -79,7 +79,11 @@
   "wheel_manager_done": "Listo",
   "wheel_manager_root_label": "Se abre con la tecla",
   "wheel_manager_entry_count": "%1$d entradas",
-  "wheel_manager_last_note": "El último menú no se puede eliminar; la tecla necesita uno para abrirse."
+  "wheel_manager_last_note": "El último menú no se puede eliminar; la tecla necesita uno para abrirse.",
+  "wheel_manager_entries_title": "Editar entradas del menú",
+  "wheel_manager_no_entries": "Aún no hay entradas. Añade una para poner una acción en este menú.",
+  "wheel_manager_add_entry": "Añadir entrada",
+  "wheel_manager_pick_action": "Elige una acción"
  },
  "fr": {
   "nav_back": "Retour",
@@ -161,7 +165,11 @@
   "wheel_manager_done": "Terminé",
   "wheel_manager_root_label": "S\\'ouvre avec la touche",
   "wheel_manager_entry_count": "%1$d entrées",
-  "wheel_manager_last_note": "Le dernier menu ne peut pas être supprimé ; la touche en a besoin pour s\\'ouvrir."
+  "wheel_manager_last_note": "Le dernier menu ne peut pas être supprimé ; la touche en a besoin pour s\\'ouvrir.",
+  "wheel_manager_entries_title": "Modifier les entrées du menu",
+  "wheel_manager_no_entries": "Aucune entrée. Ajoutez-en une pour placer une action sur ce menu.",
+  "wheel_manager_add_entry": "Ajouter une entrée",
+  "wheel_manager_pick_action": "Choisir une action"
  },
  "hi": {
   "nav_back": "वापस",
@@ -243,7 +251,11 @@
   "wheel_manager_done": "हो गया",
   "wheel_manager_root_label": "की से खुलता है",
   "wheel_manager_entry_count": "%1$d प्रविष्टियाँ",
-  "wheel_manager_last_note": "अंतिम मेनू हटाया नहीं जा सकता; खोलने के लिए की को एक चाहिए।"
+  "wheel_manager_last_note": "अंतिम मेनू हटाया नहीं जा सकता; खोलने के लिए की को एक चाहिए।",
+  "wheel_manager_entries_title": "मेनू प्रविष्टियाँ संपादित करें",
+  "wheel_manager_no_entries": "अभी कोई प्रविष्टि नहीं। इस मेनू पर क्रिया डालने के लिए एक जोड़ें।",
+  "wheel_manager_add_entry": "प्रविष्टि जोड़ें",
+  "wheel_manager_pick_action": "क्रिया चुनें"
  },
  "id": {
   "nav_back": "Kembali",
@@ -325,7 +337,11 @@
   "wheel_manager_done": "Selesai",
   "wheel_manager_root_label": "Terbuka dengan tombol",
   "wheel_manager_entry_count": "%1$d entri",
-  "wheel_manager_last_note": "Menu terakhir tidak dapat dihapus; tombol memerlukan satu untuk dibuka."
+  "wheel_manager_last_note": "Menu terakhir tidak dapat dihapus; tombol memerlukan satu untuk dibuka.",
+  "wheel_manager_entries_title": "Edit entri menu",
+  "wheel_manager_no_entries": "Belum ada entri. Tambahkan satu untuk menaruh aksi di menu ini.",
+  "wheel_manager_add_entry": "Tambah entri",
+  "wheel_manager_pick_action": "Pilih aksi"
  },
  "ja": {
   "nav_back": "戻る",
@@ -407,7 +423,11 @@
   "wheel_manager_done": "完了",
   "wheel_manager_root_label": "キーで開く",
   "wheel_manager_entry_count": "%1$d 項目",
-  "wheel_manager_last_note": "最後のメニューは削除できません。開くにはキーが必要です。"
+  "wheel_manager_last_note": "最後のメニューは削除できません。開くにはキーが必要です。",
+  "wheel_manager_entries_title": "メニュー項目を編集",
+  "wheel_manager_no_entries": "項目がまだありません。このメニューにアクションを追加してください。",
+  "wheel_manager_add_entry": "項目を追加",
+  "wheel_manager_pick_action": "アクションを選択"
  },
  "pt": {
   "nav_back": "Voltar",
@@ -489,7 +509,11 @@
   "wheel_manager_done": "Concluído",
   "wheel_manager_root_label": "Abre com a tecla",
   "wheel_manager_entry_count": "%1$d entradas",
-  "wheel_manager_last_note": "O último menu não pode ser excluído; a tecla precisa de um para abrir."
+  "wheel_manager_last_note": "O último menu não pode ser excluído; a tecla precisa de um para abrir.",
+  "wheel_manager_entries_title": "Editar entradas do menu",
+  "wheel_manager_no_entries": "Ainda não há entradas. Adicione uma para colocar uma ação neste menu.",
+  "wheel_manager_add_entry": "Adicionar entrada",
+  "wheel_manager_pick_action": "Escolha uma ação"
  },
  "ru": {
   "nav_back": "Назад",
@@ -571,7 +595,11 @@
   "wheel_manager_done": "Готово",
   "wheel_manager_root_label": "Открывается клавишей",
   "wheel_manager_entry_count": "%1$d записей",
-  "wheel_manager_last_note": "Последнее меню нельзя удалить; клавише нужно меню для открытия."
+  "wheel_manager_last_note": "Последнее меню нельзя удалить; клавише нужно меню для открытия.",
+  "wheel_manager_entries_title": "Изменить записи меню",
+  "wheel_manager_no_entries": "Записей пока нет. Добавьте, чтобы поместить действие в это меню.",
+  "wheel_manager_add_entry": "Добавить запись",
+  "wheel_manager_pick_action": "Выберите действие"
  },
  "tr": {
   "nav_back": "Geri",
@@ -653,7 +681,11 @@
   "wheel_manager_done": "Bitti",
   "wheel_manager_root_label": "Tuşla açılır",
   "wheel_manager_entry_count": "%1$d giriş",
-  "wheel_manager_last_note": "Son menü silinemez; tuşun açılmak için bir menüye ihtiyacı var."
+  "wheel_manager_last_note": "Son menü silinemez; tuşun açılmak için bir menüye ihtiyacı var.",
+  "wheel_manager_entries_title": "Menü girdilerini düzenle",
+  "wheel_manager_no_entries": "Henüz girdi yok. Bu menüye bir eylem koymak için bir tane ekleyin.",
+  "wheel_manager_add_entry": "Girdi ekle",
+  "wheel_manager_pick_action": "Bir eylem seç"
  },
  "vi": {
   "nav_back": "Quay lại",
@@ -735,7 +767,11 @@
   "wheel_manager_done": "Xong",
   "wheel_manager_root_label": "Mở bằng phím",
   "wheel_manager_entry_count": "%1$d mục",
-  "wheel_manager_last_note": "Không thể xóa menu cuối cùng; phím cần một menu để mở."
+  "wheel_manager_last_note": "Không thể xóa menu cuối cùng; phím cần một menu để mở.",
+  "wheel_manager_entries_title": "Sửa mục menu",
+  "wheel_manager_no_entries": "Chưa có mục nào. Thêm một mục để đặt hành động vào menu này.",
+  "wheel_manager_add_entry": "Thêm mục",
+  "wheel_manager_pick_action": "Chọn một hành động"
  },
  "zh-rCN": {
   "nav_back": "返回",
@@ -817,6 +853,10 @@
   "wheel_manager_done": "完成",
   "wheel_manager_root_label": "随按键打开",
   "wheel_manager_entry_count": "%1$d 项",
-  "wheel_manager_last_note": "无法删除最后一个菜单；按键需要一个菜单才能打开。"
+  "wheel_manager_last_note": "无法删除最后一个菜单；按键需要一个菜单才能打开。",
+  "wheel_manager_entries_title": "编辑菜单项",
+  "wheel_manager_no_entries": "还没有菜单项。添加一个以在此菜单上放置操作。",
+  "wheel_manager_add_entry": "添加菜单项",
+  "wheel_manager_pick_action": "选择操作"
  }
 }

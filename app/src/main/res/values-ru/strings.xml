@@ -1067,4 +1067,8 @@
     <string name="wheel_manager_root_label">Открывается клавишей</string>
     <string name="wheel_manager_entry_count">%1$d записей</string>
     <string name="wheel_manager_last_note">Последнее меню нельзя удалить; клавише нужно меню для открытия.</string>
+    <string name="wheel_manager_entries_title">Изменить записи меню</string>
+    <string name="wheel_manager_no_entries">Записей пока нет. Добавьте, чтобы поместить действие в это меню.</string>
+    <string name="wheel_manager_add_entry">Добавить запись</string>
+    <string name="wheel_manager_pick_action">Выберите действие</string>
 </resources>

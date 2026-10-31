@@ -1064,4 +1064,8 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="wheel_manager_root_label">की से खुलता है</string>
     <string name="wheel_manager_entry_count">%1$d प्रविष्टियाँ</string>
     <string name="wheel_manager_last_note">अंतिम मेनू हटाया नहीं जा सकता; खोलने के लिए की को एक चाहिए।</string>
+    <string name="wheel_manager_entries_title">मेनू प्रविष्टियाँ संपादित करें</string>
+    <string name="wheel_manager_no_entries">अभी कोई प्रविष्टि नहीं। इस मेनू पर क्रिया डालने के लिए एक जोड़ें।</string>
+    <string name="wheel_manager_add_entry">प्रविष्टि जोड़ें</string>
+    <string name="wheel_manager_pick_action">क्रिया चुनें</string>
 </resources>

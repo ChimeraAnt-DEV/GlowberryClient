@@ -1060,4 +1060,8 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="wheel_manager_root_label">Terbuka dengan tombol</string>
     <string name="wheel_manager_entry_count">%1$d entri</string>
     <string name="wheel_manager_last_note">Menu terakhir tidak dapat dihapus; tombol memerlukan satu untuk dibuka.</string>
+    <string name="wheel_manager_entries_title">Edit entri menu</string>
+    <string name="wheel_manager_no_entries">Belum ada entri. Tambahkan satu untuk menaruh aksi di menu ini.</string>
+    <string name="wheel_manager_add_entry">Tambah entri</string>
+    <string name="wheel_manager_pick_action">Pilih aksi</string>
 </resources>

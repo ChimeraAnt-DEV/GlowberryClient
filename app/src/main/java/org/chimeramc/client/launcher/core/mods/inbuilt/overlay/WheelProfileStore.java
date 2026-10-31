@@ -205,6 +205,101 @@ public final class WheelProfileStore {
         return true;
     }
 
+    // --- Entry editing ---------------------------------------------------------------------
+    //
+    // The spec's manager edits "profiles and entries", and the entries are what a player actually
+    // changes: which action sits in which sector. These methods own that, so the manager never
+    // rewrites a profile by hand and a malformed edit cannot reach the store.
+
+    /**
+     * Replaces one profile's entry list.
+     *
+     * <p>The list is sanitised the same way {@link #save} sanitises a whole profile set, so a bad
+     * label or a ninth entry cannot be written. A sub-wheel entry pointing at the profile's own id
+     * is refused (it would recurse forever), and one pointing at an id that does not exist is
+     * dropped, because a sector that opens nothing reads as broken.
+     *
+     * @return true when the profile existed and the write happened
+     */
+    public boolean setEntries(String profileId, List<WheelEntry> entries) {
+        List<WheelEntry.Profile> profiles = load();
+        WheelEntry.Profile profile = findById(profiles, profileId);
+        if (profile == null) return false;
+        profile.entries = sanitizeEntries(entries, profileId, profiles);
+        save(profiles);
+        return true;
+    }
+
+    /**
+     * The pure half of {@link #setEntries}: the rule for which entries a profile may hold.
+     *
+     * <p>Split out so it is unit-testable without a Context (the store's persistence needs one, the
+     * rule does not). A sub-wheel entry pointing at the profile's own id is refused because it would
+     * recurse forever, and one pointing at an id that does not exist is dropped because a sector
+     * that opens nothing reads as broken.
+     */
+    public static List<WheelEntry> sanitizeEntries(List<WheelEntry> entries, String profileId,
+                                                   List<WheelEntry.Profile> profiles) {
+        List<WheelEntry> safe = new ArrayList<>();
+        if (entries == null) return safe;
+        for (WheelEntry e : entries) {
+            if (e == null) continue;
+            if (safe.size() >= WheelLayout.MAX_SECTORS) break;
+            e.label = WheelEntry.normalizeLabel(e.label);
+            if (e.isSubWheel() && (e.target == null || e.target.trim().isEmpty()
+                    || e.target.equals(profileId) || findById(profiles, e.target) == null)) {
+                continue;
+            }
+            safe.add(e);
+        }
+        return safe;
+    }
+
+    /**
+     * Appends an entry to a profile, refusing a full wheel.
+     *
+     * @return true when the entry was added
+     */
+    public boolean addEntry(String profileId, WheelEntry entry) {
+        List<WheelEntry.Profile> profiles = load();
+        WheelEntry.Profile profile = findById(profiles, profileId);
+        if (profile == null || entry == null) return false;
+        List<WheelEntry> current = new ArrayList<>(profile.safeEntries());
+        if (current.size() >= WheelLayout.MAX_SECTORS) return false;
+        current.add(entry);
+        return setEntries(profileId, current);
+    }
+
+    /** Removes an entry by index, refusing an out-of-range index. */
+    public boolean removeEntry(String profileId, int index) {
+        List<WheelEntry.Profile> profiles = load();
+        WheelEntry.Profile profile = findById(profiles, profileId);
+        if (profile == null) return false;
+        List<WheelEntry> current = new ArrayList<>(profile.safeEntries());
+        if (index < 0 || index >= current.size()) return false;
+        current.remove(index);
+        return setEntries(profileId, current);
+    }
+
+    /**
+     * Moves an entry one position, which is what changes the sector an action sits in.
+     *
+     * @param direction negative to move towards the top sector, positive towards the last
+     * @return true when the order changed
+     */
+    public boolean reorderEntry(String profileId, int index, int direction) {
+        if (direction == 0) return false;
+        List<WheelEntry.Profile> profiles = load();
+        WheelEntry.Profile profile = findById(profiles, profileId);
+        if (profile == null) return false;
+        List<WheelEntry> current = new ArrayList<>(profile.safeEntries());
+        if (index < 0 || index >= current.size()) return false;
+        int to = index + (direction < 0 ? -1 : 1);
+        if (to < 0 || to >= current.size()) return false;
+        current.add(to, current.remove(index));
+        return setEntries(profileId, current);
+    }
+
     /** A profile id derived from a display name: lower-case, non-alphanumerics dropped. */
     public static String slug(String name) {
         if (name == null) return "wheel";
