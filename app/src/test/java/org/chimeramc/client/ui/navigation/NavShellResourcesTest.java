@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,11 +135,56 @@ public class NavShellResourcesTest {
         }
     }
 
+    @Test
+    public void noPaddingIsEverSetFromAWidthDimen() throws IOException {
+        // Item 82. The original rail bug was a tab whose paddingStart was @dimen/nav_rail_width:
+        // a match_parent row then pushes its icon and label off the right edge, which no build
+        // machine can see. The general shape of that mistake is a padding attribute fed from a
+        // dimen whose name says "width", so that is what this forbids, in every layout and every
+        // style - a padding is an inset inside the view, never the view's own size.
+        Path layoutDir = resolve("app/src/main/res/layout");
+        Path valuesDir = resolve("app/src/main/res/values");
+        int scanned = 0;
+        List<Path> files = new ArrayList<>();
+        try (java.util.stream.Stream<Path> a = Files.list(layoutDir);
+             java.util.stream.Stream<Path> b = Files.list(valuesDir)) {
+            a.filter(f -> f.toString().endsWith(".xml")).forEach(files::add);
+            b.filter(f -> f.toString().endsWith(".xml")).forEach(files::add);
+        }
+        assertTrue("no resource files found to scan", files.size() > 50);
+        Pattern paddingDimen = Pattern.compile(
+                "android:padding[A-Za-z]*=\"@dimen/([a-zA-Z0-9_]+)\"");
+        for (Path file : files) {
+            String xml = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+            Matcher m = paddingDimen.matcher(xml);
+            while (m.find()) {
+                scanned++;
+                String dimenName = m.group(1);
+                assertFalse(file.getFileName() + " sets a padding from @dimen/" + dimenName
+                                + ", which names a size; a padding must be its own inset dimen",
+                        dimenName.toLowerCase(java.util.Locale.ROOT).contains("width"));
+            }
+        }
+        assertTrue("the scan found no dimen-backed padding at all, so it proved nothing",
+                scanned > 0);
+    }
+
     private static int dimen(String xml, String name) {
         Matcher m = Pattern.compile("<dimen name=\"" + Pattern.quote(name) + "\">([0-9]+)dp</dimen>")
                 .matcher(xml);
         assertTrue("dimen " + name + " is missing", m.find());
         return Integer.parseInt(m.group(1));
+    }
+
+    /** Resolves a repo-relative directory, searching upward from the working directory. */
+    private static Path resolve(String relativePath) throws IOException {
+        Path dir = Paths.get("").toAbsolutePath();
+        for (int i = 0; i < 6 && dir != null; i++) {
+            Path candidate = dir.resolve(relativePath);
+            if (Files.isDirectory(candidate)) return candidate;
+            dir = dir.getParent();
+        }
+        throw new IOException("could not locate " + relativePath);
     }
 
     private static String read(String relativePath) throws IOException {
