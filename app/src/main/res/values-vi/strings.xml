@@ -1072,4 +1072,7 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="wheel_manager_pick_action">Chọn một hành động</string>
     <string name="diagnostics_field_berry_api">Phần nền BerryAPI</string>
     <string name="about_backend_status">Phần nền: %1$s</string>
+    <string name="diagnostics_field_preloader_abi">ABI của preloader</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d (khớp với ứng dụng)</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d (ứng dụng mong đợi v%2$d)</string>
 </resources>

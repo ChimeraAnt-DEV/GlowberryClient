@@ -1069,4 +1069,7 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="wheel_manager_pick_action">Bir eylem seç</string>
     <string name="diagnostics_field_berry_api">BerryAPI arka ucu</string>
     <string name="about_backend_status">Arka uç: %1$s</string>
+    <string name="diagnostics_field_preloader_abi">Ön yükleyici ABI</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d (istemciyle eşleşiyor)</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d (istemci v%2$d bekliyor)</string>
 </resources>

@@ -1063,4 +1063,7 @@
     <string name="wheel_manager_pick_action">选择操作</string>
     <string name="diagnostics_field_berry_api">BerryAPI 后端</string>
     <string name="about_backend_status">后端：%1$s</string>
+    <string name="diagnostics_field_preloader_abi">预加载器 ABI</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d（与客户端一致）</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d（客户端期望 v%2$d）</string>
 </resources>

@@ -1039,4 +1039,7 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="wheel_manager_pick_action">アクションを選択</string>
     <string name="diagnostics_field_berry_api">BerryAPIバックエンド</string>
     <string name="about_backend_status">バックエンド: %1$s</string>
+    <string name="diagnostics_field_preloader_abi">プリローダーABI</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d（クライアントと一致）</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d（クライアントはv%2$dを期待）</string>
 </resources>

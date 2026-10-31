@@ -85,7 +85,10 @@
     "wheel_manager_add_entry": "Añadir entrada",
     "wheel_manager_pick_action": "Elige una acción",
     "diagnostics_field_berry_api": "Backend de BerryAPI",
-    "about_backend_status": "Backend: %1$s"
+    "about_backend_status": "Backend: %1$s",
+    "diagnostics_field_preloader_abi": "ABI del preloader",
+    "diagnostics_preloader_abi_ok": "v%1$d (coincide con el cliente)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (el cliente espera v%2$d)"
   },
   "fr": {
     "nav_back": "Retour",
@@ -173,7 +176,10 @@
     "wheel_manager_add_entry": "Ajouter une entrée",
     "wheel_manager_pick_action": "Choisir une action",
     "diagnostics_field_berry_api": "Backend BerryAPI",
-    "about_backend_status": "Backend : %1$s"
+    "about_backend_status": "Backend : %1$s",
+    "diagnostics_field_preloader_abi": "ABI du preloader",
+    "diagnostics_preloader_abi_ok": "v%1$d (correspond au client)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (le client attend v%2$d)"
   },
   "hi": {
     "nav_back": "वापस",
@@ -261,7 +267,10 @@
     "wheel_manager_add_entry": "प्रविष्टि जोड़ें",
     "wheel_manager_pick_action": "क्रिया चुनें",
     "diagnostics_field_berry_api": "BerryAPI बैकएंड",
-    "about_backend_status": "बैकएंड: %1$s"
+    "about_backend_status": "बैकएंड: %1$s",
+    "diagnostics_field_preloader_abi": "प्रीलोडर ABI",
+    "diagnostics_preloader_abi_ok": "v%1$d (क्लाइंट से मेल खाता है)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (क्लाइंट v%2$d की अपेक्षा करता है)"
   },
   "id": {
     "nav_back": "Kembali",
@@ -349,7 +358,10 @@
     "wheel_manager_add_entry": "Tambah entri",
     "wheel_manager_pick_action": "Pilih aksi",
     "diagnostics_field_berry_api": "Backend BerryAPI",
-    "about_backend_status": "Backend: %1$s"
+    "about_backend_status": "Backend: %1$s",
+    "diagnostics_field_preloader_abi": "ABI preloader",
+    "diagnostics_preloader_abi_ok": "v%1$d (cocok dengan klien)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (klien mengharapkan v%2$d)"
   },
   "ja": {
     "nav_back": "戻る",
@@ -437,7 +449,10 @@
     "wheel_manager_add_entry": "項目を追加",
     "wheel_manager_pick_action": "アクションを選択",
     "diagnostics_field_berry_api": "BerryAPIバックエンド",
-    "about_backend_status": "バックエンド: %1$s"
+    "about_backend_status": "バックエンド: %1$s",
+    "diagnostics_field_preloader_abi": "プリローダーABI",
+    "diagnostics_preloader_abi_ok": "v%1$d（クライアントと一致）",
+    "diagnostics_preloader_abi_mismatch": "v%1$d（クライアントはv%2$dを期待）"
   },
   "pt": {
     "nav_back": "Voltar",
@@ -525,7 +540,10 @@
     "wheel_manager_add_entry": "Adicionar entrada",
     "wheel_manager_pick_action": "Escolha uma ação",
     "diagnostics_field_berry_api": "Backend BerryAPI",
-    "about_backend_status": "Backend: %1$s"
+    "about_backend_status": "Backend: %1$s",
+    "diagnostics_field_preloader_abi": "ABI do preloader",
+    "diagnostics_preloader_abi_ok": "v%1$d (corresponde ao cliente)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (o cliente espera v%2$d)"
   },
   "ru": {
     "nav_back": "Назад",
@@ -613,7 +631,10 @@
     "wheel_manager_add_entry": "Добавить запись",
     "wheel_manager_pick_action": "Выберите действие",
     "diagnostics_field_berry_api": "Бэкенд BerryAPI",
-    "about_backend_status": "Бэкенд: %1$s"
+    "about_backend_status": "Бэкенд: %1$s",
+    "diagnostics_field_preloader_abi": "ABI прелоадера",
+    "diagnostics_preloader_abi_ok": "v%1$d (совпадает с клиентом)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (клиент ожидает v%2$d)"
   },
   "tr": {
     "nav_back": "Geri",
@@ -701,7 +722,10 @@
     "wheel_manager_add_entry": "Girdi ekle",
     "wheel_manager_pick_action": "Bir eylem seç",
     "diagnostics_field_berry_api": "BerryAPI arka ucu",
-    "about_backend_status": "Arka uç: %1$s"
+    "about_backend_status": "Arka uç: %1$s",
+    "diagnostics_field_preloader_abi": "Ön yükleyici ABI",
+    "diagnostics_preloader_abi_ok": "v%1$d (istemciyle eşleşiyor)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (istemci v%2$d bekliyor)"
   },
   "vi": {
     "nav_back": "Quay lại",
@@ -789,7 +813,10 @@
     "wheel_manager_add_entry": "Thêm mục",
     "wheel_manager_pick_action": "Chọn một hành động",
     "diagnostics_field_berry_api": "Phần nền BerryAPI",
-    "about_backend_status": "Phần nền: %1$s"
+    "about_backend_status": "Phần nền: %1$s",
+    "diagnostics_field_preloader_abi": "ABI của preloader",
+    "diagnostics_preloader_abi_ok": "v%1$d (khớp với ứng dụng)",
+    "diagnostics_preloader_abi_mismatch": "v%1$d (ứng dụng mong đợi v%2$d)"
   },
   "zh-rCN": {
     "nav_back": "返回",
@@ -877,6 +904,9 @@
     "wheel_manager_add_entry": "添加菜单项",
     "wheel_manager_pick_action": "选择操作",
     "diagnostics_field_berry_api": "BerryAPI 后端",
-    "about_backend_status": "后端：%1$s"
+    "about_backend_status": "后端：%1$s",
+    "diagnostics_field_preloader_abi": "预加载器 ABI",
+    "diagnostics_preloader_abi_ok": "v%1$d（与客户端一致）",
+    "diagnostics_preloader_abi_mismatch": "v%1$d（客户端期望 v%2$d）"
   }
 }

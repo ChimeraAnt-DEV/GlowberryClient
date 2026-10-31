@@ -5,6 +5,41 @@ import android.view.MotionEvent;
 import java.io.File;
 
 public class PreloaderInput {
+
+    /**
+     * The C ABI version this client expects from the preloader.
+     *
+     * <p>Bumped together with {@code pl_get_abi_version()} in the preloader; a mismatch means the
+     * client and the native library were built from different ABI revisions, so the client refuses
+     * the surface rather than calling into it with the wrong expectations.
+     */
+    public static final int EXPECTED_ABI_VERSION = 1;
+
+    /** The preloader's own C ABI version, or 0 when the library or the symbol is unavailable. */
+    public static int abiVersion() {
+        try {
+            return nativeAbiVersion();
+        } catch (UnsatisfiedLinkError e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Whether the loaded preloader matches this client's expected ABI version.
+     *
+     * <p>Pure comparison of two integers, so the rule is testable without a device: an unavailable
+     * library reads as version 0 and therefore does not match.
+     */
+    public static boolean abiMatches(int reported) {
+        return reported == EXPECTED_ABI_VERSION;
+    }
+
+    /** Whether the loaded preloader's ABI matches this client's expectation. */
+    public static boolean isAbiCompatible() {
+        return abiMatches(abiVersion());
+    }
+
+    private static native int nativeAbiVersion();
     private static final int[] MOUSE_BUTTONS = {
             MotionEvent.BUTTON_PRIMARY,
             MotionEvent.BUTTON_SECONDARY,

@@ -1073,4 +1073,7 @@
     <string name="wheel_manager_pick_action">Выберите действие</string>
     <string name="diagnostics_field_berry_api">Бэкенд BerryAPI</string>
     <string name="about_backend_status">Бэкенд: %1$s</string>
+    <string name="diagnostics_field_preloader_abi">ABI прелоадера</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d (совпадает с клиентом)</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d (клиент ожидает v%2$d)</string>
 </resources>

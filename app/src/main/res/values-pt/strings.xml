@@ -1042,4 +1042,7 @@ A migração deve ser concluída antes que o GlowberryClient continue.</string>
     <string name="wheel_manager_pick_action">Escolha uma ação</string>
     <string name="diagnostics_field_berry_api">Backend BerryAPI</string>
     <string name="about_backend_status">Backend: %1$s</string>
+    <string name="diagnostics_field_preloader_abi">ABI do preloader</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d (corresponde ao cliente)</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d (o cliente espera v%2$d)</string>
 </resources>

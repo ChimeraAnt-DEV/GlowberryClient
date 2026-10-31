@@ -413,6 +413,16 @@ public class DiagnosticsActivity extends BaseActivity {
         // screen reports what the preloader actually found rather than assuming it is present. A
         // missing backend is then visible here before a launch, not only when a feature does nothing.
         addRow(rows, R.string.diagnostics_field_berry_api, BerryApi.summary());
+        // The preloader is a separate library with its own C ABI version. Reporting it here makes a
+        // client/native mismatch visible before a launch, rather than as a feature that silently
+        // does nothing because the two were built from different ABI revisions.
+        addRow(rows, R.string.diagnostics_field_preloader_abi,
+                PreloaderInput.abiMatches(PreloaderInput.abiVersion())
+                        ? getString(R.string.diagnostics_preloader_abi_ok,
+                                PreloaderInput.abiVersion())
+                        : getString(R.string.diagnostics_preloader_abi_mismatch,
+                                PreloaderInput.abiVersion(),
+                                PreloaderInput.EXPECTED_ABI_VERSION));
     }
 
     /**
