@@ -72,9 +72,6 @@ public class BaseActivity extends AppCompatActivity {
                 public void onControllerConnected(String name, ControllerType type, String profileName) {
                     if (isFinishing()) return;
                     ControllerToastView.showConnected(BaseActivity.this, name, profileName, type);
-                    // A pad that just arrived is the cue to show the pointer, so the user can
-                    // see where it is before they move it.
-                    showControllerCursor();
                 }
 
                 @Override
@@ -354,6 +351,10 @@ public class BaseActivity extends AppCompatActivity {
      * Moves the controller pointer from the right stick, and consumes the stick while it is up so
      * the screen below does not also scroll (Phase 12).
      *
+     * <p>The pointer appears the first time the right stick is moved, not when the pad connects:
+     * auto-showing it would make the d-pad centre button click through the pointer for a user who
+     * navigates by focus and never wants it. Moving the stick is the explicit request for it.
+     *
      * <p>The right stick drives the pointer and the left stick is left alone, so scrolling a list
      * with the left stick still works exactly as it did; only the pointer's own axis is captured.
      * The axis convention comes from {@link GamepadAxes}, the same class the in-game wheel uses, so
@@ -371,14 +372,12 @@ public class BaseActivity extends AppCompatActivity {
                 controllerCursor.move(stick.x, stick.y,
                         CursorController.DEFAULT_DEAD_ZONE, CursorController.DEFAULT_CURVE_EXPONENT);
             }
+            // While the pointer is up the right stick belongs to it, so the frame is consumed and
+            // does not also scroll the list underneath. The left stick is untouched, so list
+            // scrolling still works; B dismisses the pointer and hands the stick back.
+            if (controllerCursor.isCursorVisible()) return true;
         }
         return super.dispatchGenericMotionEvent(event);
-    }
-
-    /** Shows the controller pointer (a pad connected, or a navigation button was pressed). */
-    protected void showControllerCursor() {
-        if (controllerCursor == null || !shouldShowControllerCursor()) return;
-        controllerCursor.enable();
     }
 
     /** Hides the controller pointer (the pad left, or a touch took over). */
@@ -409,6 +408,15 @@ public class BaseActivity extends AppCompatActivity {
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
         // The controller pointer claims the face button as its click before the tab handler runs,
         // so a pad that is pointing at something activates it rather than switching tabs.
+        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0
+                && controllerCursor != null
+                && controllerCursor.isCursorVisible()
+                && event.getKeyCode() == android.view.KeyEvent.KEYCODE_BUTTON_B) {
+            // B dismisses the pointer and hands the right stick back to the screen.
+            hideControllerCursor();
+            return true;
+        }
         if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
                 && event.getRepeatCount() == 0
                 && controllerCursor != null

@@ -37,6 +37,15 @@ public final class LauncherCursorOverlay extends View {
     private boolean visible;
     private long lastMs;
 
+    /**
+     * True while {@link #select()} is dispatching its synthesised tap.
+     *
+     * <p>Without it the overlay's own {@code onTouchEvent} would see that tap, treat it as a real
+     * finger and hide the pointer on the first controller click - the pointer would vanish the
+     * moment it was used. Only a genuine touch hides the pointer.
+     */
+    private boolean dispatchingSyntheticTap;
+
     public LauncherCursorOverlay(Context context) {
         super(context);
         setWillNotDraw(false);
@@ -136,6 +145,7 @@ public final class LauncherCursorOverlay extends View {
         long now = SystemClock.uptimeMillis();
         MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, x, y, 0);
         MotionEvent up = MotionEvent.obtain(now, now + 10, MotionEvent.ACTION_UP, x, y, 0);
+        dispatchingSyntheticTap = true;
         try {
             // Dispatch to the content root; this overlay is not interactive, so it is transparent
             // to the events and the child under the point receives them.
@@ -143,6 +153,8 @@ public final class LauncherCursorOverlay extends View {
             root.dispatchTouchEvent(up);
         } catch (Throwable ignored) {
             // A screen that throws while handling the tap must not take the launcher down.
+        } finally {
+            dispatchingSyntheticTap = false;
         }
         down.recycle();
         up.recycle();
@@ -159,8 +171,11 @@ public final class LauncherCursorOverlay extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // A real touch hides the pointer and is handled by the view below; never consume.
-        if (event.getActionMasked() == MotionEvent.ACTION_DOWN && visible) {
+        // A real touch hides the pointer and is handled by the view below; never consume. The
+        // overlay's own synthesised tap is ignored, or the pointer would vanish on first use.
+        if (!dispatchingSyntheticTap
+                && event.getActionMasked() == MotionEvent.ACTION_DOWN
+                && visible) {
             disable();
         }
         return false;
