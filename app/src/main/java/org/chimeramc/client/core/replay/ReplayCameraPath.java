@@ -21,12 +21,39 @@ public final class ReplayCameraPath {
 
     /** The built-in shot presets. */
     public enum Preset {
+        STATIC,
+        // Orbit family: the camera circles the subject.
         ORBIT,
+        ORBIT_LOW,
+        ORBIT_HIGH,
+        ARC,
+        DOLLY_ORBIT,
+        // Push/pull family: the camera moves along its own forward axis.
         DOLLY_ZOOM,
+        PUSH_IN,
+        PULL_OUT,
+        REVEAL,
+        // Lateral/vertical family: the camera slides without changing its facing.
+        TRUCK_LEFT,
+        TRUCK_RIGHT,
+        PEDESTAL_UP,
+        SWEEP,
+        FLY_BY,
+        // Pitch family: the camera holds position and tilts.
+        TILT_UP,
+        TILT_DOWN,
+        TOPDOWN,
+        // Aerial family: the camera rises and looks down.
         DRONE,
         CRANE,
-        STATIC
+        FLYOVER,
+        SPIRAL,
+        HELIX,
+        CHASE
     }
+
+    /** How many presets ship; pinned by a test so "dozens" cannot quietly shrink. */
+    public static final int PRESET_COUNT = Preset.values().length;
 
     /** One timed camera pose. */
     public static final class Keyframe {
@@ -136,20 +163,91 @@ public final class ReplayCameraPath {
         keyframes.clear();
         long duration = Math.max(1000L, durationMs);
         float cx = camera.x(), cy = camera.y(), cz = camera.z();
+        float yaw = camera.yawDeg();
+        double yawRad = Math.toRadians(yaw);
+        float fx = (float) Math.sin(yawRad);   // forward
+        float fz = (float) Math.cos(yawRad);
+        float rx = (float) Math.cos(yawRad);   // right
+        float rz = (float) -Math.sin(yawRad);
         switch (preset) {
+            case STATIC:
+                capture(camera, 0L);
+                capture(camera, duration);
+                break;
             case ORBIT:
-                orbit(camera, cx, cy, cz, duration, 24f);
+                orbit(cx, cy, cz, duration, 24f, 2f, 8f);
+                break;
+            case ORBIT_LOW:
+                orbit(cx, cy, cz, duration, 18f, 0.5f, 2f);
+                break;
+            case ORBIT_HIGH:
+                orbit(cx, cy, cz, duration, 30f, 12f, 30f);
+                break;
+            case ARC:
+                arc(cx, cy, cz, duration, 20f);
+                break;
+            case DOLLY_ORBIT:
+                dollyOrbit(cx, cy, cz, duration);
                 break;
             case DOLLY_ZOOM:
-                dolly(camera, cx, cy, cz, duration);
+                pushAlong(cx, cy, cz, duration, fx, fz, 8f, 2f, 1.5f, 1f);
+                break;
+            case PUSH_IN:
+                pushAlong(cx, cy, cz, duration, fx, fz, 10f, 3f, 2f, 1.5f);
+                break;
+            case PULL_OUT:
+                pushAlong(cx, cy, cz, duration, fx, fz, 2f, 1f, 10f, 3f);
+                break;
+            case REVEAL:
+                reveal(cx, cy, cz, duration, fx, fz);
+                break;
+            case TRUCK_LEFT:
+                slide(cx, cy, cz, duration, rx, rz, yaw, 10f, 0f, 1.5f, -8f, 0f, 1.5f);
+                break;
+            case TRUCK_RIGHT:
+                slide(cx, cy, cz, duration, rx, rz, yaw, -8f, 0f, 1.5f, 10f, 0f, 1.5f);
+                break;
+            case PEDESTAL_UP:
+                addKeyframe(new Keyframe(0L, cx, cy - 2f, cz, yaw, 2f));
+                addKeyframe(new Keyframe(duration, cx, cy + 12f, cz, yaw, 6f));
+                break;
+            case SWEEP:
+                slide(cx, cy, cz, duration, rx, rz, yaw, -12f, 3f, 4f, 12f, 3f, 4f);
+                break;
+            case FLY_BY:
+                flyBy(cx, cy, cz, duration, rx, rz, yaw);
+                break;
+            case TILT_UP:
+                addKeyframe(new Keyframe(0L, cx, cy, cz, yaw, -10f));
+                addKeyframe(new Keyframe(duration, cx, cy, cz, yaw, 30f));
+                break;
+            case TILT_DOWN:
+                addKeyframe(new Keyframe(0L, cx, cy, cz, yaw, 35f));
+                addKeyframe(new Keyframe(duration, cx, cy, cz, yaw, -15f));
+                break;
+            case TOPDOWN:
+                addKeyframe(new Keyframe(0L, cx, cy + 6f, cz, yaw, 20f));
+                addKeyframe(new Keyframe(duration, cx, cy + 22f, cz, yaw, 88f));
                 break;
             case DRONE:
-                drone(camera, cx, cy, cz, duration);
+                drone(cx, cy, cz, duration, yaw, rx, rz);
                 break;
             case CRANE:
-                crane(camera, cx, cy, cz, duration);
+                addKeyframe(new Keyframe(0L, cx, cy - 2f, cz, yaw, 4f));
+                addKeyframe(new Keyframe(duration, cx, cy + 14f, cz, yaw, 34f));
                 break;
-            case STATIC:
+            case FLYOVER:
+                flyOver(cx, cy, cz, duration, yaw, rx, rz);
+                break;
+            case SPIRAL:
+                spiral(cx, cy, cz, duration, 22f, 2f, 14f, 1f);
+                break;
+            case HELIX:
+                spiral(cx, cy, cz, duration, 14f, 0f, 20f, 2f);
+                break;
+            case CHASE:
+                chase(cx, cy, cz, duration, fx, fz);
+                break;
             default:
                 capture(camera, 0L);
                 capture(camera, duration);
@@ -157,9 +255,9 @@ public final class ReplayCameraPath {
         }
     }
 
-    /** A full circle at a fixed radius, always facing the subject. */
-    private void orbit(ReplayCamera camera, float cx, float cy, float cz, long duration,
-                       float radius) {
+    /** A full circle at a fixed radius and height, always facing the subject. */
+    private void orbit(float cx, float cy, float cz, long duration, float radius, float height,
+                       float pitch) {
         int steps = 16;
         for (int i = 0; i <= steps; i++) {
             float t = i / (float) steps;
@@ -167,36 +265,122 @@ public final class ReplayCameraPath {
             float x = cx + (float) (Math.sin(angle) * radius);
             float z = cz + (float) (Math.cos(angle) * radius);
             float yaw = (float) Math.toDegrees(angle) + 180f;
-            addKeyframe(new Keyframe((long) (t * duration), x, cy + 2f, z, yaw, 8f));
+            addKeyframe(new Keyframe((long) (t * duration), x, cy + height, z, yaw, pitch));
         }
     }
 
-    /** A slow push-in from behind the subject to just over its shoulder. */
-    private void dolly(ReplayCamera camera, float cx, float cy, float cz, long duration) {
-        float yaw = camera.yawDeg();
-        double yawRad = Math.toRadians(yaw);
-        float fx = (float) Math.sin(yawRad);
-        float fz = (float) Math.cos(yawRad);
-        addKeyframe(new Keyframe(0L, cx - fx * 8f, cy + 1.5f, cz - fz * 8f, yaw, 6f));
-        addKeyframe(new Keyframe(duration, cx - fx * 2f, cy + 1f, cz - fz * 2f, yaw, 4f));
+    /** A half circle around the subject, from one side to the other. */
+    private void arc(float cx, float cy, float cz, long duration, float radius) {
+        int steps = 12;
+        for (int i = 0; i <= steps; i++) {
+            float t = i / (float) steps;
+            double angle = Math.toRadians(90.0 + t * 180.0);
+            float x = cx + (float) (Math.sin(angle) * radius);
+            float z = cz + (float) (Math.cos(angle) * radius);
+            float yaw = (float) Math.toDegrees(angle) + 180f;
+            addKeyframe(new Keyframe((long) (t * duration), x, cy + 3f, z, yaw, 6f));
+        }
+    }
+
+    /** A circle whose radius tightens from wide to close, ending on the subject. */
+    private void dollyOrbit(float cx, float cy, float cz, long duration) {
+        int steps = 20;
+        for (int i = 0; i <= steps; i++) {
+            float t = i / (float) steps;
+            double angle = Math.toRadians(t * 360.0);
+            float radius = 24f - 14f * t;
+            float x = cx + (float) (Math.sin(angle) * radius);
+            float z = cz + (float) (Math.cos(angle) * radius);
+            float yaw = (float) Math.toDegrees(angle) + 180f;
+            addKeyframe(new Keyframe((long) (t * duration), x, cy + 2f + t, z, yaw, 6f + 6f * t));
+        }
+    }
+
+    /**
+     * A push along the camera's own forward axis, from {@code startBehind} blocks behind the subject
+     * to {@code endBehind}, at heights {@code startHeight} and {@code endHeight}. A negative
+     * "behind" distance pushes through the subject, so both are kept positive by the callers.
+     */
+    private void pushAlong(float cx, float cy, float cz, long duration, float fx, float fz,
+                           float startBehind, float startHeight, float endBehind,
+                           float endHeight) {
+        float yaw = yawFor(-fx, -fz);
+        addKeyframe(new Keyframe(0L, cx - fx * startBehind, cy + startHeight,
+                cz - fz * startBehind, yaw, 6f));
+        addKeyframe(new Keyframe(duration, cx - fx * endBehind, cy + endHeight,
+                cz - fz * endBehind, yaw, 4f));
+    }
+
+    /** A drop from high and far behind down to just behind the subject. */
+    private void reveal(float cx, float cy, float cz, long duration, float fx, float fz) {
+        float yaw = yawFor(-fx, -fz);
+        addKeyframe(new Keyframe(0L, cx - fx * 18f, cy + 16f, cz - fz * 18f, yaw, 34f));
+        addKeyframe(new Keyframe(duration, cx - fx * 3f, cy + 1f, cz - fz * 3f, yaw, 4f));
+    }
+
+    /** A lateral slide: the camera moves along the right vector and holds its facing. */
+    private void slide(float cx, float cy, float cz, long duration, float rx, float rz, float yaw,
+                       float startSide, float startHeight, float startPitch,
+                       float endSide, float endHeight, float endPitch) {
+        addKeyframe(new Keyframe(0L, cx + rx * startSide, cy + startHeight,
+                cz + rz * startSide, yaw, startPitch));
+        addKeyframe(new Keyframe(duration, cx + rx * endSide, cy + endHeight,
+                cz + rz * endSide, yaw, endPitch));
+    }
+
+    /** A pass from one side of the subject to the other at altitude, facing the travel direction. */
+    private void flyBy(float cx, float cy, float cz, long duration, float rx, float rz, float yaw) {
+        float travelYaw = yawFor(rx, rz);
+        addKeyframe(new Keyframe(0L, cx - rx * 16f, cy + 6f, cz - rz * 16f, travelYaw, 8f));
+        addKeyframe(new Keyframe(duration, cx + rx * 16f, cy + 6f, cz + rz * 16f, travelYaw, 8f));
+    }
+
+    /** A high sweep across the subject, looking down. */
+    private void flyOver(float cx, float cy, float cz, long duration, float yaw, float rx,
+                         float rz) {
+        addKeyframe(new Keyframe(0L, cx - rx * 18f, cy + 18f, cz - rz * 18f, yaw, 40f));
+        addKeyframe(new Keyframe(duration / 2, cx, cy + 22f, cz, yaw, 60f));
+        addKeyframe(new Keyframe(duration, cx + rx * 18f, cy + 18f, cz + rz * 18f, yaw, 40f));
+    }
+
+    /** A circle that also rises, with {@code turns} full revolutions. */
+    private void spiral(float cx, float cy, float cz, long duration, float radius, float startRise,
+                        float rise, float turns) {
+        int steps = Math.max(8, (int) (16 * turns));
+        for (int i = 0; i <= steps; i++) {
+            float t = i / (float) steps;
+            double angle = Math.toRadians(t * 360.0 * turns);
+            float x = cx + (float) (Math.sin(angle) * radius);
+            float z = cz + (float) (Math.cos(angle) * radius);
+            float yaw = (float) Math.toDegrees(angle) + 180f;
+            addKeyframe(new Keyframe((long) (t * duration), x, cy + startRise + rise * t, z, yaw,
+                    10f + 10f * t));
+        }
+    }
+
+    /** Trails the subject from a fixed offset behind and slightly above, with a gentle bob. */
+    private void chase(float cx, float cy, float cz, long duration, float fx, float fz) {
+        float yaw = yawFor(-fx, -fz);
+        int steps = 8;
+        for (int i = 0; i <= steps; i++) {
+            float t = i / (float) steps;
+            float bob = (float) Math.sin(t * Math.PI * 2.0) * 0.6f;
+            addKeyframe(new Keyframe((long) (t * duration), cx - fx * 6f, cy + 2.5f + bob,
+                    cz - fz * 6f, yaw, 8f));
+        }
+    }
+
+    /** The yaw that makes the forward vector point along {@code (dx, dz)}. */
+    private static float yawFor(float dx, float dz) {
+        return (float) Math.toDegrees(Math.atan2(dx, dz));
     }
 
     /** A high, gently descending aerial sweep. */
-    private void drone(ReplayCamera camera, float cx, float cy, float cz, long duration) {
-        float yaw = camera.yawDeg();
-        double yawRad = Math.toRadians(yaw);
-        float rx = (float) Math.cos(yawRad);
-        float rz = (float) -Math.sin(yawRad);
+    private void drone(float cx, float cy, float cz, long duration, float yaw, float rx,
+                       float rz) {
         addKeyframe(new Keyframe(0L, cx - rx * 14f, cy + 20f, cz - rz * 14f, yaw, 42f));
         addKeyframe(new Keyframe(duration / 2, cx, cy + 16f, cz, yaw, 36f));
         addKeyframe(new Keyframe(duration, cx + rx * 14f, cy + 12f, cz + rz * 14f, yaw, 28f));
-    }
-
-    /** A vertical rise from ground level, looking down. */
-    private void crane(ReplayCamera camera, float cx, float cy, float cz, long duration) {
-        float yaw = camera.yawDeg();
-        addKeyframe(new Keyframe(0L, cx, cy - 2f, cz, yaw, 4f));
-        addKeyframe(new Keyframe(duration, cx, cy + 14f, cz, yaw, 34f));
     }
 
     private static void apply(ReplayCamera out, Keyframe k) {
