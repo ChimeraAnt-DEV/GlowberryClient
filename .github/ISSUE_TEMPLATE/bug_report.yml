@@ -1,4 +1,4 @@
-name: 🐛 Bug report
+name: Bug report
 description: Report a crash, a glitch, or something that does not work as expected.
 labels: ["bug"]
 body:

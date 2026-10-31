@@ -27,7 +27,7 @@ jobs:
 
             SANITIZED_URL=$(echo "$WEBHOOK_URL" | tr -d '[:space:]')
 
-            MESSAGE=$(printf "@everyone\n\n🚨 **Beta Release Published!** 🚨\n\n**Version:** %s\n**Release:** %s\n\n🔗 **[View Release on GitHub](%s)**\n\nThis is a beta build. Report any bugs in #bug-reports." "$TAG" "$NAME" "$URL")
+            MESSAGE=$(printf "@everyone\n\n**Beta Release Published!** \n\n**Version:** %s\n**Release:** %s\n\n**[View Release on GitHub](%s)**\n\nThis is a beta build. Report any bugs in #bug-reports." "$TAG" "$NAME" "$URL")
 
             PAYLOAD=$(jq -n --arg content "$MESSAGE" '{
               content: $content,

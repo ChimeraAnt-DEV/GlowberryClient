@@ -159,6 +159,29 @@ public class NoEmojiTest {
                         .forEach(out::add);
             }
         }
+        // The automation and the issue templates are user-facing too: the workflows post the release
+        // announcements and the templates are the first thing a reporter reads, so an emoji there is
+        // as visible as one in the app. They had them long after the app was clean, which is the
+        // reason the gate now covers the whole repository surface rather than only the shipped
+        // resources.
+        Path github = resolve(".github");
+        if (Files.exists(github)) {
+            try (Stream<Path> walk = Files.walk(github)) {
+                walk.filter(Files::isRegularFile)
+                        .filter(p -> p.toString().endsWith(".yml")
+                                || p.toString().endsWith(".yaml"))
+                        .forEach(out::add);
+            }
+        }
+        // The preloader's own docs ship with the submodule and are read by contributors.
+        Path preloaderDocs = resolve("app/src/main/cpp/preloader/docs");
+        if (Files.exists(preloaderDocs)) {
+            try (Stream<Path> walk = Files.walk(preloaderDocs)) {
+                walk.filter(Files::isRegularFile)
+                        .filter(p -> p.toString().endsWith(".md"))
+                        .forEach(out::add);
+            }
+        }
         return out;
     }
 
