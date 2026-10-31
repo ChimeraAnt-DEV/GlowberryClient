@@ -19,6 +19,7 @@ import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod;
 import org.chimeramc.client.util.MainThread;
+import org.chimeramc.client.util.OverlayRefreshGate;
 
 public class FpsDisplayOverlay {
     private static final int UPDATE_INTERVAL = 250;
@@ -42,6 +43,8 @@ public class FpsDisplayOverlay {
      * native value is unavailable.
      */
     private final FrameRateMeter fallbackMeter = new FrameRateMeter();
+    private final OverlayRefreshGate refreshGate =
+            new OverlayRefreshGate(UPDATE_INTERVAL * 4L);
     private volatile int fallbackFps;
 
     private float initialX, initialY;
@@ -93,6 +96,7 @@ public class FpsDisplayOverlay {
             overlayView = LayoutInflater.from(activity).inflate(R.layout.overlay_stats_display, null);
             statsText = overlayView.findViewById(R.id.stats_text);
             statsText.setText(activity.getString(R.string.mod_overlay_fps_unknown));
+            refreshGate.reset();
 
             wmParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -167,14 +171,17 @@ public class FpsDisplayOverlay {
     private void updateDisplay() {
         if (statsText != null) {
             int fps = nativeFps();
-            if (fps > 0) {
-                statsText.setText(activity.getString(R.string.mod_overlay_fps_value, fps));
-            } else if (fallbackMeter.isRunning() && fallbackFps > 0) {
+            if (fps <= 0 && fallbackMeter.isRunning() && fallbackFps > 0) {
                 // The native hook did not resolve on this build; show the host's own present rate
                 // rather than a permanent "FPS: --", which read as a broken module.
-                statsText.setText(activity.getString(R.string.mod_overlay_fps_value, fallbackFps));
-            } else {
-                statsText.setText(activity.getString(R.string.mod_overlay_fps_unknown));
+                fps = fallbackFps;
+            }
+            // The timer runs four times a second but the readout changes far less often, so the
+            // text is built and set only when the number actually differs (item 187).
+            if (refreshGate.shouldRefresh(Integer.toString(fps), SystemClock.uptimeMillis())) {
+                statsText.setText(fps > 0
+                        ? activity.getString(R.string.mod_overlay_fps_value, fps)
+                        : activity.getString(R.string.mod_overlay_fps_unknown));
             }
             clampCurrentPosition(false);
         }

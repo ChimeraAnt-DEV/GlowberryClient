@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,6 +19,7 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.util.MainThread;
+import org.chimeramc.client.util.OverlayRefreshGate;
 
 /**
  * A small draggable text overlay shared by the client-side readouts (List Players, Debug Menu).
@@ -43,11 +45,18 @@ abstract class TextOverlay {
     private boolean dragging;
     private final int dragThreshold;
 
+    // The timer fires far more often than the text changes, so an unchanged readout would repaint
+    // an identical frame. The gate paints a changed value at once and holds an unchanged one to the
+    // refresh cadence (item 187). Built in the constructor, not here: `refreshIntervalMs()` is
+    // overridden by the subclasses, and a field initializer would call the override before the
+    // subclass's own fields exist.
+    private final OverlayRefreshGate refreshGate;
+
     private final Runnable refreshRunnable = new Runnable() {
         @Override
         public void run() {
             if (!isShowing) return;
-            refreshText();
+            refreshTextIfChanged();
             handler.postDelayed(this, refreshIntervalMs());
         }
     };
@@ -57,6 +66,7 @@ abstract class TextOverlay {
         this.modId = modId;
         this.windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         this.dragThreshold = (int) (10 * activity.getResources().getDisplayMetrics().density);
+        this.refreshGate = new OverlayRefreshGate(refreshIntervalMs());
     }
 
     /** The overlay's layout, with one {@code R.id.stats_text} TextView. */
@@ -87,6 +97,7 @@ abstract class TextOverlay {
             overlayView = LayoutInflater.from(activity).inflate(layoutRes(), null);
             textView = overlayView.findViewById(R.id.stats_text);
             locked = InbuiltModManager.getInstance(activity).isOverlayLocked(modId);
+            refreshGate.reset();
             refreshText();
 
             wmParams = new WindowManager.LayoutParams(
@@ -140,6 +151,23 @@ abstract class TextOverlay {
             textView.setText(buildText());
         } catch (Throwable ignored) {
             textView.setText(activity.getString(R.string.mod_overlay_data_unavailable));
+        }
+    }
+
+    /**
+     * The timed path: only touches the view when the text actually changed, or when the refresh
+     * cadence has elapsed so a signature-stable overlay still repaints.
+     */
+    private void refreshTextIfChanged() {
+        if (textView == null) return;
+        String text;
+        try {
+            text = buildText();
+        } catch (Throwable t) {
+            text = activity.getString(R.string.mod_overlay_data_unavailable);
+        }
+        if (refreshGate.shouldRefresh(text, SystemClock.uptimeMillis())) {
+            textView.setText(text);
         }
     }
 

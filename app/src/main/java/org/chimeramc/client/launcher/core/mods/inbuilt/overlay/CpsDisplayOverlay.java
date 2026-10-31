@@ -18,6 +18,7 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.util.MainThread;
+import org.chimeramc.client.util.OverlayRefreshGate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ public class CpsDisplayOverlay {
     private long touchDownTime = 0;
 
     private int lastButtonState = 0;
+    private final OverlayRefreshGate refreshGate = new OverlayRefreshGate(UPDATE_INTERVAL * 3L);
 
     private final Runnable updateRunnable = new Runnable() {
         @Override
@@ -152,6 +154,7 @@ public class CpsDisplayOverlay {
             overlayView = LayoutInflater.from(activity).inflate(R.layout.overlay_stats_display, null);
             statsText = overlayView.findViewById(R.id.stats_text);
             statsText.setText(activity.getString(R.string.mod_overlay_cps_value, 0));
+            refreshGate.reset();
 
             wmParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -223,7 +226,12 @@ public class CpsDisplayOverlay {
 
     private void updateDisplay() {
         if (statsText != null) {
-            statsText.setText(activity.getString(R.string.mod_overlay_cps_value, getCps()));
+            int cps = getCps();
+            // The timer runs ten times a second while the count only changes on a click, so an
+            // unchanged readout must not repaint (item 187).
+            if (refreshGate.shouldRefresh(Integer.toString(cps), SystemClock.uptimeMillis())) {
+                statsText.setText(activity.getString(R.string.mod_overlay_cps_value, cps));
+            }
             clampCurrentPosition(false);
         }
     }

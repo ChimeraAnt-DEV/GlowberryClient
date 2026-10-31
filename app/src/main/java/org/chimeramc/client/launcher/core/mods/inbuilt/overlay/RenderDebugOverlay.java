@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.os.Looper;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,6 +16,7 @@ import org.chimeramc.client.core.cosmetics.CosmeticsDiagnosticsReport;
 import org.chimeramc.client.core.cosmetics.RenderDebugLines;
 import org.chimeramc.client.ui.components.UiTokens;
 import org.chimeramc.client.util.MainThread;
+import org.chimeramc.client.util.OverlayRefreshGate;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ public final class RenderDebugOverlay {
     private final LinearLayout root;
     private final Handler handler = MainThread.handler();
     private boolean running;
+    private final OverlayRefreshGate refreshGate = new OverlayRefreshGate(1000L);
 
     private final Runnable tick = new Runnable() {
         @Override
@@ -71,6 +74,7 @@ public final class RenderDebugOverlay {
     /** Starts refreshing (once a second) while the overlay is shown. */
     public void start() {
         running = true;
+        refreshGate.reset();
         refresh();
         handler.removeCallbacks(tick);
         handler.postDelayed(tick, 1000L);
@@ -99,9 +103,17 @@ public final class RenderDebugOverlay {
             List<String> lines = RenderDebugLines.lines(v);
             StringBuilder b = new StringBuilder();
             for (String line : lines) b.append(line).append('\n');
-            text.setText(b.toString().trim());
+            String rendered = b.toString().trim();
+            // The readout is a diagnostics dump, so a SetText on an unchanged dump is pure cost.
+            // The gate rebuilds it on change and repaints at most once per interval otherwise
+            // (item 187).
+            if (refreshGate.shouldRefresh(rendered, SystemClock.uptimeMillis())) {
+                text.setText(rendered);
+            }
         } catch (Throwable t) {
-            text.setText("render debug unavailable");
+            if (refreshGate.shouldRefresh("render debug unavailable", SystemClock.uptimeMillis())) {
+                text.setText("render debug unavailable");
+            }
         }
     }
 
