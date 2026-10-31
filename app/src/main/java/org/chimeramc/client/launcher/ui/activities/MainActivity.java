@@ -120,6 +120,9 @@ import okhttp3.OkHttpClient;
  import static org.chimeramc.client.core.minecraft.MinecraftProcessRestarterKt.EXTRA_CLOSE_RESTART_ACTIVITY_ON_FIRST_DRAW;
 
  public class MainActivity extends BaseActivity {
+
+    private static final long TIP_ROTATE_MS = 8000L;
+
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
@@ -191,6 +194,8 @@ import okhttp3.OkHttpClient;
     private final ExecutorService launchStatsExecutor = Executors.newSingleThreadExecutor();
 
     private final Handler uiHandler = MainThread.handler();
+    /** The lifetime of the self-reposting tip rotation, closed in onDestroy. */
+    private final MainThread.Scope tipScope = MainThread.scope();
     private Runnable pulseRunnable;
     private boolean pulseRunning;
     private View launchShimmer;
@@ -2010,8 +2015,11 @@ import okhttp3.OkHttpClient;
         String[] tips = getResources().getStringArray(R.array.launcher_tips);
         if (tips.length == 0 || binding.tipText == null) return;
         binding.tipText.setText(tips[new java.util.Random().nextInt(tips.length)]);
-        android.os.Handler handler = new android.os.Handler(getMainLooper());
-        Runnable rotateTip = new Runnable() {
+        // The tip rotation is a self-reposting tick. It runs through the activity's scope so
+        // onDestroy removes the pending post instead of firing into a destroyed Activity
+        // (items 14, 295).
+        if (tipScope.isClosed()) return;
+        tipScope.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (binding == null || binding.tipText == null) return;
@@ -2020,10 +2028,9 @@ import okhttp3.OkHttpClient;
                     binding.tipText.setText(tips[new java.util.Random().nextInt(tips.length)]);
                     binding.tipText.animate().alpha(1f).setDuration(300).start();
                 }).start();
-                handler.postDelayed(this, 8000);
+                tipScope.postDelayed(this, TIP_ROTATE_MS);
             }
-        };
-        handler.postDelayed(rotateTip, 8000);
+        }, TIP_ROTATE_MS);
     }
 
     private void initContentManagementSection() {
@@ -2913,6 +2920,8 @@ import okhttp3.OkHttpClient;
         launchStatsExecutor.shutdownNow();
         // The account executor was never shut down either, so it outlived the Activity.
         accountExecutor.shutdownNow();
+        // Removes a pending tip rotation, so it cannot fire into the destroyed Activity.
+        tipScope.close();
     }
 
     /**

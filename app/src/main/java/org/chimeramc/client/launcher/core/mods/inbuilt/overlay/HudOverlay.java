@@ -104,7 +104,7 @@ public class HudOverlay extends View {
         }
     };
 
-    private final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final android.os.Handler handler = org.chimeramc.client.util.MainThread.handler();
 
     // The attach is deferred by 100ms so the window token is settled, which is a window a hide can
     // land in. The gate makes that hide win instead of the overlay reappearing untracked.

@@ -138,7 +138,7 @@ public class ContentManager {
      */
     private void runOperation(Runnable work, ContentOperationCallback callback) {
         final android.os.Handler mainHandler =
-                new android.os.Handler(android.os.Looper.getMainLooper());
+                org.chimeramc.client.util.MainThread.handler();
         if (!SafeExecutor.submit(refreshExecutor, () -> {
             try {
                 work.run();

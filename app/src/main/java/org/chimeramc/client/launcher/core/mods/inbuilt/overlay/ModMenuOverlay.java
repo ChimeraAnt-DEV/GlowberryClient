@@ -77,7 +77,7 @@ public class ModMenuOverlay {
     private boolean isShowing = false;
 
     private RecyclerView modsRecycler;
-    private final android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final android.os.Handler searchHandler = MainThread.handler();
     private final Runnable searchRunnable = this::applyFilters;
     private ModMenuAdapter adapter;
     private ModMenuTheme theme;

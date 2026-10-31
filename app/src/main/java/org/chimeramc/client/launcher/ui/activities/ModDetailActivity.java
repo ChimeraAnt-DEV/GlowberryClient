@@ -30,6 +30,10 @@ import java.io.File;
 
 public class ModDetailActivity extends BaseActivity {
 
+    /** The lifetime of the staggered entrance posts, closed in onDestroy. */
+    private final org.chimeramc.client.util.MainThread.Scope staggerScope =
+            org.chimeramc.client.util.MainThread.scope();
+
     private MainViewModel viewModel;
     private Mod currentMod;
     private int modPosition;
@@ -252,7 +256,6 @@ public class ModDetailActivity extends BaseActivity {
     private void runEnterAnimations() {
         float density = getResources().getDisplayMetrics().density;
         float dy = 16f * density;
-        android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
 
         View heroContainer = findViewById(R.id.mod_detail_header_container);
         View[] cards = new View[]{headerContainer, heroContainer, infoContainer, actionsContainer};
@@ -262,13 +265,22 @@ public class ModDetailActivity extends BaseActivity {
             card.setAlpha(0f);
             card.setTranslationY(dy);
             final int delay = 100 + i * 80;
-            handler.postDelayed(() -> {
+            // Staggered through the activity's scope, so backing out mid-entrance removes the
+            // pending posts instead of firing them into a detached tree (items 14, 295).
+            staggerScope.postDelayed(() -> {
                 DynamicAnim.springAlphaTo(card, 1f).start();
                 DynamicAnim.springTranslationYTo(card, 0f).start();
             }, delay);
         }
 
         // 不对 mod 名称做入场动画，保持静态
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Removes any entrance animation still waiting to fire.
+        staggerScope.close();
+        super.onDestroy();
     }
 
     private void confirmDeleteMod() {

@@ -28,9 +28,7 @@ public class UIHelper {
         if (context instanceof android.app.Activity) {
             ((android.app.Activity) context).runOnUiThread(action);
         } else {
-            new android.os.Handler(
-                    android.os.Looper.getMainLooper()
-            ).post(action);
+            org.chimeramc.client.util.MainThread.post(action);
         }
     }
 

@@ -522,7 +522,7 @@ public class RadialMenuOverlay {
     }
 
     private final android.os.Handler mainHandler =
-            new android.os.Handler(android.os.Looper.getMainLooper());
+            org.chimeramc.client.util.MainThread.handler();
     private final Runnable detachRunnable = this::detachQuietly;
 
     private void detachQuietly() {

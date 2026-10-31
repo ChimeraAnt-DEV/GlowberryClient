@@ -36,7 +36,18 @@ public class ThreadOwnershipTest {
     private static final Path SOURCE_ROOT = Paths.get("src", "main", "java");
 
     private static final String THREAD_CONSTRUCTION = "new Thread(";
-    private static final String MAIN_HANDLER = "new Handler(Looper.getMainLooper())";
+
+    /**
+     * The main-looper Handler, in every spelling.
+     *
+     * <p>A single literal only caught the import-short form; seven sites used the fully-qualified
+     * {@code new android.os.Handler(android.os.Looper.getMainLooper())} and slipped past. The check
+     * is now a regex over both spellings, and it also catches a bare {@code getMainLooper()} call
+     * (the {@code Activity} form).
+     */
+    private static final java.util.regex.Pattern MAIN_HANDLER = java.util.regex.Pattern.compile(
+            "new\\s+(?:android\\.os\\.)?Handler\\s*\\(\\s*"
+                    + "(?:(?:android\\.os\\.)?Looper\\.)?getMainLooper\\s*\\(\\s*\\)");
 
     private static final List<String> OWNERS = List.of(
             "org/chimeramc/client/util/AppExecutors.java",
@@ -53,7 +64,7 @@ public class ThreadOwnershipTest {
 
     @Test
     public void noMainLooperHandlerIsConstructedOutsideTheOwner() throws IOException {
-        List<String> offenders = scan(MAIN_HANDLER, OWNERS);
+        List<String> offenders = scanPattern(MAIN_HANDLER, OWNERS);
         if (!offenders.isEmpty()) {
             fail("Use MainThread.handler() or MainThread.post(...) instead of constructing a"
                     + " main-looper Handler directly:\n  " + String.join("\n  ", offenders));
@@ -71,7 +82,29 @@ public class ThreadOwnershipTest {
         assertTrue("AppExecutors must own the thread construction",
                 executors.contains(THREAD_CONSTRUCTION));
         assertTrue("MainThread must own the main-looper Handler construction",
-                mainThread.contains(MAIN_HANDLER));
+                MAIN_HANDLER.matcher(mainThread).find());
+    }
+
+    private static List<String> scanPattern(java.util.regex.Pattern pattern, List<String> exemptions)
+            throws IOException {
+        List<String> offenders = new ArrayList<>();
+        Path root = SOURCE_ROOT;
+        if (!Files.isDirectory(root)) {
+            fail("source root not found from " + root.toAbsolutePath());
+        }
+        try (Stream<Path> files = Files.walk(root)) {
+            for (Path file : (Iterable<Path>) files.filter(p -> p.toString().endsWith(".java"))::iterator) {
+                String relative = root.relativize(file).toString().replace('\\', '/');
+                if (exemptions.contains(relative)) continue;
+                List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+                for (int i = 0; i < lines.size(); i++) {
+                    if (pattern.matcher(lines.get(i)).find()) {
+                        offenders.add(relative + ":" + (i + 1) + " " + lines.get(i).trim());
+                    }
+                }
+            }
+        }
+        return offenders;
     }
 
     private static List<String> scan(String needle, List<String> exemptions) throws IOException {
