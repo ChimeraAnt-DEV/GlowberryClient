@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,10 +69,15 @@ public class QuickActionsAdapter extends RecyclerView.Adapter<QuickActionsAdapte
         return items.size();
     }
 
+    /** Replaces the list, animating only what changed; an action row's identity is its action id. */
     public void updateItems(List<QuickActionItem> newItems) {
+        List<QuickActionItem> next = newItems != null ? newItems : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(items, next,
+                item -> item.actionId,
+                (old, fresh) -> old.titleRes == fresh.titleRes && old.iconRes == fresh.iconRes);
         items.clear();
-        if (newItems != null) items.addAll(newItems);
-        notifyDataSetChanged();
+        items.addAll(next);
+        ListDiffDispatch.apply(this, diff);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

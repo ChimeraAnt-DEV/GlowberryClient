@@ -16,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
+
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.UnifiedMod;
 import org.chimeramc.client.core.mods.inbuilt.model.ModAvailability;
@@ -263,9 +266,17 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         if (reordered.isEmpty()) return;
         reordered.addAll(actionBlock);
+        // A saved order usually moves one module, and the rows around it are the same rows. Diffing
+        // lets the list animate that one move instead of rebuilding every card while the user is
+        // looking at the arrangement they just chose.
+        ListDiff.Result diff = ListDiff.compute(items, reordered,
+                MenuItem::stableKey,
+                (oldItem, freshItem) -> oldItem.showGroupLabel == freshItem.showGroupLabel
+                        && Objects.equals(oldItem.mod == null ? null : oldItem.mod.getName(),
+                                freshItem.mod == null ? null : freshItem.mod.getName()));
         items.clear();
         items.addAll(reordered);
-        notifyDataSetChanged();
+        ListDiffDispatch.apply(this, diff);
     }
 
     @Override
@@ -370,13 +381,22 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (previous >= 0 && previous < items.size()) notifyItemChanged(previous);
     }
 
+    /**
+     * Switches between the grid and the single-column list.
+     *
+     * <p>Every card changes its view type, so the rows are all re-created: this is a range change
+     * over the whole list rather than a dataset change, which keeps the RecyclerView's item
+     * animations and its stable ids working across the switch.
+     */
     public void setCompactMode(boolean compactMode) {
         if (this.compactMode == compactMode) return;
         this.compactMode = compactMode;
         items.clear();
         toggleStates.clear();
         favoriteStates.clear();
-        notifyDataSetChanged();
+        if (getItemCount() > 0) {
+            notifyItemRangeChanged(0, getItemCount());
+        }
     }
 
     /**
@@ -488,9 +508,12 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return position >= 0 && position < items.size() && items.get(position).isGroup();
     }
 
+    /** The theme is baked into every card, so every row's content changed. */
     public void setTheme(ModMenuTheme theme) {
         this.theme = theme != null ? theme : new ModMenuTheme(null);
-        notifyDataSetChanged();
+        if (getItemCount() > 0) {
+            notifyItemRangeChanged(0, getItemCount());
+        }
     }
 
     @NonNull

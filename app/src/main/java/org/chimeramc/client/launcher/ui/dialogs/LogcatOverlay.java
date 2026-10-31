@@ -729,15 +729,30 @@ public class LogcatOverlay extends FrameLayout {
             notifyItemRangeInserted(items.size() - more.size(), more.size());
         }
 
+        /**
+         * Replaces the visible lines, usually after a filter change.
+         *
+         * <p>A log line has no stable identity — the same text legitimately appears twice — so this
+         * is a genuine replacement rather than a diff. It is still reported as a remove run and an
+         * insert run rather than a dataset change, which keeps the RecyclerView's own bookkeeping
+         * (and any running item animations) consistent while the list is swapped.
+         */
         void setItems(@NonNull List<CharSequence> newItems) {
-            items.clear();
+            int oldCount = items.size();
+            if (oldCount > 0) {
+                items.clear();
+                notifyItemRangeRemoved(0, oldCount);
+            }
+            if (newItems.isEmpty()) return;
             items.addAll(newItems);
-            notifyDataSetChanged();
+            notifyItemRangeInserted(0, items.size());
         }
 
         void clear() {
+            int oldCount = items.size();
+            if (oldCount == 0) return;
             items.clear();
-            notifyDataSetChanged();
+            notifyItemRangeRemoved(0, oldCount);
         }
     }
 

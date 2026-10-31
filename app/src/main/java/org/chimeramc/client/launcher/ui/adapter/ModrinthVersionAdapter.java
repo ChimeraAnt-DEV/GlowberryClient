@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.modrinth.models.ModrinthVersion;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +31,17 @@ public class ModrinthVersionAdapter extends RecyclerView.Adapter<ModrinthVersion
         this.listener = listener;
     }
 
+    /** Replaces the list, animating only what changed; a version's identity is its id. */
     public void setVersions(List<ModrinthVersion> items) {
+        List<ModrinthVersion> next = items != null ? items : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(versions, next,
+                version -> version.id,
+                (old, fresh) -> java.util.Objects.equals(old.versionNumber, fresh.versionNumber)
+                        && java.util.Objects.equals(old.name, fresh.name)
+                        && java.util.Objects.equals(old.versionType, fresh.versionType));
         versions.clear();
-        if (items != null) {
-            versions.addAll(items);
-        }
-        notifyDataSetChanged();
+        versions.addAll(next);
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

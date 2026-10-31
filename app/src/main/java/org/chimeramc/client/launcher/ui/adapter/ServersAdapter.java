@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.ServerItem;
 import org.chimeramc.client.core.content.ServerPongInfo;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,17 +43,29 @@ public class ServersAdapter extends RecyclerView.Adapter<ServersAdapter.ViewHold
         this.listener = listener;
     }
 
+    /**
+     * Replaces the list, animating only what changed.
+     *
+     * <p>Pongs are keyed by ip:port and stay valid across re-binds: a filter or a refresh does not
+     * justify losing every ping line. A server genuinely deleted and re-added with the same address
+     * re-uses the old reading, which is the better failure mode. The diff preserves that, because a
+     * row that survives the update is a change rather than a remove and an insert.
+     */
     public void updateData(List<ServerItem> newServers) {
-        this.servers = newServers;
-        // Pongs are keyed by ip:port and stay valid across re-binds: a filter or a refresh does not
-        // justify losing every ping line. A server genuinely deleted and re-added with the same
-        // address re-uses the old reading, which is the better failure mode.
-        notifyDataSetChanged();
+        List<ServerItem> next = newServers != null ? newServers : java.util.Collections.emptyList();
+        ListDiff.Result diff = ListDiff.compute(this.servers, next,
+                ServersAdapter::keyFor,
+                (old, fresh) -> old.name.equals(fresh.name));
+        this.servers = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
+    /** The compatibility verdict is per row, so every row's status line may have changed. */
     public void setSelectedVersionCode(String versionCode) {
         this.selectedVersionCode = versionCode;
-        notifyDataSetChanged();
+        if (getItemCount() > 0) {
+            notifyItemRangeChanged(0, getItemCount());
+        }
     }
 
     /** Called from the UI thread when a ping lands; redraws only the matching row. */

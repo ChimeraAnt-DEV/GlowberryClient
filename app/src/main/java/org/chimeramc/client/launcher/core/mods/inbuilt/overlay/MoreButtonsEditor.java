@@ -318,6 +318,9 @@ public final class MoreButtonsEditor {
                             names.add(displayName);
                         }
                     }
+                    // A ListView over an ArrayAdapter, not a RecyclerView: notifyDataSetChanged is
+                    // this adapter's own contract and it is already scoped to the visible keys, so
+                    // there is nothing finer to say here.
                     adapter.notifyDataSetChanged();
                 }
                 @Override public void afterTextChanged(Editable s) {}

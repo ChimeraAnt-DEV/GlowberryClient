@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.WorldItem;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,22 @@ public class WorldsAdapter extends RecyclerView.Adapter<WorldsAdapter.WorldViewH
         this.onWorldActionListener = listener;
     }
 
+    /**
+     * Replaces the list, animating only what changed.
+     *
+     * <p>A world row's identity is its directory: renaming a world keeps the same row, while a
+     * world whose size or last-played time changed is a change on that row rather than a rebuild of
+     * the list. Deleting one world no longer scrolls the rest back to the top.
+     */
     public void updateWorlds(List<WorldItem> worlds) {
-        this.worlds = worlds != null ? worlds : new ArrayList<>();
-        notifyDataSetChanged();
+        List<WorldItem> next = worlds != null ? worlds : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.worlds, next,
+                item -> item.getFile() != null ? item.getFile().getAbsolutePath() : item.getName(),
+                (old, fresh) -> old.getSize() == fresh.getSize()
+                        && old.isEnabled() == fresh.isEnabled()
+                        && java.util.Objects.equals(old.getDescription(), fresh.getDescription()));
+        this.worlds = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

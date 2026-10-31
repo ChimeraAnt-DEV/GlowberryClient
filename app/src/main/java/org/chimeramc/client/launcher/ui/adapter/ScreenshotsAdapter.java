@@ -18,8 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.ScreenshotItem;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -39,16 +42,26 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsAdapter.
     }
 
     public ScreenshotsAdapter(List<ScreenshotItem> screenshots, OnScreenshotClickListener listener) {
-        this.screenshots = screenshots;
+        this.screenshots = screenshots != null ? screenshots : new ArrayList<>();
         this.listener = listener;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         this.imageLoaderExecutor = Executors.newFixedThreadPool(4);
         this.mainThreadHandler = new Handler(Looper.getMainLooper());
     }
 
+    /**
+     * Replaces the list, animating only what changed. A screenshot's identity is its file, so
+     * deleting one removes a single row instead of reloading every thumbnail on screen.
+     */
     public void updateData(List<ScreenshotItem> newScreenshots) {
-        this.screenshots = newScreenshots;
-        notifyDataSetChanged();
+        List<ScreenshotItem> next = newScreenshots != null
+                ? newScreenshots : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.screenshots, next,
+                item -> item.file.getAbsolutePath(),
+                (old, fresh) -> old.captureTime == fresh.captureTime
+                        && java.util.Objects.equals(old.name, fresh.name));
+        this.screenshots = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

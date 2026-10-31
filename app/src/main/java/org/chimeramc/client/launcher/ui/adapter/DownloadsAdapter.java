@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.downloads.DownloadsScanner;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +36,19 @@ public class DownloadsAdapter extends RecyclerView.Adapter<DownloadsAdapter.View
         this.importListener = importListener;
     }
 
+    /**
+     * Replaces the list, animating only what changed. A found file's identity is its path, so a
+     * rescan that finds the same files and one new one inserts a single row.
+     */
     public void setItems(List<DownloadsScanner.Found> found) {
+        List<DownloadsScanner.Found> next = found != null ? found : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(items, next,
+                item -> item.file.getAbsolutePath(),
+                (old, fresh) -> old.size == fresh.size && old.modified == fresh.modified
+                        && old.importable == fresh.importable);
         items.clear();
-        if (found != null) {
-            items.addAll(found);
-        }
-        notifyDataSetChanged();
+        items.addAll(next);
+        ListDiffDispatch.apply(this, diff);
     }
 
     public int importableCount() {

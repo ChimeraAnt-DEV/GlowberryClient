@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.ResourcePackItem;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +35,18 @@ public class ResourcePacksAdapter extends RecyclerView.Adapter<ResourcePacksAdap
         this.onResourcePackActionListener = listener;
     }
 
+    /**
+     * Replaces the list, animating only what changed. A pack's identity is its file, so renaming
+     * one keeps its row; a pack that was enabled or removed animates in place.
+     */
     public void updateResourcePacks(List<ResourcePackItem> resourcePacks) {
-        this.resourcePacks = resourcePacks != null ? resourcePacks : new ArrayList<>();
-        notifyDataSetChanged();
+        List<ResourcePackItem> next = resourcePacks != null ? resourcePacks : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.resourcePacks, next,
+                item -> item.getFile() != null ? item.getFile().getAbsolutePath() : item.getPackName(),
+                (old, fresh) -> old.isEnabled() == fresh.isEnabled()
+                        && java.util.Objects.equals(old.getDescription(), fresh.getDescription()));
+        this.resourcePacks = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

@@ -564,6 +564,13 @@ public class ModsFullscreenActivity extends BaseActivity {
             boolean supported = menuButton == null || menuButton.getVisibility() == View.VISIBLE;
             emptyView.setVisibility(supported && (mods == null || mods.isEmpty()) ? View.VISIBLE : View.GONE);
         }
+        // The empty state's own action (item 180): it opens the same file-or-link chooser the Add
+        // Mod header button does, so the message always has a next step next to it.
+        TextView emptyAction = findViewById(R.id.empty_mods_action);
+        if (emptyAction != null) {
+            emptyAction.setOnClickListener(v -> showImportChooser());
+            DynamicAnim.applyPressScale(emptyAction);
+        }
     }
 
     private void updateModsCount() {

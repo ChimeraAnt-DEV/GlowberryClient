@@ -56,6 +56,8 @@ import org.chimeramc.client.core.mods.Mod;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.changelog.ChangelogManager;
 import org.chimeramc.client.core.versions.GameVersion;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 import org.chimeramc.client.core.versions.VersionManager;
 import org.chimeramc.client.databinding.ActivityMainBinding;
 import org.chimeramc.client.settings.FeatureSettings;
@@ -2506,21 +2508,29 @@ import okhttp3.OkHttpClient;
         }
 
         void filter(String query) {
+            List<GameVersion> next = new ArrayList<>();
             if (query == null || query.isEmpty()) {
-                filteredVersions = new ArrayList<>(allVersions);
+                next.addAll(allVersions);
             } else {
                 String q = query.toLowerCase();
-                filteredVersions = new ArrayList<>();
                 for (GameVersion v : allVersions) {
                     String name = getInstanceDisplayName(v).toLowerCase();
                     String code = v.versionCode != null ? v.versionCode.toLowerCase() : "";
                     String dir = v.directoryName != null ? v.directoryName.toLowerCase() : "";
                     if (name.contains(q) || code.contains(q) || dir.contains(q)) {
-                        filteredVersions.add(v);
+                        next.add(v);
                     }
                 }
             }
-            notifyDataSetChanged();
+            // The filtered list is a subset of the same rows, so diffing keeps the rows that are
+            // still shown and animates the ones that a keystroke removed. A dataset change here
+            // rebuilt the whole popup on every character typed.
+            ListDiff.Result diff = ListDiff.compute(filteredVersions, next,
+                    version -> version.directoryName,
+                    (old, fresh) -> java.util.Objects.equals(old.displayName, fresh.displayName)
+                            && java.util.Objects.equals(old.versionCode, fresh.versionCode));
+            filteredVersions = next;
+            ListDiffDispatch.apply(this, diff);
         }
 
         @NonNull @Override

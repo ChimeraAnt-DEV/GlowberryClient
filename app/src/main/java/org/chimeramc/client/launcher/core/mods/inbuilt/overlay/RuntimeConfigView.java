@@ -233,7 +233,12 @@ final class RuntimeConfigView {
             result.add(node);
         }
         nodeAdapter.submit(result);
-        categoryAdapter.notifyDataSetChanged();
+        // Selecting a category repaints every tile (the selected one loses its highlight and the
+        // new one gains it), but the tiles are the same rows, so a range change keeps the strip's
+        // scroll position.
+        if (categoryAdapter.getItemCount() > 0) {
+            categoryAdapter.notifyItemRangeChanged(0, categoryAdapter.getItemCount());
+        }
     }
 
     private boolean matches(List<RuntimeConfigSchema.Condition> conditions) {
@@ -332,7 +337,9 @@ final class RuntimeConfigView {
             holder.label.setOnClickListener(v -> {
                 if (category.id.equals(selectedCategory)) return;
                 selectedCategory = category.id;
-                notifyDataSetChanged();
+                if (getItemCount() > 0) {
+                    notifyItemRangeChanged(0, getItemCount());
+                }
                 refreshNodes();
                 contentRecycler.scrollToPosition(0);
             });

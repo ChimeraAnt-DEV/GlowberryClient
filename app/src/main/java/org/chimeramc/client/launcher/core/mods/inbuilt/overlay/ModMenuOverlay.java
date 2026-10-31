@@ -1314,8 +1314,12 @@ public class ModMenuOverlay {
         applyMenuOpacity();
         // The controls are rebuilt so the active chip/swatch reflects the new value.
         setupModMenuAppearanceSettings();
-        if (modsRecycler != null && modsRecycler.getAdapter() != null) {
-            modsRecycler.getAdapter().notifyDataSetChanged();
+        if (modsRecycler != null && modsRecycler.getAdapter() != null
+                && modsRecycler.getAdapter().getItemCount() > 0) {
+            // An appearance change repaints every card, but the rows are the same rows: a range
+            // change keeps the list's scroll position and animates the repaint.
+            modsRecycler.getAdapter().notifyItemRangeChanged(
+                    0, modsRecycler.getAdapter().getItemCount());
         }
     }
 
@@ -2154,7 +2158,10 @@ public class ModMenuOverlay {
     private void setCompactMode(boolean compact) {
         compactMode = compact;
         if (modsLayoutManager != null) {
-            modsLayoutManager.setSpanCount(compact ? 1 : 4);
+            // Two columns on a wide window, one below the 560dp threshold — the same rule the
+            // layout manager is built with. A different number here would make the density toggle
+            // and the initial layout disagree.
+            modsLayoutManager.setSpanCount(compact ? 1 : 2);
         }
         if (adapter != null) {
             adapter.setCompactMode(compact);
