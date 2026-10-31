@@ -1067,4 +1067,5 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="wheel_manager_no_entries">Henüz girdi yok. Bu menüye bir eylem koymak için bir tane ekleyin.</string>
     <string name="wheel_manager_add_entry">Girdi ekle</string>
     <string name="wheel_manager_pick_action">Bir eylem seç</string>
+    <string name="diagnostics_field_berry_api">BerryAPI arka ucu</string>
 </resources>

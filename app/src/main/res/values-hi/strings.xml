@@ -1068,4 +1068,5 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="wheel_manager_no_entries">अभी कोई प्रविष्टि नहीं। इस मेनू पर क्रिया डालने के लिए एक जोड़ें।</string>
     <string name="wheel_manager_add_entry">प्रविष्टि जोड़ें</string>
     <string name="wheel_manager_pick_action">क्रिया चुनें</string>
+    <string name="diagnostics_field_berry_api">BerryAPI बैकएंड</string>
 </resources>

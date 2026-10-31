@@ -1037,4 +1037,5 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="wheel_manager_no_entries">項目がまだありません。このメニューにアクションを追加してください。</string>
     <string name="wheel_manager_add_entry">項目を追加</string>
     <string name="wheel_manager_pick_action">アクションを選択</string>
+    <string name="diagnostics_field_berry_api">BerryAPIバックエンド</string>
 </resources>

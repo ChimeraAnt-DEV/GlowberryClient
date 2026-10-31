@@ -1071,4 +1071,5 @@
     <string name="wheel_manager_no_entries">Записей пока нет. Добавьте, чтобы поместить действие в это меню.</string>
     <string name="wheel_manager_add_entry">Добавить запись</string>
     <string name="wheel_manager_pick_action">Выберите действие</string>
+    <string name="diagnostics_field_berry_api">Бэкенд BerryAPI</string>
 </resources>

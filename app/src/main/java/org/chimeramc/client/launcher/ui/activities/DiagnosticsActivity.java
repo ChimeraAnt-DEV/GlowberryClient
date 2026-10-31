@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.chimeramc.client.preloader.BerryApi;
 
 /**
  * In-app diagnostics (U16) plus the "Repair installation" action (G2).
@@ -408,6 +409,10 @@ public class DiagnosticsActivity extends BaseActivity {
         addRow(rows, R.string.diagnostics_field_skin_seam,
                 data.skinSeam ? getString(R.string.diagnostics_hook_live)
                               : getString(R.string.diagnostics_hook_inactive));
+        // The script/runtime backend is a separate native library with its own version, so the
+        // screen reports what the preloader actually found rather than assuming it is present. A
+        // missing backend is then visible here before a launch, not only when a feature does nothing.
+        addRow(rows, R.string.diagnostics_field_berry_api, BerryApi.summary());
     }
 
     /**

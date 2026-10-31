@@ -1542,6 +1542,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_rules_no_coverage">NOT COVERED — byte-pattern hooks disabled for this build</string>
     <string name="diagnostics_field_cosmetics_hook">Cosmetics render hook</string>
     <string name="diagnostics_field_skin_seam">Skin capture seam</string>
+    <string name="diagnostics_field_berry_api">BerryAPI backend</string>
     <string name="diagnostics_no_mod_errors">No mod load errors on record.</string>
     <string name="diagnostics_mod_error_line">%1$s (%2$s): %3$s</string>
     <string name="diagnostics_native_loaded">Loaded</string>

@@ -1040,4 +1040,5 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="wheel_manager_no_entries">Aucune entrée. Ajoutez-en une pour placer une action sur ce menu.</string>
     <string name="wheel_manager_add_entry">Ajouter une entrée</string>
     <string name="wheel_manager_pick_action">Choisir une action</string>
+    <string name="diagnostics_field_berry_api">Backend BerryAPI</string>
 </resources>

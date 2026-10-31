@@ -1061,4 +1061,5 @@
     <string name="wheel_manager_no_entries">还没有菜单项。添加一个以在此菜单上放置操作。</string>
     <string name="wheel_manager_add_entry">添加菜单项</string>
     <string name="wheel_manager_pick_action">选择操作</string>
+    <string name="diagnostics_field_berry_api">BerryAPI 后端</string>
 </resources>
