@@ -179,12 +179,20 @@ public class BaseActivity extends AppCompatActivity {
     @Nullable
     private View.OnLayoutChangeListener pendingIndicatorListener;
 
+    /** The column holding the nav shape and the content, kept so the nav can be swapped (item 67). */
+    private LinearLayout navColumn;
+    /** The inflated navigation view, kept so it can be replaced on a window-shape change. */
+    private View navShapeView;
+    /** The screen's own content view, re-measured when the nav shape changes. */
+    private View navContentView;
+
     private void wrapWithNavBar(View contentView) {
         if (shouldSkipNavBar()) {
             super.setContentView(contentView);
             applyPersonalization();
             return;
         }
+        navContentView = contentView;
 
         // The navigation shape is chosen from the window width (U5): a bottom bar on a compact
         // window, a vertical icon rail on a medium one, and an expanded rail on a large one. Both
@@ -203,12 +211,14 @@ public class BaseActivity extends AppCompatActivity {
         ));
 
         LinearLayout column = new LinearLayout(this);
+        navColumn = column;
         column.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
         wrapper.addView(column, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         View navBar = LayoutInflater.from(this)
                 .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, column, false);
+        navShapeView = navBar;
 
         LinearLayout.LayoutParams contentParams;
         if (rail) {
@@ -562,9 +572,10 @@ public class BaseActivity extends AppCompatActivity {
             tab.setContentDescription(getString(destination.labelRes()));
             tab.setTooltipText(getString(destination.labelRes()));
             int color = getResources().getColor(R.color.text_secondary, getTheme());
-            tab.setTextColor(color);
             // The one type system (U8): a destination label is the LABEL role, so its size and its
             // variable-font weight come from the shared scale rather than the layout's own values.
+            // Applied once at inflation (item 73); setActiveNavTab only changes the weight axis,
+            // which is a state, not a re-application of the typeface.
             UiType.apply(tab, UiType.Role.LABEL);
             tab.setTextColor(color);
             TextViewCompat.setCompoundDrawableTintList(tab, ColorStateList.valueOf(color));
@@ -798,23 +809,28 @@ public class BaseActivity extends AppCompatActivity {
         int accentColor = org.chimeramc.client.ui.navigation.NavAccent.resolve(accent, surface, onSurface);
         int inactive = getResources().getColor(R.color.text_secondary, getTheme());
 
+        // The two colours are installed once as a state list, so every tab recolours itself from
+        // its own `selected` state and this method never branches on the colour (item 88). The
+        // state list is rebuilt here because the accent can change while the app is running.
+        ColorStateList tabTint = navTabTint(accentColor, inactive);
+
         for (int id : LauncherTab.viewIds()) {
             TextView tab = findViewById(id);
             if (tab == null) continue;
             boolean active = id == activeTabId;
-            int color = active ? accentColor : inactive;
             // `selected` is what a screen reader announces, and it is also the state the compound
-            // drawable tint and the press feedback key off, so it is set before either is applied.
+            // drawable tint, the text colour and the press feedback key off, so it is the only
+            // thing that has to change here.
+            tab.setTextColor(tabTint);
+            TextViewCompat.setCompoundDrawableTintList(tab, tabTint);
             tab.setSelected(active);
             tab.setContentDescription(describeTab(id, active));
-            tab.setTextColor(color);
             // The weight axis carries the emphasis: the active entry is heavier, not just a
             // different colour, which is the Expressive type treatment (U6). The bold flag stays
             // as the fallback for a device that ignores the axis.
             tab.setTypeface(tab.getTypeface(), active
                     ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
             UiType.applyWeight(tab, active ? UiTokens.TITLE_WEIGHT : UiTokens.ROW_TITLE_WEIGHT);
-            TextViewCompat.setCompoundDrawableTintList(tab, ColorStateList.valueOf(color));
             if (navLayoutMode.isRail()) applyRailTabShape(tab, active);
             if (navLayoutMode.isRail()) {
                 tab.setText(navLayoutMode.showsAllLabels() ? getString(labelForTab(id)) : "");
@@ -823,6 +839,23 @@ public class BaseActivity extends AppCompatActivity {
             }
             if (id == activeTabId) moveNavIndicator(tab, accentColor);
         }
+    }
+
+    /**
+     * The two-colour state list every destination is tinted from (item 88).
+     *
+     * <p>Building it here rather than branching inside the update loop means the text colour, the
+     * compound icon and anything else state-aware all recolour from the tab's own
+     * {@code selected} flag: one state list, one place the colours are defined, and no per-state
+     * colour arithmetic at each update.
+     */
+    private ColorStateList navTabTint(int accentColor, int inactiveColor) {
+        return new ColorStateList(
+                new int[][]{
+                        new int[]{android.R.attr.state_selected},
+                        new int[]{},
+                },
+                new int[]{accentColor, inactiveColor});
     }
 
     /**
@@ -1087,13 +1120,49 @@ public class BaseActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         getDelegate().applyDayNight();
         hideSystemUI();
-        // The navigation shape is chosen once, when the content view is wrapped, so a window that
-        // crosses a breakpoint (a foldable unfolding, a tablet entering split screen) has to
-        // rebuild to pick the new one. Without this the bar would stay a bar on a wide window and
-        // the rail would stay a rail on a narrow one.
-        if (navBarInjected && resolveNavLayoutMode() != navLayoutMode) {
-            recreate();
+        // A window that crosses a breakpoint (a foldable unfolding, a tablet entering split screen)
+        // needs the other navigation shape. The nav is swapped in place rather than by recreating
+        // the activity (item 67): a recreate would throw away the screen's scroll position, any
+        // in-progress text and the whole view hierarchy, for a change that only concerns the nav
+        // chrome. Only the nav view and the content's layout params are rebuilt.
+        NavLayoutMode next = resolveNavLayoutMode();
+        if (navBarInjected && next != navLayoutMode) {
+            swapNavShape(next);
         }
+    }
+
+    /**
+     * Replaces the navigation view with the one for {@code mode}, keeping the content view and the
+     * activity state (item 67).
+     *
+     * <p>The column holds exactly two children - the nav and the content - and only the nav is
+     * recreated. The content's layout params swap axis with the column so the rail's leading
+     * sibling becomes the bar's top sibling, and the insets are re-applied because the two shapes
+     * absorb different edges.
+     */
+    private void swapNavShape(NavLayoutMode mode) {
+        if (navColumn == null || navShapeView == null || navContentView == null) return;
+        boolean rail = mode.isRail();
+        navLayoutMode = mode;
+
+        navColumn.removeView(navShapeView);
+        navShapeView = LayoutInflater.from(this)
+                .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, navColumn, false);
+        navColumn.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        navColumn.addView(navShapeView, 0);
+
+        LinearLayout.LayoutParams contentParams = rail
+                ? new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
+                : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
+        navContentView.setLayoutParams(contentParams);
+
+        applyEdgeToEdgeInsets(navShapeView, navContentView, rail);
+        logNavDecision();
+        setupBaseNavBar();
+        // The content was already visible, so it must not replay its arrival animation; only the
+        // nav shape needs to settle into place.
+        LauncherTab own = LauncherTab.forActivity(getClass());
+        if (own != null) setActiveNavTab(own.viewId());
     }
 
     @Override
