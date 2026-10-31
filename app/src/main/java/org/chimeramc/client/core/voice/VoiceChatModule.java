@@ -3,6 +3,8 @@ package org.chimeramc.client.core.voice;
 import android.content.Context;
 import android.util.Log;
 
+import org.chimeramc.client.util.SignalGate;
+
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 
 import java.util.ArrayList;
@@ -58,6 +60,11 @@ public final class VoiceChatModule {
     private PositionSource positionSource;
     private Thread beaconThread;
     private Thread playbackThread;
+    /** Wakes the beacon loop's interval wait so stop() joins immediately instead of after 1s. */
+    private final SignalGate beaconGate = new SignalGate();
+
+    /** How often a peer beacon is re-sent. Also the worst-case time a departed peer stays listed. */
+    private static final long BEACON_INTERVAL_MS = 1000L;
     private volatile boolean running;
     private volatile boolean transmit = true;
     private volatile int sequence;
@@ -398,6 +405,8 @@ public final class VoiceChatModule {
      */
     public synchronized void stop() {
         running = false;
+        // Signalled before the joins so a beacon thread inside its interval wait exits at once.
+        beaconGate.signal();
         try {
             sendBye();
         } catch (Throwable t) {
@@ -503,11 +512,12 @@ public final class VoiceChatModule {
             try {
                 sendBeacon();
                 registry.evictStale(android.os.SystemClock.uptimeMillis());
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+            } catch (Throwable t) {
+                // A beacon that fails must not stop the loop: the next interval retries, and the
+                // route is the only thing that keeps this player visible to peers.
+                Log.w(TAG, "voice beacon failed", t);
             }
+            if (!beaconGate.await(BEACON_INTERVAL_MS)) break;
         }
     }
 

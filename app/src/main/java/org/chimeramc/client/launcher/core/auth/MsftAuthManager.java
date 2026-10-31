@@ -53,6 +53,15 @@ public final class MsftAuthManager {
     private static final String TAG = "MsftAuthManager";
     private static final String GAME_VERSION = "1.21.110";
     private static final long MIN_DEVICE_POLL_INTERVAL_MS = 1000L;
+    /**
+     * How often a wait re-checks the cancel flag.
+     *
+     * <p>The poll interval is minutes long, so a wait that only ended at its deadline would keep
+     * the sign-in "in progress" long after the user backed out. The thread is also interrupted by
+     * {@code Future.cancel(true)}, which ends the sleep immediately; this bound covers the paths
+     * that cancel by flag alone.
+     */
+    private static final long CANCEL_CHECK_INTERVAL_MS = 100L;
     private static final long SLOW_DOWN_INCREMENT_MS = 5000L;
     private static final long MAX_TRANSIENT_RETRY_DELAY_MS = 10000L;
     private static final int ACCOUNT_NETWORK_RETRY_COUNT = 4;
@@ -488,7 +497,7 @@ public final class MsftAuthManager {
             if (remaining <= 0L) {
                 return;
             }
-            Thread.sleep(Math.min(remaining, 250L));
+            Thread.sleep(Math.min(remaining, CANCEL_CHECK_INTERVAL_MS));
         }
     }
 }

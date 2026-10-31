@@ -7,6 +7,8 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import org.chimeramc.client.util.SignalGate;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,6 +52,8 @@ public final class VoiceAudioEngine {
     private AudioTrack track;
     private Thread captureThread;
     private Thread playThread;
+    /** Wakes the playback thread's idle wait, so stop() joins immediately. */
+    private final SignalGate playGate = new SignalGate();
     private FrameSink sink;
     private volatile boolean micEnabled = true;
 
@@ -297,18 +301,15 @@ public final class VoiceAudioEngine {
     private void playLoop() {
         // Playback is driven by incoming frames, not by this loop; it only keeps the thread
         // alive so stop() has something to join and the track is not torn down underneath a
-        // concurrent write.
+        // concurrent write. The long wait is a safety net, not a poll: stop() signals it, so the
+        // join returns at once instead of waiting out a second.
         while (running.get()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+            if (!playGate.await(1000L)) break;
         }
     }
 
     public void stop() {
+        playGate.signal();
         if (!running.compareAndSet(true, false)) {
             closeCapture();
             closePlayback();
