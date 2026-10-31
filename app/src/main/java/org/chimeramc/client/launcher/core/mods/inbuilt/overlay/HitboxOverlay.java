@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Full-screen overlay that draws the Hitboxes module's projected frame.
@@ -53,7 +54,7 @@ public final class HitboxOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private WindowManager.LayoutParams wmParams;

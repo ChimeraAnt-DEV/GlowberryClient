@@ -40,6 +40,7 @@ import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.ui.util.SkinPreviewRenderer;
 import org.chimeramc.client.util.LauncherStorage;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.io.File;
 import java.io.InputStream;
@@ -448,7 +449,7 @@ public class SkinsSettingsFragment extends Fragment {
             loadingOverlay.setVisibility(View.VISIBLE);
             recycler.setVisibility(View.GONE);
         }
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "skin-pack-scan", () -> {
             List<ResourcePackItem> packs = readSkinPacks();
             String applied = readAppliedPackName();
             if (!isAdded()) return;
@@ -461,7 +462,7 @@ public class SkinsSettingsFragment extends Fragment {
                 recycler.setVisibility(hasPacks ? View.VISIBLE : View.GONE);
                 recycler.post(() -> DynamicAnim.staggerRecyclerChildren(recycler));
             });
-        }).start();
+        });
     }
 
     private List<ResourcePackItem> readSkinPacks() {

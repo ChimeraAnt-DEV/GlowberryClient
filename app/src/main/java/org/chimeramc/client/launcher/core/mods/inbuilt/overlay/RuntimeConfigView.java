@@ -50,6 +50,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.WeakHashMap;
 import org.chimeramc.client.R;
+import org.chimeramc.client.util.MainThread;
 
 final class RuntimeConfigView {
     private static final WeakHashMap<ViewGroup, RuntimeConfigView> ACTIVE = new WeakHashMap<>();
@@ -64,7 +65,7 @@ final class RuntimeConfigView {
     private final UnifiedMod mod;
     private final boolean compact;
     private final Runnable onConfigChanged;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final Set<String> collapsedSections = new HashSet<>();
     private RuntimeConfigSchema schema;
     private String selectedCategory = "";

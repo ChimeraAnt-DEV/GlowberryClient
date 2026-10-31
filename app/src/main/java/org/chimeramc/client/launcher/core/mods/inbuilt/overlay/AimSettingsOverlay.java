@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Center-screen crosshair + hit-flash feedback for the hit-registration module.
@@ -23,7 +24,7 @@ import org.chimeramc.client.util.PersonalizationManager;
 public class AimSettingsOverlay {
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private CrosshairView view;
     private WindowManager.LayoutParams wmParams;

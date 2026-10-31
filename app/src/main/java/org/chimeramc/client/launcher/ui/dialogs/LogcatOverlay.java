@@ -53,6 +53,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.chimeramc.client.util.AppLog;
 import org.chimeramc.client.util.TouchTargetHelper;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 
 public class LogcatOverlay extends FrameLayout {
@@ -72,7 +74,7 @@ public class LogcatOverlay extends FrameLayout {
     private ImageButton filterButton, filterClearButton, copyButton;
     private View overlayHeader, bottomResizeBar, cornerBottomLeft, cornerBottomRight;
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private final SharedPreferences prefs;
 
     private final ArrayDeque<String> logBuffer = new ArrayDeque<>(2000);
@@ -442,7 +444,7 @@ public class LogcatOverlay extends FrameLayout {
     }
 
     private void startReader() {
-        readerThread = new Thread(() -> {
+        readerThread = AppExecutors.thread("logcat-reader", () -> {
             try {
                 List<String> cmd = new ArrayList<>();
                 cmd.add("logcat");
@@ -461,7 +463,7 @@ public class LogcatOverlay extends FrameLayout {
             } catch (Exception e) {
                 AppLog.warn(TAG, "The logcat reader stopped unexpectedly", e);
             }
-        }, "LogcatReader");
+        });
         readerThread.start();
     }
 

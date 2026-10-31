@@ -57,6 +57,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import org.chimeramc.client.util.TouchTargetHelper;
+import org.chimeramc.client.util.MainThread;
 
 public class MsftLoginActivity extends BaseActivity {
     public static final String EXTRA_LOGIN_COMPLETED = "ms_login_completed";
@@ -74,7 +75,7 @@ public class MsftLoginActivity extends BaseActivity {
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
     private final AtomicBoolean completed = new AtomicBoolean(false);
     private final AtomicLong loginGeneration = new AtomicLong();
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
 
     private View methodPanel;
     private View devicePanel;

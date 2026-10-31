@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Top-of-screen hit-timing indicator for the Select Hit module.
@@ -45,7 +46,7 @@ public final class HitTimingOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private WindowManager.LayoutParams wmParams;

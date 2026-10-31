@@ -21,6 +21,8 @@ import org.chimeramc.client.core.versions.GameVersion;
 import org.chimeramc.client.core.versions.VersionManager;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.ui.views.MainViewModel;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -153,7 +155,7 @@ public class FileHandler {
             importSharedLink(sharedLink, callback);
         }
 
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "mod-import-scan", () -> {
             List<Uri> packagedUris = new ArrayList<>();
             List<Uri> bareUris = new ArrayList<>();
             List<Uri> antEggUris = new ArrayList<>();
@@ -177,7 +179,7 @@ public class FileHandler {
                 }
             }
 
-            new Handler(Looper.getMainLooper()).post(() -> {
+            MainThread.post(() -> {
                 if (!antEggUris.isEmpty()) {
                     importAntEggFiles(antEggUris, callback);
                 }
@@ -206,7 +208,7 @@ public class FileHandler {
                     showImportDialogs.run();
                 }
             });
-        }).start();
+        });
     }
 
     /**
@@ -244,7 +246,7 @@ public class FileHandler {
                         .AntEggLinkDownloader.Callback() {
                     @Override
                     public void onSuccess(File staged, String fileName) {
-                        new Thread(() -> {
+                        AppExecutors.run(AppExecutors.Kind.MOD, "antegg-load", () -> {
                             org.chimeramc.client.core.antegg.AntEggLoader.LoadResult result =
                                     org.chimeramc.client.core.antegg.AntEggLoader.loadMod(context, staged);
                             //noinspection ResultOfMethodCallIgnored
@@ -253,14 +255,14 @@ public class FileHandler {
                                 org.chimeramc.client.core.antegg.AntEggLoader.recordFailure(
                                         context, fileName, result.error);
                             }
-                            new Handler(Looper.getMainLooper()).post(() -> {
+                            MainThread.post(() -> {
                                 if (result.success) {
                                     if (callback != null) callback.onSuccess(1);
                                 } else if (callback != null) {
                                     callback.onError(result.error);
                                 }
                             });
-                        }).start();
+                        });
                     }
 
                     @Override
@@ -506,7 +508,7 @@ public class FileHandler {
             List<Uri> fileUris,
             String overrideName, String overrideType, String overrideVersion,
             FileOperationCallback callback) {
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "mod-import-copy", () -> {
             if (targetPath == null) {
                 postError(callback, "No selected version mods directory");
                 return;
@@ -561,7 +563,7 @@ public class FileHandler {
 
             final int processedCount = processed;
             final String finalError = lastError;
-            new Handler(Looper.getMainLooper()).post(() -> {
+            MainThread.post(() -> {
                 modManager.reloadMods();
                 if (processedCount > 0) {
                     if (callback != null) {
@@ -571,7 +573,7 @@ public class FileHandler {
                     callback.onError(finalError);
                 }
             });
-        }).start();
+        });
     }
 
     private PreparedImport prepareImport(
@@ -1133,7 +1135,7 @@ public class FileHandler {
         final boolean[] overwrite = new boolean[1];
         final boolean[] decisionMade = new boolean[1];
 
-        new Handler(Looper.getMainLooper()).post(() -> new CustomAlertDialog(context)
+        MainThread.post(() -> new CustomAlertDialog(context)
                 .setTitleText(context.getString(R.string.overwrite_file_title))
                 .setMessage(context.getString(R.string.overwrite_file_message, modName))
                 .setPositiveButton(context.getString(R.string.overwrite), dlg -> {
@@ -1344,18 +1346,18 @@ public class FileHandler {
             return;
         }
         int progress = Math.min(100, (completed * 100) / total);
-        new Handler(Looper.getMainLooper()).post(() -> callback.onProgressUpdate(progress));
+        MainThread.post(() -> callback.onProgressUpdate(progress));
     }
 
     private void postError(FileOperationCallback callback, String message) {
         if (callback == null) {
             return;
         }
-        new Handler(Looper.getMainLooper()).post(() -> callback.onError(message));
+        MainThread.post(() -> callback.onError(message));
     }
 
     private void importAntEggFiles(List<Uri> uris, FileOperationCallback callback) {
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.MOD, "antegg-import-batch", () -> {
             // Item G4: the batch is staged and read before anything loads, so a package whose
             // dependency is in the same selection is ordered after it instead of being refused
             // for arriving first. See AntEggImport.importUriBatch.
@@ -1363,14 +1365,14 @@ public class FileHandler {
                     org.chimeramc.client.core.antegg.AntEggImport.importUriBatch(context, uris);
             final int successCount = batch.successCount;
             final String finalError = batch.error;
-            new Handler(Looper.getMainLooper()).post(() -> {
+            MainThread.post(() -> {
                 if (successCount > 0 && callback != null) {
                     callback.onSuccess(successCount);
                 } else if (callback != null && finalError != null) {
                     callback.onError(finalError);
                 }
             });
-        }).start();
+        });
     }
 
     private boolean isSupportedImportFile(Uri uri, String fileName) {
@@ -1405,7 +1407,7 @@ public class FileHandler {
     private boolean handOffJar(List<Uri> fileUris, JavaBridgeHandoff handoff) {
         for (Uri uri : fileUris) {
             if (looksLikeJavaJar(resolveImportFileName(uri))) {
-                new Handler(Looper.getMainLooper()).post(() -> handoff.onJavaJarSelected(uri));
+                MainThread.post(() -> handoff.onJavaJarSelected(uri));
                 return true;
             }
         }

@@ -42,6 +42,7 @@ import org.chimeramc.client.ui.adapter.DownloadsAdapter;
 import org.chimeramc.client.ui.adapter.ModrinthContentAdapter;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.util.UIHelper;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public class ModHubActivity extends BaseActivity {
     private DownloadsAdapter downloadsAdapter;
     private ContentImporter contentImporter;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     // Owned so a Downloads walk in progress is torn down with the screen instead of posting its
     // result to a destroyed Activity.
     private final ExecutorService worker = Executors.newSingleThreadExecutor();

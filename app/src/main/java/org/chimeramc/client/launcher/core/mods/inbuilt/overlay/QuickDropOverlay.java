@@ -8,12 +8,13 @@ import android.widget.ImageButton;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
+import org.chimeramc.client.util.MainThread;
 
 public class QuickDropOverlay extends BaseOverlayButton {
     private static final long REPEAT_START_DELAY_MS = 300;
     private static final long REPEAT_INTERVAL_MS = 100;
 
-    private final Handler repeatHandler = new Handler(Looper.getMainLooper());
+    private final Handler repeatHandler = MainThread.handler();
     private boolean pressed;
 
     private final Runnable repeatDrop = new Runnable() {

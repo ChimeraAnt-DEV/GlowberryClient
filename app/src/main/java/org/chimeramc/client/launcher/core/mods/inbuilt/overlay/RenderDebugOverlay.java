@@ -14,6 +14,7 @@ import android.widget.TextView;
 import org.chimeramc.client.core.cosmetics.CosmeticsDiagnosticsReport;
 import org.chimeramc.client.core.cosmetics.RenderDebugLines;
 import org.chimeramc.client.ui.components.UiTokens;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public final class RenderDebugOverlay {
     private final Context context;
     private final TextView text;
     private final LinearLayout root;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private boolean running;
 
     private final Runnable tick = new Runnable() {

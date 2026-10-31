@@ -4,6 +4,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.chimeramc.client.util.AppExecutors;
+
 /**
  * A single-worker compute bus that keeps heavy module work off the render thread.
  *
@@ -57,8 +59,7 @@ public final class ModuleComputeBus<I, O> {
     public synchronized void start(String threadName) {
         if (running) return;
         running = true;
-        worker = new Thread(this::loop, threadName == null ? "module-compute" : threadName);
-        worker.setDaemon(true);
+        worker = AppExecutors.thread(threadName == null ? "module-compute" : threadName, this::loop);
         worker.start();
     }
 

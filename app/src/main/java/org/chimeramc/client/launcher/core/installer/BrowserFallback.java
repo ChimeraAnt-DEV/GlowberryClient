@@ -8,6 +8,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -40,7 +41,7 @@ public class BrowserFallback {
     }
 
     private final WebView webView;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     /** Guards against a stale page load delivering into a newer request's callback. */
     private final AtomicBoolean inFlight = new AtomicBoolean(false);

@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.core.voice.VoiceChatModule;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * The bottom-right in-game microphone indicator.
@@ -35,7 +36,7 @@ public final class VoiceChatOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private MicIndicatorView micView;

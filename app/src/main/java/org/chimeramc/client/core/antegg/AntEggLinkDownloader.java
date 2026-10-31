@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 
 import org.chimeramc.client.settings.LowLatencyNetworkManager;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,7 +52,7 @@ public final class AntEggLinkDownloader {
     private static final int BUFFER_SIZE = 65536;
 
     private final OkHttpClient client;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     public AntEggLinkDownloader() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
@@ -88,7 +90,7 @@ public final class AntEggLinkDownloader {
         }
         final String fileName = AntEggLink.fileNameOf(url);
         final Context appContext = context.getApplicationContext();
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.NETWORK, "antegg-download", () -> {
             File staged = null;
             try {
                 Request request = new Request.Builder()
@@ -141,7 +143,7 @@ public final class AntEggLinkDownloader {
                 String message = e.getMessage() == null ? "The download failed." : e.getMessage();
                 post(() -> callback.onError(message));
             }
-        }, "antegg-link-download").start();
+        });
     }
 
     private void post(Runnable runnable) {

@@ -9,11 +9,12 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.ZoomMod;
+import org.chimeramc.client.util.MainThread;
 
 public class ZoomOverlay extends BaseOverlayButton {
     private boolean isZooming = false;
     private boolean initialized = false;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     public ZoomOverlay(Activity activity) {
         super(activity);

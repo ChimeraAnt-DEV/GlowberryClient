@@ -58,6 +58,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 public class ContentListActivity extends BaseActivity {
 
@@ -101,7 +103,7 @@ public class ContentListActivity extends BaseActivity {
     
     private org.chimeramc.client.ui.dialogs.LoadingDialog progressDialog;
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private ExecutorService pingExecutor;
     /** Server addresses ("ip:port") that already answered; they are not re-pinged every refresh. */
     private final java.util.Set<String> pingedServerKeys = new java.util.HashSet<>();
@@ -775,7 +777,7 @@ public class ContentListActivity extends BaseActivity {
 
     private void saveScreenshotToGallery(org.chimeramc.client.core.content.ScreenshotItem screenshot) {
         showLoading(true);
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "screenshot-export", () -> {
             try {
                 Bitmap bitmap = BitmapFactory.decodeFile(screenshot.file.getAbsolutePath());
                 if (bitmap != null) {
@@ -803,7 +805,7 @@ public class ContentListActivity extends BaseActivity {
                 showLoading(false);
                 Toast.makeText(ContentListActivity.this, R.string.save_failed, Toast.LENGTH_SHORT).show();
             });
-        }).start();
+        });
     }
 
     private void showDeleteScreenshotDialog(org.chimeramc.client.core.content.ScreenshotItem screenshot) {

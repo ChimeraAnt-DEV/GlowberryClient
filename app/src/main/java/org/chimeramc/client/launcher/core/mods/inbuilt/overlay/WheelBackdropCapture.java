@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.PixelCopy;
 import android.view.Window;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Captures a downscaled copy of the window behind the wheel, for the glass backdrop (R3, R12).
@@ -115,7 +116,7 @@ public final class WheelBackdropCapture {
             return false;
         }
         try {
-            if (mainHandler == null) mainHandler = new Handler(Looper.getMainLooper());
+            if (mainHandler == null) mainHandler = MainThread.handler();
             PixelCopy.request(window, buffer, result -> {
                 schedule.markCaptured(nowMs);
                 if (result == PixelCopy.SUCCESS) {

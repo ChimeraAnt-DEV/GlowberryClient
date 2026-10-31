@@ -17,6 +17,7 @@ import android.widget.TextView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * A small draggable text overlay shared by the client-side readouts (List Players, Debug Menu).
@@ -30,7 +31,7 @@ abstract class TextOverlay {
 
     protected final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final String modId;
 
     private View overlayView;

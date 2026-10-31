@@ -7,13 +7,14 @@ import android.view.ViewGroup;
 import org.chimeramc.client.settings.FeatureSettings;
 import org.chimeramc.client.core.minecraft.MinecraftLoadingActivity;
 import org.chimeramc.client.ui.activities.SplashActivity;
+import org.chimeramc.client.util.MainThread;
 
 public class LogcatOverlayManager {
 
     private static volatile LogcatOverlayManager instance;
     private final Application app;
     private LogcatOverlay overlay;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private volatile boolean onSplash = false;
     private volatile boolean onLoading = false;
 

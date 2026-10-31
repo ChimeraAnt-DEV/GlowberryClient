@@ -5,6 +5,7 @@ import android.hardware.input.InputManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.InputDevice;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Watches for controllers being connected and disconnected anywhere in the app.
@@ -32,7 +33,7 @@ public final class ControllerConnectionMonitor {
 
     private final Context appContext;
     private final InputManager inputManager;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
 
     private Listener listener;
     private boolean registered;

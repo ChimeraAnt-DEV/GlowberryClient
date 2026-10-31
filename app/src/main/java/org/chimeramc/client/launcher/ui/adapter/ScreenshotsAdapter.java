@@ -20,6 +20,7 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.ScreenshotItem;
 import org.chimeramc.client.ui.components.ListDiff;
 import org.chimeramc.client.ui.components.ListDiffDispatch;
+import org.chimeramc.client.util.MainThread;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsAdapter.
         this.listener = listener;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         this.imageLoaderExecutor = Executors.newFixedThreadPool(4);
-        this.mainThreadHandler = new Handler(Looper.getMainLooper());
+        this.mainThreadHandler = MainThread.handler();
     }
 
     /**

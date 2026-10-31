@@ -8,6 +8,7 @@ import android.os.Looper;
 import org.chimeramc.client.core.content.InGamePackChanger;
 import org.chimeramc.client.core.versions.GameVersion;
 import org.chimeramc.client.core.versions.VersionManager;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Relaunches the running Minecraft instance so a change that needs a fresh load takes effect.
@@ -38,7 +39,7 @@ public final class MinecraftSessionRestarter {
     /** A request older than this is ignored, so a failed relaunch cannot auto-start a later cold boot. */
     private static final long PENDING_MAX_AGE_MS = 120_000L;
 
-    private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    private static final Handler MAIN = MainThread.handler();
 
     private MinecraftSessionRestarter() {}
 

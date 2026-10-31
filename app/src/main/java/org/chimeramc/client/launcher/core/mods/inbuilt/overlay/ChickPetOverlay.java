@@ -16,6 +16,7 @@ import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 
 import java.util.Random;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.MainThread;
 
 public class ChickPetOverlay {
 
@@ -29,7 +30,7 @@ public class ChickPetOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final Random random = new Random();
 
     private ImageView chickView;

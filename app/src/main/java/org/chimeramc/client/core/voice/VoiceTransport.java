@@ -3,6 +3,7 @@ package org.chimeramc.client.core.voice;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -75,8 +76,7 @@ public final class VoiceTransport implements VoiceLink {
         acquireMulticastLock();
 
         running.set(true);
-        receiveThread = new Thread(this::receiveLoop, "voice-receive");
-        receiveThread.setDaemon(true);
+        receiveThread = AppExecutors.thread("voice-receive", this::receiveLoop);
         receiveThread.start();
         return true;
     }

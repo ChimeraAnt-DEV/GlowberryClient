@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
+import org.chimeramc.client.util.MainThread;
 
 public class CurseForgeActivity extends BaseActivity {
 
@@ -51,7 +52,7 @@ public class CurseForgeActivity extends BaseActivity {
     private ProgressBar loadingProgress;
     private CurseForgeContentAdapter adapter;
     private CurseForgeClient client;
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private Handler handler = MainThread.handler();
     private int currentPage = 1;
     private int totalPages = 1;
     private static final int PAGE_SIZE = 20;

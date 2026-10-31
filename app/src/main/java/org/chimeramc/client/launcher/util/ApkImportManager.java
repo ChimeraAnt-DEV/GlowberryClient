@@ -15,6 +15,7 @@ import org.chimeramc.client.ui.dialogs.ApkVersionConfirmDialog;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.ui.dialogs.InstallProgressDialog;
 import org.chimeramc.client.ui.views.MainViewModel;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,8 +36,7 @@ public class ApkImportManager {
      * dialog is modal — so one reused pool is both cheaper and closer to the real concurrency.
      */
     private final ExecutorService importExecutor = Executors.newSingleThreadExecutor(runnable -> {
-        Thread thread = new Thread(runnable, "apk-import");
-        thread.setDaemon(true);
+        Thread thread = AppExecutors.thread("apk-import", runnable);
         return thread;
     });
 

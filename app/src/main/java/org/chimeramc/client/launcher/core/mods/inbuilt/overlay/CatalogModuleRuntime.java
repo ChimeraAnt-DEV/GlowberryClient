@@ -15,6 +15,7 @@ import org.chimeramc.client.core.mods.inbuilt.catalog.LocalPlayerReadouts;
 import org.chimeramc.client.core.mods.inbuilt.catalog.PeerTargets;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.preloader.PreloaderInput;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ public final class CatalogModuleRuntime {
     private final Map<String, CatalogReadoutOverlay> readouts = new HashMap<>();
     private final CatalogSessionCounters counters = new CatalogSessionCounters();
     private final KeyStateTracker keyState = new KeyStateTracker();
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private String lastCreditedKill;
     private boolean lastHealthAvailable;

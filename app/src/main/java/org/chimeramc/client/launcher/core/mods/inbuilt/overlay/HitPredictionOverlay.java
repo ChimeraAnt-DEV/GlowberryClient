@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public final class HitPredictionOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private WindowManager.LayoutParams wmParams;

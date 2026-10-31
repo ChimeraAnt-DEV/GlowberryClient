@@ -17,6 +17,7 @@ import android.widget.TextView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * The glass pill that announces a controller connection.
@@ -34,7 +35,7 @@ public final class ControllerToastView {
     private static ControllerToastView current;
 
     private final Activity activity;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private View view;
     private Runnable dismissRunnable;
 

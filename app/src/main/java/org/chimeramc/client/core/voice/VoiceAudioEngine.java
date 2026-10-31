@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 import org.chimeramc.client.util.SignalGate;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -123,12 +124,10 @@ public final class VoiceAudioEngine {
         running.set(true);
 
         if (transmit) {
-            captureThread = new Thread(this::captureLoop, "voice-capture");
-            captureThread.setDaemon(true);
+            captureThread = AppExecutors.thread("voice-capture", this::captureLoop);
             captureThread.start();
         }
-        playThread = new Thread(this::playLoop, "voice-playback");
-        playThread.setDaemon(true);
+        playThread = AppExecutors.thread("voice-playback", this::playLoop);
         playThread.start();
         return true;
     }
@@ -160,8 +159,7 @@ public final class VoiceAudioEngine {
         if (!running.get()) return false;
         if (!openCapture()) return false;
         micEnabled = true;
-        captureThread = new Thread(this::captureLoop, "voice-capture");
-        captureThread.setDaemon(true);
+        captureThread = AppExecutors.thread("voice-capture", this::captureLoop);
         captureThread.start();
         return true;
     }

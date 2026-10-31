@@ -6,6 +6,7 @@ import android.util.Log;
 import org.chimeramc.client.util.SignalGate;
 
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -318,11 +319,9 @@ public final class VoiceChatModule {
         }
 
         running = true;
-        beaconThread = new Thread(this::beaconLoop, "voice-beacon");
-        beaconThread.setDaemon(true);
+        beaconThread = AppExecutors.thread("voice-beacon", this::beaconLoop);
         beaconThread.start();
-        playbackThread = new Thread(this::playbackLoop, "voice-mix");
-        playbackThread.setDaemon(true);
+        playbackThread = AppExecutors.thread("voice-mix", this::playbackLoop);
         playbackThread.start();
         return true;
     }
@@ -895,9 +894,7 @@ public final class VoiceChatModule {
      */
     public void announceNow() {
         if (!running) return;
-        Thread thread = new Thread(this::sendBeacon, "voice-announce");
-        thread.setDaemon(true);
-        thread.start();
+        AppExecutors.thread("voice-announce", this::sendBeacon).start();
     }
 
     /** Peers currently audible, for the overlay. */

@@ -18,6 +18,7 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod;
+import org.chimeramc.client.util.MainThread;
 
 public class FpsDisplayOverlay {
     private static final int UPDATE_INTERVAL = 250;
@@ -25,7 +26,7 @@ public class FpsDisplayOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private TextView statsText;

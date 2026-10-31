@@ -83,6 +83,7 @@ import org.chimeramc.client.util.StorageMigrationManager;
 import org.chimeramc.client.util.StorageMigrationService;
 import org.chimeramc.client.util.UIHelper;
 import org.chimeramc.client.core.content.ContentManager;
+import org.chimeramc.client.util.MainThread;
 import java.util.ArrayList;
 import java.text.DateFormat;
 import java.util.Date;
@@ -189,7 +190,7 @@ import okhttp3.OkHttpClient;
      */
     private final ExecutorService launchStatsExecutor = Executors.newSingleThreadExecutor();
 
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Handler uiHandler = MainThread.handler();
     private Runnable pulseRunnable;
     private boolean pulseRunning;
     private View launchShimmer;

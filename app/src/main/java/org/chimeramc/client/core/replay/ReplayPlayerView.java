@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.ui.animation.DynamicAnim;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 
@@ -70,7 +71,7 @@ public final class ReplayPlayerView {
     private SeekBar seekBar;
     private TextView positionText;
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
 
     /** The transport state (position, speed, play/pause) shared with the camera path. */
     private final ReplayTimeline timeline = new ReplayTimeline(0L);

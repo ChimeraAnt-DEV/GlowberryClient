@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.preloader.PreloaderInput;
+import org.chimeramc.client.util.MainThread;
 
 public class ModMenuButton {
 
@@ -25,7 +26,7 @@ public class ModMenuButton {
     private View buttonView;
     private WindowManager windowManager;
     private WindowManager.LayoutParams wmParams;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     // The button attaches 500ms after show() so the game window is up. A hide in that window used to
     // be a no-op (isShowing was still false) and the button appeared afterwards with nothing

@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.AppLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -212,14 +214,15 @@ public final class AccountSkinService {
         if (context == null || xuid == null || xuid.isEmpty()) return;
         if (!refreshRunning.compareAndSet(false, true)) return;
         final android.content.Context appContext = context.getApplicationContext();
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.NETWORK, "account-skin-fetch", () -> {
             try {
                 fetchAndCache(appContext, xuid);
-            } catch (Throwable ignored) {
+            } catch (Throwable error) {
+                AppLog.warn("AccountSkinService", "Account skin fetch failed", error);
             } finally {
                 refreshRunning.set(false);
             }
-        }, "account-skin-fetch").start();
+        });
     }
 
     /** The active account's XUID, or null when no account is signed in. */

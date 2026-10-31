@@ -50,6 +50,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.MainThread;
 
 public class InstanceBackupManager {
     public static final String BACKUP_EXTENSION = ".chimerabackup";
@@ -69,7 +70,7 @@ public class InstanceBackupManager {
     private static final Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 
     private final Context context;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public interface BackupCallback {

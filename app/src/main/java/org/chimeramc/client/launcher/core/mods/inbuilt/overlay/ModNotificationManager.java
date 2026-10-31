@@ -20,6 +20,7 @@ import org.chimeramc.client.R;
 import java.util.ArrayList;
 import java.util.List;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.MainThread;
 
 public class ModNotificationManager {
 
@@ -32,7 +33,7 @@ public class ModNotificationManager {
     private static final int BOTTOM_OFFSET_DP = 60;
 
     private final Activity activity;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final WindowManager windowManager;
     private final List<NotificationEntry> activeNotifications = new ArrayList<>();
     private final float density;

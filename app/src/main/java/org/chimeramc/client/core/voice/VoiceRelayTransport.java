@@ -3,6 +3,7 @@ package org.chimeramc.client.core.voice;
 import android.util.Log;
 
 import org.chimeramc.client.util.SignalGate;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -145,8 +146,7 @@ public final class VoiceRelayTransport implements VoiceLink {
             return false;
         }
         running.set(true);
-        loopThread = new Thread(this::runLoop, "voice-relay");
-        loopThread.setDaemon(true);
+        loopThread = AppExecutors.thread("voice-relay", this::runLoop);
         loopThread.start();
         return true;
     }

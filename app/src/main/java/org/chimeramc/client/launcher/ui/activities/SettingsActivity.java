@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import org.chimeramc.client.util.AppLog;
 import org.chimeramc.client.util.TouchTargetHelper;
+import org.chimeramc.client.util.AppExecutors;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -434,8 +435,8 @@ public class SettingsActivity extends BaseActivity {
             fs.setCrashUploadEnabled(checked);
             if (checked && crashUploadConfigured) {
                 Toast.makeText(this, R.string.crash_upload_sending, Toast.LENGTH_SHORT).show();
-                new Thread(() -> CrashReportUploader.uploadPending(getApplicationContext()),
-                        "crash-report-upload").start();
+                AppExecutors.run(AppExecutors.Kind.NETWORK, "crash-report-upload", () ->
+                        CrashReportUploader.uploadPending(getApplicationContext()));
             }
         });
         View crashUploadUnavailable = findViewById(R.id.crash_upload_unavailable);

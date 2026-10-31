@@ -36,6 +36,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 public class VersionManager {
     private static final String TAG = "VersionManager";
@@ -114,11 +116,11 @@ public class VersionManager {
 
     public static void initializeAsync(Context ctx, InitCallback callback) {
         Context appContext = ctx.getApplicationContext();
-        new Thread(() -> {
-            // The build is disk I/O over the instances directory, so it can fail. A failure has to
-            // reach the caller: the screen that started this disabled its Launch control and only
-            // re-arms it on a callback, so an uncaught throw would strand it disabled with no
-            // message. Reported through onFailed rather than swallowed.
+        // The build is disk I/O over the instances directory, so it can fail. A failure has to
+        // reach the caller: the screen that started this disabled its Launch control and only
+        // re-arms it on a callback, so an uncaught throw would strand it disabled with no message.
+        // Reported through onFailed rather than swallowed.
+        AppExecutors.run(AppExecutors.Kind.DISK, "version-manager-init", () -> {
             try {
                 VersionManager manager = get(appContext);
                 if (callback != null) {
@@ -130,7 +132,7 @@ public class VersionManager {
                     callback.onFailed(error);
                 }
             }
-        }, "version-manager-init").start();
+        });
     }
 
     public static String getSelectedModsDir(Context ctx) {
@@ -299,7 +301,7 @@ public class VersionManager {
     }
 
     public void repairLibsAsync(GameVersion version, LibsRepairCallback callback) {
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "version-repair", () -> {
             callback.onRepairStarted();
             try {
                 File versionDir = version.versionDir;
@@ -425,7 +427,7 @@ public class VersionManager {
                 // attemptRepairLibs refused every later repair for the life of the process.
                 callback.onRepairFailed(e);
             }
-        }).start();
+        });
     }
 
     /**
@@ -971,7 +973,7 @@ public class VersionManager {
         }
         libsRepairFlowActive = true;
         LibsRepairDialog repairDialog = new LibsRepairDialog(activity);
-        Handler mainHandler = new Handler(Looper.getMainLooper());
+        Handler mainHandler = MainThread.handler();
 
         VersionManager.LibsRepairCallback callback = new VersionManager.LibsRepairCallback() {
             @Override
@@ -1113,7 +1115,7 @@ public class VersionManager {
             return;
         }
 
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "version-rename", () -> {
             try {
                 String metaDirName = getMetadataDirectoryName(version);
                 File metadataDir = LauncherStorage.getProfileMetadataDir(context, metaDirName);
@@ -1129,7 +1131,7 @@ public class VersionManager {
                 if (callback != null)
                     callback.onRenameFailed(e);
             }
-        }).start();
+        });
     }
 
     public void deleteCustomVersion(GameVersion version, OnDeleteVersionCallback callback) {
@@ -1147,7 +1149,7 @@ public class VersionManager {
 
         boolean isSelected = version.equals(selectedVersion);
 
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "version-delete", () -> {
             try {
                 File extDir = version.versionDir;
                 if (extDir != null && extDir.exists()) {
@@ -1192,7 +1194,7 @@ public class VersionManager {
                 if (callback != null)
                     callback.onDeleteFailed(e);
             }
-        }).start();
+        });
     }
 
     private void copyDirectory(File sourceDir, File targetDir) throws IOException {
@@ -1267,7 +1269,7 @@ public class VersionManager {
     }
 
     public void importGameFile(File gameFile, VersionCallback callback) {
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "version-import", () -> {
             try {
                 String fileName = gameFile.getName().toLowerCase();
                 
@@ -1280,7 +1282,7 @@ public class VersionManager {
                 AppLog.error(TAG, "Importing the game file failed", e);
                 callback.onError(UserFacingError.shortReasonForText(context, "Import failed", e.getMessage()));
             }
-        }).start();
+        });
     }
 
     private void extractAndSplit(File gameFile, VersionCallback callback) throws IOException {

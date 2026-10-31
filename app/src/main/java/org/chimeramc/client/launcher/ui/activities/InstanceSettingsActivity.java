@@ -33,6 +33,7 @@ import org.chimeramc.client.ui.dialogs.InstallProgressDialog;
 import org.chimeramc.client.util.InstanceBackupManager;
 import org.chimeramc.client.util.InstanceShortcutManager;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
+import org.chimeramc.client.util.MainThread;
 
 public class InstanceSettingsActivity extends BaseActivity {
     private static final int REQUEST_BACKUP_STORAGE = 4201;
@@ -60,7 +61,7 @@ public class InstanceSettingsActivity extends BaseActivity {
     private ImageView shortcutIconPreview;
     private String shortcutIconUri;
     private ActivityResultLauncher<String[]> shortcutIconPicker;
-    private final Handler autoSaveHandler = new Handler(Looper.getMainLooper());
+    private final Handler autoSaveHandler = MainThread.handler();
     private Runnable pendingNameSave;
     private boolean populatingData;
     private String lastSavedInstanceName = "";

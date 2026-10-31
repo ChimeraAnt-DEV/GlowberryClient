@@ -37,6 +37,7 @@ import org.chimeramc.client.ui.activities.BaseActivity;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +70,7 @@ public class DiagnosticsActivity extends BaseActivity {
 
     /** Runs the read-only probes. A single thread, so two taps cannot overlap two gathers. */
     private final ExecutorService probeExecutor = Executors.newSingleThreadExecutor();
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Handler uiHandler = MainThread.handler();
 
     /** The most recently gathered reading. Written on the UI thread only, so the paint path is safe. */
     private Snapshot snapshot;

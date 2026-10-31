@@ -45,6 +45,7 @@ import org.chimeramc.client.core.mods.pvp.PvpSectionPolicy;
 import org.chimeramc.client.core.mods.inbuilt.model.ModLoadoutStore;
 import org.chimeramc.client.core.mods.inbuilt.vip.ModCategory;
 import org.chimeramc.client.launcher.controller.ControllerConnectionMonitor;
+import org.chimeramc.client.util.MainThread;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -72,7 +73,7 @@ public class ModMenuOverlay {
     private View overlayView;
     private WindowManager windowManager;
     private WindowManager.LayoutParams wmParams;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private boolean isShowing = false;
 
     private RecyclerView modsRecycler;
@@ -2608,6 +2609,9 @@ public class ModMenuOverlay {
         if (keep != cosmeticsContainer) hideCosmetics();
         if (keep != replayContainer) hideReplay();
         if (keep != voiceContainer) hideVoice();
+        // The keyboard page arms a key-capture timeout; leaving the page must cancel it, or it
+        // fires into a detached tree and holds the section alive (item 183).
+        if (keep != keyboardContainer && keyboardSection != null) keyboardSection.onHidden();
         if (keep != packsContainer && packsContainer != null) {
             packsContainer.setVisibility(View.GONE);
         }
