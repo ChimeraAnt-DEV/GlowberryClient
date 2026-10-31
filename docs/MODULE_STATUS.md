@@ -25,17 +25,17 @@ accessor-name strings are stripped).
 | `quick_drop` | Drops the held stack | Preloader key injection (`PreloaderInput.onKeyEvent`) | yes (preloader input, no game symbol) | working (tested) |
 | `camera_perspective` | Cycles first/third person | Preloader key injection | yes | working (tested) |
 | `toggle_hud` | Hides the HUD | Preloader key injection | yes | working (tested) |
-| `auto_sprint` | Sprint without holding | `libinbuiltmods.so` levimc native | yes (prebuilt, levimc symbols) | unverified (device) |
-| `chick_pet` | Spawns a client pet | `libinbuiltmods.so` | yes (prebuilt) | unverified (device) |
-| `zoom` | Hold-to-zoom | `libinbuiltmods.so` | yes (prebuilt) | unverified (device) |
-| `fps_display` | FPS overlay | `libinbuiltmods.so` + inbuilt overlay | yes | unverified (device) |
+| `auto_sprint` | Sprint without holding | `GameBackend.setAutoSprint` (the injected-input seam) | yes (backend seam, no prebuilt lib) | unverified (device) |
+| `chick_pet` | Spawns a client pet | Client pet render (`NativeCosmeticsBridge` / `PetGeometry`) | yes (client-side) | unverified (device) |
+| `zoom` | Hold-to-zoom | `GameBackend.setZoom` (the injected-input seam) | yes (backend seam) | unverified (device) |
+| `fps_display` | FPS overlay | `GameBackend.readFps` + inbuilt overlay | yes (backend seam; host `FrameRateMeter` fallback) | unverified (device) |
 | `cps_display` | Clicks-per-second overlay | Inbuilt overlay + attack input | yes (client-only) | working (tested) |
-| `snaplook` | Snap to a saved angle | `libinbuiltmods.so` | yes (prebuilt) | unverified (device) |
+| `snaplook` | Snap to a saved angle | `GameBackend.sendLookDelta` (the injected-input seam) | yes (backend seam) | unverified (device) |
 | `virtual_cursor` | On-screen cursor | Pojav controls | yes | unverified (device) |
 | `gyro` | Gyroscope look | `PojavControlsMod.nativeSendLookDelta` (the mouse-look path) | yes | unverified (device) |
 | `pojav_controls` | On-screen control editor | Pojav controls bridge | yes | unverified (device) |
 | `more_buttons` | Extra touch buttons | Pojav controls + SVG bridge | yes | unverified (device) |
-| `hotbar_slot` | Direct hotbar slot keys | `libinbuiltmods.so` | yes (prebuilt) | unverified (device) |
+| `hotbar_slot` | Direct hotbar slot keys | `GameBackend.selectHotbarSlot` (the injected-input seam) | yes (backend seam) | unverified (device) |
 | `offhand` | Opens the inventory for the off-hand slot (no swap key exists in Bedrock) | Preloader key injection + `OffhandAction` (tested) | yes | working (tested); UI unverified (device) |
 | `aim_settings` | Crosshair / smoothing / sensitivity | Client look shaping (`pojavSendLookDelta`) | yes | working (tested) |
 | `armor_hud` | Durability/enchant readout | `ArmorHudMod.DataSource` (native entity feed) | **no** on this build; never installed | needs-hook |
