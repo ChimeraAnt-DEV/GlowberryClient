@@ -101,7 +101,92 @@ public class UiGalleryActivity extends Activity {
         root.addView(new UiRailButtonView(this, accent, true));
         root.addView(new UiRailButtonView(this, accent, false));
 
+        addSection(root, density, "Navigation shell (bar / rail / expanded rail)");
+        for (org.chimeramc.client.ui.navigation.NavLayoutMode mode
+                : org.chimeramc.client.ui.navigation.NavLayoutMode.values()) {
+            root.addView(new NavPreviewView(this, mode, accent));
+        }
+
         setContentView(scroll);
+    }
+
+    /**
+     * A miniature of one navigation shape, drawn from the same {@link NavLayoutMode} the app uses.
+     *
+     * <p>It is a drawing, not an inflated {@code nav_bar.xml}: the point is to compare the three
+     * shapes' geometry and label visibility at a glance, and inflating the real layouts would need
+     * the whole wrapper. The label rule comes from the mode itself, so this cannot disagree with
+     * the app about whether a label is shown.
+     */
+    private static final class NavPreviewView extends View {
+        private final org.chimeramc.client.ui.navigation.NavLayoutMode mode;
+        private final int accent;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint text = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
+        private final String[] labels = {"Play", "Library", "Mods", "Settings"};
+
+        NavPreviewView(Activity a, org.chimeramc.client.ui.navigation.NavLayoutMode mode, int accent) {
+            super(a);
+            this.mode = mode;
+            this.accent = accent;
+            float density = a.getResources().getDisplayMetrics().density;
+            text.setColor(UiTokens.TEXT_PRIMARY);
+            text.setTextSize(UiTokens.TEXT_CAPTION * a.getResources().getDisplayMetrics().scaledDensity);
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (mode.isRail() ? 132 * density : 56 * density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            int w = getWidth();
+            int h = getHeight();
+            paint.setColor(UiTokens.BG_SURFACE);
+            scratch.set(0, 0, w, h);
+            canvas.drawRoundRect(scratch, UiTokens.RADIUS_CARD * density,
+                    UiTokens.RADIUS_CARD * density, paint);
+            paint.setColor(accent);
+            int icon = (int) (10 * density);
+            int gap = (int) (8 * density);
+            if (mode.isRail()) {
+                // A rail stacks its entries down the leading edge; the expanded one also names them.
+                int x = (int) (12 * density);
+                int y = (int) (14 * density);
+                for (int i = 0; i < labels.length; i++) {
+                    boolean active = i == 0;
+                    paint.setColor(active ? accent : UiTokens.TEXT_SECONDARY);
+                    canvas.drawCircle(x + icon / 2f, y + icon / 2f, icon / 2f, paint);
+                    if (mode.showsAllLabels()) {
+                        canvas.drawText(labels[i], x + icon + gap, y + icon * 0.9f, text);
+                    }
+                    y += icon + (int) (12 * density);
+                }
+                paint.setColor(accent);
+                canvas.drawRect(0, (int) (12 * density), (int) (2 * density),
+                        (int) (22 * density), paint);
+            } else {
+                // A bar runs its entries along the middle; the compact bar names only the active one.
+                int y = h / 2 - icon / 2;
+                int x = (int) (12 * density);
+                for (int i = 0; i < labels.length; i++) {
+                    boolean active = i == 0;
+                    paint.setColor(active ? accent : UiTokens.TEXT_SECONDARY);
+                    canvas.drawCircle(x + icon / 2f, y + icon / 2f, icon / 2f, paint);
+                    boolean showLabel = active;
+                    if (showLabel) {
+                        canvas.drawText(labels[i], x + icon + gap, y + icon * 0.9f, text);
+                        x += icon + gap + (int) text.measureText(labels[i]);
+                    }
+                    x += icon + (int) (16 * density);
+                }
+            }
+            paint.setColor(UiTokens.TEXT_SECONDARY);
+            canvas.drawText(mode.name() + "  (labels: " + (mode.showsAllLabels() ? "all" : "compact") + ")",
+                    0, h - (int) (2 * density), text);
+        }
     }
 
     private void addTitle(LinearLayout root, float density, String text) {
