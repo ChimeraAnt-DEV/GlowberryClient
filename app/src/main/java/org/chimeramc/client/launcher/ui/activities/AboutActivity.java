@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.core.backend.GameBridge;
 import org.chimeramc.client.preloader.BerryApi;
 
 public class AboutActivity extends BaseActivity {
@@ -101,8 +102,17 @@ public class AboutActivity extends BaseActivity {
      */
     private void showBackendStatus() {
         TextView status = findViewById(R.id.about_backend_status);
-        if (status == null) return;
-        status.setText(getString(R.string.about_backend_status, BerryApi.summary()));
+        if (status != null) {
+            status.setText(getString(R.string.about_backend_status, BerryApi.summary()));
+        }
+        // The input backend is a second, separate seam: the runtime can be present while nothing is
+        // registered to inject input through it. Both lines are shown so "the launcher runs but the
+        // controls do nothing" is a state the user can name before reporting it.
+        TextView inputStatus = findViewById(R.id.about_input_backend_status);
+        if (inputStatus != null) {
+            inputStatus.setText(getString(R.string.about_input_backend_status,
+                    GameBridge.statusLine()));
+        }
     }
 
     private void setupNavBar() {

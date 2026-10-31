@@ -1543,6 +1543,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_field_cosmetics_hook">Cosmetics render hook</string>
     <string name="diagnostics_field_skin_seam">Skin capture seam</string>
     <string name="diagnostics_field_berry_api">BerryAPI backend</string>
+    <string name="diagnostics_field_input_backend">Input backend</string>
     <string name="diagnostics_field_preloader_abi">Preloader ABI</string>
     <string name="diagnostics_preloader_abi_ok">v%1$d (matches client)</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (client expects v%2$d)</string>
@@ -1569,6 +1570,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="about_github_org" translatable="false">ChimeraAnt-DEV</string>
     <string name="about_license_note">See LICENSE in the repository for license details.</string>
     <string name="about_backend_status">Backend: %1$s</string>
+    <string name="about_input_backend_status">Input backend: %1$s</string>
     <string name="about_contribute_title">Contribute</string>
     <string name="about_contribute_desc">Contributions via Issues or Pull Requests are welcome to improve GlowberryClient.</string>
     <string name="about_issues">Issue</string>

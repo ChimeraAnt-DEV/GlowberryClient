@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.chimeramc.client.core.backend.GameBridge;
 import org.chimeramc.client.preloader.BerryApi;
 
 /**
@@ -413,6 +414,9 @@ public class DiagnosticsActivity extends BaseActivity {
         // screen reports what the preloader actually found rather than assuming it is present. A
         // missing backend is then visible here before a launch, not only when a feature does nothing.
         addRow(rows, R.string.diagnostics_field_berry_api, BerryApi.summary());
+        // The input backend is a separate seam from the runtime: the library can be present while
+        // nothing is registered to inject input through it, which is a distinct failure state.
+        addRow(rows, R.string.diagnostics_field_input_backend, GameBridge.statusLine());
         // The preloader is a separate library with its own C ABI version. Reporting it here makes a
         // client/native mismatch visible before a launch, rather than as a feature that silently
         // does nothing because the two were built from different ABI revisions.

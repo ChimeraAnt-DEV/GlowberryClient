@@ -88,7 +88,9 @@
     "about_backend_status": "Backend: %1$s",
     "diagnostics_field_preloader_abi": "ABI del preloader",
     "diagnostics_preloader_abi_ok": "v%1$d (coincide con el cliente)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (el cliente espera v%2$d)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (el cliente espera v%2$d)",
+    "about_input_backend_status": "Backend de entrada: %1$s",
+    "diagnostics_field_input_backend": "Backend de entrada"
   },
   "fr": {
     "nav_back": "Retour",
@@ -179,7 +181,9 @@
     "about_backend_status": "Backend : %1$s",
     "diagnostics_field_preloader_abi": "ABI du preloader",
     "diagnostics_preloader_abi_ok": "v%1$d (correspond au client)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (le client attend v%2$d)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (le client attend v%2$d)",
+    "about_input_backend_status": "Backend d’entrée : %1$s",
+    "diagnostics_field_input_backend": "Backend d’entrée"
   },
   "hi": {
     "nav_back": "वापस",
@@ -270,7 +274,9 @@
     "about_backend_status": "बैकएंड: %1$s",
     "diagnostics_field_preloader_abi": "प्रीलोडर ABI",
     "diagnostics_preloader_abi_ok": "v%1$d (क्लाइंट से मेल खाता है)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (क्लाइंट v%2$d की अपेक्षा करता है)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (क्लाइंट v%2$d की अपेक्षा करता है)",
+    "about_input_backend_status": "इनपुट बैकएंड: %1$s",
+    "diagnostics_field_input_backend": "इनपुट बैकएंड"
   },
   "id": {
     "nav_back": "Kembali",
@@ -361,7 +367,9 @@
     "about_backend_status": "Backend: %1$s",
     "diagnostics_field_preloader_abi": "ABI preloader",
     "diagnostics_preloader_abi_ok": "v%1$d (cocok dengan klien)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (klien mengharapkan v%2$d)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (klien mengharapkan v%2$d)",
+    "about_input_backend_status": "Backend masukan: %1$s",
+    "diagnostics_field_input_backend": "Backend masukan"
   },
   "ja": {
     "nav_back": "戻る",
@@ -452,7 +460,9 @@
     "about_backend_status": "バックエンド: %1$s",
     "diagnostics_field_preloader_abi": "プリローダーABI",
     "diagnostics_preloader_abi_ok": "v%1$d（クライアントと一致）",
-    "diagnostics_preloader_abi_mismatch": "v%1$d（クライアントはv%2$dを期待）"
+    "diagnostics_preloader_abi_mismatch": "v%1$d（クライアントはv%2$dを期待）",
+    "about_input_backend_status": "入力バックエンド: %1$s",
+    "diagnostics_field_input_backend": "入力バックエンド"
   },
   "pt": {
     "nav_back": "Voltar",
@@ -543,7 +553,9 @@
     "about_backend_status": "Backend: %1$s",
     "diagnostics_field_preloader_abi": "ABI do preloader",
     "diagnostics_preloader_abi_ok": "v%1$d (corresponde ao cliente)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (o cliente espera v%2$d)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (o cliente espera v%2$d)",
+    "about_input_backend_status": "Backend de entrada: %1$s",
+    "diagnostics_field_input_backend": "Backend de entrada"
   },
   "ru": {
     "nav_back": "Назад",
@@ -634,7 +646,9 @@
     "about_backend_status": "Бэкенд: %1$s",
     "diagnostics_field_preloader_abi": "ABI прелоадера",
     "diagnostics_preloader_abi_ok": "v%1$d (совпадает с клиентом)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (клиент ожидает v%2$d)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (клиент ожидает v%2$d)",
+    "about_input_backend_status": "Бэкенд ввода: %1$s",
+    "diagnostics_field_input_backend": "Бэкенд ввода"
   },
   "tr": {
     "nav_back": "Geri",
@@ -725,7 +739,9 @@
     "about_backend_status": "Arka uç: %1$s",
     "diagnostics_field_preloader_abi": "Ön yükleyici ABI",
     "diagnostics_preloader_abi_ok": "v%1$d (istemciyle eşleşiyor)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (istemci v%2$d bekliyor)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (istemci v%2$d bekliyor)",
+    "about_input_backend_status": "Giriş arka ucu: %1$s",
+    "diagnostics_field_input_backend": "Giriş arka ucu"
   },
   "vi": {
     "nav_back": "Quay lại",
@@ -816,7 +832,9 @@
     "about_backend_status": "Phần nền: %1$s",
     "diagnostics_field_preloader_abi": "ABI của preloader",
     "diagnostics_preloader_abi_ok": "v%1$d (khớp với ứng dụng)",
-    "diagnostics_preloader_abi_mismatch": "v%1$d (ứng dụng mong đợi v%2$d)"
+    "diagnostics_preloader_abi_mismatch": "v%1$d (ứng dụng mong đợi v%2$d)",
+    "about_input_backend_status": "Phần phụ trợ nhập: %1$s",
+    "diagnostics_field_input_backend": "Phần phụ trợ nhập"
   },
   "zh-rCN": {
     "nav_back": "返回",
@@ -907,6 +925,8 @@
     "about_backend_status": "后端：%1$s",
     "diagnostics_field_preloader_abi": "预加载器 ABI",
     "diagnostics_preloader_abi_ok": "v%1$d（与客户端一致）",
-    "diagnostics_preloader_abi_mismatch": "v%1$d（客户端期望 v%2$d）"
+    "diagnostics_preloader_abi_mismatch": "v%1$d（客户端期望 v%2$d）",
+    "about_input_backend_status": "输入后端：%1$s",
+    "diagnostics_field_input_backend": "输入后端"
   }
 }

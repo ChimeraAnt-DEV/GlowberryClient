@@ -179,6 +179,35 @@ public final class GameBridge {
         }
     }
 
+    /**
+     * A one-line description of the active backend for About and Diagnostics (item 492).
+     *
+     * <p>Pure string work from the backend's own name/version, so the wording is unit-tested and the
+     * two screens cannot describe the same state differently. A build with no backend says so
+     * plainly, because "the launcher works but injected input does nothing" is exactly the state a
+     * user needs named before they report a bug.
+     */
+    public static String statusLine() {
+        GameBackend b = backend;
+        if (b == null) {
+            return "none registered (launcher input only)";
+        }
+        String name = safeText(b.name());
+        String version = safeText(b.version());
+        int api = b.apiVersion();
+        StringBuilder out = new StringBuilder();
+        out.append(name.isEmpty() ? "unnamed backend" : name);
+        if (!version.isEmpty()) {
+            out.append(' ').append(version);
+        }
+        out.append(" (API v").append(api).append(')');
+        return out.toString();
+    }
+
+    private static String safeText(String value) {
+        return value == null ? "" : value.trim();
+    }
+
     /** Replaces the failure logger. Passing null restores the default. */
     public static void setLogger(Logger next) {
         logger = next == null ? DEFAULT_LOGGER : next;

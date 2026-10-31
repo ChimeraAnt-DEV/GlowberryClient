@@ -1066,4 +1066,6 @@
     <string name="diagnostics_field_preloader_abi">预加载器 ABI</string>
     <string name="diagnostics_preloader_abi_ok">v%1$d（与客户端一致）</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d（客户端期望 v%2$d）</string>
+    <string name="about_input_backend_status">输入后端：%1$s</string>
+    <string name="diagnostics_field_input_backend">输入后端</string>
 </resources>

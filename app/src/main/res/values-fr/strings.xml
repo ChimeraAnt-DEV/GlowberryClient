@@ -1045,4 +1045,6 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="diagnostics_field_preloader_abi">ABI du preloader</string>
     <string name="diagnostics_preloader_abi_ok">v%1$d (correspond au client)</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (le client attend v%2$d)</string>
+    <string name="about_input_backend_status">Backend d’entrée : %1$s</string>
+    <string name="diagnostics_field_input_backend">Backend d’entrée</string>
 </resources>

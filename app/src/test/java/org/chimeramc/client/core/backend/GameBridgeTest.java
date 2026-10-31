@@ -107,6 +107,18 @@ public class GameBridgeTest {
     }
 
     @Test
+    public void statusLineNamesTheBackendOrItsAbsence() {
+        // Item 492: About and Diagnostics show this line, so a build with no backend says so
+        // plainly rather than leaving the user to infer it from a feature that does nothing.
+        assertTrue(GameBridge.statusLine(), GameBridge.statusLine().contains("none"));
+        GameBridge.register(backend);
+        String line = GameBridge.statusLine();
+        assertTrue(line, line.contains("test"));
+        assertTrue(line, line.contains("9.9"));
+        assertTrue(line, line.contains("API v" + GameBackend.API_VERSION));
+    }
+
+    @Test
     public void withNoBackendEveryCallIsAQuietNoOp() {
         assertFalse(GameBridge.hasBackend());
         assertFalse(GameBridge.sendKey('W', true));

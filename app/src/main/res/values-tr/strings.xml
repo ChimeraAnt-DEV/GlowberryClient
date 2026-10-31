@@ -1072,4 +1072,6 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="diagnostics_field_preloader_abi">Ön yükleyici ABI</string>
     <string name="diagnostics_preloader_abi_ok">v%1$d (istemciyle eşleşiyor)</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (istemci v%2$d bekliyor)</string>
+    <string name="about_input_backend_status">Giriş arka ucu: %1$s</string>
+    <string name="diagnostics_field_input_backend">Giriş arka ucu</string>
 </resources>

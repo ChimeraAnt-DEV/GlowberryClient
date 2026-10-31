@@ -339,6 +339,15 @@
                         android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <TextView
+                        android:id="@+id/about_input_backend_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2"
+                        android:fontFamily="@font/misans"
+                        android:textColor="@color/text_secondary"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_3"

@@ -1076,4 +1076,6 @@
     <string name="diagnostics_field_preloader_abi">ABI прелоадера</string>
     <string name="diagnostics_preloader_abi_ok">v%1$d (совпадает с клиентом)</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (клиент ожидает v%2$d)</string>
+    <string name="about_input_backend_status">Бэкенд ввода: %1$s</string>
+    <string name="diagnostics_field_input_backend">Бэкенд ввода</string>
 </resources>

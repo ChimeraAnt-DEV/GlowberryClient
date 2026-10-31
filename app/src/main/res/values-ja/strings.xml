@@ -1042,4 +1042,6 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="diagnostics_field_preloader_abi">プリローダーABI</string>
     <string name="diagnostics_preloader_abi_ok">v%1$d（クライアントと一致）</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d（クライアントはv%2$dを期待）</string>
+    <string name="about_input_backend_status">入力バックエンド: %1$s</string>
+    <string name="diagnostics_field_input_backend">入力バックエンド</string>
 </resources>
