@@ -58,6 +58,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import org.chimeramc.client.util.TouchTargetHelper;
 import org.chimeramc.client.util.MainThread;
+import org.chimeramc.client.core.auth.Cancellation;
+import org.chimeramc.client.util.SignalGate;
 
 public class MsftLoginActivity extends BaseActivity {
     public static final String EXTRA_LOGIN_COMPLETED = "ms_login_completed";
@@ -76,6 +78,8 @@ public class MsftLoginActivity extends BaseActivity {
     private final AtomicBoolean completed = new AtomicBoolean(false);
     private final AtomicLong loginGeneration = new AtomicLong();
     private final Handler mainHandler = MainThread.handler();
+    /** Wakes a blocking sign-in wait the moment the user cancels (item 15). */
+    private final SignalGate loginGate = new SignalGate();
 
     private View methodPanel;
     private View devicePanel;
@@ -469,7 +473,7 @@ public class MsftLoginActivity extends BaseActivity {
             try {
                 BedrockAuthManager authManager = MsftAuthManager.loginWithDeviceCode(
                         code -> runOnUiThread(() -> showDeviceCode(code, generation)),
-                        () -> !isCurrentLogin(generation),
+                        cancellationFor(generation),
                         deviceState -> updateDeviceState(deviceState, generation)
                 );
                 if (!isCurrentLogin(generation)) {
@@ -484,7 +488,7 @@ public class MsftLoginActivity extends BaseActivity {
                 MsftAccountStore.MsftAccount account = MsftAuthManager.saveAccountAndActivateWithRetry(
                         this,
                         authManager,
-                        () -> !isCurrentLogin(generation),
+                        cancellationFor(generation),
                         () -> runOnUiThread(() -> {
                             if (isCurrentLogin(generation)) {
                                 showProgress(R.string.ms_login_retrying);
@@ -606,7 +610,7 @@ public class MsftLoginActivity extends BaseActivity {
                 MsftAccountStore.MsftAccount account = MsftAuthManager.saveAccountAndActivateWithRetry(
                         this,
                         authManager,
-                        () -> !isCurrentLogin(generation),
+                        cancellationFor(generation),
                         () -> runOnUiThread(() -> {
                             if (isCurrentLogin(generation)) {
                                 showProgress(R.string.ms_login_retrying);
@@ -752,6 +756,29 @@ public class MsftLoginActivity extends BaseActivity {
         return generation == loginGeneration.get() && !cancelled.get() && !Thread.currentThread().isInterrupted();
     }
 
+    /**
+     * The cancellation handed to the blocking sign-in calls.
+     *
+     * <p>State and wake-up are kept together but distinct: {@code isCancelled} is the existing
+     * generation check (so a superseded login is cancelled exactly as before), and {@code
+     * awaitSignal} is the gate {@link #cancelCurrentLogin()} fires. A predicate alone would make
+     * Cancel wait out the current poll interval; the gate makes it immediate without changing what
+     * "current" means.
+     */
+    private Cancellation cancellationFor(long generation) {
+        return new Cancellation() {
+            @Override
+            public boolean isCancelled() {
+                return !isCurrentLogin(generation);
+            }
+
+            @Override
+            public void awaitSignal(long timeoutMs) {
+                loginGate.await(timeoutMs);
+            }
+        };
+    }
+
     private boolean isCurrentWebLogin() {
         return webPanel != null && webPanel.getVisibility() == View.VISIBLE && isCurrentLogin(webGeneration);
     }
@@ -759,6 +786,7 @@ public class MsftLoginActivity extends BaseActivity {
     private void cancelCurrentLogin() {
         loginGeneration.incrementAndGet();
         cancelled.set(true);
+        loginGate.signal();
         mainHandler.removeCallbacks(expiryRunnable);
         Future<?> currentTask = loginTask;
         loginTask = null;

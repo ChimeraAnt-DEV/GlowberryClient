@@ -112,7 +112,7 @@ public final class MsftAuthManager {
 
     public static BedrockAuthManager loginWithDeviceCode(
             Consumer<MsaDeviceCode> codeConsumer,
-            BooleanSupplier cancelled,
+            Cancellation cancelled,
             Consumer<DeviceCodeState> stateConsumer
     ) throws Exception {
         HttpClient httpClient = createHttpClient();
@@ -221,7 +221,7 @@ public final class MsftAuthManager {
     public static MsftAccountStore.MsftAccount saveAccountAndActivateWithRetry(
             Context context,
             BedrockAuthManager authManager,
-            BooleanSupplier cancelled,
+            Cancellation cancelled,
             Runnable retryCallback
     ) throws Exception {
         return executeWithNetworkRetry(
@@ -377,7 +377,7 @@ public final class MsftAuthManager {
 
     private static <T> T executeWithNetworkRetry(
             ThrowingSupplier<T> supplier,
-            BooleanSupplier cancelled,
+            Cancellation cancelled,
             Runnable retryCallback,
             int maxAttempts
     ) throws Exception {
@@ -480,24 +480,33 @@ public final class MsftAuthManager {
         return requestError != null ? requestError : current != null ? current : throwable;
     }
 
-    private static void ensureNotCancelled(BooleanSupplier cancelled) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted() || (cancelled != null && cancelled.getAsBoolean())) {
+    private static void ensureNotCancelled(Cancellation cancelled) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted() || (cancelled != null && cancelled.isCancelled())) {
             throw new InterruptedException("Microsoft sign-in was cancelled.");
         }
     }
 
-    private static void sleepWithCancellation(long delayMs, BooleanSupplier cancelled) throws InterruptedException {
+    private static void sleepWithCancellation(long delayMs, Cancellation cancelled) throws InterruptedException {
         sleepUntil(SystemClock.elapsedRealtime() + Math.max(0L, delayMs), cancelled);
     }
 
-    private static void sleepUntil(long targetTimeMs, BooleanSupplier cancelled) throws InterruptedException {
+    /**
+     * Waits out a deadline while staying cancellable.
+     *
+     * <p>A signalling {@link Cancellation} wakes the wait the moment the user backs out; one that
+     * only carries a predicate still falls back to {@link #CANCEL_CHECK_INTERVAL_MS}, so the bound
+     * is a floor rather than the mechanism. The interrupt check is first and is what makes
+     * {@code Future.cancel(true)} take effect immediately.
+     */
+    private static void sleepUntil(long targetTimeMs, Cancellation cancelled) throws InterruptedException {
+        Cancellation wait = cancelled == null ? Cancellation.none() : cancelled;
         while (true) {
             ensureNotCancelled(cancelled);
             long remaining = targetTimeMs - SystemClock.elapsedRealtime();
             if (remaining <= 0L) {
                 return;
             }
-            Thread.sleep(Math.min(remaining, CANCEL_CHECK_INTERVAL_MS));
+            wait.awaitSignal(Math.min(remaining, CANCEL_CHECK_INTERVAL_MS));
         }
     }
 }

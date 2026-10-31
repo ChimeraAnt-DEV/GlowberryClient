@@ -63,6 +63,7 @@ public final class VoiceChatModule {
     private Thread playbackThread;
     /** Wakes the beacon loop's interval wait so stop() joins immediately instead of after 1s. */
     private final SignalGate beaconGate = new SignalGate();
+    private final SignalGate playbackGate = new SignalGate();
 
     /** How often a peer beacon is re-sent. Also the worst-case time a departed peer stays listed. */
     private static final long BEACON_INTERVAL_MS = 1000L;
@@ -422,6 +423,9 @@ public final class VoiceChatModule {
         }
         Thread playback = playbackThread;
         playbackThread = null;
+        // Signalled before the join so a playback thread inside its frame wait exits at once,
+        // instead of the join timing out and leaving the mixer running against a dead session.
+        playbackGate.signal();
         if (playback != null) {
             playback.interrupt();
             try {
@@ -696,17 +700,12 @@ public final class VoiceChatModule {
         while (running) {
             nextTick += VoiceAudioEngine.FRAME_MS;
             long now = android.os.SystemClock.uptimeMillis();
-            long wait = nextTick - now;
-            if (wait > 0) {
-                try {
-                    Thread.sleep(wait);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-            } else if (wait < -VoiceAudioEngine.FRAME_MS * 4) {
+            if (nextTick - now < -VoiceAudioEngine.FRAME_MS * 4) {
                 // Fell far behind (a stalled thread); resync rather than trying to catch up.
                 nextTick = now;
+            } else if (playbackGate.awaitUntil(nextTick, android.os.SystemClock::uptimeMillis)
+                    == SignalGate.Wake.INTERRUPTED) {
+                return;
             }
 
             long stamp = android.os.SystemClock.uptimeMillis();
