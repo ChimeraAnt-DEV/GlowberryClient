@@ -18,6 +18,7 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.auth.MsftAccountStore;
 import org.chimeramc.client.util.AccountTextUtils;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +113,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.Accoun
             activeBadge = itemView.findViewById(R.id.active_badge);
             btnUse = itemView.findViewById(R.id.btn_use);
             btnDelete = itemView.findViewById(R.id.btn_delete);
+            TouchTargetHelper.expand(btnDelete);
         }
     }
 }

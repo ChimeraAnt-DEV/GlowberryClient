@@ -86,7 +86,9 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_search"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/text_secondary" 
+                    android:importantForAccessibility="no"
+                    />
 
                 <EditText
                     android:id="@+id/search_input"
@@ -122,7 +124,9 @@
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:src="@drawable/ic_menu"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/text_secondary" 
+                    android:importantForAccessibility="no"
+                    />
 
                 <TextView
                     android:id="@+id/sort_label"
@@ -245,7 +249,9 @@
                     android:layout_height="52dp"
                     android:src="@drawable/ic_minecraft_cube"
                     android:alpha="0.4"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop" 
+                    android:importantForAccessibility="no"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"

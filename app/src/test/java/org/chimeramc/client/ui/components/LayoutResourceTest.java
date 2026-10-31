@@ -118,6 +118,41 @@ public class LayoutResourceTest {
     }
 
     /**
+     * Every clickable icon names itself for a screen reader (item 23/338).
+     *
+     * <p>An {@code ImageView} has no text, so a screen reader has nothing to announce unless the
+     * view says what it is. Decorative images are fine and common — the fix for those is
+     * {@code importantForAccessibility="no"}, which stops TalkBack from stopping on them at all.
+     * What is not fine is neither attribute: the image is focusable, unlabelled and unexplained.
+     */
+    @Test
+    public void everyClickableIconIsLabelledOrHiddenFromAccessibility() throws IOException {
+        Pattern icon = Pattern.compile(
+                "<(ImageView|ImageButton)\\b(.*?)(?:/>|>)", Pattern.DOTALL);
+        Map<String, List<String>> offenders = new LinkedHashMap<>();
+        for (Path layout : layoutFiles()) {
+            String xml = read(layout);
+            Matcher m = icon.matcher(xml);
+            while (m.find()) {
+                String body = m.group(2);
+                boolean interactive = m.group(1).equals("ImageButton")
+                        || body.contains("clickable=\"true\"");
+                if (!interactive) continue;
+                if (body.contains("contentDescription=") || body.contains("importantForAccessibility=")) {
+                    continue;
+                }
+                int line = xml.substring(0, m.start()).split("\n", -1).length;
+                offenders.computeIfAbsent(layout.getFileName().toString(), k -> new ArrayList<>())
+                        .add("line " + line);
+            }
+        }
+        assertTrue("a clickable icon must set android:contentDescription (what it does) or "
+                        + "android:importantForAccessibility=\"no\" (it is decorative). Offenders: "
+                        + offenders,
+                offenders.isEmpty());
+    }
+
+    /**
      * Every layout in {@code res/layout} is reachable. An unreferenced layout is dead weight that
      * lint only reports when {@code shrinkResources} runs, and the ones removed here had drifted
      * far enough to reference drawables that no longer exist. A layout referenced only by name at

@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.ui.components.UiTokens;
+import org.chimeramc.client.util.TouchTargetHelper;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.core.mods.inbuilt.ExternalModuleProvider;
 import org.chimeramc.client.core.mods.inbuilt.InbuiltModuleProvider;
@@ -649,6 +650,15 @@ public class ModMenuOverlay {
                 filterAll, filterFavorites, filterEnabled, filterInbuilt, filterExternal, filterPvp,
                 filterVisuals, filterMisc, closeBtn, clearSearchBtn}) {
             if (v != null) DynamicAnim.applyPressScale(v);
+        }
+
+        // The chrome icons draw at 22-36dp. They stay that size and gain a 48dp touch area, which
+        // is the difference between a control a player hits first time and one they miss while a
+        // game is running behind the menu.
+        for (int id : new int[]{R.id.btn_close_menu, R.id.btn_clear_search,
+                R.id.btn_back_to_modules, R.id.btn_hud_save, R.id.btn_hud_reset,
+                R.id.btn_hud_cancel}) {
+            TouchTargetHelper.expand(overlayView.findViewById(id));
         }
 
         if (btnHudSave != null) {

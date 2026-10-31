@@ -257,7 +257,9 @@
                     android:layout_height="48dp"
                     android:src="@drawable/ic_modules"
                     android:alpha="0.4"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop" 
+                    android:importantForAccessibility="no"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"

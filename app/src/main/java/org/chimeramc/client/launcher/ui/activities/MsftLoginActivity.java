@@ -56,6 +56,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 public class MsftLoginActivity extends BaseActivity {
     public static final String EXTRA_LOGIN_COMPLETED = "ms_login_completed";
@@ -151,6 +152,7 @@ public class MsftLoginActivity extends BaseActivity {
         webView = findViewById(R.id.msft_login_webview);
 
         ImageButton backButton = findViewById(R.id.msft_back_button);
+        TouchTargetHelper.expand(backButton);
         MaterialButton deviceButton = findViewById(R.id.msft_device_login_button);
         MaterialButton webButton = findViewById(R.id.msft_web_login_button);
         MaterialButton msalButton = findViewById(R.id.msft_msal_login_button);

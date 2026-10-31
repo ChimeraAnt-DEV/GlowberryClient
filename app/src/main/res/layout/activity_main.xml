@@ -51,7 +51,9 @@
                         android:id="@+id/header_account_avatar"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:visibility="gone" />
+                        android:visibility="gone" 
+                        android:importantForAccessibility="no"
+                        />
 
                     <TextView
                         android:id="@+id/header_account_name"

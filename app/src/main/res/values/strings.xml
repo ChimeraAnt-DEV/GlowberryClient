@@ -827,6 +827,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <!-- Mod Menu -->
     <string name="mod_menu">Mod Menu</string>
     <string name="mod_menu_general">General</string>
+    <string name="mod_menu_open_button">Open the Mod Menu</string>
     <string name="mod_menu_favorites">Favorites</string>
     <string name="mod_menu_favorite">Add to favorites</string>
     <string name="mod_menu_unfavorite">Remove from favorites</string>

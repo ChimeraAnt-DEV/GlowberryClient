@@ -59,6 +59,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -1406,6 +1407,10 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void setupAboutSection() {
+        // 28dp brand icons. Enlarging the drawable would move them off the row's baseline, so the
+        // touch area grows instead.
+        TouchTargetHelper.expand(findViewById(R.id.settings_btn_github));
+        TouchTargetHelper.expand(findViewById(R.id.settings_btn_discord));
         findViewById(R.id.settings_btn_github).setOnClickListener(v ->
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ChimeraAnt-DEV/GlowberryClient"))));
 

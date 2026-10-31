@@ -20,7 +20,9 @@
             android:layout_height="64dp"
             android:src="@drawable/ic_settings"
             app:tint="@color/muted_text"
-            android:layout_marginBottom="@dimen/space_4"/>
+            android:layout_marginBottom="@dimen/space_4"
+            android:importantForAccessibility="no"
+            />
 
         <TextView
             android:layout_width="wrap_content"

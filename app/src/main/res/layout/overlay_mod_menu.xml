@@ -219,7 +219,9 @@
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:src="@drawable/ic_search"
-                                android:tint="@color/mod_menu_text_secondary" />
+                                android:tint="@color/mod_menu_text_secondary" 
+                                android:importantForAccessibility="no"
+                                />
 
                             <EditText
                                 android:id="@+id/search_input"
@@ -574,7 +576,9 @@
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
                                 android:src="@drawable/ic_modules"
-                                android:tint="@color/mod_menu_bg_surface3" />
+                                android:tint="@color/mod_menu_bg_surface3" 
+                                android:importantForAccessibility="no"
+                                />
 
                             <TextView
                                 android:id="@+id/empty_state_text"
@@ -914,7 +918,9 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_notifications"
-                                    android:tint="@color/mod_menu_text_tertiary" />
+                                    android:tint="@color/mod_menu_text_tertiary" 
+                                    android:importantForAccessibility="no"
+                                    />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -964,7 +970,9 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_hud"
-                                    android:tint="@color/mod_menu_text_tertiary" />
+                                    android:tint="@color/mod_menu_text_tertiary" 
+                                    android:importantForAccessibility="no"
+                                    />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -1032,7 +1040,9 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_menu"
-                                    android:tint="@color/mod_menu_text_tertiary" />
+                                    android:tint="@color/mod_menu_text_tertiary" 
+                                    android:importantForAccessibility="no"
+                                    />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -1086,7 +1096,9 @@
                                         android:layout_width="24dp"
                                         android:layout_height="24dp"
                                         android:src="@drawable/ic_modules"
-                                        android:tint="@color/mod_menu_text_tertiary" />
+                                        android:tint="@color/mod_menu_text_tertiary" 
+                                        android:importantForAccessibility="no"
+                                        />
 
                                     <TextView
                                         android:layout_width="0dp"

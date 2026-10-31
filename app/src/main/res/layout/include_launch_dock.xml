@@ -81,7 +81,9 @@
                     android:layout_height="16dp"
                     android:layout_marginStart="@dimen/space_2"
                     android:src="@drawable/ic_arrow_down"
-                    app:tint="@color/dock_text_secondary" />
+                    app:tint="@color/dock_text_secondary" 
+                    android:importantForAccessibility="no"
+                    />
             </LinearLayout>
         </LinearLayout>
 

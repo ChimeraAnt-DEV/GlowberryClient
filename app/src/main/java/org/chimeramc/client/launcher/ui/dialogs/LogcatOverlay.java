@@ -52,6 +52,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 
 public class LogcatOverlay extends FrameLayout {
@@ -128,6 +129,14 @@ public class LogcatOverlay extends FrameLayout {
         bottomResizeBar = findViewById(R.id.bottom_resize_bar);
         cornerBottomLeft = findViewById(R.id.corner_bottom_left);
         cornerBottomRight = findViewById(R.id.corner_bottom_right);
+
+        // The header holds seven 32dp buttons in one row. They are the right size to draw and too
+        // small to press, so each gets a 48dp touch area through the header's single delegate.
+        for (int id : new int[]{R.id.btn_filter, R.id.btn_autoscroll, R.id.btn_pause,
+                R.id.btn_copy, R.id.btn_clear, R.id.btn_close, R.id.btn_filter_clear}) {
+            TouchTargetHelper.expand(findViewById(id));
+        }
+        TouchTargetHelper.expand(minimizeBubble);
 
         layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);

@@ -21,6 +21,7 @@ import org.chimeramc.client.core.mods.inbuilt.UnifiedMod;
 import org.chimeramc.client.core.mods.inbuilt.model.ModAvailability;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.ui.components.UiTokens;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1103,6 +1104,10 @@ public class ModMenuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             statusDot = itemView.findViewById(R.id.mod_card_status_dot);
             chevron = itemView.findViewById(R.id.mod_card_chevron);
             switchView = itemView.findViewById(R.id.mod_card_switch);
+            // 27dp config and favourite buttons in a card. Enlarging the draw would push the row
+            // apart, so the touch area is grown instead and the visuals stay as designed.
+            TouchTargetHelper.expand(favoriteBtn);
+            TouchTargetHelper.expand(configBtn);
         }
     }
 }

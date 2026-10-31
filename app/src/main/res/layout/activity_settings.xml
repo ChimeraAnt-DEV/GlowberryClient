@@ -849,7 +849,9 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:src="@drawable/ic_monitor"
-                                    app:tint="@color/text_secondary" />
+                                    app:tint="@color/text_secondary" 
+                                    android:importantForAccessibility="no"
+                                    />
                                 <TextView
                                     android:id="@+id/theme_text_system"
                                     android:layout_width="wrap_content"
@@ -884,7 +886,9 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:src="@drawable/ic_sun"
-                                    app:tint="@color/text_secondary" />
+                                    app:tint="@color/text_secondary" 
+                                    android:importantForAccessibility="no"
+                                    />
                                 <TextView
                                     android:id="@+id/theme_text_light"
                                     android:layout_width="wrap_content"
@@ -919,7 +923,9 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:src="@drawable/ic_moon"
-                                    app:tint="@color/text_secondary" />
+                                    app:tint="@color/text_secondary" 
+                                    android:importantForAccessibility="no"
+                                    />
                                 <TextView
                                     android:id="@+id/theme_text_dark"
                                     android:layout_width="wrap_content"
@@ -966,7 +972,9 @@
                             android:layout_height="120dp"
                             android:layout_marginTop="@dimen/space_3"
                             android:scaleType="centerCrop"
-                            android:visibility="gone" />
+                            android:visibility="gone" 
+                            android:importantForAccessibility="no"
+                            />
 
                         <LinearLayout
                             android:id="@+id/bg_image_effect_controls"

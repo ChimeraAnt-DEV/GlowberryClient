@@ -54,7 +54,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_logs"
-                app:tint="@color/primary" />
+                app:tint="@color/primary" 
+                android:importantForAccessibility="no"
+                />
 
             <TextView
                 android:layout_width="0dp"

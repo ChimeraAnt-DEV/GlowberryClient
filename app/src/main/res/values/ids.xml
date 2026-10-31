@@ -9,4 +9,6 @@
     <!-- Base (unscaled) icon dimensions, cached so the Icon Size preference never compounds. -->
     <item name="icon_size_base_width" type="id" />
     <item name="icon_size_base_height" type="id" />
+    <!-- The single TouchDelegate installed on a container that holds small controls. -->
+    <item name="touch_target_delegate" type="id" />
 </resources>
