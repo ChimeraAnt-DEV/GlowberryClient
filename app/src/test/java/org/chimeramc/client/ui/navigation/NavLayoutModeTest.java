@@ -87,4 +87,23 @@ public class NavLayoutModeTest {
         assertFalse(NavLayoutMode.NAV_RAIL.showsAllLabels());
         assertTrue(NavLayoutMode.EXPANDED_RAIL.showsAllLabels());
     }
+
+    @Test
+    public void forWindowIsTheSmallerClassificationAtEveryBoundary() {
+        // 599/600 and 839/840 are the only two places the answer changes, so both readings are
+        // swept either side of each (item 96).
+        int[][] cases = {
+                {599, 599, NavLayoutMode.BOTTOM_NAV.ordinal()},
+                {599, 600, NavLayoutMode.BOTTOM_NAV.ordinal()},
+                {600, 599, NavLayoutMode.BOTTOM_NAV.ordinal()},
+                {600, 600, NavLayoutMode.NAV_RAIL.ordinal()},
+                {839, 840, NavLayoutMode.NAV_RAIL.ordinal()},
+                {840, 839, NavLayoutMode.NAV_RAIL.ordinal()},
+                {840, 840, NavLayoutMode.EXPANDED_RAIL.ordinal()},
+        };
+        for (int[] c : cases) {
+            assertEquals("smallest=" + c[0] + " window=" + c[1],
+                    NavLayoutMode.values()[c[2]], NavLayoutMode.forWindow(c[0], c[1]));
+        }
+    }
 }

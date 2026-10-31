@@ -1049,4 +1049,5 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="crash_disable_no_suspects">このクラッシュに記録されたModはありません。</string>
     <string name="crash_disable_done">%1$d個のModを無効にしました。もう一度起動して試してください。</string>
     <string name="session_restart_loop_message">再起動を停止しました: このセッションは連続して%1$d回再起動しました。ホーム画面から再度起動するか、最近追加したModを無効にしてください。</string>
+    <string name="nav_logo_home">GlowberryClient ホーム</string>
 </resources>

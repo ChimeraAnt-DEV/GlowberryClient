@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.graphics.Rect;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -189,6 +191,7 @@ public class BaseActivity extends AppCompatActivity {
         // layouts declare the same ids, so everything below this line is layout-agnostic.
         navLayoutMode = resolveNavLayoutMode();
         boolean rail = navLayoutMode.isRail();
+        logNavDecision();
 
         // The root is a FrameLayout so the controller pointer (Phase 12) can be a MATCH_PARENT
         // overlay above the nav and the content. As a third child of a vertical LinearLayout it
@@ -280,8 +283,17 @@ public class BaseActivity extends AppCompatActivity {
             WindowInsetsCompat compat = windowInsets;
             androidx.core.graphics.Insets bars =
                     compat.getInsets(WindowInsetsCompat.Type.systemBars());
-            EdgeToEdgeInsets.Insets insets =
-                    new EdgeToEdgeInsets.Insets(bars.left, bars.top, bars.right, bars.bottom);
+            // The display cutout is a separate inset type from the system bars, and in landscape
+            // the notch is on one side, so the leading rail would sit under it without this
+            // (item 68). Unioned rather than replaced: on a device that reports both, the larger
+            // of the two on each edge is what actually needs clearing.
+            androidx.core.graphics.Insets cutout =
+                    compat.getInsets(WindowInsetsCompat.Type.displayCutout());
+            EdgeToEdgeInsets.Insets insets = new EdgeToEdgeInsets.Insets(
+                    Math.max(bars.left, cutout.left),
+                    Math.max(bars.top, cutout.top),
+                    Math.max(bars.right, cutout.right),
+                    Math.max(bars.bottom, cutout.bottom));
             EdgeToEdgeInsets.Padding navPadding = EdgeToEdgeInsets.forNavBar(rail, insets);
             view.setPadding(navBaseLeft + navPadding.left, navBaseTop + navPadding.top,
                     navBaseRight + navPadding.right, navBaseBottom + navPadding.bottom);
@@ -327,9 +339,50 @@ public class BaseActivity extends AppCompatActivity {
         return NavLayoutMode.forWindow(currentWidthDp(), currentWindowWidthDp());
     }
 
+    /**
+     * Logs the inputs to the navigation-shape decision once per screen (item 94).
+     *
+     * <p>A "the layout is wrong on my device" report is otherwise unanswerable: the shape is a
+     * function of two width readings, the density and the mode, and none of them appear anywhere.
+     * Debug-only, so a release build carries no log line for a cosmetic decision.
+     */
+    private void logNavDecision() {
+        if (!org.chimeramc.client.BuildConfig.DEBUG) return;
+        android.util.Log.d("NavLayout", "mode=" + navLayoutMode
+                + " smallestWidthDp=" + currentWidthDp()
+                + " windowWidthDp=" + currentWindowWidthDp()
+                + " density=" + getResources().getDisplayMetrics().density);
+    }
+
     private void applyPersonalization() {
         PersonalizationManager pm = new PersonalizationManager(this);
         pm.applyToActivity(this);
+        applyMotionScheme(pm);
+    }
+
+    /**
+     * Puts the shared motion system into the scheme this screen should use (items 75, 345).
+     *
+     * <p>{@link DynamicAnim} holds one static scheme, and only {@code MainActivity} used to set it.
+     * Every other screen therefore animated with whatever the previous screen had left behind -
+     * usually the expressive springs, even for a user who had reduced motion on, which is exactly
+     * the accessibility setting that must not be ignored. Setting it here means the scheme is a
+     * property of the process that every screen re-asserts on the way in.
+     *
+     * <p>The platform's own "remove animations" scale wins over the in-app switch: a user who told
+     * Android to remove animations must not get springs back because a stale preference says
+     * motion is on.
+     */
+    private void applyMotionScheme(PersonalizationManager pm) {
+        boolean platformAnimationsOff = false;
+        try {
+            platformAnimationsOff = android.provider.Settings.Global.getFloat(
+                    getContentResolver(),
+                    android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        } catch (Throwable ignored) {
+            // Unreadable on a restricted device; treat motion as allowed.
+        }
+        DynamicAnim.applyMotionScheme(pm.isReduceMotion(), platformAnimationsOff);
     }
 
     protected boolean shouldSkipNavBar() {
@@ -534,8 +587,40 @@ public class BaseActivity extends AppCompatActivity {
 
         View backButton = findViewById(R.id.nav_back_button);
         if (backButton != null) {
+            // A root destination has nothing to go back to, and a disabled arrow reads as a broken
+            // button rather than "you are home" (item 90). Hidden rather than greyed so the header
+            // only offers an action that works. Predictive back goes through the dispatcher, which
+            // is the AndroidX path available on every supported version (item 89).
+            boolean isRootDestination = LauncherTab.forActivity(getClass()) == LauncherTab.LAUNCH;
+            backButton.setVisibility(isRootDestination ? View.GONE : View.VISIBLE);
             backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
             DynamicAnim.applyPressScale(backButton);
+        }
+
+        // The logo is a real target, not decoration: tapping the brand is the universal "go home"
+        // gesture, and a 28dp view is under the 48dp minimum (item 91). A TouchDelegate widens the
+        // hit area around it without changing how it draws, and the click routes to the launch tab
+        // so the affordance does something rather than swallowing the tap.
+        View logo = findViewById(R.id.nav_logo);
+        if (logo != null) {
+            logo.setClickable(true);
+            logo.setContentDescription(getString(R.string.nav_logo_home));
+            logo.setOnClickListener(v -> {
+                if (!(this instanceof MainActivity)) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    switchNavTab(intent);
+                }
+            });
+            DynamicAnim.applyPressScale(logo);
+            View logoParent = (View) logo.getParent();
+            if (logoParent != null) {
+                logoParent.post(() -> {
+                    Rect bounds = new Rect(0, 0, Math.max(dp(48), logo.getWidth()),
+                            Math.max(dp(48), logo.getHeight()));
+                    logoParent.setTouchDelegate(new TouchDelegate(bounds, logo));
+                });
+            }
         }
 
         View signIn = findViewById(R.id.nav_sign_in_button);

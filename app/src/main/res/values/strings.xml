@@ -1316,6 +1316,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="nav_skins">Skins</string>
     <string name="nav_customize">Customize</string>
     <string name="nav_back">Back</string>
+    <string name="nav_logo_home">GlowberryClient home</string>
     <string name="customize_tab_controller">Controller</string>
     <string name="customize_tab_skins">Skins</string>
     <string name="settings_about_open">About GlowberryClient</string>

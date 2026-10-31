@@ -1080,4 +1080,5 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="crash_disable_no_suspects">इस क्रैश के लिए कोई मॉड दर्ज नहीं हुआ।</string>
     <string name="crash_disable_done">%1$d मॉड बंद किए गए। इनके बिना आज़माने के लिए फिर से लॉन्च करें।</string>
     <string name="session_restart_loop_message">पुनः आरंभ करना बंद: यह सत्र लगातार %1$d बार पुनः आरंभ हुआ। होम स्क्रीन से फिर से लॉन्च करें, या हाल ही में जोड़े गए मॉड बंद करें।</string>
+    <string name="nav_logo_home">GlowberryClient होम</string>
 </resources>

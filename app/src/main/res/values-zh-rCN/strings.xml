@@ -1073,4 +1073,5 @@
     <string name="crash_disable_no_suspects">此次崩溃没有记录任何模组。</string>
     <string name="crash_disable_done">已禁用 %1$d 个模组。请重新启动以在不加载它们的情况下尝试。</string>
     <string name="session_restart_loop_message">已停止重启：本次会话已连续重启 %1$d 次。请从主屏幕重新启动，或禁用你最近添加的模组。</string>
+    <string name="nav_logo_home">GlowberryClient 主页</string>
 </resources>

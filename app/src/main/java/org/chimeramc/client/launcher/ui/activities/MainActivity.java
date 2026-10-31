@@ -1480,20 +1480,9 @@ import okhttp3.OkHttpClient;
         // Apply Glow Effects
         boolean glow = pm.isEnableGlowEffects();
         applyGlowEffects(glow);
-        
-        
-        // Apply Show Animations toggle. The platform's "remove animations" scale wins over the
-        // in-app switch, so a user who told Android to remove animations never gets springs back
-        // from a stale app preference (U6/U11).
-        boolean platformAnimationsOff = false;
-        try {
-            platformAnimationsOff = android.provider.Settings.Global.getFloat(
-                    getContentResolver(),
-                    android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
-        } catch (Throwable ignored) {
-            // The setting is unreadable on a restricted device; treat motion as allowed.
-        }
-        DynamicAnim.applyMotionScheme(pm.isReduceMotion(), platformAnimationsOff);
+
+        // The motion scheme is applied by BaseActivity.applyMotionScheme for every screen, so
+        // this screen must not set it a second time (one owner, item 345).
     }
     
     private void applyCardRounding(int roundingDp) {

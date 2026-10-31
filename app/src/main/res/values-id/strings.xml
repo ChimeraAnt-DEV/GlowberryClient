@@ -1076,4 +1076,5 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="crash_disable_no_suspects">Tidak ada mod yang tercatat untuk crash ini.</string>
     <string name="crash_disable_done">%1$d mod dinonaktifkan. Luncurkan lagi untuk mencoba tanpa mod tersebut.</string>
     <string name="session_restart_loop_message">Berhenti memulai ulang: sesi ini memulai ulang %1$d kali berturut-turut. Luncurkan lagi dari layar utama, atau nonaktifkan mod yang baru Anda tambahkan.</string>
+    <string name="nav_logo_home">Beranda GlowberryClient</string>
 </resources>
