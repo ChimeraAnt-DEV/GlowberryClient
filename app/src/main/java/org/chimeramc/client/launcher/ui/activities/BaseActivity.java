@@ -36,6 +36,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.auth.MsftAccountStore;
 import org.chimeramc.client.launcher.controller.ControllerConnectionMonitor;
+import org.chimeramc.client.core.mods.inbuilt.overlay.CursorController;
+import org.chimeramc.client.core.mods.inbuilt.overlay.GamepadAxes;
+import org.chimeramc.client.launcher.ui.views.LauncherCursorInput;
+import org.chimeramc.client.launcher.ui.views.LauncherCursorOverlay;
 import org.chimeramc.client.launcher.controller.ControllerToastView;
 import org.chimeramc.client.launcher.controller.ControllerType;
 import org.chimeramc.client.ui.animation.DynamicAnim;
@@ -68,12 +72,16 @@ public class BaseActivity extends AppCompatActivity {
                 public void onControllerConnected(String name, ControllerType type, String profileName) {
                     if (isFinishing()) return;
                     ControllerToastView.showConnected(BaseActivity.this, name, profileName, type);
+                    // A pad that just arrived is the cue to show the pointer, so the user can
+                    // see where it is before they move it.
+                    showControllerCursor();
                 }
 
                 @Override
                 public void onControllerDisconnected(String name) {
                     if (isFinishing()) return;
                     ControllerToastView.showDisconnected(BaseActivity.this, name);
+                    hideControllerCursor();
                 }
             };
 
@@ -93,6 +101,8 @@ public class BaseActivity extends AppCompatActivity {
                 }
             };
     private boolean navBarInjected = false;
+    /** The macOS-style pointer a controller drives on launcher screens (Phase 12). */
+    private LauncherCursorOverlay controllerCursor;
     /** Which adaptive navigation shape this window is using (U5). */
     private NavLayoutMode navLayoutMode = NavLayoutMode.BOTTOM_NAV;
     private final OkHttpClient navAvatarClient = BaseActivity.buildLatencyTunedClient();
@@ -183,29 +193,36 @@ public class BaseActivity extends AppCompatActivity {
         navLayoutMode = resolveNavLayoutMode();
         boolean rail = navLayoutMode.isRail();
 
-        LinearLayout wrapper = new LinearLayout(this);
-        wrapper.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        // The root is a FrameLayout so the controller pointer (Phase 12) can be a MATCH_PARENT
+        // overlay above the nav and the content. As a third child of a vertical LinearLayout it
+        // would have been measured as another row and pushed the content off screen.
+        FrameLayout wrapper = new FrameLayout(this);
         wrapper.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
 
+        LinearLayout column = new LinearLayout(this);
+        column.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        wrapper.addView(column, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
         View navBar = LayoutInflater.from(this)
-                .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, wrapper, false);
+                .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, column, false);
 
         LinearLayout.LayoutParams contentParams;
         if (rail) {
             // A rail is the leading sibling; the content takes the rest of the width.
-            wrapper.addView(navBar);
+            column.addView(navBar);
             contentParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         } else {
             // A bar is the top sibling; the content takes the rest of the height.
-            wrapper.addView(navBar);
+            column.addView(navBar);
             contentParams = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
         }
         contentView.setLayoutParams(contentParams);
-        wrapper.addView(contentView);
+        column.addView(contentView);
 
         // The launcher targets SDK 35, so on Android 15 the window is drawn edge-to-edge whether it
         // asks to be or not: statusBarColor/navigationBarColor are ignored and the layout runs behind
@@ -221,6 +238,10 @@ public class BaseActivity extends AppCompatActivity {
         contentView.setTranslationX(rail ? 10f * getResources().getDisplayMetrics().density : 0f);
 
         super.setContentView(wrapper);
+        // The controller pointer sits above the whole screen (nav included), added last so it
+        // draws on top; it is non-interactive, so a touch passes straight through to the view
+        // under it. Hidden until a pad is actually used.
+        controllerCursor = LauncherCursorOverlay.attach(this, wrapper);
         navBarInjected = true;
         setupBaseNavBar();
 
@@ -330,6 +351,53 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
+     * Moves the controller pointer from the right stick, and consumes the stick while it is up so
+     * the screen below does not also scroll (Phase 12).
+     *
+     * <p>The right stick drives the pointer and the left stick is left alone, so scrolling a list
+     * with the left stick still works exactly as it did; only the pointer's own axis is captured.
+     * The axis convention comes from {@link GamepadAxes}, the same class the in-game wheel uses, so
+     * a pad that reports its right stick on AXIS_Z/AXIS_RZ and one that uses AXIS_RX/AXIS_RY both
+     * work without a second table.
+     */
+    @Override
+    public boolean dispatchGenericMotionEvent(android.view.MotionEvent event) {
+        if (shouldShowControllerCursor()
+                && controllerCursor != null
+                && GamepadAxes.isGamepadSource(event)) {
+            GamepadAxes.Stick stick = GamepadAxes.read(event);
+            if (LauncherCursorInput.shouldIntegrate(stick.x, stick.y,
+                    controllerCursor.isCursorVisible())) {
+                controllerCursor.move(stick.x, stick.y,
+                        CursorController.DEFAULT_DEAD_ZONE, CursorController.DEFAULT_CURVE_EXPONENT);
+            }
+        }
+        return super.dispatchGenericMotionEvent(event);
+    }
+
+    /** Shows the controller pointer (a pad connected, or a navigation button was pressed). */
+    protected void showControllerCursor() {
+        if (controllerCursor == null || !shouldShowControllerCursor()) return;
+        controllerCursor.enable();
+    }
+
+    /** Hides the controller pointer (the pad left, or a touch took over). */
+    protected void hideControllerCursor() {
+        if (controllerCursor != null) controllerCursor.disable();
+    }
+
+    /**
+     * Whether this screen shows the controller pointer.
+     *
+     * <p>Off where a screen needs the raw pad presses for itself (the controller editor), so the
+     * pointer never competes with the screen's own use of the stick and buttons.
+     */
+    protected boolean shouldShowControllerCursor() {
+        return shouldHandleNavKeys() && !shouldSkipNavBar();
+    }
+
+
+    /**
      * Console-style tab switching. Shoulder buttons and D-pad left/right cycle the top-level
      * destinations, which is how a controller user expects to move between sections.
      *
@@ -339,6 +407,15 @@ public class BaseActivity extends AppCompatActivity {
      */
     @Override
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        // The controller pointer claims the face button as its click before the tab handler runs,
+        // so a pad that is pointing at something activates it rather than switching tabs.
+        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0
+                && controllerCursor != null
+                && controllerCursor.isCursorVisible()
+                && LauncherCursorInput.isSelectKey(event.getKeyCode())) {
+            if (controllerCursor.select()) return true;
+        }
         if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
                 && event.getRepeatCount() == 0
                 && navBarInjected
