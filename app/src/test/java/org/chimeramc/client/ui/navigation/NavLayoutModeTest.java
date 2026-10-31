@@ -89,6 +89,25 @@ public class NavLayoutModeTest {
     }
 
     @Test
+    public void theBarShowsTheWordmarkOnlyWhenItHasRoom() {
+        // Item 84: the wordmark used to be hidden on every compact window, which left a wide
+        // phone's bar with empty space beside icon-only tabs and no brand anywhere. On the bar it
+        // is a width decision, so the threshold is pinned either side.
+        assertFalse(NavLayoutMode.BOTTOM_NAV.showsWordmark(NavLayoutMode.WORDMARK_WIDTH_DP - 1));
+        assertTrue(NavLayoutMode.BOTTOM_NAV.showsWordmark(NavLayoutMode.WORDMARK_WIDTH_DP));
+        assertTrue(NavLayoutMode.BOTTOM_NAV.showsWordmark(1280));
+    }
+
+    @Test
+    public void aRailShowsTheWordmarkExactlyWhenItShowsLabels() {
+        // On a rail the wordmark is a label decision, not a width one: an icon-only rail has no
+        // room for a wordmark either, and a 1280dp icon rail would otherwise grow a brand beside
+        // icon-only rows.
+        assertFalse(NavLayoutMode.NAV_RAIL.showsWordmark(1280));
+        assertTrue(NavLayoutMode.EXPANDED_RAIL.showsWordmark(0));
+    }
+
+    @Test
     public void forWindowIsTheSmallerClassificationAtEveryBoundary() {
         // 599/600 and 839/840 are the only two places the answer changes, so both readings are
         // swept either side of each (item 96).

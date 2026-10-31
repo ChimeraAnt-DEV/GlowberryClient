@@ -16,9 +16,9 @@
     (or a Samsung at large font scale) the name wrapped to two lines and slid under the first
     tab. Here the name is pinned between the logo and the tab strip with a hard end constraint,
     one line, an ellipsis and autosize; the tab strip is pinned to the end controls and scrolls;
-    and the wordmark is hidden on this window entirely, where the tabs go icon-only with only the
-    selected label shown. Those three together mean the bar cannot collide at any width or font
-    scale.
+    and the wordmark is shown only once the window is wide enough to keep it off the tabs, where
+    the tabs go icon-only with only the selected label shown. Those three together mean the bar
+    cannot collide at any width or font scale.
 
     Four destinations (U1), not six: Instances/Install/Replay are one Library screen, Cosmetics is
     a profile sheet on Play, and Controller/Skins/Voice live in Settings. A tab that only exists to
@@ -70,12 +70,14 @@
             The wordmark. Constraints (not a maxWidth) are what keep it off the tabs: it starts
             after the logo and ends where the tab strip starts, so it can never grow under them.
             maxLines + singleLine + ellipsize handle the remaining squeeze; autosize shrinks it
-            on very narrow windows. On this compact bar it is hidden (BaseActivity decides from
-            NavLayoutMode); the rail shows it when the window has room for labels.
+            on very narrow windows. BaseActivity decides whether it is shown from NavLayoutMode:
+            on the bar it needs a window at least WORDMARK_WIDTH_DP wide, and on the rail it
+            follows the labels. The goneMarginStart on the tab strip is what keeps the tabs from
+            butting against the logo when the wordmark is hidden.
         -->
         <TextView
             android:id="@+id/nav_app_name"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_2"
             android:layout_marginEnd="@dimen/space_2"
@@ -95,8 +97,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/nav_tab_scroll"
             app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/nav_logo"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <!--
             Tabs live in a scroll view so every labelled entry always fits; the strip is pinned
@@ -115,7 +119,8 @@
             app:layout_constraintEnd_toStartOf="@id/nav_trailing"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@id/nav_app_name"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginStart="@dimen/space_1">
 
             <!--
                 The tab row and its sliding accent indicator share a FrameLayout so the indicator
