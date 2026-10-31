@@ -11,4 +11,6 @@
     <item name="icon_size_base_height" type="id" />
     <!-- The single TouchDelegate installed on a container that holds small controls. -->
     <item name="touch_target_delegate" type="id" />
+    <!-- Marks a view that already has the detach-time animation cancel listener installed. -->
+    <item name="dynamic_anim_detach_guard" type="id" />
 </resources>

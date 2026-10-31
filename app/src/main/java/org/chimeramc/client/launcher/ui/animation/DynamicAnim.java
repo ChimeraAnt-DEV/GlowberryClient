@@ -134,6 +134,7 @@ public final class DynamicAnim {
 
     /** View tag marking a view that already carries the press listener. */
     private static final int KEY_PRESS_STATE = R.id.dynamic_anim_press_state;
+    private static final int KEY_DETACH_GUARD = R.id.dynamic_anim_detach_guard;
 
     private static final float PRESS_SCALE = 0.955f;
     private static final float PRESS_Z_DP = 6f;
@@ -208,9 +209,41 @@ public final class DynamicAnim {
      * {@code setOnTouchListener} would otherwise silently replace that listener — for a
      * RecyclerView drag handle that means drag-to-reorder stops working with no error.
      */
+    /**
+     * Cancels a view's running animations and clears any partial transform when it detaches
+     * (item 74).
+     *
+     * <p>A fast tab switch detaches a view mid-animation, and the animation then keeps running
+     * against a detached view: it holds the view, the transform is left part-way (a tab stuck at
+     * partial alpha or scale) and, if the same view instance is reused, it reappears in that state.
+     * Cancelling on detach is the fix, and it is attached once per view through a tag so repeated
+     * calls cannot stack listeners.
+     */
+    public static void cancelOnDetach(final View view) {
+        if (view == null) return;
+        if (view.getTag(KEY_DETACH_GUARD) != null) return;
+        view.setTag(KEY_DETACH_GUARD, Boolean.TRUE);
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                v.animate().cancel();
+                Object state = v.getTag(KEY_PRESS_STATE);
+                if (state instanceof PressState) ((PressState) state).snapBack(v);
+                v.setAlpha(1f);
+                v.setScaleX(1f);
+                v.setScaleY(1f);
+            }
+        });
+    }
+
     public static void applyPressScale(View view, @Nullable View.OnTouchListener delegate) {
         if (view == null) return;
         if (view.getTag(KEY_PRESS_STATE) != null) return;
+        cancelOnDetach(view);
 
         view.setClickable(true);
         final PressState state = new PressState(view, delegate);
@@ -414,6 +447,7 @@ public final class DynamicAnim {
      */
     public static void overshootScaleIn(View view, long startDelayMs) {
         if (view == null) return;
+        cancelOnDetach(view);
         if (!animationsEnabled) {
             view.setAlpha(1f);
             view.setScaleX(1f);

@@ -59,4 +59,26 @@ public enum NavLayoutMode {
     public boolean showsAllLabels() {
         return this == EXPANDED_RAIL;
     }
+
+    /**
+     * The width at which a bottom bar can afford to show the wordmark beside its tabs (item 84).
+     *
+     * <p>Below this the bar is icon-only with a single label and there is no room for the brand as
+     * well; above it the extra width is otherwise empty, so the wordmark is what tells a user
+     * which app they are in. A rail shows the wordmark whenever it shows labels, which is a
+     * different question and stays {@link #showsAllLabels()}.
+     */
+    public static final int WORDMARK_WIDTH_DP = 480;
+
+    /**
+     * Whether the wordmark is shown for this mode at {@code windowWidthDp} (item 84).
+     *
+     * <p>On a rail it follows the labels: an icon-only rail has no room for a wordmark either. On
+     * the bar it is a width decision, because the bar is horizontal and gains room from width
+     * rather than from a label column.
+     */
+    public boolean showsWordmark(int windowWidthDp) {
+        if (isRail()) return showsAllLabels();
+        return windowWidthDp >= WORDMARK_WIDTH_DP;
+    }
 }

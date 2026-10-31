@@ -513,7 +513,13 @@ public class BaseActivity extends AppCompatActivity {
     private void applyNavCompactMode() {
         View appName = findViewById(R.id.nav_app_name);
         if (appName != null) {
-            appName.setVisibility(navLayoutMode.showsAllLabels() ? View.VISIBLE : View.GONE);
+            // The wordmark is a width decision on the bar and a label decision on the rail
+            // (item 84). Hiding it on every compact window left the bar with empty space beside
+            // the icon-only tabs, so the brand was invisible even where it fit; the bar's own
+            // constraints (the wordmark is pinned between the logo and the tab strip) are what
+            // keep it off the tabs, so a width threshold is safe to introduce.
+            boolean showWordmark = navLayoutMode.showsWordmark(currentWindowWidthDp());
+            appName.setVisibility(showWordmark ? View.VISIBLE : View.GONE);
         }
         // On a rail the row is wide enough for its label, so the label is all-or-nothing: the
         // expanded rail names every destination, the icon-only rail names none.
@@ -782,9 +788,14 @@ public class BaseActivity extends AppCompatActivity {
 
         PersonalizationManager pm = new PersonalizationManager(this);
         int accent = pm.getAccentColor();
-        int accentColor = accent != 0
-                ? accent
-                : getResources().getColor(R.color.on_surface, getTheme());
+        int onSurface = getResources().getColor(R.color.on_surface, getTheme());
+        // The accent is only usable as the active-tab colour if it is readable on the navigation
+        // surface. Under Material You it comes from the wallpaper, so it can land almost on top of
+        // the surface and make the selected destination unreadable (item 87); NavAccent applies the
+        // contrast floor and falls back to on-surface, which the indicator and the weight still
+        // distinguish.
+        int surface = getResources().getColor(R.color.ui_bg_surface, getTheme());
+        int accentColor = org.chimeramc.client.ui.navigation.NavAccent.resolve(accent, surface, onSurface);
         int inactive = getResources().getColor(R.color.text_secondary, getTheme());
 
         for (int id : LauncherTab.viewIds()) {
