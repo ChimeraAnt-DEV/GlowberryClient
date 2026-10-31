@@ -10,9 +10,18 @@ public class FeatureSettings {
     private boolean lowInputDelayEnabled = false;
     private Boolean crashUploadEnabled = true;
     private boolean foregroundServiceEnabled = false;
-    private Boolean gxcoreEnabled = false;
     private boolean reduceNetworkLatencyEnabled = false;
     private boolean fpsOptimizerEnabled = false;
+
+    /**
+     * The top-level destination the user was last on, by {@code LauncherTab} name (item 77).
+     *
+     * <p>Stored as the enum's name, not its view id: an id is a generated resource number that a
+     * later build can renumber, so a stored id would silently point at a different tab after an
+     * update. A name this build does not know reads as "no preference" and the launcher opens on
+     * Play.
+     */
+    private String lastNavTab = null;
 
     // --- Game Performance Mode -------------------------------------------------------------
     // The master switch plus one toggle per optimization, so a user can isolate an item that
@@ -94,8 +103,6 @@ public class FeatureSettings {
     public boolean isForegroundServiceEnabled() { return foregroundServiceEnabled; }
     public void setForegroundServiceEnabled(boolean enabled) { this.foregroundServiceEnabled = enabled; autoSave(); }
 
-    public boolean isGxCoreEnabled() { return gxcoreEnabled != null && gxcoreEnabled; }
-    public void setGxCoreEnabled(boolean enabled) { this.gxcoreEnabled = enabled; autoSave(); }
 
     /**
      * Whether the FPS optimization module may quiet the host during a session.
@@ -107,6 +114,18 @@ public class FeatureSettings {
      */
     public boolean isFpsOptimizerEnabled() { return fpsOptimizerEnabled; }
     public void setFpsOptimizerEnabled(boolean enabled) { this.fpsOptimizerEnabled = enabled; autoSave(); }
+
+    /**
+     * The last top-level destination the user visited, or null when there is none (item 77).
+     *
+     * <p>Persisting the tab is what makes the launcher reopen where the user left off instead of
+     * always resetting to Play, which matters most on a device where the launcher is used as the
+     * game's own front end. The value is a {@code LauncherTab} name so it survives a renumbering
+     * of resource ids, and an unknown name is treated as no preference rather than a failure.
+     */
+    public String getLastNavTab() { return lastNavTab; }
+
+    public void setLastNavTab(String tabName) { this.lastNavTab = tabName; autoSave(); }
 
     // --- Game Performance Mode accessors ---------------------------------------------------
 

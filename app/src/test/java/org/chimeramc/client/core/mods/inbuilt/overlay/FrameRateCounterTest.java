@@ -66,4 +66,48 @@ public class FrameRateCounterTest {
         counter.reset();
         assertEquals(0, counter.fps());
     }
+
+    @Test
+    public void theOnePercentLowReflectsTheSlowestFrameNotTheAverage() {
+        // 60 fps for ten frames, then one frame that arrives 50 ms late. The average barely moves
+        // but the low must capture the hitch, which is the whole reason to show it.
+        FrameRateCounter counter = new FrameRateCounter();
+        long t = 0;
+        for (int i = 0; i < 10; i++) {
+            counter.record(t);
+            t += 1000L / 60L * MS;
+        }
+        counter.record(t + 50L * MS); // a 66 ms gap after the 16.7 ms cadence
+        long now = t + 50L * MS;
+        assertEquals("the slowest interval is ~66 ms -> ~15 fps",
+                15, counter.onePercentLowFpsAt(now));
+        assertTrue("the average stays high", counter.fpsAt(now) >= 9);
+    }
+
+    @Test
+    public void theOnePercentLowIsZeroBeforeTwoFrames() {
+        FrameRateCounter counter = new FrameRateCounter();
+        assertEquals(0, counter.onePercentLowFps());
+        counter.record(0L);
+        assertEquals(0, counter.onePercentLowFps());
+    }
+
+    @Test
+    public void theWorstIntervalOnlyCountsFramesInsideTheWindow() {
+        // A very slow frame from over a second ago must age out, or the low would stay pinned to an
+        // old hitch forever.
+        FrameRateCounter counter = new FrameRateCounter();
+        counter.record(0L);
+        counter.record(500L * MS); // a huge early gap
+        long t = 500L * MS;
+        for (int i = 0; i < 72; i++) {
+            t += 1000L / 60L * MS;
+            counter.record(t);
+        }
+        long now = t;
+        // The 500 ms gap is now more than a second behind, so only the steady 60 fps frames are in
+        // the window and the worst interval is ~16.7 ms.
+        long worst = counter.worstIntervalNanos(now);
+        assertTrue("stale hitch must age out, worst=" + worst, worst < 20L * MS);
+    }
 }

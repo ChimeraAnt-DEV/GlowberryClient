@@ -9,10 +9,25 @@ import android.widget.FrameLayout;
 
 import org.chimeramc.client.core.mods.inbuilt.ExternalModBridge;
 import org.chimeramc.client.core.mods.inbuilt.ExternalModBridge.DrawCommand;
+import org.chimeramc.client.util.AppLog;
 
 public class HudOverlay extends View {
+
+    private static final String TAG = "HudOverlay";
     private boolean isShowing = false;
     private final Paint paint = new Paint();
+    // Triangle scratch, reused so a TYPE_TRIANGLE_FILLED command does not allocate a Path on
+    // every frame (item 17). The draw path runs on the game's frame tick.
+    private final android.graphics.Path trianglePath = new android.graphics.Path();
+    private final android.graphics.RectF imageDst = new android.graphics.RectF();
+
+    // The command list is drawn every frame, so a text command whose only placeholder is the
+    // surface size must not rebuild its string each time. The cache holds the last command and its
+    // expansion, and is invalidated when the surface size changes.
+    private DrawCommand cachedSizeCommand;
+    private int cachedSizeWidth = -1;
+    private int cachedSizeHeight = -1;
+    private String cachedSizeText = "";
     private DrawCommand[] cachedDrawCommands = new DrawCommand[0];
     private long cachedDrawRevision = Long.MIN_VALUE;
     private boolean frameCallbackPosted = false;
@@ -33,7 +48,7 @@ public class HudOverlay extends View {
                 typefaceCache.put(fontId, tf);
                 return tf;
             } catch (Exception e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "Failed to resolve a registered font", e);
             }
         }
         typefaceCache.put(fontId, null);
@@ -89,7 +104,11 @@ public class HudOverlay extends View {
         }
     };
 
-    private final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final android.os.Handler handler = org.chimeramc.client.util.MainThread.handler();
+
+    // The attach is deferred by 100ms so the window token is settled, which is a window a hide can
+    // land in. The gate makes that hide win instead of the overlay reappearing untracked.
+    private final OverlayShowGate showGate = new OverlayShowGate();
 
     private void postFrameCallback() {
         if (frameCallbackPosted || !isShowing || getVisibility() != VISIBLE) return;
@@ -106,10 +125,11 @@ public class HudOverlay extends View {
     public void show() {
         if (isShowing) return;
 
+        final long token = showGate.begin();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isShowing) return;
+                if (isShowing || !showGate.isCurrent(token)) return;
                 
                 try {
                     ViewGroup rootView = ((Activity) getContext()).findViewById(android.R.id.content);
@@ -129,13 +149,17 @@ public class HudOverlay extends View {
                         postFrameCallback();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    AppLog.warn(TAG, "Failed to attach the HUD overlay", e);
                 }
             }
         }, 100);
     }
 
     public void hide() {
+        // Invalidated first, before the isShowing check: a pending attach has not set isShowing yet,
+        // so a hide during that window would otherwise return here and leave the runnable armed.
+        showGate.invalidate();
+        handler.removeCallbacksAndMessages(null);
         if (!isShowing) return;
         try {
             ViewGroup rootView = ((Activity) getContext()).findViewById(android.R.id.content);
@@ -143,7 +167,7 @@ public class HudOverlay extends View {
                 rootView.removeView(this);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Failed to detach the HUD overlay", e);
         }
         isShowing = false;
         android.view.Choreographer.getInstance().removeFrameCallback(frameCallback);
@@ -506,7 +530,7 @@ public class HudOverlay extends View {
             paint.setTextSize(cmd.size);
             String text = cmd.text;
             if (text != null && text.contains("{DISPLAY_SIZE}")) {
-                text = text.replace("{DISPLAY_SIZE}", getWidth() + "x" + getHeight());
+                text = expandDisplaySize(cmd);
             }
             float textWidth = text != null && !text.isEmpty() ? paint.measureText(text) : 100f;
             float width = cmd.w > 0 ? cmd.w : textWidth;
@@ -596,6 +620,27 @@ public class HudOverlay extends View {
         }
     }
 
+    /**
+     * Expands a text command's {@code {DISPLAY_SIZE}} placeholder, reusing the previous expansion
+     * when neither the command nor the surface size changed.
+     *
+     * <p>Commands are redrawn every frame, so building the string each time is a per-frame
+     * allocation for a value that changes only when the surface does. A mod that shows the
+     * resolution would otherwise allocate two strings and a builder 60 times a second.
+     */
+    private String expandDisplaySize(DrawCommand cmd) {
+        int width = getWidth();
+        int height = getHeight();
+        if (cmd == cachedSizeCommand && width == cachedSizeWidth && height == cachedSizeHeight) {
+            return cachedSizeText;
+        }
+        cachedSizeCommand = cmd;
+        cachedSizeWidth = width;
+        cachedSizeHeight = height;
+        cachedSizeText = cmd.text.replace("{DISPLAY_SIZE}", width + "x" + height);
+        return cachedSizeText;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -634,7 +679,7 @@ public class HudOverlay extends View {
                     
                     String txt = cmd.text;
                     if (txt != null && txt.contains("{DISPLAY_SIZE}")) {
-                        txt = txt.replace("{DISPLAY_SIZE}", getWidth() + "x" + getHeight());
+                        txt = expandDisplaySize(cmd);
                     }
                     
                     int bgColor = Float.floatToRawIntBits(cmd.x3);
@@ -699,7 +744,8 @@ public class HudOverlay extends View {
                     canvas.drawCircle(drawX, drawY, cmd.size, paint);
                 } else if (cmd.type == DrawCommand.TYPE_TRIANGLE_FILLED) {
                     paint.setStyle(Paint.Style.FILL);
-                    android.graphics.Path path = new android.graphics.Path();
+                    android.graphics.Path path = trianglePath;
+                    path.reset();
                     path.moveTo(drawX, drawY);
                     
                     float pt2X = cmd.w;
@@ -723,8 +769,8 @@ public class HudOverlay extends View {
                 } else if (cmd.type == DrawCommand.TYPE_IMAGE) {
                     android.graphics.Bitmap bitmap = getImage(cmd.imageId);
                     if (bitmap != null) {
-                        android.graphics.RectF dst = new android.graphics.RectF(drawX, drawY, drawX + cmd.w, drawY + cmd.h);
-                        canvas.drawBitmap(bitmap, null, dst, paint);
+                        imageDst.set(drawX, drawY, drawX + cmd.w, drawY + cmd.h);
+                        canvas.drawBitmap(bitmap, null, imageDst, paint);
                     }
                 }
 

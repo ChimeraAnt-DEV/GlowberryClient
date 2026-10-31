@@ -7,6 +7,8 @@ import org.chimeramc.client.core.installer.BedrockSource.DownloadForm;
 import org.chimeramc.client.core.installer.BedrockSource.Field;
 import org.chimeramc.client.core.installer.BedrockSource.ResolvedDownload;
 import org.chimeramc.client.core.installer.BedrockSource.Version;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +53,7 @@ public class PackageSourceClient {
     private final OkHttpClient client;
     /** A second client that stops at the first redirect, used only for form submissions. */
     private final OkHttpClient postClient;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private static PackageSourceClient instance;
 
@@ -403,7 +405,7 @@ public class PackageSourceClient {
     }
 
     private static void run(Runnable work) {
-        new Thread(work, "bedrock-source").start();
+        AppExecutors.run(AppExecutors.Kind.NETWORK, "bedrock-source", work);
     }
 
     private void post(Runnable action) {

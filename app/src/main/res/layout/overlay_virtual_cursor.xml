@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/cursor"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/overlay_text_primary"
         android:textAppearance="@style/TextAppearance.Glowberry.Body"
         android:textStyle="bold" />
 </FrameLayout>

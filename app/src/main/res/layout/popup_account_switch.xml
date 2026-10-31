@@ -33,7 +33,9 @@
         <com.microsoft.xbox.idp.toolkit.CircleImageView
             android:id="@+id/header_avatar"
             android:layout_width="36dp"
-            android:layout_height="36dp" />
+            android:layout_height="36dp" 
+            android:importantForAccessibility="no"
+            />
 
         <TextView
             android:id="@+id/header_name"

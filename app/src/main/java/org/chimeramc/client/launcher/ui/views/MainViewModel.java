@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 import org.chimeramc.client.core.mods.Mod;
 import org.chimeramc.client.core.mods.ModManager;
 import org.chimeramc.client.core.versions.GameVersion;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,14 +86,15 @@ public class MainViewModel extends ViewModel {
     }
 
     public void setModEnabled(String fileName, boolean enabled) {
-        new Thread(() -> modManager.setModEnabled(fileName, enabled)).start();
+        AppExecutors.run(AppExecutors.Kind.MOD, "mod-enable", () ->
+                modManager.setModEnabled(fileName, enabled));
     }
 
     public void reorderMods(List<Mod> reorderedMods) {
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.MOD, "mod-reorder", () -> {
             modManager.reorderMods(reorderedMods);
             refreshMods();
-        }).start();
+        });
     }
 
     /**

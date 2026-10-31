@@ -8,6 +8,8 @@ import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.versions.VersionManager;
 import org.chimeramc.client.preloader.PreloaderSignatureRulesManager;
 import org.chimeramc.client.util.LauncherStorage;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,10 +62,10 @@ public final class SplashInit {
      */
     public static void run(Context context, Listener listener) {
         final Context appContext = context.getApplicationContext();
-        final Handler main = new Handler(Looper.getMainLooper());
+        final Handler main = MainThread.handler();
         final AtomicInteger done = new AtomicInteger(0);
 
-        Thread worker = new Thread(() -> {
+        Thread worker = AppExecutors.thread("splash-init", () -> {
             step(() -> LauncherStorage.ensureNoMedia(appContext), main, done, listener);
             step(() -> PreloaderSignatureRulesManager.refreshOnLauncherStart(appContext),
                     main, done, listener);
@@ -73,8 +75,7 @@ public final class SplashInit {
             main.post(() -> {
                 if (listener != null) listener.onComplete();
             });
-        }, "splash-init");
-        worker.setDaemon(true);
+        });
         worker.start();
     }
 

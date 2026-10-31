@@ -50,6 +50,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.WeakHashMap;
 import org.chimeramc.client.R;
+import org.chimeramc.client.util.MainThread;
 
 final class RuntimeConfigView {
     private static final WeakHashMap<ViewGroup, RuntimeConfigView> ACTIVE = new WeakHashMap<>();
@@ -64,7 +65,7 @@ final class RuntimeConfigView {
     private final UnifiedMod mod;
     private final boolean compact;
     private final Runnable onConfigChanged;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final Set<String> collapsedSections = new HashSet<>();
     private RuntimeConfigSchema schema;
     private String selectedCategory = "";
@@ -233,7 +234,12 @@ final class RuntimeConfigView {
             result.add(node);
         }
         nodeAdapter.submit(result);
-        categoryAdapter.notifyDataSetChanged();
+        // Selecting a category repaints every tile (the selected one loses its highlight and the
+        // new one gains it), but the tiles are the same rows, so a range change keeps the strip's
+        // scroll position.
+        if (categoryAdapter.getItemCount() > 0) {
+            categoryAdapter.notifyItemRangeChanged(0, categoryAdapter.getItemCount());
+        }
     }
 
     private boolean matches(List<RuntimeConfigSchema.Condition> conditions) {
@@ -332,7 +338,9 @@ final class RuntimeConfigView {
             holder.label.setOnClickListener(v -> {
                 if (category.id.equals(selectedCategory)) return;
                 selectedCategory = category.id;
-                notifyDataSetChanged();
+                if (getItemCount() > 0) {
+                    notifyItemRangeChanged(0, getItemCount());
+                }
                 refreshNodes();
                 contentRecycler.scrollToPosition(0);
             });
@@ -858,8 +866,12 @@ final class RuntimeConfigView {
             label.setTextSize(12);
             row.addView(label, new LinearLayout.LayoutParams(0, dp(38), 1f));
             Button remove = new Button(context);
-            remove.setText("×");
-            remove.setTextSize(16);
+            // A vector close glyph, never the "×" text character: a text glyph changes shape with
+            // the device font and reads as a bullet or a math sign on some builds. The spec bans
+            // symbol glyphs in the UI, so the button carries the shared close icon.
+            remove.setText("");
+            remove.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_close, 0, 0, 0);
+            remove.setCompoundDrawableTintList(ColorStateList.valueOf(TEXT_PRIMARY));
             remove.setMinWidth(0);
             remove.setMinimumWidth(0);
             remove.setPadding(dp(8), 0, dp(8), 0);
@@ -868,7 +880,17 @@ final class RuntimeConfigView {
         }
         @Override public void onBindViewHolder(OrderedHolder holder, int position) {
             String value = values.get(position);
-            holder.label.setText((position + 1) + ".  " + optionLabel(node, value) + (node.allowReorder ? "   ≡" : ""));
+            // The reorder affordance is a vector handle, not the "≡" character: a text glyph is a
+            // symbol, not an icon, and the spec bans it. It is appended to the row's own text view
+            // through a compound drawable so it keeps the row's baseline at any font scale.
+            holder.label.setText((position + 1) + ".  " + optionLabel(node, value));
+            if (node.allowReorder) {
+                holder.label.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_drag_handle, 0);
+                holder.label.setCompoundDrawablePadding(dp(6));
+                holder.label.setCompoundDrawableTintList(ColorStateList.valueOf(TEXT_SECONDARY));
+            } else {
+                holder.label.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            }
             holder.remove.setOnClickListener(v -> {
                 int pos = holder.getBindingAdapterPosition();
                 if (pos < 0 || pos >= values.size()) return;

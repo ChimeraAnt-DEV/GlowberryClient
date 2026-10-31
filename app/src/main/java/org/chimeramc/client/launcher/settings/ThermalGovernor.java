@@ -80,7 +80,7 @@ public final class ThermalGovernor {
     private static final class Api29 {
 
         private static final android.os.Handler MAIN =
-                new android.os.Handler(android.os.Looper.getMainLooper());
+                org.chimeramc.client.util.MainThread.handler();
 
         private static final android.os.PowerManager.OnThermalStatusChangedListener LISTENER =
                 status -> { };

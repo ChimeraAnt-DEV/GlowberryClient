@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.WorldEditor.WorldProperty;
 import org.chimeramc.client.core.content.nbt.NbtTag;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +39,41 @@ public class WorldPropertiesAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.listener = listener;
     }
 
+    /**
+     * Replaces the grouped list, animating only what changed.
+     *
+     * <p>A group header and a property row share one list, so both need a key: a header is keyed by
+     * its title and a property by its path. The key prefix keeps the two apart, because a category
+     * and a property can share a name and would otherwise be treated as the same row.
+     */
     public void setProperties(Map<String, List<WorldProperty>> grouped) {
-        items.clear();
+        List<Object> next = new ArrayList<>();
         for (Map.Entry<String, List<WorldProperty>> entry : grouped.entrySet()) {
-            items.add(new HeaderItem(entry.getKey()));
-            items.addAll(entry.getValue());
+            next.add(new HeaderItem(entry.getKey()));
+            next.addAll(entry.getValue());
         }
-        notifyDataSetChanged();
+        ListDiff.Result diff = ListDiff.compute(items, next,
+                WorldPropertiesAdapter::keyOf,
+                WorldPropertiesAdapter::sameContent);
+        items.clear();
+        items.addAll(next);
+        ListDiffDispatch.apply(this, diff);
+    }
+
+    /** A header and a property are different kinds of row, so the key carries the kind. */
+    private static Object keyOf(Object item) {
+        if (item instanceof HeaderItem) {
+            return "H:" + ((HeaderItem) item).title;
+        }
+        return "P:" + ((WorldProperty) item).getPath();
+    }
+
+    private static boolean sameContent(Object oldItem, Object freshItem) {
+        if (oldItem instanceof HeaderItem || freshItem instanceof HeaderItem) {
+            return oldItem instanceof HeaderItem && freshItem instanceof HeaderItem;
+        }
+        return java.util.Objects.equals(((WorldProperty) oldItem).getValueString(),
+                ((WorldProperty) freshItem).getValueString());
     }
 
     @Override

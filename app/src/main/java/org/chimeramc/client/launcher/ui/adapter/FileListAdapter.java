@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.curseforge.models.ContentFile;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +32,16 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
         this.accentColor = accentColor;
     }
 
+    /** Replaces the list, animating only what changed; a file row's identity is its file id. */
     public void setFiles(List<ContentFile> files) {
-        this.files = files;
-        notifyDataSetChanged();
+        List<ContentFile> next = files != null ? files : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.files, next,
+                file -> file.id,
+                (old, fresh) -> java.util.Objects.equals(old.fileName, fresh.fileName)
+                        && java.util.Objects.equals(old.displayName, fresh.displayName)
+                        && java.util.Objects.equals(old.fileDate, fresh.fileDate));
+        this.files = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

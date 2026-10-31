@@ -99,6 +99,30 @@ public class EdgeToEdgeInsetsTest {
     }
 
     @Test
+    public void aCutoutLargerThanTheSystemBarWinsOnEveryEdge() {
+        // Item 93: the union used to be an inline Math.max at the call site, untested. A landscape
+        // notch reports a cutout on one side that the system bars do not describe, and a tall
+        // status bar reports a top inset the cutout does not; whichever is larger on each edge is
+        // what actually has to be cleared.
+        EdgeToEdgeInsets.Insets insets =
+                EdgeToEdgeInsets.from(0, 24, 0, 0, 96, 0, 0, 48);
+        assertEquals(96, insets.left);
+        assertEquals(24, insets.top);
+        assertEquals(0, insets.right);
+        assertEquals(48, insets.bottom);
+    }
+
+    @Test
+    public void anEmptyCutoutLeavesTheSystemBarsAlone() {
+        EdgeToEdgeInsets.Insets insets =
+                EdgeToEdgeInsets.from(8, 24, 8, 48, 0, 0, 0, 0);
+        assertEquals(8, insets.left);
+        assertEquals(24, insets.top);
+        assertEquals(8, insets.right);
+        assertEquals(48, insets.bottom);
+    }
+
+    @Test
     public void aNullInsetSetIsTreatedAsNoBarsRatherThanCrashing() {
         // requestApplyInsets can deliver a null on some OEM builds; a launcher must not die there.
         for (boolean rail : new boolean[] {false, true}) {

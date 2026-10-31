@@ -15,6 +15,9 @@ class LauncherApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
+        // Point the failure reporter at the application context before anything else can fail, so
+        // the first failure is durable rather than only reaching logcat.
+        org.chimeramc.client.util.AppLog.install(applicationContext)
         FeatureSettings.init(applicationContext)
         LowLatencyNetworkManager.init(applicationContext)
         ThermalGovernor.init(applicationContext)

@@ -215,4 +215,44 @@ public class RadialWheelLayoutTest {
             }
         }
     }
+
+    // --- Flick-to-select (spec: "flicking your mouse toward a segment") ----------------------
+
+    private static Sector flick(double deg, float speed) {
+        double rad = Math.toRadians(deg);
+        return RadialWheelLayout.flickSector((float) (Math.cos(rad) * speed),
+                (float) (Math.sin(rad) * speed), OUTER, GAP);
+    }
+
+    @Test
+    public void aFastThrowTowardASliceSelectsIt() {
+        // A flick straight up (screen space -90) lands on MODS, the top sector.
+        assertEquals(Sector.MODS, flick(-90.0, 2500f));
+        assertEquals(Sector.CLOSET, flick(0.0, 2500f));
+        assertEquals(Sector.SETTINGS, flick(90.0, 2500f));
+        assertEquals(Sector.HUD, flick(180.0, 2500f));
+    }
+
+    @Test
+    public void aSlowReleaseIsNotAFlick() {
+        // Below the threshold the release is a placement, so the pointer hit test decides.
+        assertEquals(Sector.NONE, flick(-90.0, RadialWheelLayout.FLICK_MIN_SPEED_PX_S - 1f));
+        assertEquals(Sector.NONE, flick(-90.0, 0f));
+        assertEquals(Sector.NONE, RadialWheelLayout.flickSector(0f, 0f, OUTER, GAP));
+    }
+
+    @Test
+    public void aFlickStraightAtABoundarySelectsNothing() {
+        // A throw at exactly 45 degrees sits in the gap, so it is a coin flip and must be refused.
+        assertEquals(Sector.NONE, flick(45.0, 2500f));
+        assertEquals(Sector.NONE, flick(-45.0, 2500f));
+        assertEquals(Sector.NONE, flick(135.0, 2500f));
+    }
+
+    @Test
+    public void theFlickThresholdMatchesTheRule() {
+        // At exactly the threshold the flick counts; the boundary is inclusive so a deliberate
+        // throw at the documented speed is never silently dropped.
+        assertEquals(Sector.MODS, flick(-90.0, RadialWheelLayout.FLICK_MIN_SPEED_PX_S));
+    }
 }

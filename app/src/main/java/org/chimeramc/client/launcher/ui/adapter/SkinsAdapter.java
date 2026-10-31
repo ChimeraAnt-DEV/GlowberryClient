@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.ResourcePackItem;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 import org.chimeramc.client.ui.util.SkinPreviewRenderer;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,8 +49,7 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
      * keep the visible rows filled without letting a fling open dozens of decoders at once.
      */
     private final ExecutorService previewExecutor = Executors.newFixedThreadPool(2, r -> {
-        Thread thread = new Thread(r, "skin-preview");
-        thread.setDaemon(true);
+        Thread thread = AppExecutors.thread("skin-preview", r);
         return thread;
     });
 
@@ -85,8 +87,11 @@ public class SkinsAdapter extends RecyclerView.Adapter<SkinsAdapter.SkinViewHold
 
         List<ResourcePackItem> sorted = packs != null ? new ArrayList<>(packs) : new ArrayList<>();
         sorted.sort(Comparator.comparing(item -> item.getPackName() == null ? "" : item.getPackName()));
+        ListDiff.Result diff = ListDiff.compute(skinPacks, sorted,
+                item -> item.getFile() != null ? item.getFile().getAbsolutePath() : item.getPackName(),
+                (old, fresh) -> old.isEnabled() == fresh.isEnabled());
         this.skinPacks = sorted;
-        notifyDataSetChanged();
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

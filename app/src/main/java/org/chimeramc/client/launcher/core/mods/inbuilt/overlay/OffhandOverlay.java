@@ -11,7 +11,7 @@ import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.core.mods.inbuilt.model.OffhandAction;
 import org.chimeramc.pojavcontrols.KeyMapper;
-import org.levimc.launcher.core.mods.inbuilt.nativemod.MoreButtonsMod;
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.MoreButtonsMod;
 
 /**
  * The Offhand button: opens the inventory so an allowed item can go in the off-hand slot, and/or

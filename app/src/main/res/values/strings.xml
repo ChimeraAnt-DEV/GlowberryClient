@@ -1,6 +1,6 @@
 <resources>
     <!-- Common -->
-    <string name="app_name">GlowberryClient</string>
+    <string name="app_name" translatable="false">GlowberryClient</string>
     <string name="minecraft">Minecraft</string>
     <string name="launch">Launch</string>
     <string name="beta_badge">Beta</string>
@@ -42,11 +42,11 @@
     <string name="about_title">About</string>
     <string name="copyright">©2024–2026 GlowberryClient. Licensed under the Apache License 2.0.</string>
     <string name="font_license">This app uses the Misans font.</string>
-    <string name="about_footer_github">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
+    <string name="about_footer_github" translatable="false">GitHub: https://github.com/ChimeraAnt-DEV/GlowberryClient</string>
     <string name="quick_actions_title">Quick Actions</string>
 
     <!-- Home screen -->
-    <string name="home_app_title">GlowberryClient</string>
+    <string name="home_app_title" translatable="false">GlowberryClient</string>
     <string name="home_subtitle">Minecraft: Bedrock Edition launcher</string>
     <string name="home_versions">Versions</string>
     <string name="home_mods">Mods</string>
@@ -283,7 +283,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_import_from_file">Choose a file</string>
     <string name="mod_import_from_link">Use a link</string>
     <string name="mod_import_link_message">Paste the link to an .antegg package. If you copied a whole message, the link inside it is found for you.</string>
-    <string name="mod_import_link_hint">https://example.com/mod.antegg</string>
+    <string name="mod_import_link_hint" translatable="false">https://example.com/mod.antegg</string>
     <string name="mod_import_link_go">Import</string>
     <string name="mod_import_link_invalid">That text does not contain a link to an .antegg package.</string>
     <string name="mod_import_link_downloading">Downloading the package…</string>
@@ -477,6 +477,7 @@ GlowberryClient must complete the migration before continuing.</string>
 
     <!-- Custom Flat World -->
     <string name="custom_flat_world">Custom Flat World</string>
+    <string name="flat_world_block_hint" translatable="false">minecraft:stone</string>
     <string name="world_name">World Name</string>
     <string name="enter_world_name">Enter world name</string>
     <string name="biome">Biome</string>
@@ -538,7 +539,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_config_expand">Expand</string>
     <string name="mod_config_collapse">Collapse</string>
     <string name="mod_config_raw_json">Edit Raw JSON</string>
-    <string name="mod_config_raw_json_short">JSON</string>
+    <string name="mod_config_raw_json_short" translatable="false">JSON</string>
     <string name="mod_config_item_label">Item %1$s</string>
     <string name="mod_config_object_desc">Group of related settings</string>
     <string name="mod_config_array_desc">List of values</string>
@@ -585,7 +586,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="microsoft_accounts">Microsoft Accounts</string>
     <string name="manage_accounts">Manage accounts</string>
     <string name="not_signed_in">Not signed in</string>
-    <string name="xuid">XUID</string>
+    <string name="xuid" translatable="false">XUID</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
     <string name="accounts_active_privilege">Signed in</string>
@@ -675,6 +676,11 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="crash_details_title">Crash details</string>
     <string name="crash_back_to_main">Back to Home</string>
     <string name="crash_share_log">Share Log</string>
+    <string name="session_restart_loop_message">Stopped restarting: this session has restarted %1$d times in a row. Launch again from the home screen, or disable the mods you added most recently.</string>
+    <string name="crash_exit_reason_label">Last exit reason:</string>
+    <string name="crash_disable_last_mod">Disable the mod that crashed</string>
+    <string name="crash_disable_no_suspects">No mods were recorded for this crash.</string>
+    <string name="crash_disable_done">Disabled %1$d mod(s). Launch again to try without them.</string>
     <string name="crash_log_file_label">Log file:</string>
     <string name="crash_log_file_missing">Log file not found or unreadable.</string>
     <string name="crash_share_no_log">No crash log to share - this crash did not produce a report file.</string>
@@ -735,8 +741,6 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="optifine_item_oreui_stripping_desc">Watches the in-game HUD updates so the launcher can tell the HUD is live. Advanced: installs a game hook, off by default.</string>
     <string name="playtime_label">%1$s played</string>
     <string name="recent_playtime_label">%1$s played on this instance</string>
-    <string name="gxcore_title">gxcore native bootstrap</string>
-    <string name="gxcore_desc">Off by default. Enable to run the closed-source gxcore verification stack. Leave off to skip it, which avoids a silent process exit right after "Loading native library: libgxcore.so" on devices where verification cannot complete</string>
     <string name="logcat_live">Logcat: <b>live</b></string>
     <string name="logcat_paused">Logcat: paused</string>
     <!-- Logcat Overlay i18n -->
@@ -829,6 +833,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <!-- Mod Menu -->
     <string name="mod_menu">Mod Menu</string>
     <string name="mod_menu_general">General</string>
+    <string name="mod_menu_open_button">Open the Mod Menu</string>
     <string name="mod_menu_favorites">Favorites</string>
     <string name="mod_menu_favorite">Add to favorites</string>
     <string name="mod_menu_unfavorite">Remove from favorites</string>
@@ -850,6 +855,23 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_menu_action_reload_mods">Reload Modules</string>
     <string name="mod_menu_action_reload_mods_desc">Re-scan and re-register every module</string>
     <string name="mod_menu_action_reset_hud_done">HUD positions reset</string>
+    <string name="mod_menu_action_manage_wheel">Manage Radial Menu</string>
+    <string name="mod_menu_action_manage_wheel_desc">Create, rename, reorder and delete wheel profiles</string>
+    <string name="wheel_manager_title">Radial menu profiles</string>
+    <string name="wheel_manager_add">New wheel</string>
+    <string name="wheel_manager_add_title">Name the new wheel</string>
+    <string name="wheel_manager_rename_title">Rename this wheel</string>
+    <string name="wheel_manager_name_hint">Wheel name</string>
+    <string name="wheel_manager_cancel">Cancel</string>
+    <string name="wheel_manager_save">Save</string>
+    <string name="wheel_manager_done">Done</string>
+    <string name="wheel_manager_root_label">Opens with the bind</string>
+    <string name="wheel_manager_entry_count">%1$d entries</string>
+    <string name="wheel_manager_last_note">The last wheel cannot be deleted; the bind needs one to open.</string>
+    <string name="wheel_manager_entries_title">Edit wheel entries</string>
+    <string name="wheel_manager_no_entries">No entries yet. Add one to put an action on this wheel.</string>
+    <string name="wheel_manager_add_entry">Add entry</string>
+    <string name="wheel_manager_pick_action">Pick an action</string>
 
     <!-- Mod Menu settings tab (M6). Presets plus four sliders, and nothing free-form. -->
     <string name="mod_menu_settings_appearance">Appearance</string>
@@ -887,6 +909,10 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_menu_filter_external">External</string>
     <string name="mod_menu_filter_pvp">PvP</string>
     <string name="mod_menu_group_pvp">PvP</string>
+    <string name="mod_menu_filter_hud">HUD</string>
+    <string name="wheel_customize_title">Which thing would you like to customize?</string>
+    <string name="wheel_customize_mod_settings">Mod Menu Settings</string>
+    <string name="wheel_customize_cosmetics">Cosmetics</string>
     <string name="mod_menu_search_hint">Search mods…</string>
     <string name="mod_stats_fps_placeholder">— FPS</string>
     <string name="mod_stats_ping_placeholder">— ms</string>
@@ -1154,14 +1180,6 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="catalog_screenshot_failed">Could not save the screenshot</string>
     <string name="mod_overlay_no_peers">No players nearby</string>
     <string name="mod_overlay_players_title">Players (%1$d)</string>
-    <string name="mod_overlay_debug_title">Debug</string>
-    <string name="mod_overlay_pos">XYZ: %1$s</string>
-    <string name="mod_overlay_chunk">Chunk: %1$s</string>
-    <string name="mod_overlay_yaw">Yaw/Pitch: %1$s</string>
-    <string name="mod_overlay_facing">Facing: %1$s</string>
-    <string name="mod_overlay_chunk_origin">Chunk origin: %1$s</string>
-    <string name="mod_overlay_pitch">Pitch: %1$s</string>
-    <string name="mod_overlay_health">Health: %1$s</string>
     <string name="mod_overlay_fps_value">FPS: %1$d</string>
     <string name="mod_overlay_cps_value">CPS: %1$d</string>
     <string name="mod_config_overlay_button_size_dp">Overlay Button Size (dp)</string>
@@ -1232,7 +1250,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="world_name_hint">World Name</string>
     <string name="command_hint">Command (without /)</string>
     <string name="command_warning">Note: This will disconnect you if used in a local world</string>
-    <string name="uri_hint">minecraft://…</string>
+    <string name="uri_hint" translatable="false">minecraft://…</string>
     <string name="custom_uri_hint">Enter a full minecraft:// URI. Examples:\nminecraft://openStore\nminecraft://?showStoreOffer=UUID</string>
     <string name="select_tab">Select Tab:</string>
 
@@ -1291,16 +1309,24 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="nav_mods">Mods</string>
     <string name="nav_about">About</string>
     <string name="nav_settings">Settings</string>
+    <!-- Accessibility: announced for the active destination. `selected` is not read on every
+         Android version, and the icon-only rail hides the label entirely. -->
+    <string name="nav_tab_selected">%1$s, selected</string>
     <string name="nav_controller">Controller</string>
     <string name="nav_skins">Skins</string>
     <string name="nav_customize">Customize</string>
     <string name="nav_back">Back</string>
+    <string name="nav_logo_home">GlowberryClient home</string>
     <string name="customize_tab_controller">Controller</string>
     <string name="customize_tab_skins">Skins</string>
     <string name="settings_about_open">About GlowberryClient</string>
     <string name="controller_title">Controller</string>
     <string name="controller_detected_message">has been connected and detected! Settings loaded.</string>
     <string name="controller_disconnected_message">disconnected. Touch controls active.</string>
+    <!-- Phase 12: keyboard connect/disconnect pills, the keyboard twin of the controller pill. -->
+    <string name="keyboard_connected_message">has been connected! Keyboard controls active.</string>
+    <string name="keyboard_disconnected_message">disconnected. Keyboard controls released.</string>
+    <string name="keyboard_title">Keyboard</string>
     <string name="controller_profile_chip_default">Default</string>
     <string name="controller_empty_hint">Controller setup is coming soon. Connect a supported gamepad to begin.</string>
     <string name="controller_status_none">No controller detected</string>
@@ -1500,7 +1526,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_field_device">Device</string>
     <string name="diagnostics_field_sdk_build">Target SDK</string>
     <string name="diagnostics_field_min_sdk">Min SDK</string>
-    <string name="diagnostics_field_abi">ABI</string>
+    <string name="diagnostics_field_abi" translatable="false">ABI</string>
     <string name="diagnostics_field_launcher_abi">Launch ABI</string>
     <string name="diagnostics_field_selected_version">Selected version</string>
     <string name="diagnostics_section_readiness">Launch readiness</string>
@@ -1522,6 +1548,11 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="diagnostics_rules_no_coverage">NOT COVERED — byte-pattern hooks disabled for this build</string>
     <string name="diagnostics_field_cosmetics_hook">Cosmetics render hook</string>
     <string name="diagnostics_field_skin_seam">Skin capture seam</string>
+    <string name="diagnostics_field_berry_api">BerryAPI backend</string>
+    <string name="diagnostics_field_input_backend">Input backend</string>
+    <string name="diagnostics_field_preloader_abi">Preloader ABI</string>
+    <string name="diagnostics_preloader_abi_ok">v%1$d (matches client)</string>
+    <string name="diagnostics_preloader_abi_mismatch">v%1$d (client expects v%2$d)</string>
     <string name="diagnostics_no_mod_errors">No mod load errors on record.</string>
     <string name="diagnostics_mod_error_line">%1$s (%2$s): %3$s</string>
     <string name="diagnostics_native_loaded">Loaded</string>
@@ -1541,9 +1572,11 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="about_afdian">Afdian</string>
     <string name="about_patreon">Patreon</string>
     <string name="about_source_title">Source Code &amp; Open Source</string>
-    <string name="about_github_repo">GitHub · GlowberryClient</string>
-    <string name="about_github_org">ChimeraAnt-DEV</string>
+    <string name="about_github_repo" translatable="false">GitHub · GlowberryClient</string>
+    <string name="about_github_org" translatable="false">ChimeraAnt-DEV</string>
     <string name="about_license_note">See LICENSE in the repository for license details.</string>
+    <string name="about_backend_status">Backend: %1$s</string>
+    <string name="about_input_backend_status">Input backend: %1$s</string>
     <string name="about_contribute_title">Contribute</string>
     <string name="about_contribute_desc">Contributions via Issues or Pull Requests are welcome to improve GlowberryClient.</string>
     <string name="about_issues">Issue</string>
@@ -1785,7 +1818,7 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_config_offhand_keybind">Hardware keybind</string>
     <string name="offhand_scope_note">Bedrock has no swap-to-off-hand key. The off-hand slot is filled from your inventory, and only shields, arrows, firework rockets, totems of undying, maps and nautilus shells can go in it. This button opens the inventory for you (or uses the off-hand item), and works the same in a world, a Realm or a server.</string>
     <string name="changelog_title">What’s new</string>
-    <string name="changelog_version">GlowberryClient %1$s</string>
+    <string name="changelog_version" translatable="false">GlowberryClient %1$s</string>
     <string name="changelog_continue">Continue</string>
     <string name="foreground_service_channel">Minecraft</string>
     <string name="foreground_service_notification_title">Minecraft is running</string>
@@ -2273,6 +2306,25 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="replay_cinematic_preset_drone">Drone</string>
     <string name="replay_cinematic_preset_crane">Crane</string>
     <string name="replay_cinematic_preset_static">Static</string>
+    <string name="replay_cinematic_preset_orbit_low">Orbit (low)</string>
+    <string name="replay_cinematic_preset_orbit_high">Orbit (high)</string>
+    <string name="replay_cinematic_preset_arc">Arc</string>
+    <string name="replay_cinematic_preset_dolly_orbit">Dolly orbit</string>
+    <string name="replay_cinematic_preset_push_in">Push in</string>
+    <string name="replay_cinematic_preset_pull_out">Pull out</string>
+    <string name="replay_cinematic_preset_reveal">Reveal</string>
+    <string name="replay_cinematic_preset_truck_left">Truck left</string>
+    <string name="replay_cinematic_preset_truck_right">Truck right</string>
+    <string name="replay_cinematic_preset_pedestal_up">Pedestal up</string>
+    <string name="replay_cinematic_preset_sweep">Sweep</string>
+    <string name="replay_cinematic_preset_fly_by">Fly by</string>
+    <string name="replay_cinematic_preset_tilt_up">Tilt up</string>
+    <string name="replay_cinematic_preset_tilt_down">Tilt down</string>
+    <string name="replay_cinematic_preset_topdown">Top down</string>
+    <string name="replay_cinematic_preset_flyover">Flyover</string>
+    <string name="replay_cinematic_preset_spiral">Spiral</string>
+    <string name="replay_cinematic_preset_helix">Helix</string>
+    <string name="replay_cinematic_preset_chase">Chase</string>
     <string name="replay_cinematic_keyframe_add">Add keyframe</string>
     <string name="replay_cinematic_keyframes">%1$d keyframes</string>
     <string name="replay_cinematic_clear">Clear path</string>
@@ -2439,5 +2491,14 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="error_short_interrupted">the transfer was interrupted</string>
     <string name="error_short_abi_incompatible">Unsupported 32-bit build</string>
     <string name="error_short_unknown">see the log for the exact error</string>
+
+    <!-- Microsoft sign-in card (moved out of the layout so it can be translated). -->
+    <string name="ms_login_card_title">Microsoft Account Sign-In</string>
+    <string name="ms_login_card_subtitle">Official Microsoft Authentication Library (MSAL) integration</string>
+    <string name="ms_login_azure_note">Note: You must register your own Azure AD application and replace the client ID in the code.</string>
+    <string name="shader_compat_title">Shader compatibility fixer</string>
+    <string name="shader_compat_desc">Fixes shader/materialbin compatibility for resource packs</string>
+    <string name="about_maintainer_name">MrPokeG</string>
+    <string name="server_sample_address">play.example.com</string>
 
 </resources>

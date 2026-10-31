@@ -149,4 +149,82 @@ public class ReplayCameraTest {
         assertTrue(ReplayCameraPathCodec.parse("").isEmpty());
         assertTrue(ReplayCameraPathCodec.parse(null).isEmpty());
     }
+
+    @Test
+    public void dozensOfShotPresetsShip() {
+        // The spec asks for "dozens" of presets. Pinned so the set cannot quietly shrink back to a
+        // handful.
+        assertTrue("expected at least 20 presets, found " + ReplayCameraPath.PRESET_COUNT,
+                ReplayCameraPath.PRESET_COUNT >= 20);
+    }
+
+    @Test
+    public void everyPresetGeneratesAUsablePath() {
+        // A preset that produces no keyframes would render nothing; each one must fill the path with
+        // at least two poses spanning the clip.
+        ReplayCamera camera = new ReplayCamera();
+        camera.set(3f, 12f, -5f, 40f, 0f);
+        for (ReplayCameraPath.Preset preset : ReplayCameraPath.Preset.values()) {
+            ReplayCameraPath path = new ReplayCameraPath();
+            path.generate(preset, camera, 8_000L);
+            assertEquals("preset " + preset + " must produce a path", preset, path.preset());
+            assertTrue("preset " + preset + " needs at least two keyframes", path.size() >= 2);
+            ReplayCamera out = new ReplayCamera();
+            assertTrue("preset " + preset + " must sample", path.sample(4_000L, out));
+            assertTrue("preset " + preset + " must keep pitch in range",
+                    Math.abs(out.pitchDeg()) <= ReplayCamera.MAX_PITCH_DEG + 0.001f);
+        }
+    }
+
+    @Test
+    public void everyPresetHasADisplayName() {
+        // A preset with no label would render an empty row in the cinematic dialog.
+        for (ReplayCameraPath.Preset preset : ReplayCameraPath.Preset.values()) {
+            assertTrue("preset " + preset + " has no label",
+                    ReplayCinematicDialog.presetLabelRes(preset) != 0);
+        }
+    }
+
+    @Test
+    public void aRevealShotDescendsTowardTheSubject() {
+        ReplayCamera camera = new ReplayCamera();
+        camera.set(0f, 10f, 0f, 0f, 0f);
+        ReplayCameraPath path = new ReplayCameraPath();
+        path.generate(ReplayCameraPath.Preset.REVEAL, camera, 6_000L);
+        ReplayCamera out = new ReplayCamera();
+        path.sample(0L, out);
+        float startDist = (float) Math.hypot(out.x(), out.z());
+        path.sample(6_000L, out);
+        float endDist = (float) Math.hypot(out.x(), out.z());
+        assertTrue("a reveal must close the distance", endDist < startDist);
+    }
+
+    @Test
+    public void aPullOutShotOpensTheDistance() {
+        ReplayCamera camera = new ReplayCamera();
+        camera.set(0f, 10f, 0f, 0f, 0f);
+        ReplayCameraPath path = new ReplayCameraPath();
+        path.generate(ReplayCameraPath.Preset.PULL_OUT, camera, 6_000L);
+        ReplayCamera out = new ReplayCamera();
+        path.sample(0L, out);
+        float startDist = (float) Math.hypot(out.x(), out.z());
+        path.sample(6_000L, out);
+        float endDist = (float) Math.hypot(out.x(), out.z());
+        assertTrue("a pull out must open the distance", endDist > startDist);
+    }
+
+    @Test
+    public void everyPresetRoundTripsThroughTheSidecar() {
+        // A preset name that does not survive the codec would restore as STATIC and silently lose
+        // the shot's identity, so every name must parse back.
+        for (ReplayCameraPath.Preset preset : ReplayCameraPath.Preset.values()) {
+            ReplayCameraPath path = new ReplayCameraPath();
+            ReplayCamera camera = new ReplayCamera();
+            camera.set(1f, 2f, 3f, 0f, 0f);
+            path.generate(preset, camera, 4_000L);
+            ReplayCameraPath restored = ReplayCameraPathCodec.parse(
+                    ReplayCameraPathCodec.serialize(path));
+            assertEquals("preset " + preset + " did not round-trip", preset, restored.preset());
+        }
+    }
 }

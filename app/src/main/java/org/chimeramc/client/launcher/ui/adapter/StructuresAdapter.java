@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.content.StructureExtractor.StructureInfo;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +30,14 @@ public class StructuresAdapter extends RecyclerView.Adapter<StructuresAdapter.St
         this.listener = listener;
     }
 
+    /** Replaces the list, animating only what changed; a structure's identity is its id. */
     public void setStructures(List<StructureInfo> structures) {
-        this.structures = structures != null ? structures : new ArrayList<>();
-        notifyDataSetChanged();
+        List<StructureInfo> next = structures != null ? structures : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.structures, next,
+                StructureInfo::getId,
+                (old, fresh) -> old.getSize() == fresh.getSize());
+        this.structures = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

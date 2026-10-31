@@ -24,6 +24,7 @@ import org.chimeramc.client.ui.animation.DynamicAnim;
 
 import java.util.List;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
+import org.chimeramc.client.util.MainThread;
 
 public class GameVersionSelectDialog extends Dialog {
     public interface OnVersionSelectListener {
@@ -136,7 +137,7 @@ public class GameVersionSelectDialog extends Dialog {
         VersionManager.get(getContext()).renameVersion(version, newName, new VersionManager.OnRenameVersionCallback() {
             @Override
             public void onRenameCompleted(boolean success) {
-                new Handler(Looper.getMainLooper()).post(() -> {
+                MainThread.post(() -> {
                     if (success) {
                         Toast.makeText(getContext(), getContext().getString(R.string.rename_success), Toast.LENGTH_SHORT).show();
                         dismiss();
@@ -146,7 +147,7 @@ public class GameVersionSelectDialog extends Dialog {
 
             @Override
             public void onRenameFailed(Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> {
+                MainThread.post(() -> {
                     // "Rename failed: null" is the shape this produced when the throwable
                     // carried no message, which is common for a wrapped IOException.
                     android.content.Context ctx = getContext();

@@ -41,16 +41,23 @@ public class RadialMenuOverlay {
     /** The backdrop capture, so the wheel's glass can blur what is behind it (R3/R12). */
     private WheelBackdropCapture backdropCapture;
 
-    /** How the wheel reaches its destinations; supplied by whoever owns the other screens. */
+    /**
+     * How the wheel reaches its destinations; supplied by whoever owns the other screens.
+     *
+     * <p>Each method names the destination, not the sector, so the wheel's sectors and the profile
+     * entries share one routing table. The MODS and HUD sectors open the one Mod Menu on the
+     * matching section (a filter over the module list, never a second list); CLOSET asks which of
+     * the two customization surfaces to open; SETTINGS opens the Mod Menu's settings page.
+     */
     public interface Destinations {
-        /** Open the module list (the MODS sector). */
+        /** The module list (the MODS sector). */
         void openMods();
-        /** Open the cosmetics wardrobe (the CLOSET sector). */
-        void openCloset();
-        /** Open the general settings (the SETTINGS sector). */
+        /** The HUD section of the module list (the HUD sector). */
+        void openHud();
+        /** Ask which customization surface to open (the CLOSET sector). */
+        void openCustomize();
+        /** The Mod Menu's settings page (the SETTINGS sector). */
         void openSettings();
-        /** Enter the HUD editor (the HUD sector). */
-        void openHudEditor();
     }
 
     private Destinations destinations;
@@ -77,13 +84,20 @@ public class RadialMenuOverlay {
             }
 
             @Override
-            public void openCloset() {
-                android.content.Intent intent = new android.content.Intent(
-                        activity, org.chimeramc.client.ui.activities.CustomizeActivity.class);
-                intent.putExtra(
-                        org.chimeramc.client.ui.activities.CustomizeActivity.EXTRA_INITIAL_TAB,
-                        org.chimeramc.client.ui.activities.CustomizeActivity.TAB_SKINS);
-                activity.startActivity(intent);
+            public void openHud() {
+                // Over the launcher there is no game HUD, so the HUD section is the launcher's own
+                // HUD-related screen. It is reached through the same activity the Mods sector opens
+                // rather than silently doing nothing.
+                openMods();
+            }
+
+            @Override
+            public void openCustomize() {
+                // The same chooser the in-game wheel shows, so the two homes behave identically.
+                new CustomizeChooser(activity,
+                        () -> activity.startActivity(new android.content.Intent(activity,
+                                org.chimeramc.client.ui.activities.SettingsActivity.class)),
+                        () -> openCosmetics(activity)).show();
             }
 
             @Override
@@ -91,16 +105,18 @@ public class RadialMenuOverlay {
                 activity.startActivity(new android.content.Intent(
                         activity, org.chimeramc.client.ui.activities.SettingsActivity.class));
             }
-
-            @Override
-            public void openHudEditor() {
-                // Over the launcher there is no game HUD; the HUD section lives in the Mod Menu,
-                // which needs a session, so this sector opens the Mod Menu's module list instead
-                // of silently doing nothing.
-                openMods();
-            }
         });
         overlay.show();
+    }
+
+    /** Opens the cosmetics wardrobe: the Customize host on its Skins tab. */
+    private static void openCosmetics(Activity activity) {
+        android.content.Intent intent = new android.content.Intent(
+                activity, org.chimeramc.client.ui.activities.CustomizeActivity.class);
+        intent.putExtra(
+                org.chimeramc.client.ui.activities.CustomizeActivity.EXTRA_INITIAL_TAB,
+                org.chimeramc.client.ui.activities.CustomizeActivity.TAB_SKINS);
+        activity.startActivity(intent);
     }
 
     public void setDestinations(Destinations destinations) {
@@ -369,13 +385,13 @@ public class RadialMenuOverlay {
                 destinations.openMods();
                 break;
             case CLOSET:
-                destinations.openCloset();
+                destinations.openCustomize();
                 break;
             case SETTINGS:
                 destinations.openSettings();
                 break;
             case HUD:
-                destinations.openHudEditor();
+                destinations.openHud();
                 break;
             default:
                 break;
@@ -397,13 +413,13 @@ public class RadialMenuOverlay {
                 destinations.openMods();
                 break;
             case OPEN_CLOSET:
-                destinations.openCloset();
+                destinations.openCustomize();
                 break;
             case OPEN_SETTINGS:
                 destinations.openSettings();
                 break;
             case OPEN_HUD:
-                destinations.openHudEditor();
+                destinations.openHud();
                 break;
             default:
                 break;
@@ -522,7 +538,7 @@ public class RadialMenuOverlay {
     }
 
     private final android.os.Handler mainHandler =
-            new android.os.Handler(android.os.Looper.getMainLooper());
+            org.chimeramc.client.util.MainThread.handler();
     private final Runnable detachRunnable = this::detachQuietly;
 
     private void detachQuietly() {

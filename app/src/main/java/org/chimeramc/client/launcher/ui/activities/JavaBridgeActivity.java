@@ -38,6 +38,7 @@ import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.util.PersonalizationManager;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -76,7 +77,7 @@ public class JavaBridgeActivity extends BaseActivity {
             android.util.Log.w("JavaBridgeActivity", "JavaBridge task dropped: the screen is gone", rejected);
         }
     }
-    private final Handler main = new Handler(Looper.getMainLooper());
+    private final Handler main = MainThread.handler();
 
     private ActivityResultLauncher<Intent> pickJarLauncher;
 

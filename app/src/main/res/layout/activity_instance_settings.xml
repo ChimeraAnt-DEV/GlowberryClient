@@ -219,7 +219,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -259,7 +259,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -279,7 +279,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Shader compatibility fixer"
+                                    android:text="@string/shader_compat_title"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/on_surface"
                                     android:textAppearance="@style/TextAppearance.Glowberry.Title"
@@ -289,7 +289,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="@dimen/space_hairline"
-                                    android:text="Fixes shader/materialbin compatibility for resource packs"
+                                    android:text="@string/shader_compat_desc"
                                     android:fontFamily="@font/misans"
                                     android:textColor="@color/text_secondary"
                                     android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
@@ -300,7 +300,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -341,7 +341,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:thumbTint="@color/primary"
-                                android:trackTint="#555555" />
+                                android:trackTint="@color/track_inactive" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -663,7 +663,7 @@
                                     android:layout_marginTop="@dimen/space_hairline"
                                     android:text="@string/instance_delete_warning"
                                     android:fontFamily="@font/misans"
-                                    android:textColor="#E53935"
+                                    android:textColor="@color/status_danger"
                                     android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
                             </LinearLayout>
 
@@ -676,8 +676,8 @@
                                 android:text="@string/delete"
                                 android:fontFamily="@font/misans"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Label"
-                                android:textColor="#FFFFFF"
-                                android:backgroundTint="#E53935"
+                                android:textColor="@color/on_error"
+                                android:backgroundTint="@color/status_danger"
                                 android:textAllCaps="false" />
                         </LinearLayout>
                     </LinearLayout>

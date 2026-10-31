@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.util.List;
@@ -85,7 +87,7 @@ public final class ReplayManager {
     private static volatile ReplayManager instance;
 
     private final Context appContext;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final ReplayClipRepository repository;
 
@@ -224,7 +226,7 @@ public final class ReplayManager {
         notifyState();
         final ReplayQuality.Profile finishedProfile = profile;
         // The sidecar and the storage prune are file work; keep them off the main thread.
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.DISK, "replay-finalize", () -> {
             try {
                 writeSidecar(file, durationMs, finishedProfile);
                 pruneIfNeeded();
@@ -237,7 +239,7 @@ public final class ReplayManager {
                     notifyState();
                 });
             }
-        }, "replay-finalize").start();
+        });
     }
 
     public void onRecordingFailed() {

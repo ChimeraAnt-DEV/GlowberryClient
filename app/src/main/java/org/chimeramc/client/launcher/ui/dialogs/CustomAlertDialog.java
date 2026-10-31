@@ -22,8 +22,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.ui.animation.DynamicAnim;
+import org.chimeramc.client.util.AppLog;
 
 public class CustomAlertDialog extends Dialog {
+
+    private static final String TAG = "CustomAlertDialog";
 
     private String mTitle;
     private String mMessage;
@@ -262,7 +265,9 @@ public class CustomAlertDialog extends Dialog {
                 btnPositive.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accent));
                 btnPositive.setTextColor(Color.WHITE);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "dialog-tint", "Tinting the dialog buttons failed", ignored);
+        }
     }
 
     @Override
@@ -297,6 +302,10 @@ public class CustomAlertDialog extends Dialog {
                 try {
                     super.dismiss();
                 } catch (Exception ignored) {
+                    // Dismissing a dialog whose window is already detached throws on some builds;
+                    // there is nothing to recover, but a silent swallow hid state bugs (item 117).
+                    AppLog.warnOnce(TAG, "dialog-dismiss-detached",
+                            "Dismissing a detached dialog failed", ignored);
                 } finally {
                     notifyDismissAnimationEnd();
                 }
@@ -316,6 +325,8 @@ public class CustomAlertDialog extends Dialog {
                             }
                         }
                     } catch (Exception ignored) {
+                        AppLog.warnOnce(TAG, "dialog-dismiss-anim",
+                                "Dismissing the dialog with an animation failed", ignored);
                     } finally {
                         notifyDismissAnimationEnd();
                     }
@@ -325,7 +336,9 @@ public class CustomAlertDialog extends Dialog {
                 super.dismiss();
                 notifyDismissAnimationEnd();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "dialog-dismiss", "Dismissing the dialog with an animation failed", ignored);
+        }
     }
 
     private void notifyDismissAnimationEnd() {
@@ -376,7 +389,9 @@ public class CustomAlertDialog extends Dialog {
                 }
                 super.dismiss();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "dialog-dismiss2", "Dismissing the dialog with an animation failed", ignored);
+        }
     }
 
     public Button getPositiveButton() {

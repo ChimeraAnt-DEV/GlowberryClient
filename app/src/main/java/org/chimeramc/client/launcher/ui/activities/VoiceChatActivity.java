@@ -34,6 +34,8 @@ import org.chimeramc.client.core.voice.VoiceConsent;
 import org.chimeramc.client.core.voice.VoicePeer;
 import org.chimeramc.client.core.voice.VoiceProtocol;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.TouchTargetHelper;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +68,7 @@ public class VoiceChatActivity extends BaseActivity {
     private static final long REFRESH_MS = 500L;
     private static final int REQUEST_VOICE_MIC = 0x7C02;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private boolean refreshing;
 
     private SwitchMaterial masterSwitch;
@@ -131,7 +133,10 @@ public class VoiceChatActivity extends BaseActivity {
         accent = pm.getAccentColor();
 
         View back = findViewById(R.id.voice_back);
-        if (back != null) back.setOnClickListener(v -> finish());
+        if (back != null) {
+            back.setOnClickListener(v -> finish());
+            TouchTargetHelper.expand(back);
+        }
 
         bindViews();
         buildTypeToggle();

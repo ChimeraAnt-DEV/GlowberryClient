@@ -1,5 +1,6 @@
 <LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="@dimen/space_6"
     android:background="@drawable/dialog_background_black_border"
@@ -43,7 +44,7 @@
             android:fontFamily="@font/misans"
             android:gravity="end"
             android:minWidth="54dp"
-            android:text="0%"
+            tools:text="0%"
             android:textColor="?attr/colorPrimary"
             android:textAppearance="@style/TextAppearance.Glowberry.Title"
             android:textStyle="bold" />

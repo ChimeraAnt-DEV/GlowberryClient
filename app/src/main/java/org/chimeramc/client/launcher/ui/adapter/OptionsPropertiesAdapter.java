@@ -17,6 +17,8 @@ import org.chimeramc.client.core.content.OptionsEditor.OptionProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 public class OptionsPropertiesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -34,13 +36,40 @@ public class OptionsPropertiesAdapter extends RecyclerView.Adapter<RecyclerView.
         this.listener = listener;
     }
 
+    /**
+     * Replaces the grouped list, animating only what changed.
+     *
+     * <p>A header and a property share one list, so the key carries the kind: a header by its title
+     * and a property by its key, prefixed so a category and a property of the same name cannot
+     * collide.
+     */
     public void setProperties(Map<String, List<OptionProperty>> grouped) {
-        items.clear();
+        List<Object> next = new ArrayList<>();
         for (Map.Entry<String, List<OptionProperty>> entry : grouped.entrySet()) {
-            items.add(new HeaderItem(entry.getKey()));
-            items.addAll(entry.getValue());
+            next.add(new HeaderItem(entry.getKey()));
+            next.addAll(entry.getValue());
         }
-        notifyDataSetChanged();
+        ListDiff.Result diff = ListDiff.compute(items, next,
+                OptionsPropertiesAdapter::keyOf,
+                OptionsPropertiesAdapter::sameContent);
+        items.clear();
+        items.addAll(next);
+        ListDiffDispatch.apply(this, diff);
+    }
+
+    private static Object keyOf(Object item) {
+        if (item instanceof HeaderItem) {
+            return "H:" + ((HeaderItem) item).title;
+        }
+        return "P:" + ((OptionProperty) item).getKey();
+    }
+
+    private static boolean sameContent(Object oldItem, Object freshItem) {
+        if (oldItem instanceof HeaderItem || freshItem instanceof HeaderItem) {
+            return oldItem instanceof HeaderItem && freshItem instanceof HeaderItem;
+        }
+        return java.util.Objects.equals(((OptionProperty) oldItem).getValue(),
+                ((OptionProperty) freshItem).getValue());
     }
 
     @Override

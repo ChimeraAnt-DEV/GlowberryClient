@@ -16,8 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.auth.MsftAccountStore;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 import org.chimeramc.client.util.AccountTextUtils;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +39,22 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.Accoun
         this.listener = listener;
     }
 
+    /**
+     * Replaces the list, animating only what changed. An account's identity is its id, so signing
+     * in a second account inserts one row and switching the active account changes two.
+     */
     public void updateAccounts(List<MsftAccountStore.MsftAccount> list) {
+        List<MsftAccountStore.MsftAccount> next = list != null ? list : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(accounts, next,
+                account -> account.id,
+                (old, fresh) -> old.active == fresh.active
+                        && java.util.Objects.equals(old.xboxGamertag, fresh.xboxGamertag)
+                        && java.util.Objects.equals(old.minecraftUsername, fresh.minecraftUsername)
+                        && java.util.Objects.equals(old.xboxAvatarUrl, fresh.xboxAvatarUrl)
+                        && old.lastUpdated == fresh.lastUpdated);
         accounts.clear();
-        if (list != null) accounts.addAll(list);
-        notifyDataSetChanged();
+        accounts.addAll(next);
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull
@@ -112,6 +127,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.Accoun
             activeBadge = itemView.findViewById(R.id.active_badge);
             btnUse = itemView.findViewById(R.id.btn_use);
             btnDelete = itemView.findViewById(R.id.btn_delete);
+            TouchTargetHelper.expand(btnDelete);
         }
     }
 }

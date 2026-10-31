@@ -21,6 +21,7 @@ import org.chimeramc.client.core.mods.inbuilt.vip.MenuBindRelay;
 import org.chimeramc.client.launcher.ui.views.KeyboardIllustrationView;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.ui.components.UiTokens;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ final class ModMenuKeyboardSection {
     private final Activity activity;
     private final FrameLayout host;
     private final int accent;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private KeyboardIllustrationView illustration;
     private LinearLayout keysRow;
@@ -144,6 +145,18 @@ final class ModMenuKeyboardSection {
                 value.setTextColor(accent);
             }
         }, KEY_CAPTURE_TIMEOUT_MS);
+    }
+
+    /**
+     * Cancels the pending key-capture timeout (item 183).
+     *
+     * <p>The timeout releases a capture that was armed and then abandoned. Left pending past the
+     * page switch it would run against a detached tree and reset a label the user can no longer see,
+     * and it holds the section (and its activity) alive for its full duration.
+     */
+    void onHidden() {
+        handler.removeCallbacksAndMessages(null);
+        MenuBindRelay.clear();
     }
 
     private List<KbmAction> actions() {

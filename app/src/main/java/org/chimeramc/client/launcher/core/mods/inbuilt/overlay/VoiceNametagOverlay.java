@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 
 import org.chimeramc.client.core.voice.VoiceChatModule;
 import org.chimeramc.client.core.voice.VoicePeer;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public final class VoiceNametagOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private WindowManager.LayoutParams wmParams;

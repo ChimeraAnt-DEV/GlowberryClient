@@ -37,7 +37,9 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:src="@drawable/ic_plugin"
-                app:tint="@color/accent_violet" />
+                app:tint="@color/accent_violet" 
+                android:importantForAccessibility="no"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -86,7 +88,9 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:src="@drawable/ic_nav_voice"
-                app:tint="@color/accent_sky" />
+                app:tint="@color/accent_sky" 
+                android:importantForAccessibility="no"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -135,7 +139,9 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:src="@drawable/ic_replay"
-                app:tint="@color/secondary" />
+                app:tint="@color/secondary" 
+                android:importantForAccessibility="no"
+                />
 
             <TextView
                 android:layout_width="wrap_content"

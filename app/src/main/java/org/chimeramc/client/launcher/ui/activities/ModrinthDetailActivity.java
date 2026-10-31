@@ -25,6 +25,7 @@ import org.chimeramc.client.settings.FeatureSettings;
 import org.chimeramc.client.util.LauncherStorage;
 import org.chimeramc.client.ui.adapter.ModrinthVersionAdapter;
 import org.chimeramc.client.launcher.core.minecraft.UserFacingError;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -61,7 +62,7 @@ public class ModrinthDetailActivity extends BaseActivity {
     private ContentImporter contentImporter;
     private OkHttpClient httpClient;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     // Owned so the download thread is torn down with the screen instead of posting a result
     // (or a failure dialog) to a destroyed Activity.
     private final ExecutorService worker = Executors.newSingleThreadExecutor();

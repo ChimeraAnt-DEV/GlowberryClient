@@ -1,0 +1,92 @@
+{
+  "es": {
+    "launch_failure_message_play_store": "Esta es una versión de Minecraft de Google Play, o una versión a la que le falta un archivo necesario para iniciar el juego.\\n\\nEl lanzador tiene que cargar la biblioteca nativa del juego directamente, y la versión de Play Store la mantiene dentro de la app instalada, donde este lanzador no puede acceder.\\n\\nPara jugar, importa un APK de Minecraft desde la Biblioteca. Una instalación de Play Store puede quedarse en tu dispositivo: no tienes que eliminarla.",
+    "launch_failure_message_game_files_missing": "Los archivos de juego de esta instancia faltan o están incompletos. Vuelve a importar la versión desde la Biblioteca, o ejecuta Reparar instalación en Ajustes \\u2192 Diagnóstico.",
+    "launch_failure_message_abi": "Esta versión de Minecraft solo incluye bibliotecas nativas de 32 bits, y GlowberryClient se ejecuta como app de 64 bits. Importa una compilación de 64 bits de esta versión.",
+    "launch_failure_message_stale_libs": "Las bibliotecas nativas extraídas son de una versión anterior del lanzador. Se volverán a extraer automáticamente en el próximo inicio. Si el juego sigue sin arrancar, ejecuta Reparar instalación en Ajustes \\u2192 Diagnóstico.",
+    "launch_failure_message_rules": "Aún no hay definiciones de enganche para esta compilación de Minecraft, así que las superposiciones y los cosméticos del juego están desactivados. El juego en sí funcionará con normalidad.",
+    "launch_failure_message_unexpected": "El lanzador no pudo iniciar la partida y la causa no es una que reconozca. No se cambió nada en tu dispositivo. Vuelve a abrir el lanzador e inténtalo de nuevo; si sigue ocurriendo, ejecuta Reparar instalación en Ajustes \\u2192 Diagnóstico.",
+    "launch_failure_message_not_installed": "Minecraft no parece estar instalado en este dispositivo. Importa un APK de Minecraft desde la Biblioteca: una instalación de Google Play no puede iniciarla este lanzador, porque el juego guarda su biblioteca nativa dentro de la app instalada, donde el lanzador no puede acceder."
+  },
+  "fr": {
+    "launch_failure_message_play_store": "Il s’agit soit d’une version Google Play de Minecraft, soit d’une version à laquelle il manque un fichier nécessaire au lancement du jeu.\\n\\nLe lanceur doit charger directement la bibliothèque native du jeu, et la version Play Store la garde à l’intérieur de l’application installée, où ce lanceur ne peut pas l’atteindre.\\n\\nPour jouer, importez un APK Minecraft depuis la Bibliothèque. Une installation Play Store peut rester sur votre appareil : vous n’avez pas à la supprimer.",
+    "launch_failure_message_game_files_missing": "Les fichiers de jeu de cette instance sont manquants ou incomplets. Réimportez la version depuis la Bibliothèque, ou lancez Réparer l’installation dans Paramètres \\u2192 Diagnostic.",
+    "launch_failure_message_abi": "Cette version de Minecraft ne fournit que des bibliothèques natives 32 bits, et GlowberryClient s’exécute en 64 bits. Importez plutôt une version 64 bits de cette version du jeu.",
+    "launch_failure_message_stale_libs": "Les bibliothèques natives extraites proviennent d’une version plus ancienne du lanceur. Elles seront réextraites automatiquement au prochain lancement. Si le jeu ne démarre toujours pas, lancez Réparer l’installation dans Paramètres \\u2192 Diagnostic.",
+    "launch_failure_message_rules": "Il n’existe pas encore de définitions de hooks pour cette version de Minecraft, donc les superpositions et les cosmétiques en jeu sont désactivés. Le jeu lui-même fonctionnera normalement.",
+    "launch_failure_message_unexpected": "Le lanceur n’a pas pu démarrer le jeu et la cause ne fait pas partie de celles qu’il reconnaît. Rien n’a été modifié sur votre appareil. Rouvrez le lanceur et réessayez ; si cela se reproduit, lancez Réparer l’installation dans Paramètres \\u2192 Diagnostic.",
+    "launch_failure_message_not_installed": "Minecraft ne semble pas installé sur cet appareil. Importez un APK Minecraft depuis la Bibliothèque : une installation Google Play ne peut pas être lancée par ce lanceur, car le jeu conserve sa bibliothèque native à l’intérieur de l’application installée, hors de portée du lanceur."
+  },
+  "hi": {
+    "launch_failure_message_play_store": "यह या तो Minecraft का Google Play संस्करण है, या ऐसा संस्करण जिसमें गेम शुरू करने के लिए ज़रूरी एक फ़ाइल नहीं है।\\n\\nलॉन्चर को गेम की नेटिव लाइब्रेरी सीधे लोड करनी होती है, और Play Store संस्करण उसे इंस्टॉल किए गए ऐप के अंदर रखता है, जहाँ यह लॉन्चर पहुँच नहीं सकता।\\n\\nखेलने के लिए लाइब्रेरी से Minecraft APK इंपोर्ट करें। Play Store इंस्टॉल आपके डिवाइस पर रह सकता है — उसे हटाना ज़रूरी नहीं है।",
+    "launch_failure_message_game_files_missing": "इस इंस्टेंस की गेम फ़ाइलें गायब या अधूरी हैं। लाइब्रेरी से संस्करण दोबारा इंपोर्ट करें, या सेटिंग्स \\u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।",
+    "launch_failure_message_abi": "Minecraft का यह संस्करण केवल 32-बिट नेटिव लाइब्रेरी देता है, और GlowberryClient 64-बिट ऐप के रूप में चलता है। इसके बजाय इस संस्करण का 64-बिट बिल्ड इंपोर्ट करें।",
+    "launch_failure_message_stale_libs": "निकाली गई नेटिव लाइब्रेरी लॉन्चर के पुराने संस्करण की हैं। अगले लॉन्च पर इन्हें अपने आप दोबारा निकाला जाएगा। अगर गेम फिर भी शुरू न हो, तो सेटिंग्स \\u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।",
+    "launch_failure_message_rules": "Minecraft के इस बिल्ड के लिए अभी कोई हुक परिभाषा नहीं है, इसलिए इन-गेम ओवरले और कॉस्मेटिक्स बंद हैं। गेम स्वयं सामान्य रूप से चलेगा।",
+    "launch_failure_message_unexpected": "लॉन्चर गेम शुरू नहीं कर सका और कारण उनमें से नहीं है जिन्हें वह पहचानता है। आपके डिवाइस पर कुछ नहीं बदला गया। लॉन्चर दोबारा खोलें और पुनः प्रयास करें; अगर ऐसा बार-बार हो, तो सेटिंग्स \\u2192 डायग्नोस्टिक्स में इंस्टॉल की मरम्मत करें चलाएँ।",
+    "launch_failure_message_not_installed": "इस डिवाइस पर Minecraft इंस्टॉल नहीं दिखता। लाइब्रेरी से Minecraft APK इंपोर्ट करें — Google Play इंस्टॉल को यह लॉन्चर शुरू नहीं कर सकता, क्योंकि गेम अपनी नेटिव लाइब्रेरी इंस्टॉल किए गए ऐप के अंदर रखता है, जहाँ लॉन्चर पहुँच नहीं सकता।"
+  },
+  "id": {
+    "launch_failure_message_play_store": "Ini adalah versi Minecraft dari Google Play, atau versi yang kehilangan file tertentu yang diperlukan untuk memulai game.\\n\\nPeluncur harus memuat pustaka native game secara langsung, dan versi Play Store menyimpannya di dalam aplikasi yang terpasang, tempat peluncur ini tidak dapat menjangkaunya.\\n\\nUntuk bermain, impor APK Minecraft dari Pustaka. Pemasangan dari Play Store boleh tetap ada di perangkat Anda — Anda tidak perlu menghapusnya.",
+    "launch_failure_message_game_files_missing": "File game instans ini hilang atau tidak lengkap. Impor ulang versinya dari Pustaka, atau jalankan Perbaiki pemasangan di Pengaturan \\u2192 Diagnostik.",
+    "launch_failure_message_abi": "Versi Minecraft ini hanya menyertakan pustaka native 32-bit, sedangkan GlowberryClient berjalan sebagai aplikasi 64-bit. Impor build 64-bit dari versi ini sebagai gantinya.",
+    "launch_failure_message_stale_libs": "Pustaka native yang diekstrak berasal dari versi peluncur yang lebih lama. Pustaka itu akan diekstrak ulang secara otomatis pada peluncuran berikutnya. Jika game tetap gagal dimulai, jalankan Perbaiki pemasangan di Pengaturan \\u2192 Diagnostik.",
+    "launch_failure_message_rules": "Belum ada definisi hook untuk build Minecraft ini, jadi overlay dan kosmetik dalam game dinonaktifkan. Gamenya sendiri akan berjalan normal.",
+    "launch_failure_message_unexpected": "Peluncur tidak dapat memulai game dan penyebabnya bukan salah satu yang dikenali. Tidak ada yang diubah di perangkat Anda. Buka kembali peluncur dan coba lagi; jika terus terjadi, jalankan Perbaiki pemasangan di Pengaturan \\u2192 Diagnostik.",
+    "launch_failure_message_not_installed": "Minecraft tampaknya tidak terpasang di perangkat ini. Impor APK Minecraft dari Pustaka — pemasangan dari Google Play tidak dapat diluncurkan peluncur ini, karena game menyimpan pustaka nativenya di dalam aplikasi yang terpasang, tempat peluncur tidak dapat menjangkaunya."
+  },
+  "ja": {
+    "launch_failure_message_play_store": "これは Google Play 版の Minecraft か、ゲームの起動に必要なファイルが欠けているバージョンです。\\n\\nランチャーはゲームのネイティブライブラリを直接読み込む必要がありますが、Play ストア版はそれをインストール済みアプリの内部に保持しており、このランチャーからはアクセスできません。\\n\\nプレイするには、ライブラリから Minecraft の APK を読み込んでください。Play ストア版は端末に残したままでかまいません。削除する必要はありません。",
+    "launch_failure_message_game_files_missing": "このインスタンスのゲームファイルが欠けているか不完全です。ライブラリからバージョンを読み込み直すか、設定 \\u2192 診断 で「インストールを修復」を実行してください。",
+    "launch_failure_message_abi": "この Minecraft のバージョンは 32 ビットのネイティブライブラリしか含んでおらず、GlowberryClient は 64 ビットアプリとして動作します。代わりにこのバージョンの 64 ビットビルドを読み込んでください。",
+    "launch_failure_message_stale_libs": "展開されたネイティブライブラリが古いバージョンのランチャーのものです。次回の起動時に自動で展開し直されます。それでもゲームが起動しない場合は、設定 \\u2192 診断 で「インストールを修復」を実行してください。",
+    "launch_failure_message_rules": "この Minecraft ビルド用のフック定義がまだないため、ゲーム内オーバーレイとコスメティックは無効です。ゲーム自体は通常どおり動作します。",
+    "launch_failure_message_unexpected": "ランチャーがゲームを起動できず、原因はランチャーが認識するものではありませんでした。端末上の何も変更されていません。ランチャーを開き直して再試行してください。繰り返す場合は、設定 \\u2192 診断 で「インストールを修復」を実行してください。",
+    "launch_failure_message_not_installed": "この端末に Minecraft がインストールされていないようです。ライブラリから Minecraft の APK を読み込んでください。Google Play 版はこのランチャーでは起動できません。ゲームがネイティブライブラリをインストール済みアプリの内部に保持しており、ランチャーからアクセスできないためです。"
+  },
+  "pt": {
+    "launch_failure_message_play_store": "Esta é uma versão do Minecraft da Google Play, ou uma versão sem um arquivo necessário para iniciar o jogo.\\n\\nO iniciador precisa carregar a biblioteca nativa do jogo diretamente, e a versão da Play Store a mantém dentro do app instalado, onde este iniciador não consegue alcançar.\\n\\nPara jogar, importe um APK do Minecraft pela Biblioteca. Uma instalação da Play Store pode continuar no seu dispositivo — você não precisa removê-la.",
+    "launch_failure_message_game_files_missing": "Os arquivos de jogo desta instância estão ausentes ou incompletos. Importe a versão novamente pela Biblioteca, ou execute Reparar instalação em Configurações \\u2192 Diagnóstico.",
+    "launch_failure_message_abi": "Esta versão do Minecraft traz apenas bibliotecas nativas de 32 bits, e o GlowberryClient roda como app de 64 bits. Importe uma compilação de 64 bits desta versão.",
+    "launch_failure_message_stale_libs": "As bibliotecas nativas extraídas são de uma versão mais antiga do iniciador. Elas serão extraídas novamente de forma automática no próximo início. Se o jogo ainda não iniciar, execute Reparar instalação em Configurações \\u2192 Diagnóstico.",
+    "launch_failure_message_rules": "Ainda não há definições de hook para esta compilação do Minecraft, então as sobreposições e os cosméticos no jogo ficam desativados. O jogo em si funciona normalmente.",
+    "launch_failure_message_unexpected": "O iniciador não conseguiu começar o jogo e a causa não é uma que ele reconheça. Nada foi alterado no seu dispositivo. Abra o iniciador de novo e tente outra vez; se continuar acontecendo, execute Reparar instalação em Configurações \\u2192 Diagnóstico.",
+    "launch_failure_message_not_installed": "O Minecraft não parece estar instalado neste dispositivo. Importe um APK do Minecraft pela Biblioteca — uma instalação da Google Play não pode ser iniciada por este iniciador, porque o jogo mantém sua biblioteca nativa dentro do app instalado, onde o iniciador não consegue alcançar."
+  },
+  "ru": {
+    "launch_failure_message_play_store": "Это либо версия Minecraft из Google Play, либо версия, в которой отсутствует нужный для запуска игры файл.\\n\\nЛаунчер должен загрузить нативную библиотеку игры напрямую, а версия из Play Store держит её внутри установленного приложения, куда лаунчер не может попасть.\\n\\nЧтобы играть, импортируйте APK Minecraft из Библиотеки. Установку из Play Store можно оставить на устройстве — удалять её не нужно.",
+    "launch_failure_message_game_files_missing": "Файлы игры этого экземпляра отсутствуют или неполны. Импортируйте версию заново из Библиотеки или запустите «Восстановить установку» в Настройки \\u2192 Диагностика.",
+    "launch_failure_message_abi": "Эта версия Minecraft содержит только 32-битные нативные библиотеки, а GlowberryClient работает как 64-битное приложение. Импортируйте 64-битную сборку этой версии.",
+    "launch_failure_message_stale_libs": "Извлечённые нативные библиотеки относятся к более старой версии лаунчера. При следующем запуске они будут извлечены заново автоматически. Если игра всё равно не запускается, выполните «Восстановить установку» в Настройки \\u2192 Диагностика.",
+    "launch_failure_message_rules": "Для этой сборки Minecraft пока нет определений хуков, поэтому внутриигровые оверлеи и косметика отключены. Сама игра будет работать как обычно.",
+    "launch_failure_message_unexpected": "Лаунчер не смог начать запуск игры, и причина не входит в те, которые он распознаёт. На устройстве ничего не изменено. Откройте лаунчер заново и попробуйте ещё раз; если это повторяется, выполните «Восстановить установку» в Настройки \\u2192 Диагностика.",
+    "launch_failure_message_not_installed": "Похоже, Minecraft не установлен на этом устройстве. Импортируйте APK Minecraft из Библиотеки — установку из Google Play этот лаунчер запустить не может, потому что игра хранит свою нативную библиотеку внутри установленного приложения, куда лаунчер не может попасть."
+  },
+  "tr": {
+    "launch_failure_message_play_store": "Bu ya Google Play sürümü bir Minecraft ya da oyunu başlatmak için gereken bir dosyası eksik bir sürüm.\\n\\nBaşlatıcı, oyunun yerel kitaplığını doğrudan yüklemek zorunda, ancak Play Store sürümü onu yüklü uygulamanın içinde tutar ve bu başlatıcı oraya erişemez.\\n\\nOynamak için Kitaplık’tan bir Minecraft APK’sı içe aktarın. Play Store kurulumu cihazınızda kalabilir — kaldırmanız gerekmez.",
+    "launch_failure_message_game_files_missing": "Bu örneğin oyun dosyaları eksik veya tamamlanmamış. Sürümü Kitaplık’tan yeniden içe aktarın ya da Ayarlar \\u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.",
+    "launch_failure_message_abi": "Bu Minecraft sürümü yalnızca 32 bit yerel kitaplıklar içeriyor ve GlowberryClient 64 bit uygulama olarak çalışıyor. Bunun yerine bu sürümün 64 bit derlemesini içe aktarın.",
+    "launch_failure_message_stale_libs": "Çıkarılan yerel kitaplıklar başlatıcının daha eski bir sürümüne ait. Bir sonraki başlatmada otomatik olarak yeniden çıkarılacaklar. Oyun yine başlamazsa Ayarlar \\u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.",
+    "launch_failure_message_rules": "Bu Minecraft derlemesi için henüz kanca tanımı yok, bu yüzden oyun içi katmanlar ve kozmetikler kapalı. Oyunun kendisi normal çalışacak.",
+    "launch_failure_message_unexpected": "Başlatıcı oyunu başlatamadı ve neden, tanıdığı nedenlerden biri değil. Cihazınızda hiçbir şey değiştirilmedi. Başlatıcıyı yeniden açıp tekrar deneyin; sürerse Ayarlar \\u2192 Tanılama içinde Kurulumu onar seçeneğini çalıştırın.",
+    "launch_failure_message_not_installed": "Minecraft bu cihazda yüklü görünmüyor. Kitaplık’tan bir Minecraft APK’sı içe aktarın — Google Play kurulumu bu başlatıcıyla başlatılamaz, çünkü oyun yerel kitaplığını yüklü uygulamanın içinde tutar ve başlatıcı oraya erişemez."
+  },
+  "vi": {
+    "launch_failure_message_play_store": "Đây là bản Minecraft từ Google Play, hoặc một phiên bản thiếu tệp cần thiết để khởi chạy trò chơi.\\n\\nTrình khởi chạy phải tải trực tiếp thư viện gốc của trò chơi, còn bản Play Store giữ nó bên trong ứng dụng đã cài, nơi trình khởi chạy này không thể truy cập.\\n\\nĐể chơi, hãy nhập APK Minecraft từ Thư viện. Bản cài từ Play Store có thể vẫn nằm trên thiết bị — bạn không cần gỡ nó.",
+    "launch_failure_message_game_files_missing": "Tệp trò chơi của bản cài này bị thiếu hoặc chưa đầy đủ. Hãy nhập lại phiên bản từ Thư viện, hoặc chạy Sửa bản cài trong Cài đặt \\u2192 Chẩn đoán.",
+    "launch_failure_message_abi": "Phiên bản Minecraft này chỉ có thư viện gốc 32-bit, còn GlowberryClient chạy dưới dạng ứng dụng 64-bit. Hãy nhập bản dựng 64-bit của phiên bản này.",
+    "launch_failure_message_stale_libs": "Thư viện gốc đã giải nén thuộc phiên bản trình khởi chạy cũ hơn. Chúng sẽ được giải nén lại tự động ở lần khởi chạy tới. Nếu trò chơi vẫn không khởi động, hãy chạy Sửa bản cài trong Cài đặt \\u2192 Chẩn đoán.",
+    "launch_failure_message_rules": "Chưa có định nghĩa hook cho bản dựng Minecraft này, nên lớp phủ và trang phục trong trò chơi bị tắt. Bản thân trò chơi vẫn chạy bình thường.",
+    "launch_failure_message_unexpected": "Trình khởi chạy không thể bắt đầu trò chơi và nguyên nhân không thuộc những gì nó nhận ra. Không có gì trên thiết bị của bạn bị thay đổi. Hãy mở lại trình khởi chạy và thử lại; nếu vẫn tiếp diễn, hãy chạy Sửa bản cài trong Cài đặt \\u2192 Chẩn đoán.",
+    "launch_failure_message_not_installed": "Có vẻ như Minecraft chưa được cài trên thiết bị này. Hãy nhập APK Minecraft từ Thư viện — bản cài từ Google Play không thể được trình khởi chạy này khởi chạy, vì trò chơi giữ thư viện gốc bên trong ứng dụng đã cài, nơi trình khởi chạy không thể truy cập."
+  },
+  "zh-rCN": {
+    "launch_failure_message_play_store": "这可能是 Google Play 版本的 Minecraft，也可能是缺少启动游戏所需文件的版本。\\n\\n启动器必须直接加载游戏的本机库，而 Play 商店版本将它保留在已安装的应用内部，启动器无法访问。\\n\\n如需游玩，请从资源库导入 Minecraft APK。Play 商店安装可以保留在设备上——你无需卸载它。",
+    "launch_failure_message_game_files_missing": "此实例的游戏文件缺失或不完整。请从资源库重新导入该版本，或在“设置 \\u2192 诊断”中运行“修复安装”。",
+    "launch_failure_message_abi": "此 Minecraft 版本只包含 32 位本机库，而 GlowberryClient 以 64 位应用运行。请改为导入该版本的 64 位构建。",
+    "launch_failure_message_stale_libs": "已解压的本机库来自较旧的启动器版本。它们会在下次启动时自动重新解压。如果游戏仍无法启动，请在“设置 \\u2192 诊断”中运行“修复安装”。",
+    "launch_failure_message_rules": "此 Minecraft 构建尚无钩子定义，因此游戏内叠加层和装饰已禁用。游戏本身仍可正常运行。",
+    "launch_failure_message_unexpected": "启动器无法开始启动游戏，且原因不在它能识别的范围内。你的设备上没有任何改动。请重新打开启动器再试；若问题持续，请在“设置 \\u2192 诊断”中运行“修复安装”。",
+    "launch_failure_message_not_installed": "此设备上似乎未安装 Minecraft。请从资源库导入 Minecraft APK——Google Play 安装无法由此启动器启动，因为游戏将本机库保留在已安装的应用内部，启动器无法访问。"
+  }
+}

@@ -53,6 +53,15 @@ public final class MsftAuthManager {
     private static final String TAG = "MsftAuthManager";
     private static final String GAME_VERSION = "1.21.110";
     private static final long MIN_DEVICE_POLL_INTERVAL_MS = 1000L;
+    /**
+     * How often a wait re-checks the cancel flag.
+     *
+     * <p>The poll interval is minutes long, so a wait that only ended at its deadline would keep
+     * the sign-in "in progress" long after the user backed out. The thread is also interrupted by
+     * {@code Future.cancel(true)}, which ends the sleep immediately; this bound covers the paths
+     * that cancel by flag alone.
+     */
+    private static final long CANCEL_CHECK_INTERVAL_MS = 100L;
     private static final long SLOW_DOWN_INCREMENT_MS = 5000L;
     private static final long MAX_TRANSIENT_RETRY_DELAY_MS = 10000L;
     private static final int ACCOUNT_NETWORK_RETRY_COUNT = 4;
@@ -103,7 +112,7 @@ public final class MsftAuthManager {
 
     public static BedrockAuthManager loginWithDeviceCode(
             Consumer<MsaDeviceCode> codeConsumer,
-            BooleanSupplier cancelled,
+            Cancellation cancelled,
             Consumer<DeviceCodeState> stateConsumer
     ) throws Exception {
         HttpClient httpClient = createHttpClient();
@@ -212,7 +221,7 @@ public final class MsftAuthManager {
     public static MsftAccountStore.MsftAccount saveAccountAndActivateWithRetry(
             Context context,
             BedrockAuthManager authManager,
-            BooleanSupplier cancelled,
+            Cancellation cancelled,
             Runnable retryCallback
     ) throws Exception {
         return executeWithNetworkRetry(
@@ -368,7 +377,7 @@ public final class MsftAuthManager {
 
     private static <T> T executeWithNetworkRetry(
             ThrowingSupplier<T> supplier,
-            BooleanSupplier cancelled,
+            Cancellation cancelled,
             Runnable retryCallback,
             int maxAttempts
     ) throws Exception {
@@ -471,24 +480,33 @@ public final class MsftAuthManager {
         return requestError != null ? requestError : current != null ? current : throwable;
     }
 
-    private static void ensureNotCancelled(BooleanSupplier cancelled) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted() || (cancelled != null && cancelled.getAsBoolean())) {
+    private static void ensureNotCancelled(Cancellation cancelled) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted() || (cancelled != null && cancelled.isCancelled())) {
             throw new InterruptedException("Microsoft sign-in was cancelled.");
         }
     }
 
-    private static void sleepWithCancellation(long delayMs, BooleanSupplier cancelled) throws InterruptedException {
+    private static void sleepWithCancellation(long delayMs, Cancellation cancelled) throws InterruptedException {
         sleepUntil(SystemClock.elapsedRealtime() + Math.max(0L, delayMs), cancelled);
     }
 
-    private static void sleepUntil(long targetTimeMs, BooleanSupplier cancelled) throws InterruptedException {
+    /**
+     * Waits out a deadline while staying cancellable.
+     *
+     * <p>A signalling {@link Cancellation} wakes the wait the moment the user backs out; one that
+     * only carries a predicate still falls back to {@link #CANCEL_CHECK_INTERVAL_MS}, so the bound
+     * is a floor rather than the mechanism. The interrupt check is first and is what makes
+     * {@code Future.cancel(true)} take effect immediately.
+     */
+    private static void sleepUntil(long targetTimeMs, Cancellation cancelled) throws InterruptedException {
+        Cancellation wait = cancelled == null ? Cancellation.none() : cancelled;
         while (true) {
             ensureNotCancelled(cancelled);
             long remaining = targetTimeMs - SystemClock.elapsedRealtime();
             if (remaining <= 0L) {
                 return;
             }
-            Thread.sleep(Math.min(remaining, 250L));
+            wait.awaitSignal(Math.min(remaining, CANCEL_CHECK_INTERVAL_MS));
         }
     }
 }

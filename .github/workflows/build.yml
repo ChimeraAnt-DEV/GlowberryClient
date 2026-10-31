@@ -50,6 +50,11 @@ jobs:
       - name: Grant execute permission to Gradle wrapper
         run: chmod +x ./gradlew
 
+      - name: Run unit tests
+        # The resource, translation and accessibility gates live in the unit tests, so a pull
+        # request that breaks one has to fail here rather than at review time.
+        run: ./gradlew testDebugUnitTest
+
       - name: Build debug APK
         run: ./gradlew assembleDebug
 

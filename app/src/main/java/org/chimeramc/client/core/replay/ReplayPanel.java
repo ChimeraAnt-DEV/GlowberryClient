@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.ui.animation.DynamicAnim;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,9 +60,7 @@ public final class ReplayPanel {
     private final boolean compact;
     private final ReplayClipRepository repository;
     private final ExecutorService io = Executors.newSingleThreadExecutor(r -> {
-        Thread thread = new Thread(r, "replay-panel-io");
-        thread.setDaemon(true);
-        return thread;
+        return AppExecutors.thread("replay-panel-io", r);
     });
 
     private final LinearLayout root;
@@ -98,7 +98,7 @@ public final class ReplayPanel {
     private TextView hintView;
     private ReplayPlayerView playerView;
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private final ReplayManager.Listener stateListener = new ReplayManager.Listener() {
         @Override
         public void onReplayStateChanged(ReplayManager.State state, long elapsed,

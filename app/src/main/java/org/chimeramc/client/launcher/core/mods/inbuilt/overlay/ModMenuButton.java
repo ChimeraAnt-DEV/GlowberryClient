@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.preloader.PreloaderInput;
+import org.chimeramc.client.util.MainThread;
 
 public class ModMenuButton {
 
@@ -25,7 +26,12 @@ public class ModMenuButton {
     private View buttonView;
     private WindowManager windowManager;
     private WindowManager.LayoutParams wmParams;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
+
+    // The button attaches 500ms after show() so the game window is up. A hide in that window used to
+    // be a no-op (isShowing was still false) and the button appeared afterwards with nothing
+    // tracking it.
+    private final OverlayShowGate showGate = new OverlayShowGate();
     private boolean isShowing = false;
     
     private float initialX, initialY, initialTouchX, initialTouchY;
@@ -46,7 +52,11 @@ public class ModMenuButton {
     
     public void show(int startX, int startY) {
         if (isShowing) return;
-        handler.postDelayed(() -> showInternal(startX, startY), 500);
+        long token = showGate.begin();
+        handler.postDelayed(() -> {
+            if (!showGate.isCurrent(token)) return;
+            showInternal(startX, startY);
+        }, 500);
     }
     
     private void showInternal(int startX, int startY) {
@@ -238,6 +248,9 @@ public class ModMenuButton {
     }
     
     public void hide() {
+        // Invalidated before the isShowing check so a hide during the attach delay still wins.
+        showGate.invalidate();
+        handler.removeCallbacksAndMessages(null);
         if (menuOverlay != null) {
             menuOverlay.hide();
             menuOverlay = null;
@@ -315,28 +328,34 @@ public class ModMenuButton {
                     .RadialMenuOverlay.Destinations() {
                 @Override
                 public void openMods() {
-                    openMenuSection(
-                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuPage.GENERAL);
+                    openMenuFiltered(
+                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuOverlay
+                                    .ModuleFilter.ALL);
                 }
 
                 @Override
-                public void openCloset() {
-                    openMenuSection(
-                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuPage.COSMETICS);
+                public void openHud() {
+                    // The HUD sector is a filter over the one module list, so it lands on the same
+                    // rows the HUD chip shows rather than a second, hand-built list.
+                    openMenuFiltered(
+                            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuOverlay
+                                    .ModuleFilter.HUD);
+                }
+
+                @Override
+                public void openCustomize() {
+                    new org.chimeramc.client.core.mods.inbuilt.overlay.CustomizeChooser(
+                            activity,
+                            () -> openMenuSection(org.chimeramc.client.core.mods.inbuilt.overlay
+                                    .ModMenuPage.SETTINGS),
+                            () -> openMenuSection(org.chimeramc.client.core.mods.inbuilt.overlay
+                                    .ModMenuPage.COSMETICS)).show();
                 }
 
                 @Override
                 public void openSettings() {
                     openMenuSection(
                             org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuPage.SETTINGS);
-                }
-
-                @Override
-                public void openHudEditor() {
-                    InbuiltOverlayManager manager = InbuiltOverlayManager.getInstance();
-                    if (manager != null) {
-                        manager.setMoreButtonsEditorOpen(true);
-                    }
                 }
             });
         }
@@ -355,6 +374,22 @@ public class ModMenuButton {
             menuOverlay.setCallback(new ModMenuCallback());
         }
         menuOverlay.showPage(page);
+    }
+
+    /**
+     * Opens the one Mod Menu's module list already filtered to a section.
+     *
+     * <p>The wheel's MODS and HUD sectors route here, so the wheel lands on the same filtered rows
+     * the filter chip shows. The menu is created lazily and the filter is applied on the first
+     * frame, so a cold open and an already-open menu behave identically.
+     */
+    private void openMenuFiltered(
+            org.chimeramc.client.core.mods.inbuilt.overlay.ModMenuOverlay.ModuleFilter filter) {
+        if (menuOverlay == null) {
+            menuOverlay = new ModMenuOverlay(activity);
+            menuOverlay.setCallback(new ModMenuCallback());
+        }
+        menuOverlay.showModulesFiltered(filter);
     }
 
     /** The callback the overlay calls back into, kept in one place so both paths share it. */

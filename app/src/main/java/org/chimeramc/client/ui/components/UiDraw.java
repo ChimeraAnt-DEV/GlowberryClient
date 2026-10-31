@@ -62,42 +62,37 @@ public final class UiDraw {
      */
     public static void pointerCursor(Canvas canvas, Paint shadowFill, Paint arrowFill,
                                      float x, float y, float density) {
-        float s = 7f * density;      // arrow width
-        float h = 10f * density;     // arrow height
-        // Standard pointer silhouette: tip, then a right edge that steps down into the tail, with a
-        // notch on the bottom edge before the tail's lower-right corner.
+        // The silhouette is the macOS-style pointer from PointerCursorGeometry: a slender blade with
+        // the tip as the hotspot and a stepped tail. Coordinates come from the pure class so the
+        // shape is unit-testable and a click lands exactly on the point.
+        float h = 13f * density;
+        float[] pts = PointerCursorGeometry.points(x, y, h);
+
         Path shape = new Path();
-        shape.moveTo(x, y);
-        shape.lineTo(x + s * 0.55f, y + h * 0.55f);
-        shape.lineTo(x + s * 0.22f, y + h * 0.55f);
-        shape.lineTo(x + s * 0.22f, y + h);
-        shape.lineTo(x - s * 0.1f, y + h * 0.75f);
-        shape.lineTo(x - s * 0.1f, y + h * 0.55f);
-        shape.lineTo(x - s * 0.32f, y + h * 0.78f);
-        shape.lineTo(x - s * 0.68f, y + h * 0.40f);
-        // Close the shape back to the tip via the upper-left side.
-        shape.lineTo(x - s * 0.35f, y + s * 0.30f);
+        shape.moveTo(pts[0], pts[1]);
+        for (int i = 2; i < pts.length; i += 2) {
+            shape.lineTo(pts[i], pts[i + 1]);
+        }
         shape.close();
 
-        // Shadow: a 1dp offset copy in black at 18% alpha, blurred by the caller (we do not paint a
-        // shadow layer here; the caller's paint can carry one as a small convenience, but a plain
-        // offset fill reads cleaner and costs nothing).
+        // A soft offset shadow so the pointer reads on a bright world frame, without a blur layer.
         shadowFill.reset();
         shadowFill.setAntiAlias(true);
-        shadowFill.setColor(0x2E000000);
+        shadowFill.setColor(0x38000000);
         canvas.save();
-        canvas.translate(0.8f * density, 1.1f * density);
+        canvas.translate(0.9f * density, 1.2f * density);
         canvas.drawPath(shape, shadowFill);
         canvas.restore();
 
-        // Arrow body: near-white fill with a 1dp dark outline so it reads on any backdrop.
+        // Near-white body with a 1dp dark outline, the classic readable pointer.
         arrowFill.reset();
         arrowFill.setAntiAlias(true);
         arrowFill.setStyle(Paint.Style.FILL);
-        arrowFill.setColor(0xFFFAFAFA);
+        arrowFill.setColor(0xFFFCFCFD);
         canvas.drawPath(shape, arrowFill);
         arrowFill.setStyle(Paint.Style.STROKE);
-        arrowFill.setStrokeWidth(Math.max(1f, 0.75f * density));
+        arrowFill.setStrokeWidth(Math.max(1f, 0.8f * density));
+        arrowFill.setStrokeJoin(Paint.Join.ROUND);
         arrowFill.setColor(0xB3000000);
         canvas.drawPath(shape, arrowFill);
     }

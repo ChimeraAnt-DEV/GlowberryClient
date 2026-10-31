@@ -10,7 +10,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.chimeramc.client.R;
@@ -66,16 +68,23 @@ final class ReplayCinematicDialog {
         Runnable refresh = () -> count.setText(activity.getString(
                 R.string.replay_cinematic_keyframes, holder[0].size()));
 
-        // One row per preset. A preset regenerates the whole shot, which is what "a preset shot"
-        // means; the count updates so the user sees the path was replaced, not appended to.
-        addPresetRow(activity, style, root, R.string.replay_cinematic_preset_orbit,
-                ReplayCameraPath.Preset.ORBIT, holder, camera, durationMs, refresh);
-        addPresetRow(activity, style, root, R.string.replay_cinematic_preset_dolly,
-                ReplayCameraPath.Preset.DOLLY_ZOOM, holder, camera, durationMs, refresh);
-        addPresetRow(activity, style, root, R.string.replay_cinematic_preset_drone,
-                ReplayCameraPath.Preset.DRONE, holder, camera, durationMs, refresh);
-        addPresetRow(activity, style, root, R.string.replay_cinematic_preset_crane,
-                ReplayCameraPath.Preset.CRANE, holder, camera, durationMs, refresh);
+        // Every preset is listed, one row each. A preset regenerates the whole shot, which is what
+        // "a preset shot" means; the count updates so the user sees the path was replaced, not
+        // appended to. The list is long (dozens of shots), so it scrolls inside a fixed height.
+        ScrollView presetScroll = new ScrollView(activity);
+        presetScroll.setVerticalScrollBarEnabled(true);
+        LinearLayout presetList = new LinearLayout(activity);
+        presetList.setOrientation(LinearLayout.VERTICAL);
+        presetScroll.addView(presetList, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        for (ReplayCameraPath.Preset preset : ReplayCameraPath.Preset.values()) {
+            addPresetRow(activity, style, presetList, presetLabelRes(preset), preset, holder, camera,
+                    durationMs, refresh);
+        }
+        LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(activity, 260));
+        scrollParams.topMargin = dp(activity, 8);
+        root.addView(presetScroll, scrollParams);
 
         LinearLayout buttons = new LinearLayout(activity);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
@@ -150,6 +159,37 @@ final class ReplayCinematicDialog {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = dp(activity, 6);
         root.addView(row, params);
+    }
+
+    /** The display name of a preset. Every preset must have a label; a test pins the coverage. */
+    static int presetLabelRes(ReplayCameraPath.Preset preset) {
+        switch (preset) {
+            case ORBIT: return R.string.replay_cinematic_preset_orbit;
+            case ORBIT_LOW: return R.string.replay_cinematic_preset_orbit_low;
+            case ORBIT_HIGH: return R.string.replay_cinematic_preset_orbit_high;
+            case ARC: return R.string.replay_cinematic_preset_arc;
+            case DOLLY_ORBIT: return R.string.replay_cinematic_preset_dolly_orbit;
+            case DOLLY_ZOOM: return R.string.replay_cinematic_preset_dolly;
+            case PUSH_IN: return R.string.replay_cinematic_preset_push_in;
+            case PULL_OUT: return R.string.replay_cinematic_preset_pull_out;
+            case REVEAL: return R.string.replay_cinematic_preset_reveal;
+            case TRUCK_LEFT: return R.string.replay_cinematic_preset_truck_left;
+            case TRUCK_RIGHT: return R.string.replay_cinematic_preset_truck_right;
+            case PEDESTAL_UP: return R.string.replay_cinematic_preset_pedestal_up;
+            case SWEEP: return R.string.replay_cinematic_preset_sweep;
+            case FLY_BY: return R.string.replay_cinematic_preset_fly_by;
+            case TILT_UP: return R.string.replay_cinematic_preset_tilt_up;
+            case TILT_DOWN: return R.string.replay_cinematic_preset_tilt_down;
+            case TOPDOWN: return R.string.replay_cinematic_preset_topdown;
+            case DRONE: return R.string.replay_cinematic_preset_drone;
+            case CRANE: return R.string.replay_cinematic_preset_crane;
+            case FLYOVER: return R.string.replay_cinematic_preset_flyover;
+            case SPIRAL: return R.string.replay_cinematic_preset_spiral;
+            case HELIX: return R.string.replay_cinematic_preset_helix;
+            case CHASE: return R.string.replay_cinematic_preset_chase;
+            case STATIC:
+            default: return R.string.replay_cinematic_preset_static;
+        }
     }
 
     private static TextView sheetButton(Activity activity, ReplayStyle style, int labelRes,

@@ -58,6 +58,9 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.TouchTargetHelper;
+import org.chimeramc.client.util.AppExecutors;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -432,8 +435,8 @@ public class SettingsActivity extends BaseActivity {
             fs.setCrashUploadEnabled(checked);
             if (checked && crashUploadConfigured) {
                 Toast.makeText(this, R.string.crash_upload_sending, Toast.LENGTH_SHORT).show();
-                new Thread(() -> CrashReportUploader.uploadPending(getApplicationContext()),
-                        "crash-report-upload").start();
+                AppExecutors.run(AppExecutors.Kind.NETWORK, "crash-report-upload", () ->
+                        CrashReportUploader.uploadPending(getApplicationContext()));
             }
         });
         View crashUploadUnavailable = findViewById(R.id.crash_upload_unavailable);
@@ -454,10 +457,6 @@ public class SettingsActivity extends BaseActivity {
             // loaded profile must be rebuilt for the change to apply without a restart.
             org.chimeramc.client.launcher.controller.ControllerInputProcessor.reload(this);
         });
-
-        SwitchMaterial switchGxCore = findViewById(R.id.switch_gxcore);
-        switchGxCore.setChecked(fs.isGxCoreEnabled());
-        switchGxCore.setOnCheckedChangeListener((btn, checked) -> fs.setGxCoreEnabled(checked));
 
         SwitchMaterial switchReduceNetworkLatency = findViewById(R.id.switch_reduce_network_latency);
         switchReduceNetworkLatency.setChecked(fs.isReduceNetworkLatencyEnabled());
@@ -1409,6 +1408,10 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void setupAboutSection() {
+        // 28dp brand icons. Enlarging the drawable would move them off the row's baseline, so the
+        // touch area grows instead.
+        TouchTargetHelper.expand(findViewById(R.id.settings_btn_github));
+        TouchTargetHelper.expand(findViewById(R.id.settings_btn_discord));
         findViewById(R.id.settings_btn_github).setOnClickListener(v ->
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ChimeraAnt-DEV/GlowberryClient"))));
 
@@ -1502,7 +1505,7 @@ public class SettingsActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Opening the Easter-egg link failed", e);
         }
     }
 

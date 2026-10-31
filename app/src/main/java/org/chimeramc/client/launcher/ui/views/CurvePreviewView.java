@@ -32,6 +32,10 @@ public class CurvePreviewView extends View {
     private ControllerProfile profile;
     private int accentColor = 0xFF4CC2FF;
 
+    // The response is a pure function of the profile, and this view only redraws when the profile
+    // or the accent changes, so it is rebuilt on setProfile rather than on every draw (item 17).
+    private ControllerResponse response;
+
     public CurvePreviewView(Context context) {
         super(context);
         init();
@@ -72,6 +76,7 @@ public class CurvePreviewView extends View {
 
     public void setProfile(ControllerProfile profile) {
         this.profile = profile;
+        this.response = profile == null ? null : new ControllerResponse(profile, false);
         invalidate();
     }
 
@@ -113,12 +118,14 @@ public class CurvePreviewView extends View {
         }
         canvas.drawRect(left, top, right, bottom, axisPaint);
 
-        ControllerResponse response = new ControllerResponse(profile, false);
         // Paint the output curve over the full travel. Dead-zone flattening and sensitivity
         // clamping are part of the response, so plotting through it shows the real result
         // rather than the raw curve shape.
-        drawCurve(canvas, response, true, left, top, right, bottom, leftPaint);
-        drawCurve(canvas, response, false, left, top, right, bottom, rightPaint);
+        ControllerResponse active = response;
+        if (active != null) {
+            drawCurve(canvas, active, true, left, top, right, bottom, leftPaint);
+            drawCurve(canvas, active, false, left, top, right, bottom, rightPaint);
+        }
     }
 
     private void drawCurve(Canvas canvas, ControllerResponse response, boolean isLeft,

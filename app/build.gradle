@@ -116,11 +116,7 @@ android {
 
     buildFeatures {
         viewBinding true
-    }
-    buildFeatures {
         prefab true
-    }
-    buildFeatures {
         buildConfig true
     }
     sourceSets {
@@ -130,10 +126,16 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            // R8 shrinks and obfuscates the release build. JNI-bound classes are kept by
+            // proguard-rules.pro; JniBindingParityTest runs against the minified build in CI so a
+            // stripped native binding fails the build rather than the app at runtime.
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             ndk {
-                debugSymbolLevel 'FULL'
+                // Only the symbol table ships; full debug info goes out as a separate symbol file
+                // for crash decoding instead of into every APK.
+                debugSymbolLevel 'SYMBOL_TABLE'
             }
             buildConfigField "boolean", "IS_BETA", "false"
         }
@@ -147,20 +149,19 @@ android {
         }
         beta {
             initWith release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            resValue "string", "app_name", "Chimera Client Beta"
+            // The beta channel is the release build under a different name, so it inherits R8 and
+            // the symbol-table level from release rather than redeclaring them.
+            resValue "string", "app_name", "Glowberry Client Beta"
             buildConfigField "boolean", "IS_BETA", "true"
             matchingFallbacks = ["release"]
-            ndk {
-                debugSymbolLevel 'FULL'
-            }
         }
 
     }
     packagingOptions {
+        // Item 9: legacy packaging extracts the .so files to the app's lib dir on install, which
+        // the launcher's own extractor and the preloader's file-based hooks rely on. Re-check
+        // before turning this off.
         jniLibs.useLegacyPackaging = true
-        doNotStrip "**/*.so"
         resources.excludes += [
                 "DebugProbesKt.bin"
         ]
@@ -214,6 +215,10 @@ dependencies {
     // Microsoft Authentication Library (MSAL) for official OAuth
     implementation 'com.microsoft.identity.client:msal:2.2.3'
     testImplementation libs.junit
+    // Android ships org.json in the platform, so the local unit-test runtime has stubs that
+    // throw "not mocked". org.json:json is the same API as a plain jar, so a JSON-parsing
+    // rule stays unit-testable without an instrumented test.
+    testImplementation 'org.json:json:20240303'
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.glide

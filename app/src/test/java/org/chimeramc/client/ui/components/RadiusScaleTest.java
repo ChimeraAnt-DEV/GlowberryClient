@@ -51,9 +51,12 @@ public class RadiusScaleTest {
      */
     @Test
     public void theSharedSurfaceDrawablesNameARadiusRole() throws IOException {
+        // Only surfaces that exist and are referenced. The list used to name glass_card_accent,
+        // glass_card_elevated and bg_dialog_config, which had no consumer anywhere — a pin on a
+        // dead drawable is a pin that keeps dead code alive, so they were removed with it.
         String[] surfaces = {
-                "glass_card", "glass_card_accent", "glass_card_elevated",
-                "bg_instance_card", "bg_modal_card", "bg_dialog_config",
+                "glass_card",
+                "bg_instance_card", "bg_modal_card",
                 "bg_vip_surface", "bg_launch_dock", "bg_search_field", "bg_edit_text",
                 "bg_popup_menu_rounded", "bg_launch_quickdock",
         };

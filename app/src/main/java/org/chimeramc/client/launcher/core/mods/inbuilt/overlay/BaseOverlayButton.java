@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
+import org.chimeramc.client.util.MainThread;
 
 public abstract class BaseOverlayButton {
     protected final Activity activity;
@@ -33,7 +34,7 @@ public abstract class BaseOverlayButton {
     private long touchDownTime = 0;
     private static final long TAP_TIMEOUT = 200;
     private static final float DRAG_THRESHOLD = 10f;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private boolean isShowing = false;
     private boolean isHiding = false;
     private Runnable pendingShowRunnable;

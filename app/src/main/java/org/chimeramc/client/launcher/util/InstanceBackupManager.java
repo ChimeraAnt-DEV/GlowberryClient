@@ -49,6 +49,8 @@ import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.MainThread;
 
 public class InstanceBackupManager {
     public static final String BACKUP_EXTENSION = ".chimerabackup";
@@ -68,7 +70,7 @@ public class InstanceBackupManager {
     private static final Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 
     private final Context context;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public interface BackupCallback {
@@ -387,7 +389,9 @@ public class InstanceBackupManager {
             if (target.outputStream != null) {
                 target.outputStream.close();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "backup-close", "Closing the backup archive failed", ignored);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && target.uri != null) {
             ContentResolver resolver = context.getContentResolver();
@@ -621,13 +625,17 @@ public class InstanceBackupManager {
                     return cursor.getLong(sizeIndex);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "backup-size-cursor", "Reading the size of a backup failed", ignored);
+        }
 
         try (ParcelFileDescriptor fd = context.getContentResolver().openFileDescriptor(uri, "r")) {
             if (fd != null) {
                 return fd.getStatSize();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "backup-size-fd", "Reading the size of a backup failed", ignored);
+        }
         return -1L;
     }
 

@@ -15,8 +15,12 @@ import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 
 import java.util.Random;
+import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.MainThread;
 
 public class ChickPetOverlay {
+
+    private static final String TAG = "ChickPetOverlay";
     private static final int FRAME_DELAY = 200;
     private static final int BLINK_DELAY = 2500;
     private static final int STATE_CHANGE_MIN = 4000;
@@ -26,7 +30,7 @@ public class ChickPetOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final Random random = new Random();
 
     private ImageView chickView;
@@ -138,7 +142,7 @@ public class ChickPetOverlay {
             handler.post(animationRunnable);
             scheduleNextStateChange();
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Attaching the chick pet overlay failed", e);
         }
     }
 

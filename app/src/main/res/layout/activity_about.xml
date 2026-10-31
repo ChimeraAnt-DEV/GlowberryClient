@@ -68,7 +68,9 @@
                         android:layout_width="44dp"
                         android:layout_height="44dp"
                         android:src="@drawable/ic_qa_account"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop" 
+                        android:importantForAccessibility="no"
+                        />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -133,7 +135,7 @@
                         android:gravity="center"
                         android:text="@string/about_patreon"
                         android:fontFamily="@font/misans"
-                        android:textColor="#FF9800"
+                        android:textColor="@color/status_warning"
                         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textStyle="bold"
                         android:background="@drawable/bg_link_chip_orange"
@@ -152,7 +154,7 @@
                         android:gravity="center"
                         android:text="@string/about_afdian"
                         android:fontFamily="@font/misans"
-                        android:textColor="#E91E63"
+                        android:textColor="@color/status_accent_pink"
                         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textStyle="bold"
                         android:background="@drawable/bg_link_chip_pink"
@@ -167,7 +169,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/space_4"
                     android:layout_marginBottom="@dimen/space_hairline"
-                    android:background="#1A000000" />
+                    android:background="@color/wash_black_10" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -181,7 +183,9 @@
                         android:layout_width="44dp"
                         android:layout_height="44dp"
                         android:src="@drawable/ic_qa_account"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop" 
+                        android:importantForAccessibility="no"
+                        />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -198,7 +202,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="MrPokeG"
+                                android:text="@string/about_maintainer_name"
                                 android:fontFamily="@font/misans"
                                 android:textColor="@color/on_surface"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Title"
@@ -246,7 +250,7 @@
                         android:gravity="center"
                         android:text="@string/youtube"
                         android:fontFamily="@font/misans"
-                        android:textColor="#FF0000"
+                        android:textColor="@color/error"
                         android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                         android:textStyle="bold"
                         android:background="@drawable/bg_link_chip_pink"
@@ -324,6 +328,24 @@
                             android:clickable="true"
                             android:focusable="true" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/about_backend_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_3"
+                        android:fontFamily="@font/misans"
+                        android:textColor="@color/text_secondary"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
+
+                    <TextView
+                        android:id="@+id/about_input_backend_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2"
+                        android:fontFamily="@font/misans"
+                        android:textColor="@color/text_secondary"
+                        android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                     <TextView
                         android:layout_width="wrap_content"

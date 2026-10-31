@@ -16,8 +16,13 @@ import java.util.concurrent.Executors;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.core.backend.GameBridge;
+import org.chimeramc.client.preloader.BerryApi;
 
 public class AboutActivity extends BaseActivity {
+
+    private static final String TAG = "AboutActivity";
 
     private static final String AVATAR_URL = "https://avatars.githubusercontent.com/u/62042544?v=4";
     private static final String URL_AFDIAN = "https://afdian.com/a/DreamGuXiang";
@@ -61,6 +66,7 @@ public class AboutActivity extends BaseActivity {
         loadAvatars();
         setupLinks();
         styleBadges();
+        showBackendStatus();
 
         DynamicAnim.applyPressScaleRecursively(findViewById(android.R.id.content));
     }
@@ -84,6 +90,28 @@ public class AboutActivity extends BaseActivity {
                 maintainerBadge.setBackground(gd);
                 maintainerBadge.setTextColor(android.graphics.Color.WHITE);
             }
+        }
+    }
+
+    /**
+     * Shows which script/runtime backend the launcher found.
+     *
+     * <p>BerryAPI is a separate native library, so the About page reports it rather than assuming it
+     * is present: with none registered the line says so, and the script-driven features are known to
+     * be inactive before a launch rather than after a silent no-op.
+     */
+    private void showBackendStatus() {
+        TextView status = findViewById(R.id.about_backend_status);
+        if (status != null) {
+            status.setText(getString(R.string.about_backend_status, BerryApi.summary()));
+        }
+        // The input backend is a second, separate seam: the runtime can be present while nothing is
+        // registered to inject input through it. Both lines are shown so "the launcher runs but the
+        // controls do nothing" is a state the user can name before reporting it.
+        TextView inputStatus = findViewById(R.id.about_input_backend_status);
+        if (inputStatus != null) {
+            inputStatus.setText(getString(R.string.about_input_backend_status,
+                    GameBridge.statusLine()));
         }
     }
 
@@ -114,7 +142,9 @@ public class AboutActivity extends BaseActivity {
                         }
                     }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "about-fetch", "Fetching the contributor list failed", ignored);
+            }
 
             try {
                 if (maintainerAvatar != null) {
@@ -128,7 +158,9 @@ public class AboutActivity extends BaseActivity {
                         }
                     }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "about-fetch2", "Fetching the contributor list failed", ignored);
+            }
         });
     }
 
@@ -148,7 +180,9 @@ public class AboutActivity extends BaseActivity {
         btn.setOnClickListener(v -> {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-            } catch (Throwable ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "about-link", "Opening a link failed", ignored);
+            }
         });
         DynamicAnim.applyPressScale(btn);
     }

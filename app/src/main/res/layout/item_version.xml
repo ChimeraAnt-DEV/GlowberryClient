@@ -40,6 +40,8 @@
             android:tint="@color/primary"
             android:padding="@dimen/space_2"
             android:scaleType="fitCenter"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:contentDescription="@string/rename"
+            />
     </LinearLayout>
 </FrameLayout>

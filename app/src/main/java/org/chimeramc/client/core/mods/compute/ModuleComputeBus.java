@@ -1,6 +1,10 @@
 package org.chimeramc.client.core.mods.compute;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.chimeramc.client.util.AppExecutors;
 
 /**
  * A single-worker compute bus that keeps heavy module work off the render thread.
@@ -19,6 +23,12 @@ import java.util.concurrent.atomic.AtomicReference;
  * result is kept, so one bad module cannot take the worker thread down or publish a half-computed
  * result. {@link #lastError()} surfaces it instead.
  *
+ * <p><b>The worker waits, it does not poll.</b> It parks on a condition that {@link #submit}
+ * signals, rather than sleeping and re-checking. A poll loop burns a core and, worse, adds up to a
+ * full poll interval of latency to every solve: a 4 ms sleep is 4 ms of delay on a 16 ms frame
+ * budget, for work that was submitted to be ready this frame. The wait also makes {@link #stop}
+ * immediate instead of "within one poll interval".
+ *
  * <p>Threads: {@link #submit} and {@link #latestResult} are safe from any thread. The worker is the
  * only consumer of the pending input.
  */
@@ -35,6 +45,9 @@ public final class ModuleComputeBus<I, O> {
     private final AtomicReference<Throwable> lastError = new AtomicReference<>(null);
     private final ComputeSchedule schedule = new ComputeSchedule();
 
+    private final ReentrantLock waitLock = new ReentrantLock();
+    private final Condition pendingAvailable = waitLock.newCondition();
+
     private Thread worker;
     private volatile boolean running;
 
@@ -46,8 +59,7 @@ public final class ModuleComputeBus<I, O> {
     public synchronized void start(String threadName) {
         if (running) return;
         running = true;
-        worker = new Thread(this::loop, threadName == null ? "module-compute" : threadName);
-        worker.setDaemon(true);
+        worker = AppExecutors.thread(threadName == null ? "module-compute" : threadName, this::loop);
         worker.start();
     }
 
@@ -55,6 +67,13 @@ public final class ModuleComputeBus<I, O> {
     public synchronized void stop() {
         running = false;
         pending.set(null);
+        // Wake the worker so it observes running == false now rather than on its next poll.
+        waitLock.lock();
+        try {
+            pendingAvailable.signalAll();
+        } finally {
+            waitLock.unlock();
+        }
         if (worker != null) {
             worker.interrupt();
             worker = null;
@@ -65,6 +84,23 @@ public final class ModuleComputeBus<I, O> {
     public void submit(I input) {
         pending.set(input);
         schedule.submit(0L);
+        waitLock.lock();
+        try {
+            pendingAvailable.signalAll();
+        } finally {
+            waitLock.unlock();
+        }
+    }
+
+    /**
+     * How many inputs are waiting to be solved: 0 or 1.
+     *
+     * <p>The bus is bounded by construction, so this is a two-state reading rather than a length. It
+     * exists for the Diagnostics page, where a value that is stuck at 1 means the worker is not
+     * keeping up and the inputs are being replaced before they are solved.
+     */
+    public int queueDepth() {
+        return pending.get() == null ? 0 : 1;
     }
 
     /** The most recent published result, or null when none has been produced. */
@@ -86,11 +122,18 @@ public final class ModuleComputeBus<I, O> {
         while (running) {
             final I input = pending.getAndSet(null);
             if (input == null) {
+                waitLock.lock();
                 try {
-                    Thread.sleep(4L);
+                    // Re-check under the lock: a submit that raced the getAndSet above has already
+                    // signalled, and awaiting after that signal would park until the next submit.
+                    if (running && pending.get() == null) {
+                        pendingAvailable.await();
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
+                } finally {
+                    waitLock.unlock();
                 }
                 continue;
             }

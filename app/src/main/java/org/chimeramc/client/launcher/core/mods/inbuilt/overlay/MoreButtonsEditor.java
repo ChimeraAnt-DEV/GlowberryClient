@@ -124,6 +124,9 @@ public final class MoreButtonsEditor {
         private final MoreButtonsManager manager;
         private Runnable backAction;
         private EditPage currentEdit;
+        /** The lifetime of this editor's deferred posts, closed in dispose(). */
+        private final org.chimeramc.client.util.MainThread.Scope scope =
+                org.chimeramc.client.util.MainThread.scope();
 
         EditorHost(Activity activity) {
             super(activity);
@@ -133,7 +136,11 @@ public final class MoreButtonsEditor {
             setClickable(true);
             setFocusable(true);
             setFocusableInTouchMode(true);
-            setOnSystemUiVisibilityChangeListener(visibility -> postDelayed(() -> applyImmersive(activity), 120));
+            // The deferred immersive re-apply and the delete-confirm timer both outlive a close if
+            // they are not scoped: the host is removed from its parent while the post is pending, so
+            // it would fire against a detached view (items 14, 183, 295).
+            setOnSystemUiVisibilityChangeListener(
+                    visibility -> scope.postDelayed(() -> applyImmersive(activity), 120));
             showMain();
         }
 
@@ -148,6 +155,9 @@ public final class MoreButtonsEditor {
         }
 
         void dispose() {
+            // Removes every pending post this host scheduled, so a close cannot leave a timer that
+            // fires into the removed view.
+            scope.close();
             if (currentEdit != null) currentEdit.dispose();
             currentEdit = null;
         }
@@ -235,7 +245,7 @@ public final class MoreButtonsEditor {
                         if (!confirmDelete[0]) {
                             confirmDelete[0] = true;
                             delete.setText(R.string.more_buttons_tap_again_delete);
-                            delete.postDelayed(() -> {
+                            scope.postDelayed(() -> {
                                 confirmDelete[0] = false;
                                 delete.setText(R.string.delete);
                             }, 2500);
@@ -318,6 +328,9 @@ public final class MoreButtonsEditor {
                             names.add(displayName);
                         }
                     }
+                    // A ListView over an ArrayAdapter, not a RecyclerView: notifyDataSetChanged is
+                    // this adapter's own contract and it is already scoped to the visible keys, so
+                    // there is nothing finer to say here.
                     adapter.notifyDataSetChanged();
                 }
                 @Override public void afterTextChanged(Editable s) {}

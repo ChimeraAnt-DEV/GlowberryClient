@@ -1,6 +1,13 @@
 <resources>
 
-    <style name="Base.Theme.FullScreen" parent="Theme.Material3.DayNight.NoActionBar">
+    <!--
+        The common half of the full-screen theme, declared once. The version-qualified
+        Base.Theme.FullScreen definitions (values-v29/v31/v35) each extend this and add only the
+        attributes that a given API level introduces, so the shared colour/font/inset set cannot
+        drift between them again (it had: the container colours were missing from every
+        qualifier, so they were dead on every shipped device).
+    -->
+    <style name="Base.Theme.FullScreen.Common" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:fontFamily">@font/misans</item>
         <item name="colorPrimary">@color/primary</item>
@@ -28,13 +35,17 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowContentOverlay">@null</item>
-
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
+
+    <!-- API 28 (minSdk): the common theme with no API-specific additions. -->
+    <style name="Base.Theme.FullScreen" parent="Base.Theme.FullScreen.Common" />
 
     <style name="MinecraftLoadingTheme" parent="Base.Theme.FullScreen">
         <item name="android:windowDisablePreview">true</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
     <style name="MainActivityTheme" parent="Base.Theme.FullScreen">

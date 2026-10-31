@@ -104,6 +104,27 @@ public class ModuleComputeBusTest {
         }
     }
 
+    @Test
+    public void theBusReportsItsDepthAndStopsPromptly() throws Exception {
+        ModuleComputeBus<Integer, Integer> bus = new ModuleComputeBus<>(input -> input * 2);
+        bus.start("test-compute-depth");
+        try {
+            // A block worker parks on the condition, so an idle bus reads as empty rather than
+            // "always one pending" the way a poll loop that re-reads its input would.
+            assertEquals(0, bus.queueDepth());
+            bus.submit(4);
+            assertEquals(8, awaitResult(bus).intValue());
+            assertEquals(0, bus.queueDepth());
+        } finally {
+            long before = System.nanoTime();
+            bus.stop();
+            long elapsedMs = (System.nanoTime() - before) / 1_000_000L;
+            // The wait is signalled, so a stop does not have to wait out a poll interval.
+            assertTrue("stop returned in " + elapsedMs + "ms", elapsedMs < 1000L);
+        }
+        assertFalse(bus.isRunning());
+    }
+
     private static <O> O awaitResult(ModuleComputeBus<?, O> bus) throws InterruptedException {
         for (int i = 0; i < 200; i++) {
             O value = bus.latestResult();

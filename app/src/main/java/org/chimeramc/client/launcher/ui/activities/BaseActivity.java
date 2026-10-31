@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.graphics.Rect;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -36,6 +38,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.auth.MsftAccountStore;
 import org.chimeramc.client.launcher.controller.ControllerConnectionMonitor;
+import org.chimeramc.client.core.mods.inbuilt.overlay.CursorController;
+import org.chimeramc.client.core.mods.inbuilt.overlay.GamepadAxes;
+import org.chimeramc.client.launcher.ui.views.LauncherCursorInput;
+import org.chimeramc.client.launcher.ui.views.LauncherCursorOverlay;
 import org.chimeramc.client.launcher.controller.ControllerToastView;
 import org.chimeramc.client.launcher.controller.ControllerType;
 import org.chimeramc.client.ui.animation.DynamicAnim;
@@ -74,9 +80,28 @@ public class BaseActivity extends AppCompatActivity {
                 public void onControllerDisconnected(String name) {
                     if (isFinishing()) return;
                     ControllerToastView.showDisconnected(BaseActivity.this, name);
+                    hideControllerCursor();
+                }
+            };
+
+    /** Shows the keyboard pill for whichever screen is in front (Phase 12). */
+    private final ControllerConnectionMonitor.KeyboardListener keyboardListener =
+            new ControllerConnectionMonitor.KeyboardListener() {
+                @Override
+                public void onKeyboardConnected(String name) {
+                    if (isFinishing()) return;
+                    ControllerToastView.showKeyboardConnected(BaseActivity.this, name);
+                }
+
+                @Override
+                public void onKeyboardDisconnected(String name) {
+                    if (isFinishing()) return;
+                    ControllerToastView.showKeyboardDisconnected(BaseActivity.this, name);
                 }
             };
     private boolean navBarInjected = false;
+    /** The macOS-style pointer a controller drives on launcher screens (Phase 12). */
+    private LauncherCursorOverlay controllerCursor;
     /** Which adaptive navigation shape this window is using (U5). */
     private NavLayoutMode navLayoutMode = NavLayoutMode.BOTTOM_NAV;
     private final OkHttpClient navAvatarClient = BaseActivity.buildLatencyTunedClient();
@@ -142,42 +167,72 @@ public class BaseActivity extends AppCompatActivity {
     /** True once the nav indicator has been placed once, so later moves spring instead of jump. */
     private boolean navIndicatorPlaced;
 
+    /**
+     * The one-shot layout listener waiting for the active tab to re-measure after its label
+     * changed, or null when no placement is pending.
+     *
+     * <p>{@link #setActiveNavTab} swaps the tab's text (a compact bar shows only the active
+     * label), which invalidates the tab's width. Reading {@code getWidth()} in that same frame
+     * returns the *old* width, so the indicator would be positioned under where the tab used to
+     * be. One listener is kept and replaced so a fast tab switch cannot stack placements.
+     */
+    @Nullable
+    private View.OnLayoutChangeListener pendingIndicatorListener;
+
+    /** The column holding the nav shape and the content, kept so the nav can be swapped (item 67). */
+    private LinearLayout navColumn;
+    /** The inflated navigation view, kept so it can be replaced on a window-shape change. */
+    private View navShapeView;
+    /** The screen's own content view, re-measured when the nav shape changes. */
+    private View navContentView;
+
     private void wrapWithNavBar(View contentView) {
         if (shouldSkipNavBar()) {
             super.setContentView(contentView);
             applyPersonalization();
             return;
         }
+        navContentView = contentView;
 
         // The navigation shape is chosen from the window width (U5): a bottom bar on a compact
         // window, a vertical icon rail on a medium one, and an expanded rail on a large one. Both
         // layouts declare the same ids, so everything below this line is layout-agnostic.
-        navLayoutMode = NavLayoutMode.forWidthDp(currentWidthDp());
+        navLayoutMode = resolveNavLayoutMode();
         boolean rail = navLayoutMode.isRail();
+        logNavDecision();
 
-        LinearLayout wrapper = new LinearLayout(this);
-        wrapper.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        // The root is a FrameLayout so the controller pointer (Phase 12) can be a MATCH_PARENT
+        // overlay above the nav and the content. As a third child of a vertical LinearLayout it
+        // would have been measured as another row and pushed the content off screen.
+        FrameLayout wrapper = new FrameLayout(this);
         wrapper.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
 
+        LinearLayout column = new LinearLayout(this);
+        navColumn = column;
+        column.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        wrapper.addView(column, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
         View navBar = LayoutInflater.from(this)
-                .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, wrapper, false);
+                .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, column, false);
+        navShapeView = navBar;
 
         LinearLayout.LayoutParams contentParams;
         if (rail) {
             // A rail is the leading sibling; the content takes the rest of the width.
-            wrapper.addView(navBar);
+            column.addView(navBar);
             contentParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         } else {
             // A bar is the top sibling; the content takes the rest of the height.
-            wrapper.addView(navBar);
+            column.addView(navBar);
             contentParams = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
         }
         contentView.setLayoutParams(contentParams);
-        wrapper.addView(contentView);
+        column.addView(contentView);
 
         // The launcher targets SDK 35, so on Android 15 the window is drawn edge-to-edge whether it
         // asks to be or not: statusBarColor/navigationBarColor are ignored and the layout runs behind
@@ -193,6 +248,10 @@ public class BaseActivity extends AppCompatActivity {
         contentView.setTranslationX(rail ? 10f * getResources().getDisplayMetrics().density : 0f);
 
         super.setContentView(wrapper);
+        // The controller pointer sits above the whole screen (nav included), added last so it
+        // draws on top; it is non-interactive, so a touch passes straight through to the view
+        // under it. Hidden until a pad is actually used.
+        controllerCursor = LauncherCursorOverlay.attach(this, wrapper);
         navBarInjected = true;
         setupBaseNavBar();
 
@@ -234,8 +293,15 @@ public class BaseActivity extends AppCompatActivity {
             WindowInsetsCompat compat = windowInsets;
             androidx.core.graphics.Insets bars =
                     compat.getInsets(WindowInsetsCompat.Type.systemBars());
-            EdgeToEdgeInsets.Insets insets =
-                    new EdgeToEdgeInsets.Insets(bars.left, bars.top, bars.right, bars.bottom);
+            // The display cutout is a separate inset type from the system bars, and in landscape
+            // the notch is on one side, so the leading rail would sit under it without this
+            // (item 68). Unioned rather than replaced: on a device that reports both, the larger
+            // of the two on each edge is what actually needs clearing.
+            androidx.core.graphics.Insets cutout =
+                    compat.getInsets(WindowInsetsCompat.Type.displayCutout());
+            EdgeToEdgeInsets.Insets insets = EdgeToEdgeInsets.from(
+                    bars.left, bars.top, bars.right, bars.bottom,
+                    cutout.left, cutout.top, cutout.right, cutout.bottom);
             EdgeToEdgeInsets.Padding navPadding = EdgeToEdgeInsets.forNavBar(rail, insets);
             view.setPadding(navBaseLeft + navPadding.left, navBaseTop + navPadding.top,
                     navBaseRight + navPadding.right, navBaseBottom + navPadding.bottom);
@@ -261,9 +327,70 @@ public class BaseActivity extends AppCompatActivity {
                 / getResources().getDisplayMetrics().density);
     }
 
+    /** The current window width in dp, which tracks a split-screen or freeform column. */
+    private int currentWindowWidthDp() {
+        Configuration config = getResources().getConfiguration();
+        if (config.screenWidthDp > 0) return config.screenWidthDp;
+        return (int) (getResources().getDisplayMetrics().widthPixels
+                / getResources().getDisplayMetrics().density);
+    }
+
+    /**
+     * The navigation shape for the current window.
+     *
+     * Both readings are needed: the smallest width is stable across rotation but stays a tablet's
+     * width inside a narrow split-screen column, and the current width tracks the column but flips
+     * on rotation. {@link NavLayoutMode#forWindow} takes the smaller classification, so the rail
+     * never lands on a window too narrow to hold it.
+     */
+    private NavLayoutMode resolveNavLayoutMode() {
+        return NavLayoutMode.forWindow(currentWidthDp(), currentWindowWidthDp());
+    }
+
+    /**
+     * Logs the inputs to the navigation-shape decision once per screen (item 94).
+     *
+     * <p>A "the layout is wrong on my device" report is otherwise unanswerable: the shape is a
+     * function of two width readings, the density and the mode, and none of them appear anywhere.
+     * Debug-only, so a release build carries no log line for a cosmetic decision.
+     */
+    private void logNavDecision() {
+        if (!org.chimeramc.client.BuildConfig.DEBUG) return;
+        android.util.Log.d("NavLayout", "mode=" + navLayoutMode
+                + " smallestWidthDp=" + currentWidthDp()
+                + " windowWidthDp=" + currentWindowWidthDp()
+                + " density=" + getResources().getDisplayMetrics().density);
+    }
+
     private void applyPersonalization() {
         PersonalizationManager pm = new PersonalizationManager(this);
         pm.applyToActivity(this);
+        applyMotionScheme(pm);
+    }
+
+    /**
+     * Puts the shared motion system into the scheme this screen should use (items 75, 345).
+     *
+     * <p>{@link DynamicAnim} holds one static scheme, and only {@code MainActivity} used to set it.
+     * Every other screen therefore animated with whatever the previous screen had left behind -
+     * usually the expressive springs, even for a user who had reduced motion on, which is exactly
+     * the accessibility setting that must not be ignored. Setting it here means the scheme is a
+     * property of the process that every screen re-asserts on the way in.
+     *
+     * <p>The platform's own "remove animations" scale wins over the in-app switch: a user who told
+     * Android to remove animations must not get springs back because a stale preference says
+     * motion is on.
+     */
+    private void applyMotionScheme(PersonalizationManager pm) {
+        boolean platformAnimationsOff = false;
+        try {
+            platformAnimationsOff = android.provider.Settings.Global.getFloat(
+                    getContentResolver(),
+                    android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        } catch (Throwable ignored) {
+            // Unreadable on a restricted device; treat motion as allowed.
+        }
+        DynamicAnim.applyMotionScheme(pm.isReduceMotion(), platformAnimationsOff);
     }
 
     protected boolean shouldSkipNavBar() {
@@ -282,6 +409,55 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
+     * Moves the controller pointer from the right stick, and consumes the stick while it is up so
+     * the screen below does not also scroll (Phase 12).
+     *
+     * <p>The pointer appears the first time the right stick is moved, not when the pad connects:
+     * auto-showing it would make the d-pad centre button click through the pointer for a user who
+     * navigates by focus and never wants it. Moving the stick is the explicit request for it.
+     *
+     * <p>The right stick drives the pointer and the left stick is left alone, so scrolling a list
+     * with the left stick still works exactly as it did; only the pointer's own axis is captured.
+     * The axis convention comes from {@link GamepadAxes}, the same class the in-game wheel uses, so
+     * a pad that reports its right stick on AXIS_Z/AXIS_RZ and one that uses AXIS_RX/AXIS_RY both
+     * work without a second table.
+     */
+    @Override
+    public boolean dispatchGenericMotionEvent(android.view.MotionEvent event) {
+        if (shouldShowControllerCursor()
+                && controllerCursor != null
+                && GamepadAxes.isGamepadSource(event)) {
+            GamepadAxes.Stick stick = GamepadAxes.read(event);
+            if (LauncherCursorInput.shouldIntegrate(stick.x, stick.y,
+                    controllerCursor.isCursorVisible())) {
+                controllerCursor.move(stick.x, stick.y,
+                        CursorController.DEFAULT_DEAD_ZONE, CursorController.DEFAULT_CURVE_EXPONENT);
+            }
+            // While the pointer is up the right stick belongs to it, so the frame is consumed and
+            // does not also scroll the list underneath. The left stick is untouched, so list
+            // scrolling still works; B dismisses the pointer and hands the stick back.
+            if (controllerCursor.isCursorVisible()) return true;
+        }
+        return super.dispatchGenericMotionEvent(event);
+    }
+
+    /** Hides the controller pointer (the pad left, or a touch took over). */
+    protected void hideControllerCursor() {
+        if (controllerCursor != null) controllerCursor.disable();
+    }
+
+    /**
+     * Whether this screen shows the controller pointer.
+     *
+     * <p>Off where a screen needs the raw pad presses for itself (the controller editor), so the
+     * pointer never competes with the screen's own use of the stick and buttons.
+     */
+    protected boolean shouldShowControllerCursor() {
+        return shouldHandleNavKeys() && !shouldSkipNavBar();
+    }
+
+
+    /**
      * Console-style tab switching. Shoulder buttons and D-pad left/right cycle the top-level
      * destinations, which is how a controller user expects to move between sections.
      *
@@ -291,6 +467,24 @@ public class BaseActivity extends AppCompatActivity {
      */
     @Override
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        // The controller pointer claims the face button as its click before the tab handler runs,
+        // so a pad that is pointing at something activates it rather than switching tabs.
+        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0
+                && controllerCursor != null
+                && controllerCursor.isCursorVisible()
+                && event.getKeyCode() == android.view.KeyEvent.KEYCODE_BUTTON_B) {
+            // B dismisses the pointer and hands the right stick back to the screen.
+            hideControllerCursor();
+            return true;
+        }
+        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
+                && event.getRepeatCount() == 0
+                && controllerCursor != null
+                && controllerCursor.isCursorVisible()
+                && LauncherCursorInput.isSelectKey(event.getKeyCode())) {
+            if (controllerCursor.select()) return true;
+        }
         if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
                 && event.getRepeatCount() == 0
                 && navBarInjected
@@ -311,16 +505,6 @@ public class BaseActivity extends AppCompatActivity {
         return super.dispatchKeyEvent(event);
     }
 
-    /** Top-bar tabs, in declaration order. Order matches LauncherTab and nav_bar.xml. */
-    private static final int[] NAV_TAB_IDS = {
-            R.id.nav_tab_launch, R.id.nav_tab_library, R.id.nav_tab_mods, R.id.nav_tab_settings
-    };
-
-    /** Labels for {@link #NAV_TAB_IDS}, same order, so compact mode can restore the active one. */
-    private static final int[] NAV_TAB_LABELS = {
-            R.string.nav_launch, R.string.nav_library, R.string.nav_mods, R.string.nav_settings
-    };
-
     /** True on a narrow window, where only the selected tab shows its label. */
     private boolean compactNavTabs;
 
@@ -337,15 +521,20 @@ public class BaseActivity extends AppCompatActivity {
     private void applyNavCompactMode() {
         View appName = findViewById(R.id.nav_app_name);
         if (appName != null) {
-            appName.setVisibility(navLayoutMode.showsAllLabels() ? View.VISIBLE : View.GONE);
+            // The wordmark is a width decision on the bar and a label decision on the rail
+            // (item 84). Hiding it on every compact window left the bar with empty space beside
+            // the icon-only tabs, so the brand was invisible even where it fit; the bar's own
+            // constraints (the wordmark is pinned between the logo and the tab strip) are what
+            // keep it off the tabs, so a width threshold is safe to introduce.
+            boolean showWordmark = navLayoutMode.showsWordmark(currentWindowWidthDp());
+            appName.setVisibility(showWordmark ? View.VISIBLE : View.GONE);
         }
         // On a rail the row is wide enough for its label, so the label is all-or-nothing: the
         // expanded rail names every destination, the icon-only rail names none.
         compactNavTabs = !navLayoutMode.showsAllLabels();
         LauncherTab own = LauncherTab.forActivity(getClass());
-        int ownTabId = own != null && own.index() < NAV_TAB_IDS.length
-                ? NAV_TAB_IDS[own.index()] : 0;
-        for (int id : NAV_TAB_IDS) {
+        int ownTabId = own != null ? own.viewId() : 0;
+        for (int id : LauncherTab.viewIds()) {
             TextView tab = findViewById(id);
             if (tab == null) continue;
             if (navLayoutMode.isRail()) {
@@ -371,13 +560,20 @@ public class BaseActivity extends AppCompatActivity {
 
         // Each tab is a single TextView carrying its own icon via drawableStart, so tinting
         // the compound drawable is what colours the icon.
-        for (int id : NAV_TAB_IDS) {
-            TextView tab = findViewById(id);
+        for (LauncherTab destination : LauncherTab.values()) {
+            TextView tab = findViewById(destination.viewId());
             if (tab == null) continue;
+            // The label and the icon come from the enum, so the two nav layouts and the
+            // destination list cannot disagree about what a tab is (U5).
+            tab.setText(destination.labelRes());
+            tab.setCompoundDrawablesRelativeWithIntrinsicBounds(destination.iconRes(), 0, 0, 0);
+            tab.setContentDescription(getString(destination.labelRes()));
+            tab.setTooltipText(getString(destination.labelRes()));
             int color = getResources().getColor(R.color.text_secondary, getTheme());
-            tab.setTextColor(color);
             // The one type system (U8): a destination label is the LABEL role, so its size and its
             // variable-font weight come from the shared scale rather than the layout's own values.
+            // Applied once at inflation (item 73); setActiveNavTab only changes the weight axis,
+            // which is a state, not a re-application of the typeface.
             UiType.apply(tab, UiType.Role.LABEL);
             tab.setTextColor(color);
             TextViewCompat.setCompoundDrawableTintList(tab, ColorStateList.valueOf(color));
@@ -406,8 +602,40 @@ public class BaseActivity extends AppCompatActivity {
 
         View backButton = findViewById(R.id.nav_back_button);
         if (backButton != null) {
+            // A root destination has nothing to go back to, and a disabled arrow reads as a broken
+            // button rather than "you are home" (item 90). Hidden rather than greyed so the header
+            // only offers an action that works. Predictive back goes through the dispatcher, which
+            // is the AndroidX path available on every supported version (item 89).
+            boolean isRootDestination = LauncherTab.forActivity(getClass()) == LauncherTab.LAUNCH;
+            backButton.setVisibility(isRootDestination ? View.GONE : View.VISIBLE);
             backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
             DynamicAnim.applyPressScale(backButton);
+        }
+
+        // The logo is a real target, not decoration: tapping the brand is the universal "go home"
+        // gesture, and a 28dp view is under the 48dp minimum (item 91). A TouchDelegate widens the
+        // hit area around it without changing how it draws, and the click routes to the launch tab
+        // so the affordance does something rather than swallowing the tap.
+        View logo = findViewById(R.id.nav_logo);
+        if (logo != null) {
+            logo.setClickable(true);
+            logo.setContentDescription(getString(R.string.nav_logo_home));
+            logo.setOnClickListener(v -> {
+                if (!(this instanceof MainActivity)) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    switchNavTab(intent);
+                }
+            });
+            DynamicAnim.applyPressScale(logo);
+            View logoParent = (View) logo.getParent();
+            if (logoParent != null) {
+                logoParent.post(() -> {
+                    Rect bounds = new Rect(0, 0, Math.max(dp(48), logo.getWidth()),
+                            Math.max(dp(48), logo.getHeight()));
+                    logoParent.setTouchDelegate(new TouchDelegate(bounds, logo));
+                });
+            }
         }
 
         View signIn = findViewById(R.id.nav_sign_in_button);
@@ -461,9 +689,10 @@ public class BaseActivity extends AppCompatActivity {
      */
     protected void animateNavTabsArrival() {
         if (!navBarInjected) return;
-        View[] tabs = new View[NAV_TAB_IDS.length];
-        for (int i = 0; i < NAV_TAB_IDS.length; i++) {
-            tabs[i] = findViewById(NAV_TAB_IDS[i]);
+        int[] tabIds = LauncherTab.viewIds();
+        View[] tabs = new View[tabIds.length];
+        for (int i = 0; i < tabIds.length; i++) {
+            tabs[i] = findViewById(tabIds[i]);
         }
         org.chimeramc.client.ui.animation.DynamicAnim.staggerArrival(tabs, 60L);
     }
@@ -564,28 +793,51 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void setActiveNavTab(int activeTabId) {
+        // Remember the destination so a cold start reopens where the user left off (item 77).
+        // Recorded here, in the one place that knows the active tab, rather than in each
+        // activity's onCreate: every screen already calls this to tint its own entry, so the
+        // memory cannot drift from the highlight.
+        LauncherTab visited = LauncherTab.forViewId(activeTabId);
+        if (visited != null) {
+            org.chimeramc.client.settings.FeatureSettings.getInstance()
+                    .setLastNavTab(visited.name());
+        }
         if (!navBarInjected) return;
 
         PersonalizationManager pm = new PersonalizationManager(this);
         int accent = pm.getAccentColor();
-        int accentColor = accent != 0
-                ? accent
-                : getResources().getColor(R.color.on_surface, getTheme());
+        int onSurface = getResources().getColor(R.color.on_surface, getTheme());
+        // The accent is only usable as the active-tab colour if it is readable on the navigation
+        // surface. Under Material You it comes from the wallpaper, so it can land almost on top of
+        // the surface and make the selected destination unreadable (item 87); NavAccent applies the
+        // contrast floor and falls back to on-surface, which the indicator and the weight still
+        // distinguish.
+        int surface = getResources().getColor(R.color.ui_bg_surface, getTheme());
+        int accentColor = org.chimeramc.client.ui.navigation.NavAccent.resolve(accent, surface, onSurface);
         int inactive = getResources().getColor(R.color.text_secondary, getTheme());
 
-        for (int id : NAV_TAB_IDS) {
+        // The two colours are installed once as a state list, so every tab recolours itself from
+        // its own `selected` state and this method never branches on the colour (item 88). The
+        // state list is rebuilt here because the accent can change while the app is running.
+        ColorStateList tabTint = navTabTint(accentColor, inactive);
+
+        for (int id : LauncherTab.viewIds()) {
             TextView tab = findViewById(id);
             if (tab == null) continue;
             boolean active = id == activeTabId;
-            int color = active ? accentColor : inactive;
-            tab.setTextColor(color);
+            // `selected` is what a screen reader announces, and it is also the state the compound
+            // drawable tint, the text colour and the press feedback key off, so it is the only
+            // thing that has to change here.
+            tab.setTextColor(tabTint);
+            TextViewCompat.setCompoundDrawableTintList(tab, tabTint);
+            tab.setSelected(active);
+            tab.setContentDescription(describeTab(id, active));
             // The weight axis carries the emphasis: the active entry is heavier, not just a
             // different colour, which is the Expressive type treatment (U6). The bold flag stays
             // as the fallback for a device that ignores the axis.
             tab.setTypeface(tab.getTypeface(), active
                     ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
             UiType.applyWeight(tab, active ? UiTokens.TITLE_WEIGHT : UiTokens.ROW_TITLE_WEIGHT);
-            TextViewCompat.setCompoundDrawableTintList(tab, ColorStateList.valueOf(color));
             if (navLayoutMode.isRail()) applyRailTabShape(tab, active);
             if (navLayoutMode.isRail()) {
                 tab.setText(navLayoutMode.showsAllLabels() ? getString(labelForTab(id)) : "");
@@ -594,6 +846,31 @@ public class BaseActivity extends AppCompatActivity {
             }
             if (id == activeTabId) moveNavIndicator(tab, accentColor);
         }
+    }
+
+    /**
+     * The state list every destination is tinted from (item 88), with the focus state added so a
+     * D-pad or keyboard user can see where focus is (item 76).
+     *
+     * <p>Building it here rather than branching inside the update loop means the text colour, the
+     * compound icon and anything else state-aware all recolour from the tab's own
+     * {@code selected} flag: one state list, one place the colours are defined, and no per-state
+     * colour arithmetic at each update.
+     *
+     * <p>Order matters: {@code selected} is declared before {@code focused}, because Android picks
+     * the first entry whose state set is satisfied and the selected tab must keep its accent even
+     * while it also holds focus. A focused-but-not-selected tab shows the accent too - that is the
+     * visible focus ring for a controller - and the two states therefore look the same, which is
+     * the honest presentation while a tab has only one "highlighted" look.
+     */
+    private ColorStateList navTabTint(int accentColor, int inactiveColor) {
+        return new ColorStateList(
+                new int[][]{
+                        new int[]{android.R.attr.state_selected},
+                        new int[]{android.R.attr.state_focused},
+                        new int[]{},
+                },
+                new int[]{accentColor, accentColor, inactiveColor});
     }
 
     /**
@@ -636,8 +913,48 @@ public class BaseActivity extends AppCompatActivity {
             float targetX = tab.getLeft() + (tabWidth - indicatorWidth) / 2f;
             placeIndicator(indicator, targetX, 0f, false);
         };
-        if (tab.getWidth() > 0) place.run();
-        else tab.post(place);
+        placeIndicatorWhenMeasured(tab, place);
+    }
+
+    /**
+     * Runs [place] once the tab has a real width.
+     *
+     * <p>If the tab already has a width and no layout is pending the placement runs immediately.
+     * Otherwise it waits for the next layout pass, because the width read in this frame is stale:
+     * {@link #setActiveNavTab} has just changed the label, and on a compact bar that change is what
+     * gives the active tab its width. A pending listener is replaced rather than added, so a rapid
+     * tab switch leaves exactly one waiting placement and never a burst of them.
+     */
+    private void placeIndicatorWhenMeasured(View tab, Runnable place) {
+        if (pendingIndicatorListener != null) {
+            tab.removeOnLayoutChangeListener(pendingIndicatorListener);
+            pendingIndicatorListener = null;
+        }
+        if (tab.getWidth() > 0 && !tab.isLayoutRequested()) {
+            place.run();
+            return;
+        }
+        View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (v.getWidth() <= 0) return;
+                v.removeOnLayoutChangeListener(this);
+                if (pendingIndicatorListener == this) pendingIndicatorListener = null;
+                place.run();
+            }
+        };
+        pendingIndicatorListener = listener;
+        tab.addOnLayoutChangeListener(listener);
+        // Fallback: if the view is already attached and no layout pass is coming (for example the
+        // width did not actually change), place from the current bounds so the indicator is never
+        // left unpositioned.
+        tab.post(() -> {
+            if (pendingIndicatorListener != listener) return;
+            tab.removeOnLayoutChangeListener(listener);
+            pendingIndicatorListener = null;
+            place.run();
+        });
     }
 
     /**
@@ -725,12 +1042,43 @@ public class BaseActivity extends AppCompatActivity {
         return (int) (value * getResources().getDisplayMetrics().density);
     }
 
-    /** The resource string for one of {@link #NAV_TAB_IDS}, or 0 for an unknown id. */
+    /** The label resource for a tab view id, or 0 for an id that is not a destination. */
     private int labelForTab(int tabId) {
-        for (int i = 0; i < NAV_TAB_IDS.length; i++) {
-            if (NAV_TAB_IDS[i] == tabId) return NAV_TAB_LABELS[i];
+        LauncherTab tab = LauncherTab.forViewId(tabId);
+        return tab != null ? tab.labelRes() : 0;
+    }
+
+    /**
+     * The destination a cold start should open, or null to leave the caller's own default
+     * (item 77).
+     *
+     * <p>Reads the persisted tab name through {@link LauncherTab#fromStoredName}, so a name this
+     * build no longer has - or a settings file written by an older build - is "no preference"
+     * rather than a crash. The caller decides what "no preference" means; the splash opens Play.
+     */
+    public static LauncherTab rememberedTab() {
+        try {
+            return LauncherTab.fromStoredName(
+                    org.chimeramc.client.settings.FeatureSettings.getInstance().getLastNavTab());
+        } catch (Throwable t) {
+            // A settings read must never be able to stop the launcher from starting; falling
+            // through to the default screen is the same result as having no preference.
+            return null;
         }
-        return 0;
+    }
+
+    /**
+     * The accessibility description for a tab.
+     *
+     * <p>The icon-only rail and the compact bar hide the label with {@code setText("")}, so without
+     * this a screen reader would announce a bare, nameless node. The active destination also says
+     * so, because {@code selected} alone is not read on every Android version.
+     */
+    private CharSequence describeTab(int tabId, boolean active) {
+        int label = labelForTab(tabId);
+        if (label == 0) return null;
+        String name = getString(label);
+        return active ? getString(R.string.nav_tab_selected, name) : name;
     }
 
     @Override
@@ -738,6 +1086,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onStart();
         ControllerConnectionMonitor monitor = controllerMonitor();
         monitor.setListener(controllerListener);
+        monitor.setKeyboardListener(keyboardListener);
         monitor.start();
     }
 
@@ -779,6 +1128,7 @@ public class BaseActivity extends AppCompatActivity {
         // incoming screen (or the game) was already in front, so a pad plugged in during a tab
         // change was never seen.
         controllerMonitor().clearListener(controllerListener);
+        controllerMonitor().clearKeyboardListener(keyboardListener);
         super.onStop();
     }
 
@@ -804,13 +1154,49 @@ public class BaseActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         getDelegate().applyDayNight();
         hideSystemUI();
-        // The navigation shape is chosen once, when the content view is wrapped, so a window that
-        // crosses a breakpoint (a foldable unfolding, a tablet entering split screen) has to
-        // rebuild to pick the new one. Without this the bar would stay a bar on a wide window and
-        // the rail would stay a rail on a narrow one.
-        if (navBarInjected && NavLayoutMode.forWidthDp(currentWidthDp()) != navLayoutMode) {
-            recreate();
+        // A window that crosses a breakpoint (a foldable unfolding, a tablet entering split screen)
+        // needs the other navigation shape. The nav is swapped in place rather than by recreating
+        // the activity (item 67): a recreate would throw away the screen's scroll position, any
+        // in-progress text and the whole view hierarchy, for a change that only concerns the nav
+        // chrome. Only the nav view and the content's layout params are rebuilt.
+        NavLayoutMode next = resolveNavLayoutMode();
+        if (navBarInjected && next != navLayoutMode) {
+            swapNavShape(next);
         }
+    }
+
+    /**
+     * Replaces the navigation view with the one for {@code mode}, keeping the content view and the
+     * activity state (item 67).
+     *
+     * <p>The column holds exactly two children - the nav and the content - and only the nav is
+     * recreated. The content's layout params swap axis with the column so the rail's leading
+     * sibling becomes the bar's top sibling, and the insets are re-applied because the two shapes
+     * absorb different edges.
+     */
+    private void swapNavShape(NavLayoutMode mode) {
+        if (navColumn == null || navShapeView == null || navContentView == null) return;
+        boolean rail = mode.isRail();
+        navLayoutMode = mode;
+
+        navColumn.removeView(navShapeView);
+        navShapeView = LayoutInflater.from(this)
+                .inflate(rail ? R.layout.nav_rail : R.layout.nav_bar, navColumn, false);
+        navColumn.setOrientation(rail ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        navColumn.addView(navShapeView, 0);
+
+        LinearLayout.LayoutParams contentParams = rail
+                ? new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
+                : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
+        navContentView.setLayoutParams(contentParams);
+
+        applyEdgeToEdgeInsets(navShapeView, navContentView, rail);
+        logNavDecision();
+        setupBaseNavBar();
+        // The content was already visible, so it must not replay its arrival animation; only the
+        // nav shape needs to settle into place.
+        LauncherTab own = LauncherTab.forActivity(getClass());
+        if (own != null) setActiveNavTab(own.viewId());
     }
 
     @Override

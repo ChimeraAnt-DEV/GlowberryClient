@@ -23,7 +23,9 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:src="@drawable/ic_menu"
-            android:tint="@color/text_secondary" />
+            android:tint="@color/text_secondary" 
+            android:importantForAccessibility="no"
+            />
 
         <EditText
             android:id="@+id/search_input"

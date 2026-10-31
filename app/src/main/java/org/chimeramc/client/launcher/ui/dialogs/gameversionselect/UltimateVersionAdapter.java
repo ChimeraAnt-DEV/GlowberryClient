@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.versions.GameVersion;
+import org.chimeramc.client.util.TouchTargetHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +126,7 @@ public class UltimateVersionAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             tv = v.findViewById(R.id.tv_version_name_item);
             parentLayout = v.findViewById(R.id.linear_parent);
             btnRename = v.findViewById(R.id.btn_rename);
+            TouchTargetHelper.expand(btnRename);
         }
 
         public void bind(GameVersion v, OnVersionSelectListener listener, OnVersionLongClickListener longClickListener) {

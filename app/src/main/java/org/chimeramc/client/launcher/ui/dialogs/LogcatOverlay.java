@@ -51,9 +51,15 @@ import java.util.regex.Pattern;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.TouchTargetHelper;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 
 public class LogcatOverlay extends FrameLayout {
+
+    private static final String TAG = "LogcatOverlay";
 
     private View overlayContainer;
     private RecyclerView recyclerView;
@@ -68,7 +74,7 @@ public class LogcatOverlay extends FrameLayout {
     private ImageButton filterButton, filterClearButton, copyButton;
     private View overlayHeader, bottomResizeBar, cornerBottomLeft, cornerBottomRight;
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = MainThread.handler();
     private final SharedPreferences prefs;
 
     private final ArrayDeque<String> logBuffer = new ArrayDeque<>(2000);
@@ -125,6 +131,14 @@ public class LogcatOverlay extends FrameLayout {
         bottomResizeBar = findViewById(R.id.bottom_resize_bar);
         cornerBottomLeft = findViewById(R.id.corner_bottom_left);
         cornerBottomRight = findViewById(R.id.corner_bottom_right);
+
+        // The header holds seven 32dp buttons in one row. They are the right size to draw and too
+        // small to press, so each gets a 48dp touch area through the header's single delegate.
+        for (int id : new int[]{R.id.btn_filter, R.id.btn_autoscroll, R.id.btn_pause,
+                R.id.btn_copy, R.id.btn_clear, R.id.btn_close, R.id.btn_filter_clear}) {
+            TouchTargetHelper.expand(findViewById(id));
+        }
+        TouchTargetHelper.expand(minimizeBubble);
 
         layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);
@@ -430,7 +444,7 @@ public class LogcatOverlay extends FrameLayout {
     }
 
     private void startReader() {
-        readerThread = new Thread(() -> {
+        readerThread = AppExecutors.thread("logcat-reader", () -> {
             try {
                 List<String> cmd = new ArrayList<>();
                 cmd.add("logcat");
@@ -447,9 +461,9 @@ public class LogcatOverlay extends FrameLayout {
                     if (!paused) pendingLines.offer(line);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                AppLog.warn(TAG, "The logcat reader stopped unexpectedly", e);
             }
-        }, "LogcatReader");
+        });
         readerThread.start();
     }
 
@@ -457,7 +471,9 @@ public class LogcatOverlay extends FrameLayout {
         try {
             if (logcatProc != null) logcatProc.destroy();
             if (readerThread != null && readerThread.isAlive()) readerThread.interrupt();
-        } catch (Throwable ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "logcat-stop", "Stopping the logcat reader failed", ignored);
+        }
         logcatProc = null;
         readerThread = null;
     }
@@ -715,15 +731,30 @@ public class LogcatOverlay extends FrameLayout {
             notifyItemRangeInserted(items.size() - more.size(), more.size());
         }
 
+        /**
+         * Replaces the visible lines, usually after a filter change.
+         *
+         * <p>A log line has no stable identity — the same text legitimately appears twice — so this
+         * is a genuine replacement rather than a diff. It is still reported as a remove run and an
+         * insert run rather than a dataset change, which keeps the RecyclerView's own bookkeeping
+         * (and any running item animations) consistent while the list is swapped.
+         */
         void setItems(@NonNull List<CharSequence> newItems) {
-            items.clear();
+            int oldCount = items.size();
+            if (oldCount > 0) {
+                items.clear();
+                notifyItemRangeRemoved(0, oldCount);
+            }
+            if (newItems.isEmpty()) return;
             items.addAll(newItems);
-            notifyDataSetChanged();
+            notifyItemRangeInserted(0, items.size());
         }
 
         void clear() {
+            int oldCount = items.size();
+            if (oldCount == 0) return;
             items.clear();
-            notifyDataSetChanged();
+            notifyItemRangeRemoved(0, oldCount);
         }
     }
 
@@ -818,7 +849,9 @@ public class LogcatOverlay extends FrameLayout {
                         pendingHistoryTrimLines = 0;
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "logcat-trim", "Trimming the persisted logcat history failed", ignored);
+            }
         }
     }
 
@@ -886,7 +919,9 @@ public class LogcatOverlay extends FrameLayout {
                     }
                     pendingHistoryTrimLines = 0;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "logcat-trim2", "Trimming the persisted logcat history failed", ignored);
+            }
         }
     }
 

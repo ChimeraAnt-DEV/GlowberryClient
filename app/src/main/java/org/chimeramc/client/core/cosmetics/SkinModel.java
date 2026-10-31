@@ -346,15 +346,29 @@ public final class SkinModel {
      * allocates nothing.
      */
     public static final class Camera {
-        public final float yawDeg;
-        public final float pitchDeg;
-        public final float distance;
+        public float yawDeg;
+        public float pitchDeg;
+        public float distance;
 
-        private final double cosY, sinY, cosP, sinP;
-        private final float ox, oy, oz;
+        private double cosY, sinY, cosP, sinP;
+        private float ox, oy, oz;
 
         public Camera(float yawDeg, float pitchDeg, float distance,
                       float orbitX, float orbitY, float orbitZ) {
+            set(yawDeg, pitchDeg, distance, orbitX, orbitY, orbitZ);
+        }
+
+        /**
+         * Re-targets this camera in place.
+         *
+         * <p>A preview that orbits the model rebuilds its camera every frame, and the constructor
+         * recomputes six trigonometric values. Reusing the instance keeps the per-frame cost to
+         * those six calls with no allocation, which is what lets the render loop stay off the GC.
+         * The camera is only ever read on the thread that drives the draw, so the fields are
+         * deliberately not volatile.
+         */
+        public void set(float yawDeg, float pitchDeg, float distance,
+                        float orbitX, float orbitY, float orbitZ) {
             this.yawDeg = yawDeg;
             this.pitchDeg = pitchDeg;
             this.distance = distance;

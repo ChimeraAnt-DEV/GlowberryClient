@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.chimeramc.client.R;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +55,18 @@ public class QuickLaunchAdapter extends RecyclerView.Adapter<QuickLaunchAdapter.
         this.listener = listener;
     }
 
+    /**
+     * Replaces the list, animating only what changed. A quick-launch row's identity is its action,
+     * so a filter that reorders the same rows moves them instead of rebuilding the grid.
+     */
     public void updateItems(List<QuickLaunchItem> newItems) {
-        this.items = newItems != null ? newItems : new ArrayList<>();
-        notifyDataSetChanged();
+        List<QuickLaunchItem> next = newItems != null ? newItems : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.items, next,
+                item -> item.actionType.name(),
+                (old, fresh) -> java.util.Objects.equals(old.title, fresh.title)
+                        && java.util.Objects.equals(old.description, fresh.description));
+        this.items = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     @NonNull

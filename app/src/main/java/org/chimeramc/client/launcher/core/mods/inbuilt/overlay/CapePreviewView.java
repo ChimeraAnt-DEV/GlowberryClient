@@ -189,6 +189,9 @@ public class CapePreviewView extends View {
      * yaw/pitch/scale, and used by every projection and cull test so the two cannot disagree.
      */
     private SkinModel.Camera camera;
+    // Blit scratch, reused so a frame draws without allocating two Rects (item 17).
+    private final android.graphics.Rect sourceRect = new android.graphics.Rect();
+    private final android.graphics.Rect destRect = new android.graphics.Rect();
 
     private long animStartMs;
     private boolean animating;
@@ -625,11 +628,18 @@ public class CapePreviewView extends View {
             }
             // Background: transparent, so the glass panel behind the preview shows through.
             raster.prepare(internalW, internalH, 0x00000000);
-            camera = new SkinModel.Camera(yawDeg, pitchDeg, SkinModel.CAMERA_DISTANCE, 0f, 18f, 0f);
+            if (camera == null) {
+                camera = new SkinModel.Camera(yawDeg, pitchDeg, SkinModel.CAMERA_DISTANCE, 0f, 18f, 0f);
+            } else {
+                // Re-target rather than rebuild: the constructor recomputes six trig values and
+                // this runs every frame while the preview is animating (item 17).
+                camera.set(yawDeg, pitchDeg, SkinModel.CAMERA_DISTANCE, 0f, 18f, 0f);
+            }
             renderScene(camera, internalW, internalH);
             target.setPixels(raster.pixels(), 0, internalW, 0, 0, internalW, internalH);
-            canvas.drawBitmap(target, new android.graphics.Rect(0, 0, internalW, internalH),
-                    new android.graphics.Rect(0, 0, w, h), pixelPaint);
+            sourceRect.set(0, 0, internalW, internalH);
+            destRect.set(0, 0, w, h);
+            canvas.drawBitmap(target, sourceRect, destRect, pixelPaint);
         } catch (Throwable t) {
             lastRenderError = t;
             drawPreviewError(canvas, w, h);

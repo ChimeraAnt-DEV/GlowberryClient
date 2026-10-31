@@ -45,6 +45,19 @@ public class ControllerConnectionMonitorTest {
     }
 
     @Test
+    public void sourceFilterSeparatesKeyboardFromGamepad() {
+        // A keyboard must be announced as a keyboard, never as a pad: isGamepadSource already
+        // rejects it, and isKeyboardSource must accept it.
+        assertTrue(ControllerConnectionMonitor.isKeyboardSource(InputDevice.SOURCE_KEYBOARD));
+        assertFalse(ControllerConnectionMonitor.isKeyboardSource(InputDevice.SOURCE_GAMEPAD));
+        assertFalse(ControllerConnectionMonitor.isKeyboardSource(InputDevice.SOURCE_TOUCHSCREEN));
+        // A combined gamepad+keyboard device (a pad with a chat pad) is a pad, announced once on the
+        // pad path; firing the keyboard pill too would double-announce it.
+        assertFalse(ControllerConnectionMonitor.isKeyboardSource(
+                InputDevice.SOURCE_GAMEPAD | InputDevice.SOURCE_KEYBOARD));
+    }
+
+    @Test
     public void debounceWindowIsShortEnoughToFeelResponsive() {
         assertTrue(ControllerConnectionMonitor.DEBOUNCE_MS > 0);
         assertTrue("a reconnect flap must be swallowed",

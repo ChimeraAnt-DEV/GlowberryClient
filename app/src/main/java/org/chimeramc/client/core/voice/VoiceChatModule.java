@@ -3,7 +3,10 @@ package org.chimeramc.client.core.voice;
 import android.content.Context;
 import android.util.Log;
 
+import org.chimeramc.client.util.SignalGate;
+
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,12 @@ public final class VoiceChatModule {
     private PositionSource positionSource;
     private Thread beaconThread;
     private Thread playbackThread;
+    /** Wakes the beacon loop's interval wait so stop() joins immediately instead of after 1s. */
+    private final SignalGate beaconGate = new SignalGate();
+    private final SignalGate playbackGate = new SignalGate();
+
+    /** How often a peer beacon is re-sent. Also the worst-case time a departed peer stays listed. */
+    private static final long BEACON_INTERVAL_MS = 1000L;
     private volatile boolean running;
     private volatile boolean transmit = true;
     private volatile int sequence;
@@ -311,11 +320,9 @@ public final class VoiceChatModule {
         }
 
         running = true;
-        beaconThread = new Thread(this::beaconLoop, "voice-beacon");
-        beaconThread.setDaemon(true);
+        beaconThread = AppExecutors.thread("voice-beacon", this::beaconLoop);
         beaconThread.start();
-        playbackThread = new Thread(this::playbackLoop, "voice-mix");
-        playbackThread.setDaemon(true);
+        playbackThread = AppExecutors.thread("voice-mix", this::playbackLoop);
         playbackThread.start();
         return true;
     }
@@ -398,6 +405,8 @@ public final class VoiceChatModule {
      */
     public synchronized void stop() {
         running = false;
+        // Signalled before the joins so a beacon thread inside its interval wait exits at once.
+        beaconGate.signal();
         try {
             sendBye();
         } catch (Throwable t) {
@@ -414,6 +423,9 @@ public final class VoiceChatModule {
         }
         Thread playback = playbackThread;
         playbackThread = null;
+        // Signalled before the join so a playback thread inside its frame wait exits at once,
+        // instead of the join timing out and leaving the mixer running against a dead session.
+        playbackGate.signal();
         if (playback != null) {
             playback.interrupt();
             try {
@@ -503,11 +515,12 @@ public final class VoiceChatModule {
             try {
                 sendBeacon();
                 registry.evictStale(android.os.SystemClock.uptimeMillis());
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+            } catch (Throwable t) {
+                // A beacon that fails must not stop the loop: the next interval retries, and the
+                // route is the only thing that keeps this player visible to peers.
+                Log.w(TAG, "voice beacon failed", t);
             }
+            if (!beaconGate.await(BEACON_INTERVAL_MS)) break;
         }
     }
 
@@ -687,17 +700,12 @@ public final class VoiceChatModule {
         while (running) {
             nextTick += VoiceAudioEngine.FRAME_MS;
             long now = android.os.SystemClock.uptimeMillis();
-            long wait = nextTick - now;
-            if (wait > 0) {
-                try {
-                    Thread.sleep(wait);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-            } else if (wait < -VoiceAudioEngine.FRAME_MS * 4) {
+            if (nextTick - now < -VoiceAudioEngine.FRAME_MS * 4) {
                 // Fell far behind (a stalled thread); resync rather than trying to catch up.
                 nextTick = now;
+            } else if (playbackGate.awaitUntil(nextTick, android.os.SystemClock::uptimeMillis)
+                    == SignalGate.Wake.INTERRUPTED) {
+                return;
             }
 
             long stamp = android.os.SystemClock.uptimeMillis();
@@ -885,9 +893,7 @@ public final class VoiceChatModule {
      */
     public void announceNow() {
         if (!running) return;
-        Thread thread = new Thread(this::sendBeacon, "voice-announce");
-        thread.setDaemon(true);
-        thread.start();
+        AppExecutors.thread("voice-announce", this::sendBeacon).start();
     }
 
     /** Peers currently audible, for the overlay. */

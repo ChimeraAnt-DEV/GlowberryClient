@@ -31,6 +31,8 @@ import com.google.gson.JsonPrimitive;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.config.ModConfigSchema;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.util.PersonalizationManager;
 
@@ -80,31 +82,50 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
         return nodes.size();
     }
 
+    /**
+     * Rebuilds the row list from the config tree and reports only what changed.
+     *
+     * <p>Every edit used to clear the list and call {@code notifyDataSetChanged}, so expanding one
+     * section rebuilt every visible row and dropped the list back to the top. Diffing by path means
+     * expanding or collapsing one node inserts or removes exactly that node's subtree, and an edit
+     * changes one row.
+     */
     private void rebuildNodes() {
-        nodes.clear();
+        List<Node> next = new ArrayList<>();
         if (root != null && root.isJsonObject()) {
             JsonObject object = root.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 ModConfigSchema childSchema = rootSchema == null ? null : rootSchema.getProperty(entry.getKey());
-                buildNodes(entry.getKey(), entry.getKey(), entry.getValue(), childSchema, 0, root, entry.getKey());
+                buildNodes(next, entry.getKey(), entry.getKey(), entry.getValue(), childSchema, 0, root, entry.getKey());
             }
         } else if (root != null && root.isJsonArray()) {
             ModConfigSchema itemSchema = rootSchema == null ? null : rootSchema.getItems();
             JsonArray array = root.getAsJsonArray();
             for (int i = 0; i < array.size(); i++) {
-                buildNodes("item " + (i + 1), "[" + (i + 1) + "]", array.get(i), itemSchema,
+                buildNodes(next, "item " + (i + 1), "[" + (i + 1) + "]", array.get(i), itemSchema,
                         0, root, String.valueOf(i));
             }
         } else {
-            buildNodes("value", "value", root, rootSchema, 0, null, null);
+            buildNodes(next, "value", "value", root, rootSchema, 0, null, null);
         }
+
+        ListDiff.Result diff = ListDiff.compute(nodes, next,
+                node -> node.path,
+                (oldNode, freshNode) -> java.util.Objects.equals(oldNode.type(), freshNode.type())
+                        && java.util.Objects.equals(
+                                oldNode.value == null ? null : oldNode.value.toString(),
+                                freshNode.value == null ? null : freshNode.value.toString())
+                        && oldNode.expanded == freshNode.expanded);
+        nodes.clear();
+        nodes.addAll(next);
+        ListDiffDispatch.apply(this, diff);
     }
 
-    private void buildNodes(String path, String key, JsonElement value, ModConfigSchema schema,
-                            int depth, JsonElement parent, String childKey) {
+    private void buildNodes(List<Node> out, String path, String key, JsonElement value,
+                            ModConfigSchema schema, int depth, JsonElement parent, String childKey) {
         Node node = new Node(path, key, value, schema, depth, parent, childKey);
         node.expanded = !collapsedPaths.contains(path);
-        nodes.add(node);
+        out.add(node);
 
         if (!node.expanded) {
             return;
@@ -115,14 +136,14 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
             JsonObject object = value.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 ModConfigSchema childSchema = schema == null ? null : schema.getProperty(entry.getKey());
-                buildNodes(path + "." + entry.getKey(), entry.getKey(), entry.getValue(), childSchema,
+                buildNodes(out, path + "." + entry.getKey(), entry.getKey(), entry.getValue(), childSchema,
                         depth + 1, value, entry.getKey());
             }
         } else if ("array".equals(type) && value != null && value.isJsonArray()) {
             JsonArray array = value.getAsJsonArray();
             ModConfigSchema itemSchema = schema == null ? null : schema.getItems();
             for (int i = 0; i < array.size(); i++) {
-                buildNodes(path + "[" + (i + 1) + "]", "[" + (i + 1) + "]", array.get(i), itemSchema,
+                buildNodes(out, path + "[" + (i + 1) + "]", "[" + (i + 1) + "]", array.get(i), itemSchema,
                         depth + 1, value, String.valueOf(i));
             }
         }
@@ -199,7 +220,6 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
                 }
             }
             rebuildNodes();
-            notifyDataSetChanged();
             return;
         }
         if (node.parent.isJsonObject()) {
@@ -210,7 +230,6 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
             array.set(index, value);
         }
         rebuildNodes();
-        notifyDataSetChanged();
     }
 
     private JsonElement defaultArrayValue(ModConfigSchema schema) {
@@ -356,7 +375,6 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
                     collapsedPaths.remove(node.path);
                 }
                 rebuildNodes();
-                notifyDataSetChanged();
             });
             controls.addView(button);
         }
@@ -370,7 +388,6 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
                     JsonArray array = node.parent.getAsJsonArray();
                     array.remove(Integer.parseInt(node.childKey));
                     rebuildNodes();
-                    notifyDataSetChanged();
                 });
                 controls.addView(removeButton);
                 addExpandButton(node);
@@ -382,7 +399,6 @@ public class ModConfigAdapter extends RecyclerView.Adapter<ModConfigAdapter.Conf
                 if (node.value != null && node.value.isJsonArray()) {
                     node.value.getAsJsonArray().add(defaultArrayValue(node.schema));
                     rebuildNodes();
-                    notifyDataSetChanged();
                 }
             });
             controls.addView(addButton);

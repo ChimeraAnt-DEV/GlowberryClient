@@ -15,7 +15,9 @@
         android:layout_height="32dp"
         android:layout_marginBottom="@dimen/space_1"
         android:src="@drawable/ic_minecraft_cube"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter" 
+        android:importantForAccessibility="no"
+        />
 
     <TextView
         android:id="@+id/qa_title"

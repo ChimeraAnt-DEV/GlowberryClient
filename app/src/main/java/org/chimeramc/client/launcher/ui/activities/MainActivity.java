@@ -56,6 +56,8 @@ import org.chimeramc.client.core.mods.Mod;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.changelog.ChangelogManager;
 import org.chimeramc.client.core.versions.GameVersion;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 import org.chimeramc.client.core.versions.VersionManager;
 import org.chimeramc.client.databinding.ActivityMainBinding;
 import org.chimeramc.client.settings.FeatureSettings;
@@ -81,6 +83,7 @@ import org.chimeramc.client.util.StorageMigrationManager;
 import org.chimeramc.client.util.StorageMigrationService;
 import org.chimeramc.client.util.UIHelper;
 import org.chimeramc.client.core.content.ContentManager;
+import org.chimeramc.client.util.MainThread;
 import java.util.ArrayList;
 import java.text.DateFormat;
 import java.util.Date;
@@ -117,6 +120,9 @@ import okhttp3.OkHttpClient;
  import static org.chimeramc.client.core.minecraft.MinecraftProcessRestarterKt.EXTRA_CLOSE_RESTART_ACTIVITY_ON_FIRST_DRAW;
 
  public class MainActivity extends BaseActivity {
+
+    private static final long TIP_ROTATE_MS = 8000L;
+
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
@@ -187,7 +193,9 @@ import okhttp3.OkHttpClient;
      */
     private final ExecutorService launchStatsExecutor = Executors.newSingleThreadExecutor();
 
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Handler uiHandler = MainThread.handler();
+    /** The lifetime of the self-reposting tip rotation, closed in onDestroy. */
+    private final MainThread.Scope tipScope = MainThread.scope();
     private Runnable pulseRunnable;
     private boolean pulseRunning;
     private View launchShimmer;
@@ -1472,20 +1480,9 @@ import okhttp3.OkHttpClient;
         // Apply Glow Effects
         boolean glow = pm.isEnableGlowEffects();
         applyGlowEffects(glow);
-        
-        
-        // Apply Show Animations toggle. The platform's "remove animations" scale wins over the
-        // in-app switch, so a user who told Android to remove animations never gets springs back
-        // from a stale app preference (U6/U11).
-        boolean platformAnimationsOff = false;
-        try {
-            platformAnimationsOff = android.provider.Settings.Global.getFloat(
-                    getContentResolver(),
-                    android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
-        } catch (Throwable ignored) {
-            // The setting is unreadable on a restricted device; treat motion as allowed.
-        }
-        DynamicAnim.applyMotionScheme(pm.isReduceMotion(), platformAnimationsOff);
+
+        // The motion scheme is applied by BaseActivity.applyMotionScheme for every screen, so
+        // this screen must not set it a second time (one owner, item 345).
     }
     
     private void applyCardRounding(int roundingDp) {
@@ -2007,8 +2004,11 @@ import okhttp3.OkHttpClient;
         String[] tips = getResources().getStringArray(R.array.launcher_tips);
         if (tips.length == 0 || binding.tipText == null) return;
         binding.tipText.setText(tips[new java.util.Random().nextInt(tips.length)]);
-        android.os.Handler handler = new android.os.Handler(getMainLooper());
-        Runnable rotateTip = new Runnable() {
+        // The tip rotation is a self-reposting tick. It runs through the activity's scope so
+        // onDestroy removes the pending post instead of firing into a destroyed Activity
+        // (items 14, 295).
+        if (tipScope.isClosed()) return;
+        tipScope.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (binding == null || binding.tipText == null) return;
@@ -2017,10 +2017,9 @@ import okhttp3.OkHttpClient;
                     binding.tipText.setText(tips[new java.util.Random().nextInt(tips.length)]);
                     binding.tipText.animate().alpha(1f).setDuration(300).start();
                 }).start();
-                handler.postDelayed(this, 8000);
+                tipScope.postDelayed(this, TIP_ROTATE_MS);
             }
-        };
-        handler.postDelayed(rotateTip, 8000);
+        }, TIP_ROTATE_MS);
     }
 
     private void initContentManagementSection() {
@@ -2506,21 +2505,29 @@ import okhttp3.OkHttpClient;
         }
 
         void filter(String query) {
+            List<GameVersion> next = new ArrayList<>();
             if (query == null || query.isEmpty()) {
-                filteredVersions = new ArrayList<>(allVersions);
+                next.addAll(allVersions);
             } else {
                 String q = query.toLowerCase();
-                filteredVersions = new ArrayList<>();
                 for (GameVersion v : allVersions) {
                     String name = getInstanceDisplayName(v).toLowerCase();
                     String code = v.versionCode != null ? v.versionCode.toLowerCase() : "";
                     String dir = v.directoryName != null ? v.directoryName.toLowerCase() : "";
                     if (name.contains(q) || code.contains(q) || dir.contains(q)) {
-                        filteredVersions.add(v);
+                        next.add(v);
                     }
                 }
             }
-            notifyDataSetChanged();
+            // The filtered list is a subset of the same rows, so diffing keeps the rows that are
+            // still shown and animates the ones that a keystroke removed. A dataset change here
+            // rebuilt the whole popup on every character typed.
+            ListDiff.Result diff = ListDiff.compute(filteredVersions, next,
+                    version -> version.directoryName,
+                    (old, fresh) -> java.util.Objects.equals(old.displayName, fresh.displayName)
+                            && java.util.Objects.equals(old.versionCode, fresh.versionCode));
+            filteredVersions = next;
+            ListDiffDispatch.apply(this, diff);
         }
 
         @NonNull @Override
@@ -2902,6 +2909,8 @@ import okhttp3.OkHttpClient;
         launchStatsExecutor.shutdownNow();
         // The account executor was never shut down either, so it outlived the Activity.
         accountExecutor.shutdownNow();
+        // Removes a pending tip rotation, so it cannot fire into the destroyed Activity.
+        tipScope.close();
     }
 
     /**

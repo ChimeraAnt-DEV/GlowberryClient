@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import org.chimeramc.client.R;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Crystal Optimizer readout.
@@ -35,7 +36,7 @@ public final class CrystalOptimizerOverlay {
 
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private View overlayView;
     private WindowManager.LayoutParams wmParams;

@@ -13,7 +13,8 @@ import android.widget.ImageButton;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
-import org.levimc.launcher.core.mods.inbuilt.nativemod.PojavControlsMod;
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.PojavControlsMod;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Gyroscope camera control.
@@ -34,7 +35,7 @@ public class GyroOverlay extends BaseOverlayButton implements SensorEventListene
 
     private boolean isActive = false;
     private boolean initialized = false;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private SensorManager sensorManager;
     private Sensor rotationSensor;
@@ -308,6 +309,9 @@ public class GyroOverlay extends BaseOverlayButton implements SensorEventListene
 
     @Override
     public void hide() {
+        // Drop the pending native init: hiding before it fires must not leave the runnable (and
+        // this overlay) referenced, and must not initialise a module the user just switched off.
+        handler.removeCallbacksAndMessages(null);
         if (isActive && initialized) {
             disableGyro();
         }

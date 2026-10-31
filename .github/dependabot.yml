@@ -1,0 +1,38 @@
+# Item 313: keep plugin and dependency versions current without a manual sweep.
+#
+# The versions themselves live in gradle/libs.versions.toml, so Dependabot edits one file rather
+# than five build scripts. Weekly, not daily: this is a game launcher, and a dependency bump that
+# lands mid-release is churn for the sake of churn.
+version: 2
+updates:
+  # The Gradle version catalogue and the build scripts.
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      # AndroidX ships as a set; one PR per artifact is noise. Grouped, one PR to review and one
+      # build to verify, which is the point of a group.
+      androidx:
+        patterns:
+          - "androidx.*"
+      firebase:
+        patterns:
+          - "com.google.firebase*"
+    ignore:
+      # The Bedrock protocol binding and the Mojang auth library are pinned to SNAPSHOT refs on
+      # purpose (bedrockConnection, minecraftauth in libs.versions.toml). A move here is a protocol
+      # or auth change, not a maintenance update, and it needs a device pass — so it is a deliberate
+      # edit, never an automated PR.
+      - dependency-name: "org.cloudburstmc.protocol:bedrock-connection"
+      - dependency-name: "com.github.RaphiMC:MinecraftAuth"
+
+  # The GitHub Actions the workflows use.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5

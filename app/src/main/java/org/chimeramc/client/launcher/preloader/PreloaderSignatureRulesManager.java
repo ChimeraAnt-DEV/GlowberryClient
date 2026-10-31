@@ -8,6 +8,8 @@ import android.util.Log;
 
 import org.chimeramc.client.util.JsonIOUtils;
 import org.chimeramc.client.util.LauncherStorage;
+import org.chimeramc.client.util.AppExecutors;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -192,7 +194,7 @@ public final class PreloaderSignatureRulesManager {
         }
 
         Context appContext = context.getApplicationContext();
-        new Thread(() -> {
+        AppExecutors.run(AppExecutors.Kind.NETWORK, "preloader-sig-refresh", () -> {
             RefreshResult result;
             try {
                 ensureLocalRulesFile(appContext);
@@ -204,7 +206,7 @@ public final class PreloaderSignatureRulesManager {
                 refreshRunning.set(false);
             }
             postCallback(callback, result);
-        }, "preloader-sig-refresh").start();
+        });
     }
 
     private static File ensureLocalRulesFile(Context context) {
@@ -444,7 +446,7 @@ public final class PreloaderSignatureRulesManager {
         if (callback == null) {
             return;
         }
-        new Handler(Looper.getMainLooper()).post(() -> callback.onFinished(result));
+        MainThread.post(() -> callback.onFinished(result));
     }
 
     private static boolean isBlank(String value) {

@@ -4,7 +4,10 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import org.chimeramc.client.util.SignalGate;
+
 import org.chimeramc.client.core.voice.VoiceProtocol;
+import org.chimeramc.client.util.AppExecutors;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -113,6 +116,11 @@ public final class CosmeticSyncModule {
     private CosmeticSyncCloudRelay cloudRelay;
     private String cloudTopic;
     private Thread cloudThread;
+    /** Wakes the cloud poll loop's interval wait so stop() joins immediately. */
+    private final SignalGate cloudGate = new SignalGate();
+
+    /** How often the cloud topic is polled. The relay has no push, so this bounds a manifest's age. */
+    private static final long CLOUD_POLL_INTERVAL_MS = 1000L;
     private volatile long cloudSinceSeconds;
     private CosmeticSyncCache cache;
 
@@ -212,8 +220,7 @@ public final class CosmeticSyncModule {
         if (!config.enabled) return false;
         if (starterThread != null && starterThread.isAlive()) return true;
         cancelled.set(false);
-        starterThread = new Thread(this::openAndStart, "cosmetic-sync-start");
-        starterThread.setDaemon(true);
+        starterThread = AppExecutors.thread("cosmetic-sync-start", this::openAndStart);
         starterThread.start();
         return true;
     }
@@ -243,8 +250,7 @@ public final class CosmeticSyncModule {
 
         acquireMulticastLock();
 
-        receiveThread = new Thread(this::receiveLoop, "cosmetic-sync-receive");
-        receiveThread.setDaemon(true);
+        receiveThread = AppExecutors.thread("cosmetic-sync-receive", this::receiveLoop);
         receiveThread.start();
 
         // Seed the registry from the local cache, so a peer seen in a previous session shows their
@@ -261,9 +267,7 @@ public final class CosmeticSyncModule {
         else if (config.hasManualPeer()) resolveManualPeer();
 
         announcer = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r, "cosmetic-sync-announce");
-            t.setDaemon(true);
-            return t;
+            return AppExecutors.thread("cosmetic-sync-announce", r);
         });
         announcer.scheduleWithFixedDelay(this::announce, 0, ANNOUNCE_INTERVAL_MS,
                 TimeUnit.MILLISECONDS);
@@ -271,9 +275,7 @@ public final class CosmeticSyncModule {
         // On-demand announces (an equip in the Cosmetics panel, a relay HELLO_ACK, a peer's
         // request) are queued here so no caller ever blocks on a socket from the UI thread.
         broadcaster = Executors.newSingleThreadExecutor(r -> {
-            Thread t = new Thread(r, "cosmetic-sync-broadcast");
-            t.setDaemon(true);
-            return t;
+            return AppExecutors.thread("cosmetic-sync-broadcast", r);
         });
     }
 
@@ -282,6 +284,8 @@ public final class CosmeticSyncModule {
         // after this stop (which would leave the module running with no way to reach it).
         cancelled.set(true);
         if (!running.getAndSet(false)) return;
+        // Signalled first so a poll loop inside its interval wait exits before the join below.
+        cloudGate.signal();
         if (instance == this) instance = null;
         if (announcer != null) {
             announcer.shutdownNow();
@@ -403,8 +407,7 @@ public final class CosmeticSyncModule {
         // Start the cursor an hour back so a peer that advertised before we joined is picked up on
         // the first poll; ntfy caches messages for a window, so this is cheap and finite.
         cloudSinceSeconds = System.currentTimeMillis() / 1000L - 3600L;
-        cloudThread = new Thread(this::cloudLoop, "cosmetic-sync-cloud");
-        cloudThread.setDaemon(true);
+        cloudThread = AppExecutors.thread("cosmetic-sync-cloud", this::cloudLoop);
         cloudThread.start();
     }
 
@@ -461,12 +464,7 @@ public final class CosmeticSyncModule {
                 // A network blip must not kill the route; the next loop retries.
                 Log.w(TAG, "Cloud poll failed", t);
             }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+            if (!cloudGate.await(CLOUD_POLL_INTERVAL_MS)) break;
         }
     }
 
@@ -545,8 +543,7 @@ public final class CosmeticSyncModule {
             relayServer = null;
             return;
         }
-        relayThread = new Thread(this::relayLoop, "cosmetic-sync-relay");
-        relayThread.setDaemon(true);
+        relayThread = AppExecutors.thread("cosmetic-sync-relay", this::relayLoop);
         relayThread.start();
     }
 
@@ -671,8 +668,7 @@ public final class CosmeticSyncModule {
                 DatagramSocket unicast = new DatagramSocket();
                 unicast.setSoTimeout(RELAY_READ_TIMEOUT_MS);
                 relaySocket = unicast;
-                relayThread = new Thread(this::manualReceiveLoop, "cosmetic-sync-manual");
-                relayThread.setDaemon(true);
+                relayThread = AppExecutors.thread("cosmetic-sync-manual", this::manualReceiveLoop);
                 relayThread.start();
             }
         } catch (IOException e) {

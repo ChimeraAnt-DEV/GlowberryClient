@@ -40,6 +40,17 @@ const val ACTION_MAIN_ACTIVITY_FIRST_DRAWN =
 private const val LEGACY_LAUNCHER_RESTART_REQUEST_CODE = 0x1E72
 private const val KILL_OLD_PROCESS_DELAY_MS = 300L
 private const val RELAUNCH_AFTER_KILL_DELAY_MS = 700L
+private const val TAG = "LauncherRestart"
+
+/**
+ * Whether the old process is still alive. A same-uid process always has a /proc/<pid> entry, and
+ * the platform removes it on exit, so the directory's existence is the exit signal. A denied or
+ * unreadable entry reads as "gone": the wait is bounded, and a false "gone" only means the relaunch
+ * proceeds on schedule, which is the pre-existing behaviour.
+ */
+private val OLD_PROCESS_PROBE = ProcessExitWait.Probe { pid ->
+    java.io.File("/proc/$pid").exists()
+}
 
 object MinecraftProcessRestarter {
     fun restartLauncherAfterMinecraftExit(context: Context) {
@@ -131,23 +142,55 @@ class LauncherRestartActivity : BaseActivity() {
             if (oldPid > 0 && oldPid != Process.myPid()) {
                 Process.killProcess(oldPid)
                 hideSystemUI()
+                // Do not assume a fixed delay is enough for the old process to be gone (item 275):
+                // starting MainActivity while the old process still holds the app's storage and the
+                // game's files is the race the restart exists to avoid. The wait runs off the main
+                // thread so the restart screen stays responsive, and it is bounded so a process that
+                // refuses to die cannot hang the relaunch forever.
+                awaitOldProcessExit(oldPid, mainHandler)
+                return@postDelayed
             }
-
-            mainHandler.postDelayed({ hideSystemUI() }, 120L)
-            mainHandler.postDelayed({ hideSystemUI() }, 360L)
-            mainHandler.postDelayed({
-                hideSystemUI()
-                startActivity(Intent(this, MainActivity::class.java).apply {
-                    addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_NO_ANIMATION
-                    )
-                    putExtra(EXTRA_CLOSE_RESTART_ACTIVITY_ON_FIRST_DRAW, true)
-                })
-                overridePendingTransition(0, 0)
-            }, RELAUNCH_AFTER_KILL_DELAY_MS)
+            scheduleRelaunch(mainHandler)
         }, KILL_OLD_PROCESS_DELAY_MS)
     }
+
+    /**
+     * Waits for the old process to exit, then relaunches. A timeout is logged and the relaunch
+     * proceeds anyway: a blank screen is worse than a possible overlap, and the log names the case
+     * so a report of "it restarted twice" has a cause.
+     */
+    private fun awaitOldProcessExit(oldPid: Int, mainHandler: Handler) {
+        Thread({
+            val exited = ProcessExitWait.await(oldPid, OLD_PROCESS_PROBE,
+                ProcessExitWait.DEFAULT_TIMEOUT_MS)
+            if (!exited) {
+                android.util.Log.w(TAG, "old process $oldPid still alive after "
+                    + ProcessExitWait.DEFAULT_TIMEOUT_MS + "ms; relaunching anyway")
+            }
+            mainHandler.post { scheduleRelaunch(mainHandler) }
+        }, "launcher-restart-wait").apply { isDaemon = true }.start()
+    }
+
+    private fun scheduleRelaunch(mainHandler: Handler) {
+        if (isFinishingOrGone()) return
+        hideSystemUI()
+        mainHandler.postDelayed({ hideSystemUI() }, 120L)
+        mainHandler.postDelayed({ hideSystemUI() }, 360L)
+        mainHandler.postDelayed({
+            if (isFinishingOrGone()) return@postDelayed
+            hideSystemUI()
+            startActivity(Intent(this, MainActivity::class.java).apply {
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_NO_ANIMATION
+                )
+                putExtra(EXTRA_CLOSE_RESTART_ACTIVITY_ON_FIRST_DRAW, true)
+            })
+            overridePendingTransition(0, 0)
+        }, RELAUNCH_AFTER_KILL_DELAY_MS)
+    }
+
+    private fun isFinishingOrGone(): Boolean = isFinishing || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isDestroyed)
 
     private fun registerCloseReceiver() {
         if (closeReceiverRegistered) return

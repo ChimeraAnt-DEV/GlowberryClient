@@ -34,7 +34,7 @@
         android:id="@+id/mod_menu_scrim"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#66070A0F" />
+        android:background="@color/overlay_scrim_soft" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/mod_menu_container"
@@ -81,7 +81,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="@string/app_name"
                         android:src="@drawable/ic_glowberry_logo"
-                        android:tint="#FFFFFF" />
+                        android:tint="@color/overlay_text_primary" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -219,7 +219,9 @@
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:src="@drawable/ic_search"
-                                android:tint="@color/mod_menu_text_secondary" />
+                                android:tint="@color/mod_menu_text_secondary" 
+                                android:importantForAccessibility="no"
+                                />
 
                             <EditText
                                 android:id="@+id/search_input"
@@ -267,14 +269,14 @@
                                 android:contentDescription="@string/cancel"
                                 android:padding="@dimen/space_2"
                                 android:src="@drawable/ic_arrow_back"
-                                android:tint="#FFFFFF" />
+                                android:tint="@color/overlay_text_primary" />
 
                             <TextView
                                 android:id="@+id/config_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/space_2"
-                                android:textColor="#FFFFFF"
+                                android:textColor="@color/overlay_text_primary"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Body"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -483,6 +485,22 @@
                                 android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 
                             <TextView
+                                android:id="@+id/filter_hud"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:minHeight="30dp"
+                                android:layout_marginEnd="@dimen/space_2"
+                                android:background="@drawable/bg_search_field"
+                                android:defaultFocusHighlightEnabled="false"
+                                android:gravity="center"
+                                android:minWidth="58dp"
+                                android:paddingStart="@dimen/space_4"
+                                android:paddingEnd="@dimen/space_4"
+                                android:text="@string/mod_menu_filter_hud"
+                                android:textColor="@color/mod_menu_text_secondary"
+                                android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
+
+                            <TextView
                                 android:id="@+id/module_count_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -574,7 +592,9 @@
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
                                 android:src="@drawable/ic_modules"
-                                android:tint="@color/mod_menu_bg_surface3" />
+                                android:tint="@color/mod_menu_bg_surface3" 
+                                android:importantForAccessibility="no"
+                                />
 
                             <TextView
                                 android:id="@+id/empty_state_text"
@@ -914,7 +934,9 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_notifications"
-                                    android:tint="@color/mod_menu_text_tertiary" />
+                                    android:tint="@color/mod_menu_text_tertiary" 
+                                    android:importantForAccessibility="no"
+                                    />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -927,7 +949,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_notifications"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -964,7 +986,9 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_hud"
-                                    android:tint="@color/mod_menu_text_tertiary" />
+                                    android:tint="@color/mod_menu_text_tertiary" 
+                                    android:importantForAccessibility="no"
+                                    />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -977,7 +1001,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_pause_menu_only"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1032,7 +1056,9 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_menu"
-                                    android:tint="@color/mod_menu_text_tertiary" />
+                                    android:tint="@color/mod_menu_text_tertiary" 
+                                    android:importantForAccessibility="no"
+                                    />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -1045,7 +1071,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_compact"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1086,7 +1112,9 @@
                                         android:layout_width="24dp"
                                         android:layout_height="24dp"
                                         android:src="@drawable/ic_modules"
-                                        android:tint="@color/mod_menu_text_tertiary" />
+                                        android:tint="@color/mod_menu_text_tertiary" 
+                                        android:importantForAccessibility="no"
+                                        />
 
                                     <TextView
                                         android:layout_width="0dp"
@@ -1094,7 +1122,7 @@
                                         android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:text="@string/mod_menu_opacity"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1152,7 +1180,7 @@
                                         android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:text="@string/mod_menu_primary_opacity"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1207,7 +1235,7 @@
                                         android:layout_marginStart="@dimen/space_3"
                                         android:layout_weight="1"
                                         android:text="@string/mod_menu_button_opacity"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1288,7 +1316,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_keyboard_bind"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1333,7 +1361,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/mod_menu_controller_bind"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="@color/overlay_text_primary"
                                         android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                         android:textStyle="bold" />
 
@@ -1362,7 +1390,7 @@
                                 android:layout_marginTop="@dimen/space_4"
                                 android:layout_marginBottom="@dimen/space_2"
                                 android:text="@string/mod_menu_loadouts"
-                                android:textColor="#FFFFFF"
+                                android:textColor="@color/overlay_text_primary"
                                 android:textAppearance="@style/TextAppearance.Glowberry.Caption"
                                 android:textStyle="bold" />
 
@@ -1403,7 +1431,7 @@
                                     android:layout_marginStart="@dimen/space_3"
                                     android:layout_weight="1"
                                     android:text="@string/mod_menu_loadout_save"
-                                    android:textColor="#FFFFFF"
+                                    android:textColor="@color/overlay_text_primary"
                                     android:textAppearance="@style/TextAppearance.Glowberry.Label"
                                     android:textStyle="bold" />
 
@@ -1540,7 +1568,7 @@
                     android:contentDescription="@string/cancel"
                     android:padding="@dimen/space_2"
                     android:src="@drawable/ic_close"
-                    android:tint="#FFFFFF" />
+                    android:tint="@color/overlay_text_primary" />
 
             </LinearLayout>
 

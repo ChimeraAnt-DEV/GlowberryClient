@@ -7,12 +7,13 @@ import android.widget.ImageButton;
 
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
-import org.levimc.launcher.core.mods.inbuilt.nativemod.SnaplookMod;
+import org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.SnaplookMod;
+import org.chimeramc.client.util.MainThread;
 
 public class SnaplookOverlay extends BaseOverlayButton {
     private boolean isActive = false;
     private boolean initialized = false;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     public SnaplookOverlay(Activity activity) {
         super(activity);
@@ -97,6 +98,7 @@ public class SnaplookOverlay extends BaseOverlayButton {
 
     @Override
     public void hide() {
+        handler.removeCallbacksAndMessages(null);
         if (isActive && initialized) {
             SnaplookMod.nativeOnKeyUp();
             isActive = false;

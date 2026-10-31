@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_hairline"
                 android:fontFamily="@font/misans"
-                android:text="play.example.com"
+                android:text="@string/server_sample_address"
                 android:textColor="@color/on_surface"
                 android:textAppearance="@style/TextAppearance.Glowberry.Caption" />
 

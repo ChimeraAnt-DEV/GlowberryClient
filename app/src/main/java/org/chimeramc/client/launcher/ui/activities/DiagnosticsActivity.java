@@ -37,12 +37,15 @@ import org.chimeramc.client.ui.activities.BaseActivity;
 import org.chimeramc.client.ui.animation.DynamicAnim;
 import org.chimeramc.client.ui.dialogs.CustomAlertDialog;
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.MainThread;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.chimeramc.client.core.backend.GameBridge;
+import org.chimeramc.client.preloader.BerryApi;
 
 /**
  * In-app diagnostics (U16) plus the "Repair installation" action (G2).
@@ -69,7 +72,7 @@ public class DiagnosticsActivity extends BaseActivity {
 
     /** Runs the read-only probes. A single thread, so two taps cannot overlap two gathers. */
     private final ExecutorService probeExecutor = Executors.newSingleThreadExecutor();
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Handler uiHandler = MainThread.handler();
 
     /** The most recently gathered reading. Written on the UI thread only, so the paint path is safe. */
     private Snapshot snapshot;
@@ -407,6 +410,23 @@ public class DiagnosticsActivity extends BaseActivity {
         addRow(rows, R.string.diagnostics_field_skin_seam,
                 data.skinSeam ? getString(R.string.diagnostics_hook_live)
                               : getString(R.string.diagnostics_hook_inactive));
+        // The script/runtime backend is a separate native library with its own version, so the
+        // screen reports what the preloader actually found rather than assuming it is present. A
+        // missing backend is then visible here before a launch, not only when a feature does nothing.
+        addRow(rows, R.string.diagnostics_field_berry_api, BerryApi.summary());
+        // The input backend is a separate seam from the runtime: the library can be present while
+        // nothing is registered to inject input through it, which is a distinct failure state.
+        addRow(rows, R.string.diagnostics_field_input_backend, GameBridge.statusLine());
+        // The preloader is a separate library with its own C ABI version. Reporting it here makes a
+        // client/native mismatch visible before a launch, rather than as a feature that silently
+        // does nothing because the two were built from different ABI revisions.
+        addRow(rows, R.string.diagnostics_field_preloader_abi,
+                PreloaderInput.abiMatches(PreloaderInput.abiVersion())
+                        ? getString(R.string.diagnostics_preloader_abi_ok,
+                                PreloaderInput.abiVersion())
+                        : getString(R.string.diagnostics_preloader_abi_mismatch,
+                                PreloaderInput.abiVersion(),
+                                PreloaderInput.EXPECTED_ABI_VERSION));
     }
 
     /**

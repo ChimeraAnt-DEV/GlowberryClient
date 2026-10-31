@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -19,8 +20,13 @@ import org.chimeramc.client.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.chimeramc.client.util.AppLog;
+import org.chimeramc.client.util.MainThread;
+import org.chimeramc.client.util.OverlayLayers;
 
 public class ModNotificationManager {
+
+    private static final String TAG = "ModNotificationManager";
     private static final int DISPLAY_DURATION = 2500;
     private static final int SLIDE_DURATION = 200;
     private static final int NOTIFICATION_HEIGHT_DP = 70;
@@ -29,7 +35,7 @@ public class ModNotificationManager {
     private static final int BOTTOM_OFFSET_DP = 60;
 
     private final Activity activity;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
     private final WindowManager windowManager;
     private final List<NotificationEntry> activeNotifications = new ArrayList<>();
     private final float density;
@@ -91,7 +97,7 @@ public class ModNotificationManager {
             entry.dismissRunnable = () -> dismissNotification(entry);
             handler.postDelayed(entry.dismissRunnable, DISPLAY_DURATION);
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Showing a mod notification failed", e);
         }
     }
 
@@ -109,10 +115,14 @@ public class ModNotificationManager {
                         entry.view.setTranslationY(0);
                         try {
                             windowManager.updateViewLayout(entry.view, entry.params);
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            AppLog.warnOnce(TAG, "notif-relayout", "Relaying out a notification failed", ignored);
+                        }
                     })
                     .start();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "notif-relayout2", "Relaying out a notification failed", ignored);
+            }
         }
     }
 
@@ -131,30 +141,36 @@ public class ModNotificationManager {
     private void animateIn(View view) {
         view.setTranslationX(300);
         view.setAlpha(0f);
-        view.animate()
+        ViewPropertyAnimator animator = view.animate()
             .translationX(0)
             .alpha(1f)
             .setDuration(SLIDE_DURATION)
-            .setInterpolator(new DecelerateInterpolator())
-            .start();
+            .setInterpolator(new DecelerateInterpolator());
+        // A hardware layer pays for itself while the slide/alpha runs and is pure overhead after,
+        // so it is promoted for the animation and demoted on its end or cancel (item 189).
+        OverlayLayers.hardwareDuring(view, animator);
+        animator.start();
     }
 
     private void dismissNotification(NotificationEntry entry) {
         if (!activeNotifications.contains(entry)) return;
 
-        entry.view.animate()
+        ViewPropertyAnimator animator = entry.view.animate()
             .translationX(300)
             .alpha(0f)
             .setDuration(SLIDE_DURATION)
             .setInterpolator(new AccelerateInterpolator())
-            .withEndAction(() -> removeNotification(entry))
-            .start();
+            .withEndAction(() -> removeNotification(entry));
+        OverlayLayers.hardwareDuring(entry.view, animator);
+        animator.start();
     }
 
     private void removeNotification(NotificationEntry entry) {
         try {
             windowManager.removeView(entry.view);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            AppLog.warnOnce(TAG, "notif-remove", "Removing a notification view failed", ignored);
+        }
         activeNotifications.remove(entry);
     }
 
@@ -175,7 +191,9 @@ public class ModNotificationManager {
                 }
                 try {
                     windowManager.removeView(entry.view);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    AppLog.warnOnce(TAG, "notif-remove2", "Removing a notification view failed", ignored);
+                }
             }
             activeNotifications.clear();
         });

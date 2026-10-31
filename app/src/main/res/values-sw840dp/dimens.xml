@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Expanded-rail metrics (U5).
+
+    At 840dp and up the rail shows every destination's label, so the 72dp icon-only width is far
+    too narrow: the label would be measured against 72dp minus 24dp of inset and ellipsised to
+    nothing. 184dp is the standard expanded navigation-rail width and leaves room for the longest
+    destination name ("Settings") at the LABEL role. The drawable padding grows to 12dp so the
+    label is not crowded against the icon.
+-->
+<resources>
+    <dimen name="nav_rail_width">184dp</dimen>
+    <dimen name="nav_rail_tab_drawable_padding">12dp</dimen>
+</resources>

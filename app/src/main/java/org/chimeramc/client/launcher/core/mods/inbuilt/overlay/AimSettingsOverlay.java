@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import org.chimeramc.client.util.PersonalizationManager;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * Center-screen crosshair + hit-flash feedback for the hit-registration module.
@@ -23,7 +24,7 @@ import org.chimeramc.client.util.PersonalizationManager;
 public class AimSettingsOverlay {
     private final Activity activity;
     private final WindowManager windowManager;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private CrosshairView view;
     private WindowManager.LayoutParams wmParams;
@@ -87,6 +88,10 @@ public class AimSettingsOverlay {
     private final class CrosshairView extends View implements Runnable {
         private final Paint reticle = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // The flash glow runs on its own 40ms loop, so its Paint is a field: allocating one per
+        // frame is exactly the kind of churn an overlay that shares the game's frame budget must
+        // not add.
+        private final Paint flashPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path flashPath = new Path();
         private float flashStrength;
         private final float density;
@@ -158,13 +163,12 @@ public class AimSettingsOverlay {
 
             if (flashStrength > 0f) {
                 int accent = flashAccent();
-                Paint glowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                glowPaint.setStyle(Paint.Style.STROKE);
-                glowPaint.setStrokeWidth(3.2f * density * flashStrength);
-                glowPaint.setColor(accent);
-                glowPaint.setAlpha((int) (200 * flashStrength));
-                canvas.drawCircle(cx, cy, 26f * density, glowPaint);
-                canvas.drawCircle(cx, cy, 12f * density, glowPaint);
+                flashPaint.setStyle(Paint.Style.STROKE);
+                flashPaint.setStrokeWidth(3.2f * density * flashStrength);
+                flashPaint.setColor(accent);
+                flashPaint.setAlpha((int) (200 * flashStrength));
+                canvas.drawCircle(cx, cy, 26f * density, flashPaint);
+                canvas.drawCircle(cx, cy, 12f * density, flashPaint);
             }
         }
 

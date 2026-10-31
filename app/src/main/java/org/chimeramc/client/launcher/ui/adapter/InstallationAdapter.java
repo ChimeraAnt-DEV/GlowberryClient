@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.installer.BedrockSource.Version;
 import org.chimeramc.client.ui.animation.DynamicAnim;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,22 +49,50 @@ public class InstallationAdapter extends RecyclerView.Adapter<InstallationAdapte
         this.listener = listener;
     }
 
+    /**
+     * Replaces the page of versions, keeping the per-row download state of the rows that survive.
+     *
+     * <p>The old code cleared every parallel list, so paging forward and back discarded the state
+     * of a download that was still running: the row said "Download" again while the transfer was in
+     * progress. A version's identity is its page URL, so a row that is still on the page keeps its
+     * state and only the new rows start at IDLE.
+     */
     public void setVersions(List<Version> newVersions) {
-        versions.clear();
-        states.clear();
-        progress.clear();
-        errors.clear();
-        installed.clear();
-        if (newVersions != null) {
-            for (Version version : newVersions) {
-                versions.add(version);
-                states.add(State.IDLE);
-                progress.add(0);
-                errors.add(null);
-                installed.add(false);
+        List<Version> next = newVersions != null ? newVersions : new ArrayList<>();
+        List<State> nextStates = new ArrayList<>(next.size());
+        List<Integer> nextProgress = new ArrayList<>(next.size());
+        List<String> nextErrors = new ArrayList<>(next.size());
+        List<Boolean> nextInstalled = new ArrayList<>(next.size());
+        for (Version version : next) {
+            int existing = indexOf(version.pageUrl);
+            if (existing >= 0) {
+                nextStates.add(states.get(existing));
+                nextProgress.add(progress.get(existing));
+                nextErrors.add(errors.get(existing));
+                nextInstalled.add(installed.get(existing));
+            } else {
+                nextStates.add(State.IDLE);
+                nextProgress.add(0);
+                nextErrors.add(null);
+                nextInstalled.add(false);
             }
         }
-        notifyDataSetChanged();
+
+        ListDiff.Result diff = ListDiff.compute(versions, next,
+                version -> version.pageUrl,
+                (old, fresh) -> java.util.Objects.equals(old.title, fresh.title)
+                        && old.release == fresh.release);
+        versions.clear();
+        versions.addAll(next);
+        states.clear();
+        states.addAll(nextStates);
+        progress.clear();
+        progress.addAll(nextProgress);
+        errors.clear();
+        errors.addAll(nextErrors);
+        installed.clear();
+        installed.addAll(nextInstalled);
+        ListDiffDispatch.apply(this, diff);
     }
 
     /** True when [versionCode] already exists as an instance, so the row can say so. */

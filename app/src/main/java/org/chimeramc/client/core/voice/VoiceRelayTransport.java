@@ -2,6 +2,9 @@ package org.chimeramc.client.core.voice;
 
 import android.util.Log;
 
+import org.chimeramc.client.util.SignalGate;
+import org.chimeramc.client.util.AppExecutors;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -52,6 +55,8 @@ public final class VoiceRelayTransport implements VoiceLink {
     private final String initialChannel;
     private final Listener listener;
     private final RelayReconnectPolicy reconnect = RelayReconnectPolicy.defaults();
+    /** Cuts a backoff wait short so stop() does not have to wait out the delay it just scheduled. */
+    private final SignalGate backoffGate = new SignalGate();
 
     private final AtomicBoolean running = new AtomicBoolean(false);
     private volatile DatagramSocket socket;
@@ -141,14 +146,16 @@ public final class VoiceRelayTransport implements VoiceLink {
             return false;
         }
         running.set(true);
-        loopThread = new Thread(this::runLoop, "voice-relay");
-        loopThread.setDaemon(true);
+        loopThread = AppExecutors.thread("voice-relay", this::runLoop);
         loopThread.start();
         return true;
     }
 
     @Override
     public void stop() {
+        // Signalled before the join so a loop sitting in a 30-second backoff exits now; otherwise
+        // the join has to time out and the socket stays open behind it.
+        backoffGate.signal();
         if (!running.compareAndSet(true, false)) {
             closeSocket();
             return;
@@ -347,11 +354,14 @@ public final class VoiceRelayTransport implements VoiceLink {
         }
     }
 
+    /**
+     * Waits out a backoff delay, cut short by {@link #stop()}.
+     *
+     * <p>The delay is the point here, so it is not replaced by a wake-up; it is made interruptible.
+     * The schedule reaches 30 seconds, and a stop that has to wait that out is a stop that appears
+     * to hang while a socket stays open.
+     */
     private void sleep(long millis) {
-        try {
-            Thread.sleep(Math.max(0, millis));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        backoffGate.await(Math.max(0L, millis));
     }
 }

@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import org.chimeramc.client.R;
 import org.chimeramc.client.core.minecraft.MinecraftLauncher;
 import org.chimeramc.client.core.versions.VersionProfileMetadataStore;
+import org.chimeramc.client.util.MainThread;
 
 import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
@@ -288,7 +289,7 @@ public class ApkInstaller {
             return;
         }
         lastPostedProgress = clamped;
-        new Handler(Looper.getMainLooper()).post(() -> {
+        MainThread.post(() -> {
             if (callback != null) callback.onProgress(clamped);
         });
     }
@@ -343,13 +344,13 @@ public class ApkInstaller {
     }
 
     private void postSuccess(String versionName) {
-        new Handler(Looper.getMainLooper()).post(() -> {
+        MainThread.post(() -> {
             if (callback != null) callback.onSuccess(versionName);
         });
     }
 
     private void postError(String error) {
-        new Handler(Looper.getMainLooper()).post(() -> {
+        MainThread.post(() -> {
             if (callback != null) callback.onError(error);
         });
     }

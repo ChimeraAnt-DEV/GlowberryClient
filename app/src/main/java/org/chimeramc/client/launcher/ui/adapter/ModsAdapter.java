@@ -15,6 +15,8 @@ import org.chimeramc.client.R;
 import org.chimeramc.client.core.mods.Mod;
 import org.chimeramc.client.core.mods.ModLoadDiagnostics;
 import org.chimeramc.client.core.mods.ModRowPresentation;
+import org.chimeramc.client.ui.components.ListDiff;
+import org.chimeramc.client.ui.components.ListDiffDispatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,9 +67,16 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
     }
 
     /** Supplies the last-launch failures so each row can flag a mod that did not load. */
+    /**
+     * Supplies the last-launch failures so each row can flag a mod that did not load.
+     *
+     * <p>A failure map replaces the whole set at once, and every row's badge is derived from it, so
+     * the rows are all told their content may have changed. It is a range change rather than a
+     * dataset change: the rows are the same rows, and the list keeps its scroll position.
+     */
     public void setLoadFailures(Map<String, ModLoadDiagnostics.Record> failures) {
         this.loadFailures = failures != null ? failures : Collections.emptyMap();
-        notifyDataSetChanged();
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     /**
@@ -215,9 +224,25 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
         notifyItemRemoved(pos);
     }
 
+    /**
+     * Replaces the list, animating only what changed (item 202).
+     *
+     * <p>A mod's identity is its id, so discovery that reorders or appends keeps the existing rows
+     * and inserts the new ones. Toggling a switch used to rebuild every card in the grid, which
+     * scrolled the list back to the top under the finger that had just touched it.
+     */
     public void updateMods(List<Mod> list) {
-        this.mods = list;
-        notifyDataSetChanged();
+        List<Mod> next = list != null ? list : new ArrayList<>();
+        ListDiff.Result diff = ListDiff.compute(this.mods, next,
+                Mod::getId,
+                (old, fresh) -> old.isEnabled() == fresh.isEnabled()
+                        && old.getOrder() == fresh.getOrder()
+                        && old.isVerified() == fresh.isVerified()
+                        && java.util.Objects.equals(old.getDisplayName(), fresh.getDisplayName())
+                        && java.util.Objects.equals(old.getVersion(), fresh.getVersion())
+                        && java.util.Objects.equals(old.getAuthor(), fresh.getAuthor()));
+        this.mods = next;
+        ListDiffDispatch.apply(this, diff);
     }
 
     public void moveItem(int fromPosition, int toPosition) {

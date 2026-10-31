@@ -18,7 +18,9 @@
         android:src="@drawable/ic_minecraft_cube"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" 
+        android:importantForAccessibility="no"
+        />
 
     <TextView
         android:id="@+id/mod_title"

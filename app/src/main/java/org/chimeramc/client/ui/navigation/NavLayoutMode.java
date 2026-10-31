@@ -32,6 +32,24 @@ public enum NavLayoutMode {
         return BOTTOM_NAV;
     }
 
+    /**
+     * The mode for a window described by both its {@code smallestScreenWidthDp} and its current
+     * width in dp.
+     *
+     * <p>Either reading alone is wrong for a window that is not the whole screen. The smallest
+     * width is stable across rotation, but on a tablet it stays the tablet's width even while the
+     * window is a narrow split-screen column, so the rail would be chosen for a column too narrow
+     * to hold its labels. The current width tracks the window, but it flips on rotation, which
+     * would swap the layout under the user mid-turn. Taking the **smaller** classification of the
+     * two keeps the rail off a window that cannot hold it, while a full-width window still gets
+     * the shape its size deserves.
+     */
+    public static NavLayoutMode forWindow(int smallestWidthDp, int windowWidthDp) {
+        NavLayoutMode bySmallest = forWidthDp(smallestWidthDp);
+        NavLayoutMode byWindow = forWidthDp(windowWidthDp);
+        return bySmallest.ordinal() <= byWindow.ordinal() ? bySmallest : byWindow;
+    }
+
     /** True for a vertical rail, whatever its width class. */
     public boolean isRail() {
         return this != BOTTOM_NAV;
@@ -40,5 +58,27 @@ public enum NavLayoutMode {
     /** True when the rail (or bar) shows a text label beside every icon. */
     public boolean showsAllLabels() {
         return this == EXPANDED_RAIL;
+    }
+
+    /**
+     * The width at which a bottom bar can afford to show the wordmark beside its tabs (item 84).
+     *
+     * <p>Below this the bar is icon-only with a single label and there is no room for the brand as
+     * well; above it the extra width is otherwise empty, so the wordmark is what tells a user
+     * which app they are in. A rail shows the wordmark whenever it shows labels, which is a
+     * different question and stays {@link #showsAllLabels()}.
+     */
+    public static final int WORDMARK_WIDTH_DP = 480;
+
+    /**
+     * Whether the wordmark is shown for this mode at {@code windowWidthDp} (item 84).
+     *
+     * <p>On a rail it follows the labels: an icon-only rail has no room for a wordmark either. On
+     * the bar it is a width decision, because the bar is horizontal and gains room from width
+     * rather than from a label column.
+     */
+    public boolean showsWordmark(int windowWidthDp) {
+        if (isRail()) return showsAllLabels();
+        return windowWidthDp >= WORDMARK_WIDTH_DP;
     }
 }

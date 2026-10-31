@@ -92,6 +92,8 @@
         android:layout_marginStart="@dimen/space_2"
         android:src="@drawable/ic_check"
         android:tint="@color/primary"
-        android:visibility="gone" />
+        android:visibility="gone" 
+        android:importantForAccessibility="no"
+        />
 
 </LinearLayout>

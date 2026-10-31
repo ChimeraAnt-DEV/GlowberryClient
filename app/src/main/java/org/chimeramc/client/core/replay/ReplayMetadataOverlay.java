@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.chimeramc.client.core.mods.inbuilt.overlay.HitTimingMod;
+import org.chimeramc.client.util.MainThread;
 
 /**
  * The metadata burn-in layer.
@@ -33,7 +34,7 @@ final class ReplayMetadataOverlay {
     private static final long TICK_MS = 1_000L;
 
     private final Activity activity;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = MainThread.handler();
 
     private WindowManager windowManager;
     private LinearLayout root;
@@ -124,8 +125,8 @@ final class ReplayMetadataOverlay {
         if (metadataText == null || metadataText.getVisibility() != View.VISIBLE) return;
         int fps = 0;
         try {
-            if (org.levimc.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeIsInitialized()) {
-                fps = org.levimc.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeGetFps();
+            if (org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeIsInitialized()) {
+                fps = org.chimeramc.client.launcher.core.mods.inbuilt.nativemod.FpsMod.nativeGetFps();
             }
         } catch (Throwable ignored) {
             // The em dash is the honest fallback for a native read that is not ready.

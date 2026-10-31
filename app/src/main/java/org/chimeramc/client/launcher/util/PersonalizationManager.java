@@ -34,8 +34,11 @@ import org.chimeramc.client.R;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import org.chimeramc.client.util.AppLog;
 
 public class PersonalizationManager {
+
+    private static final String TAG = "PersonalizationManager";
     public static final String PREFS_NAME = "personalization_prefs";
     private static final String KEY_ACCENT_COLOR = "accent_color";
     private static final String KEY_BG_IMAGE_PATH = "bg_image_path";
@@ -184,7 +187,7 @@ public class PersonalizationManager {
             prefs.edit().putString(KEY_BG_IMAGE_PATH, destFile.getAbsolutePath()).apply();
             sChangeGeneration++;
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLog.warn(TAG, "Saving the background image failed", e);
         }
     }
 
@@ -700,7 +703,9 @@ public class PersonalizationManager {
                             child.setBackground(newGd);
                         }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    AppLog.warnOnce(TAG, "tint-child", "Applying the accent to a child view failed", ignored);
+                }
             } else if (bg instanceof StateListDrawable) {
                 StateListDrawable sld = (StateListDrawable) bg;
                 boolean modified = false;
@@ -719,7 +724,9 @@ public class PersonalizationManager {
                                     modified = true;
                                 }
                             }
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            AppLog.warnOnce(TAG, "tint-gradient", "Applying the accent to a gradient failed", ignored);
+                        }
                     }
                 }
                 if (modified) {
@@ -765,6 +772,10 @@ public class PersonalizationManager {
                 }
             }
         } catch (Throwable ignored) {
+            // A StateListDrawable that is not a DrawableContainerState has no children to walk; the
+            // empty list is correct, but a repeated failure means the walk needs revisiting.
+            AppLog.warnOnce(TAG, "state-list-walk",
+                    "Walking a StateListDrawable's children failed", ignored);
         }
         return out;
     }
@@ -788,7 +799,9 @@ public class PersonalizationManager {
                 sw.setThumbTintList(new ColorStateList(states, new int[]{accentColor, 0xFFAAAAAA}));
                 int trackChecked = Color.argb(100, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor));
                 sw.setTrackTintList(new ColorStateList(states, new int[]{trackChecked, 0xFF555555}));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-switch", "Tinting a switch failed", ignored);
+            }
         }
 
         if (view instanceof Switch && !(view instanceof com.google.android.material.switchmaterial.SwitchMaterial)) {
@@ -798,7 +811,9 @@ public class PersonalizationManager {
                 sw.setThumbTintList(new ColorStateList(states, new int[]{accentColor, 0xFFAAAAAA}));
                 int trackChecked = Color.argb(100, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor));
                 sw.setTrackTintList(new ColorStateList(states, new int[]{trackChecked, 0xFF555555}));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-switch2", "Tinting a switch failed", ignored);
+            }
         }
 
         if (view instanceof androidx.appcompat.widget.SwitchCompat && !(view instanceof com.google.android.material.switchmaterial.SwitchMaterial)) {
@@ -808,7 +823,9 @@ public class PersonalizationManager {
                 sw.setThumbTintList(new ColorStateList(states, new int[]{accentColor, 0xFFAAAAAA}));
                 int trackChecked = Color.argb(100, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor));
                 sw.setTrackTintList(new ColorStateList(states, new int[]{trackChecked, 0xFF555555}));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-switch3", "Tinting a switch failed", ignored);
+            }
         }
 
         if (view instanceof SeekBar) {
@@ -816,7 +833,9 @@ public class PersonalizationManager {
             try {
                 sb.setProgressTintList(ColorStateList.valueOf(accentColor));
                 sb.setThumbTintList(ColorStateList.valueOf(accentColor));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-seekbar", "Tinting a seek bar failed", ignored);
+            }
         }
 
         if (view instanceof ProgressBar) {
@@ -825,7 +844,9 @@ public class PersonalizationManager {
                 pb.setProgressTintList(ColorStateList.valueOf(accentColor));
                 pb.setProgressBackgroundTintList(ColorStateList.valueOf(Color.argb(42, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor))));
                 pb.setIndeterminateTintList(ColorStateList.valueOf(accentColor));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-progress", "Tinting a progress bar failed", ignored);
+            }
         }
 
         if (view instanceof Button) {
@@ -838,7 +859,9 @@ public class PersonalizationManager {
                         btn.setTextColor(Color.WHITE);
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-button", "Tinting a button failed", ignored);
+            }
 
             if (btn.getCurrentTextColor() == defaultPrimary || btn.getCurrentTextColor() == defaultAccentText) {
                 btn.setTextColor(accentColor);
@@ -856,7 +879,9 @@ public class PersonalizationManager {
                             btn.setTextColor(Color.WHITE);
                         }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    AppLog.warnOnce(TAG, "tint-button2", "Tinting a button failed", ignored);
+                }
             }
         }
 
@@ -875,7 +900,9 @@ public class PersonalizationManager {
                         tv.setCompoundDrawableTintList(ColorStateList.valueOf(accentColor));
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-textview", "Tinting a text view drawable failed", ignored);
+            }
         }
 
         if (view instanceof ImageView && !(view instanceof Button)) {
@@ -926,6 +953,10 @@ public class PersonalizationManager {
                 return value.data;
             }
         } catch (Throwable ignored) {
+            // Called for every tinted view, so warn-once: an attribute that cannot be resolved
+            // falls back to the brand accent rather than failing the whole tint pass.
+            AppLog.warnOnce(TAG, "resolve-theme-color",
+                    "Resolving a theme colour attribute failed", ignored);
         }
         return ContextCompat.getColor(ctx, fallbackRes);
     }
@@ -962,7 +993,9 @@ public class PersonalizationManager {
                         gd.setColor(glassColor);
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                AppLog.warnOnce(TAG, "tint-card", "Tinting a card background failed", ignored);
+            }
         } else if (bg instanceof StateListDrawable) {
             StateListDrawable sld = (StateListDrawable) bg;
             // API 29 accessors; see stateDrawables().
@@ -979,7 +1012,9 @@ public class PersonalizationManager {
                                 sgd.setColor(glassColor);
                             }
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                        AppLog.warnOnce(TAG, "tint-card2", "Tinting a card background failed", ignored);
+                    }
                 }
             }
             sld.invalidateSelf();

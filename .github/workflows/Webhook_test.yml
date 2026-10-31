@@ -13,5 +13,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{"content": "✅ Chimera Launcher Webhook Test Successful!"}' \
+               -d '{"content": "Chimera Launcher Webhook Test Successful!"}' \
                "$WEBHOOK_URL"

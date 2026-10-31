@@ -3,6 +3,7 @@ package org.chimeramc.client.ui.navigation;
 import android.app.Activity;
 import android.view.KeyEvent;
 
+import org.chimeramc.client.R;
 import org.chimeramc.client.ui.activities.LibraryActivity;
 import org.chimeramc.client.ui.activities.MainActivity;
 import org.chimeramc.client.ui.activities.ModsFullscreenActivity;
@@ -26,19 +27,65 @@ import org.chimeramc.client.ui.activities.SettingsActivity;
  * communication feature in the same row as navigation.
  */
 public enum LauncherTab {
-    LAUNCH(MainActivity.class),
-    LIBRARY(LibraryActivity.class),
-    MODS(ModsFullscreenActivity.class),
-    SETTINGS(SettingsActivity.class);
+    LAUNCH(MainActivity.class, R.id.nav_tab_launch, R.string.nav_launch, R.drawable.ic_nav_launch),
+    LIBRARY(LibraryActivity.class, R.id.nav_tab_library, R.string.nav_library,
+            R.drawable.ic_nav_instances),
+    MODS(ModsFullscreenActivity.class, R.id.nav_tab_mods, R.string.nav_mods,
+            R.drawable.ic_inbuilt_mods),
+    SETTINGS(SettingsActivity.class, R.id.nav_tab_settings, R.string.nav_settings,
+            R.drawable.ic_nav_settings);
 
     private final Class<? extends Activity> activity;
+    private final int viewId;
+    private final int labelRes;
+    private final int iconRes;
 
-    LauncherTab(Class<? extends Activity> activity) {
+    LauncherTab(Class<? extends Activity> activity, int viewId, int labelRes, int iconRes) {
         this.activity = activity;
+        this.viewId = viewId;
+        this.labelRes = labelRes;
+        this.iconRes = iconRes;
     }
 
     public Class<? extends Activity> activity() {
         return activity;
+    }
+
+    /**
+     * The id of this tab's view, shared by {@code nav_bar.xml} and {@code nav_rail.xml}.
+     *
+     * <p>Both layouts declare the same ids, so a screen never branches on which one inflated.
+     * Keeping the id here, beside the activity and the label, is what makes adding a destination a
+     * single edit: the enum, the two layouts and the string and drawable resources.
+     */
+    public int viewId() {
+        return viewId;
+    }
+
+    /** The string resource for this destination's label. */
+    public int labelRes() {
+        return labelRes;
+    }
+
+    /** The drawable resource for this destination's icon. */
+    public int iconRes() {
+        return iconRes;
+    }
+
+    /** The tab whose view has [viewId], or null when the id is not a destination. */
+    public static LauncherTab forViewId(int viewId) {
+        for (LauncherTab tab : values()) {
+            if (tab.viewId == viewId) return tab;
+        }
+        return null;
+    }
+
+    /** Every destination's view id, in declaration order. */
+    public static int[] viewIds() {
+        LauncherTab[] tabs = values();
+        int[] ids = new int[tabs.length];
+        for (int i = 0; i < tabs.length; i++) ids[i] = tabs[i].viewId;
+        return ids;
     }
 
     /** Index of this tab, used to position the selection indicator. */
@@ -57,6 +104,23 @@ public enum LauncherTab {
         int count = tabs.length;
         int next = ((ordinal() + steps) % count + count) % count;
         return tabs[next];
+    }
+
+    /**
+     * The tab a stored name refers to, or null when it is absent or unknown (item 77).
+     *
+     * <p>The launcher remembers the last destination so a cold start reopens where the user left
+     * off, and it stores the <em>name</em> rather than the view id: an id is a generated resource
+     * number that a later build can renumber, so a stored id would silently open a different tab
+     * after an update. An unknown name is treated as "no preference", which is why this returns
+     * null rather than falling back to a guess.
+     */
+    public static LauncherTab fromStoredName(String name) {
+        if (name == null) return null;
+        for (LauncherTab tab : values()) {
+            if (tab.name().equals(name)) return tab;
+        }
+        return null;
     }
 
     /** The tab whose activity is [activityClass], or null when it is not a tab. */

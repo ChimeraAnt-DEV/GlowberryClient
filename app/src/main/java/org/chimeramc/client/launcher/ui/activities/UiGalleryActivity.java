@@ -101,7 +101,92 @@ public class UiGalleryActivity extends Activity {
         root.addView(new UiRailButtonView(this, accent, true));
         root.addView(new UiRailButtonView(this, accent, false));
 
+        addSection(root, density, "Navigation shell (bar / rail / expanded rail)");
+        for (org.chimeramc.client.ui.navigation.NavLayoutMode mode
+                : org.chimeramc.client.ui.navigation.NavLayoutMode.values()) {
+            root.addView(new NavPreviewView(this, mode, accent));
+        }
+
         setContentView(scroll);
+    }
+
+    /**
+     * A miniature of one navigation shape, drawn from the same {@link NavLayoutMode} the app uses.
+     *
+     * <p>It is a drawing, not an inflated {@code nav_bar.xml}: the point is to compare the three
+     * shapes' geometry and label visibility at a glance, and inflating the real layouts would need
+     * the whole wrapper. The label rule comes from the mode itself, so this cannot disagree with
+     * the app about whether a label is shown.
+     */
+    private static final class NavPreviewView extends View {
+        private final org.chimeramc.client.ui.navigation.NavLayoutMode mode;
+        private final int accent;
+        private final android.graphics.Paint paint = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint text = new android.graphics.Paint(
+                android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
+        private final String[] labels = {"Play", "Library", "Mods", "Settings"};
+
+        NavPreviewView(Activity a, org.chimeramc.client.ui.navigation.NavLayoutMode mode, int accent) {
+            super(a);
+            this.mode = mode;
+            this.accent = accent;
+            float density = a.getResources().getDisplayMetrics().density;
+            text.setColor(UiTokens.TEXT_PRIMARY);
+            text.setTextSize(UiTokens.TEXT_CAPTION * a.getResources().getDisplayMetrics().scaledDensity);
+            setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (mode.isRail() ? 132 * density : 56 * density)));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float density = getResources().getDisplayMetrics().density;
+            int w = getWidth();
+            int h = getHeight();
+            paint.setColor(UiTokens.BG_SURFACE);
+            scratch.set(0, 0, w, h);
+            canvas.drawRoundRect(scratch, UiTokens.RADIUS_CARD * density,
+                    UiTokens.RADIUS_CARD * density, paint);
+            paint.setColor(accent);
+            int icon = (int) (10 * density);
+            int gap = (int) (8 * density);
+            if (mode.isRail()) {
+                // A rail stacks its entries down the leading edge; the expanded one also names them.
+                int x = (int) (12 * density);
+                int y = (int) (14 * density);
+                for (int i = 0; i < labels.length; i++) {
+                    boolean active = i == 0;
+                    paint.setColor(active ? accent : UiTokens.TEXT_SECONDARY);
+                    canvas.drawCircle(x + icon / 2f, y + icon / 2f, icon / 2f, paint);
+                    if (mode.showsAllLabels()) {
+                        canvas.drawText(labels[i], x + icon + gap, y + icon * 0.9f, text);
+                    }
+                    y += icon + (int) (12 * density);
+                }
+                paint.setColor(accent);
+                canvas.drawRect(0, (int) (12 * density), (int) (2 * density),
+                        (int) (22 * density), paint);
+            } else {
+                // A bar runs its entries along the middle; the compact bar names only the active one.
+                int y = h / 2 - icon / 2;
+                int x = (int) (12 * density);
+                for (int i = 0; i < labels.length; i++) {
+                    boolean active = i == 0;
+                    paint.setColor(active ? accent : UiTokens.TEXT_SECONDARY);
+                    canvas.drawCircle(x + icon / 2f, y + icon / 2f, icon / 2f, paint);
+                    boolean showLabel = active;
+                    if (showLabel) {
+                        canvas.drawText(labels[i], x + icon + gap, y + icon * 0.9f, text);
+                        x += icon + gap + (int) text.measureText(labels[i]);
+                    }
+                    x += icon + (int) (16 * density);
+                }
+            }
+            paint.setColor(UiTokens.TEXT_SECONDARY);
+            canvas.drawText(mode.name() + "  (labels: " + (mode.showsAllLabels() ? "all" : "compact") + ")",
+                    0, h - (int) (2 * density), text);
+        }
     }
 
     private void addTitle(LinearLayout root, float density, String text) {
@@ -190,6 +275,8 @@ public class UiGalleryActivity extends Activity {
         private final float density;
         private final android.graphics.Paint paint = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
+        // Reused so the draw path allocates nothing; the gallery repaints on every state change.
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
 
         UiWindowView(Activity a, float density) {
             super(a);
@@ -200,9 +287,8 @@ public class UiGalleryActivity extends Activity {
 
         @Override
         protected void onDraw(android.graphics.Canvas canvas) {
-            android.graphics.RectF window = new android.graphics.RectF(
-                    0, 0, getWidth(), getHeight() - 8 * density);
-            org.chimeramc.client.ui.components.UiWindow.draw(canvas, paint, window,
+            scratch.set(0, 0, getWidth(), getHeight() - 8 * density);
+            org.chimeramc.client.ui.components.UiWindow.draw(canvas, paint, scratch,
                     UiTokens.RADIUS_WINDOW * density, density, 12 * density, 0.35f);
         }
     }
@@ -213,6 +299,7 @@ public class UiGalleryActivity extends Activity {
         private final int selected;
         private final android.graphics.Paint paint = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
         private final android.graphics.Paint text = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
 
@@ -229,10 +316,9 @@ public class UiGalleryActivity extends Activity {
         protected void onDraw(android.graphics.Canvas canvas) {
             float density = getResources().getDisplayMetrics().density;
             float h = org.chimeramc.client.ui.components.UiSegmented.HEIGHT_DP * density;
-            android.graphics.RectF b = new android.graphics.RectF(
-                    0, (getHeight() - h) / 2f, Math.min(getWidth(), 240 * density),
+            scratch.set(0, (getHeight() - h) / 2f, Math.min(getWidth(), 240 * density),
                     (getHeight() + h) / 2f);
-            org.chimeramc.client.ui.components.UiSegmented.draw(canvas, paint, text, b,
+            org.chimeramc.client.ui.components.UiSegmented.draw(canvas, paint, text, scratch,
                     new String[]{"Navy", "Black", "System"}, selected, accent, density);
         }
     }
@@ -242,6 +328,7 @@ public class UiGalleryActivity extends Activity {
         private final boolean withText;
         private final android.graphics.Paint paint = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
 
         UiSearchFieldView(Activity a, boolean withText) {
             super(a);
@@ -255,10 +342,9 @@ public class UiGalleryActivity extends Activity {
         protected void onDraw(android.graphics.Canvas canvas) {
             float density = getResources().getDisplayMetrics().density;
             float h = org.chimeramc.client.ui.components.UiSearchField.HEIGHT_DP * density;
-            android.graphics.RectF field = new android.graphics.RectF(
-                    0, (getHeight() - h) / 2f, Math.min(getWidth(), 240 * density),
+            scratch.set(0, (getHeight() - h) / 2f, Math.min(getWidth(), 240 * density),
                     (getHeight() + h) / 2f);
-            org.chimeramc.client.ui.components.UiSearchField.draw(canvas, paint, field,
+            org.chimeramc.client.ui.components.UiSearchField.draw(canvas, paint, scratch,
                     withText ? "fps" : "", withText, density);
         }
     }
@@ -297,6 +383,7 @@ public class UiGalleryActivity extends Activity {
         private final boolean enabled;
         private final android.graphics.Paint paint = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
 
         UiButtonView(Activity a, int accent, org.chimeramc.client.ui.components.UiButton.Style style,
                      boolean pressed, boolean enabled) {
@@ -313,9 +400,8 @@ public class UiGalleryActivity extends Activity {
         @Override
         protected void onDraw(android.graphics.Canvas canvas) {
             float density = getResources().getDisplayMetrics().density;
-            android.graphics.RectF b = new android.graphics.RectF(
-                    0, 6 * density, Math.min(getWidth(), 180 * density), getHeight() - 6 * density);
-            org.chimeramc.client.ui.components.UiButton.draw(canvas, paint, b,
+            scratch.set(0, 6 * density, Math.min(getWidth(), 180 * density), getHeight() - 6 * density);
+            org.chimeramc.client.ui.components.UiButton.draw(canvas, paint, scratch,
                     UiTokens.RADIUS_BUTTON * density, accent, style, pressed, enabled);
         }
     }
@@ -324,6 +410,7 @@ public class UiGalleryActivity extends Activity {
     private static final class UiCardView extends View {
         private final android.graphics.Paint paint = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
 
         UiCardView(Activity a) {
             super(a);
@@ -335,9 +422,8 @@ public class UiGalleryActivity extends Activity {
         @Override
         protected void onDraw(android.graphics.Canvas canvas) {
             float density = getResources().getDisplayMetrics().density;
-            android.graphics.RectF b = new android.graphics.RectF(
-                    0, 6 * density, Math.min(getWidth(), 260 * density), getHeight() - 6 * density);
-            org.chimeramc.client.ui.components.UiCard.draw(canvas, paint, b,
+            scratch.set(0, 6 * density, Math.min(getWidth(), 260 * density), getHeight() - 6 * density);
+            org.chimeramc.client.ui.components.UiCard.draw(canvas, paint, scratch,
                     UiTokens.RADIUS_CARD * density);
         }
     }
@@ -408,6 +494,8 @@ public class UiGalleryActivity extends Activity {
         private final boolean pressed;
         private final android.graphics.Paint paint = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF scratch = new android.graphics.RectF();
+        private final android.graphics.RectF scratch2 = new android.graphics.RectF();
         private final android.graphics.Paint text = new android.graphics.Paint(
                 android.graphics.Paint.ANTI_ALIAS_FLAG);
 
@@ -424,19 +512,18 @@ public class UiGalleryActivity extends Activity {
         @Override
         protected void onDraw(android.graphics.Canvas canvas) {
             float density = getResources().getDisplayMetrics().density;
-            android.graphics.RectF row = new android.graphics.RectF(
-                    0, 4 * density, getWidth(), getHeight() - 4 * density);
-            org.chimeramc.client.ui.components.UiRow.drawBackground(canvas, paint, row,
+            scratch.set(0, 4 * density, getWidth(), getHeight() - 4 * density);
+            org.chimeramc.client.ui.components.UiRow.drawBackground(canvas, paint, scratch,
                     UiTokens.RADIUS_CARD * density, accent, on, pressed);
             text.setColor(UiTokens.TEXT_PRIMARY);
             text.setTextSize(UiTokens.TEXT_ROW_TITLE * density);
             android.graphics.Paint.FontMetrics fm = text.getFontMetrics();
-            float ty = row.centerY() - (fm.ascent + fm.descent) / 2f;
-            canvas.drawText("Example module", row.left + 44 * density, ty, text);
-            android.graphics.RectF t = org.chimeramc.client.ui.components.UiRow
-                    .toggleBounds(row, density);
-            org.chimeramc.client.ui.components.UiToggle.draw(canvas, paint, t.left, t.top,
-                    t.width(), t.height(), accent, on, on ? 1f : 0f, density);
+            float ty = scratch.centerY() - (fm.ascent + fm.descent) / 2f;
+            canvas.drawText("Example module", scratch.left + 44 * density, ty, text);
+            org.chimeramc.client.ui.components.UiRow.toggleBoundsInto(scratch2, scratch, density);
+            org.chimeramc.client.ui.components.UiToggle.draw(canvas, paint,
+                    scratch2.left, scratch2.top, scratch2.width(), scratch2.height(),
+                    accent, on, on ? 1f : 0f, density);
         }
     }
 }
