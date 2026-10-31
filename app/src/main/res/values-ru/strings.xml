@@ -1054,4 +1054,17 @@
     <string name="wheel_customize_title">Что вы хотите настроить?</string>
     <string name="wheel_customize_mod_settings">Настройки меню модов</string>
     <string name="wheel_customize_cosmetics">Косметика</string>
+    <string name="mod_menu_action_manage_wheel">Управление радиальным меню</string>
+    <string name="mod_menu_action_manage_wheel_desc">Создание, переименование, изменение порядка и удаление профилей радиального меню</string>
+    <string name="wheel_manager_title">Профили радиального меню</string>
+    <string name="wheel_manager_add">Новое меню</string>
+    <string name="wheel_manager_add_title">Назовите новое меню</string>
+    <string name="wheel_manager_rename_title">Переименовать это меню</string>
+    <string name="wheel_manager_name_hint">Название меню</string>
+    <string name="wheel_manager_cancel">Отмена</string>
+    <string name="wheel_manager_save">Сохранить</string>
+    <string name="wheel_manager_done">Готово</string>
+    <string name="wheel_manager_root_label">Открывается клавишей</string>
+    <string name="wheel_manager_entry_count">%1$d записей</string>
+    <string name="wheel_manager_last_note">Последнее меню нельзя удалить; клавише нужно меню для открытия.</string>
 </resources>

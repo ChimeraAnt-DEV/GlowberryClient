@@ -1053,4 +1053,17 @@ Quá trình chuyển đổi phải hoàn tất trước khi GlowberryClient có 
     <string name="wheel_customize_title">Bạn muốn tùy chỉnh gì?</string>
     <string name="wheel_customize_mod_settings">Cài đặt Menu Mod</string>
     <string name="wheel_customize_cosmetics">Trang phục</string>
+    <string name="mod_menu_action_manage_wheel">Quản lý menu tròn</string>
+    <string name="mod_menu_action_manage_wheel_desc">Tạo, đổi tên, sắp xếp lại và xóa hồ sơ menu tròn</string>
+    <string name="wheel_manager_title">Hồ sơ menu tròn</string>
+    <string name="wheel_manager_add">Menu mới</string>
+    <string name="wheel_manager_add_title">Đặt tên cho menu mới</string>
+    <string name="wheel_manager_rename_title">Đổi tên menu này</string>
+    <string name="wheel_manager_name_hint">Tên menu</string>
+    <string name="wheel_manager_cancel">Hủy</string>
+    <string name="wheel_manager_save">Lưu</string>
+    <string name="wheel_manager_done">Xong</string>
+    <string name="wheel_manager_root_label">Mở bằng phím</string>
+    <string name="wheel_manager_entry_count">%1$d mục</string>
+    <string name="wheel_manager_last_note">Không thể xóa menu cuối cùng; phím cần một menu để mở.</string>
 </resources>

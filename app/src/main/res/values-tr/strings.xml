@@ -1050,4 +1050,17 @@ GlowberryClient\'ın devam edebilmesi için taşımanın tamamlanması gerekiyor
     <string name="wheel_customize_title">Neyi özelleştirmek istersiniz?</string>
     <string name="wheel_customize_mod_settings">Mod Menüsü Ayarları</string>
     <string name="wheel_customize_cosmetics">Kozmetikler</string>
+    <string name="mod_menu_action_manage_wheel">Radyal menüyü yönet</string>
+    <string name="mod_menu_action_manage_wheel_desc">Radyal menü profillerini oluştur, yeniden adlandır, sırala ve sil</string>
+    <string name="wheel_manager_title">Radyal menü profilleri</string>
+    <string name="wheel_manager_add">Yeni menü</string>
+    <string name="wheel_manager_add_title">Yeni menüyü adlandır</string>
+    <string name="wheel_manager_rename_title">Bu menüyü yeniden adlandır</string>
+    <string name="wheel_manager_name_hint">Menü adı</string>
+    <string name="wheel_manager_cancel">İptal</string>
+    <string name="wheel_manager_save">Kaydet</string>
+    <string name="wheel_manager_done">Bitti</string>
+    <string name="wheel_manager_root_label">Tuşla açılır</string>
+    <string name="wheel_manager_entry_count">%1$d giriş</string>
+    <string name="wheel_manager_last_note">Son menü silinemez; tuşun açılmak için bir menüye ihtiyacı var.</string>
 </resources>

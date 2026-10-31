@@ -986,6 +986,11 @@ public class ModMenuOverlay {
             case ModMenuActionCatalog.ACTION_RELOAD_MODULES:
                 reloadModules();
                 break;
+            case ModMenuActionCatalog.ACTION_MANAGE_WHEEL:
+                WheelProfileManagerDialog.show(activity, new ModMenuTheme(activity,
+                        org.chimeramc.client.core.mods.inbuilt.manager.InbuiltModManager
+                                .getInstance(activity).getModMenuSettings()));
+                break;
             default:
                 break;
         }

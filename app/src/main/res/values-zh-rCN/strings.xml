@@ -1044,4 +1044,17 @@
     <string name="wheel_customize_title">你想自定义什么？</string>
     <string name="wheel_customize_mod_settings">模组菜单设置</string>
     <string name="wheel_customize_cosmetics">外观</string>
+    <string name="mod_menu_action_manage_wheel">管理径向菜单</string>
+    <string name="mod_menu_action_manage_wheel_desc">创建、重命名、重新排序和删除径向菜单配置</string>
+    <string name="wheel_manager_title">径向菜单配置</string>
+    <string name="wheel_manager_add">新建菜单</string>
+    <string name="wheel_manager_add_title">为新建菜单命名</string>
+    <string name="wheel_manager_rename_title">重命名此菜单</string>
+    <string name="wheel_manager_name_hint">菜单名称</string>
+    <string name="wheel_manager_cancel">取消</string>
+    <string name="wheel_manager_save">保存</string>
+    <string name="wheel_manager_done">完成</string>
+    <string name="wheel_manager_root_label">随按键打开</string>
+    <string name="wheel_manager_entry_count">%1$d 项</string>
+    <string name="wheel_manager_last_note">无法删除最后一个菜单；按键需要一个菜单才能打开。</string>
 </resources>

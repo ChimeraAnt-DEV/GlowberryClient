@@ -1023,4 +1023,17 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="wheel_customize_title">Que souhaitez-vous personnaliser ?</string>
     <string name="wheel_customize_mod_settings">Paramètres du menu de mods</string>
     <string name="wheel_customize_cosmetics">Cosmétiques</string>
+    <string name="mod_menu_action_manage_wheel">Gérer le menu radial</string>
+    <string name="mod_menu_action_manage_wheel_desc">Créer, renommer, réorganiser et supprimer des profils du menu radial</string>
+    <string name="wheel_manager_title">Profils du menu radial</string>
+    <string name="wheel_manager_add">Nouveau menu</string>
+    <string name="wheel_manager_add_title">Nommer le nouveau menu</string>
+    <string name="wheel_manager_rename_title">Renommer ce menu</string>
+    <string name="wheel_manager_name_hint">Nom du menu</string>
+    <string name="wheel_manager_cancel">Annuler</string>
+    <string name="wheel_manager_save">Enregistrer</string>
+    <string name="wheel_manager_done">Terminé</string>
+    <string name="wheel_manager_root_label">S\'ouvre avec la touche</string>
+    <string name="wheel_manager_entry_count">%1$d entrées</string>
+    <string name="wheel_manager_last_note">Le dernier menu ne peut pas être supprimé ; la touche en a besoin pour s\'ouvrir.</string>
 </resources>

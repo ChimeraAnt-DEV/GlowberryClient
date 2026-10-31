@@ -19,6 +19,8 @@ public final class ModMenuActionCatalog {
     public static final String ACTION_RESET_HUD = "reset_hud";
     /** Re-scan and re-register every module without restarting the session. */
     public static final String ACTION_RELOAD_MODULES = "reload_modules";
+    /** Open the radial wheel's profile manager. */
+    public static final String ACTION_MANAGE_WHEEL = "manage_wheel";
 
     private static final List<ModMenuAction> ACTIONS = Collections.unmodifiableList(build());
 
@@ -39,6 +41,11 @@ public final class ModMenuActionCatalog {
                 R.string.mod_menu_action_reload_mods_desc,
                 "inbuilt",
                 R.drawable.ic_reload));
+        actions.add(new ModMenuAction(ACTION_MANAGE_WHEEL,
+                R.string.mod_menu_action_manage_wheel,
+                R.string.mod_menu_action_manage_wheel_desc,
+                "inbuilt",
+                R.drawable.ic_wheel));
         return actions;
     }
 

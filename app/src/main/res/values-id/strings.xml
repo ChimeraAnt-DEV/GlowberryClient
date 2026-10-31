@@ -1047,4 +1047,17 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="wheel_customize_title">Apa yang ingin Anda sesuaikan?</string>
     <string name="wheel_customize_mod_settings">Pengaturan Menu Mod</string>
     <string name="wheel_customize_cosmetics">Kosmetik</string>
+    <string name="mod_menu_action_manage_wheel">Kelola menu radial</string>
+    <string name="mod_menu_action_manage_wheel_desc">Buat, ganti nama, urutkan ulang, dan hapus profil menu radial</string>
+    <string name="wheel_manager_title">Profil menu radial</string>
+    <string name="wheel_manager_add">Menu baru</string>
+    <string name="wheel_manager_add_title">Beri nama menu baru</string>
+    <string name="wheel_manager_rename_title">Ganti nama menu ini</string>
+    <string name="wheel_manager_name_hint">Nama menu</string>
+    <string name="wheel_manager_cancel">Batal</string>
+    <string name="wheel_manager_save">Simpan</string>
+    <string name="wheel_manager_done">Selesai</string>
+    <string name="wheel_manager_root_label">Terbuka dengan tombol</string>
+    <string name="wheel_manager_entry_count">%1$d entri</string>
+    <string name="wheel_manager_last_note">Menu terakhir tidak dapat dihapus; tombol memerlukan satu untuk dibuka.</string>
 </resources>

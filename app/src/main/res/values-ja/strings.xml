@@ -1020,4 +1020,17 @@ GlowberryClient を続行するには移行を完了する必要があります�
     <string name="wheel_customize_title">何をカスタマイズしますか？</string>
     <string name="wheel_customize_mod_settings">Mod メニュー設定</string>
     <string name="wheel_customize_cosmetics">コスメ</string>
+    <string name="mod_menu_action_manage_wheel">ラジアルメニューを管理</string>
+    <string name="mod_menu_action_manage_wheel_desc">ラジアルメニューのプロファイルを作成、名前変更、並べ替え、削除します</string>
+    <string name="wheel_manager_title">ラジアルメニューのプロファイル</string>
+    <string name="wheel_manager_add">新しいメニュー</string>
+    <string name="wheel_manager_add_title">新しいメニューに名前を付ける</string>
+    <string name="wheel_manager_rename_title">このメニューの名前を変更</string>
+    <string name="wheel_manager_name_hint">メニュー名</string>
+    <string name="wheel_manager_cancel">キャンセル</string>
+    <string name="wheel_manager_save">保存</string>
+    <string name="wheel_manager_done">完了</string>
+    <string name="wheel_manager_root_label">キーで開く</string>
+    <string name="wheel_manager_entry_count">%1$d 項目</string>
+    <string name="wheel_manager_last_note">最後のメニューは削除できません。開くにはキーが必要です。</string>
 </resources>

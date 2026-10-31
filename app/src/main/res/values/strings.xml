@@ -850,6 +850,19 @@ GlowberryClient must complete the migration before continuing.</string>
     <string name="mod_menu_action_reload_mods">Reload Modules</string>
     <string name="mod_menu_action_reload_mods_desc">Re-scan and re-register every module</string>
     <string name="mod_menu_action_reset_hud_done">HUD positions reset</string>
+    <string name="mod_menu_action_manage_wheel">Manage Radial Menu</string>
+    <string name="mod_menu_action_manage_wheel_desc">Create, rename, reorder and delete wheel profiles</string>
+    <string name="wheel_manager_title">Radial menu profiles</string>
+    <string name="wheel_manager_add">New wheel</string>
+    <string name="wheel_manager_add_title">Name the new wheel</string>
+    <string name="wheel_manager_rename_title">Rename this wheel</string>
+    <string name="wheel_manager_name_hint">Wheel name</string>
+    <string name="wheel_manager_cancel">Cancel</string>
+    <string name="wheel_manager_save">Save</string>
+    <string name="wheel_manager_done">Done</string>
+    <string name="wheel_manager_root_label">Opens with the bind</string>
+    <string name="wheel_manager_entry_count">%1$d entries</string>
+    <string name="wheel_manager_last_note">The last wheel cannot be deleted; the bind needs one to open.</string>
 
     <!-- Mod Menu settings tab (M6). Presets plus four sliders, and nothing free-form. -->
     <string name="mod_menu_settings_appearance">Appearance</string>

@@ -67,6 +67,17 @@ public class ModMenuActionTest {
     }
 
     @Test
+    public void theWheelManagerActionExistsBecauseTheStoreHadNoScreen() {
+        // The store could create, rename, reorder and delete but nothing opened it, so the wheel
+        // was stuck on the built-in default set. The action is that screen's entry point.
+        ModMenuAction manage = ModMenuActionCatalog.byId(ModMenuActionCatalog.ACTION_MANAGE_WHEEL);
+        assertNotNull("the wheel profile manager needs an entry point", manage);
+        assertEquals("inbuilt", manage.getGroupId());
+        assertTrue("the action has a title", manage.getTitleRes() != 0);
+        assertTrue("the action has an explanation", manage.getSubtitleRes() != 0);
+    }
+
+    @Test
     public void forGroupReturnsOnlyThatSectionsActions() {
         for (ModMenuAction action : ModMenuActionCatalog.all()) {
             for (ModMenuAction inGroup : ModMenuActionCatalog.forGroup(action.getGroupId())) {

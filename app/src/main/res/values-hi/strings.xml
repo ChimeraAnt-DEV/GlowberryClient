@@ -1051,4 +1051,17 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="wheel_customize_title">आप किसे अनुकूलित करना चाहेंगे?</string>
     <string name="wheel_customize_mod_settings">मॉड मेनू सेटिंग्स</string>
     <string name="wheel_customize_cosmetics">कॉस्मेटिक्स</string>
+    <string name="mod_menu_action_manage_wheel">रेडियल मेनू प्रबंधित करें</string>
+    <string name="mod_menu_action_manage_wheel_desc">रेडियल मेनू प्रोफ़ाइल बनाएँ, नाम बदलें, क्रम बदलें और हटाएँ</string>
+    <string name="wheel_manager_title">रेडियल मेनू प्रोफ़ाइल</string>
+    <string name="wheel_manager_add">नया मेनू</string>
+    <string name="wheel_manager_add_title">नए मेनू का नाम दें</string>
+    <string name="wheel_manager_rename_title">इस मेनू का नाम बदलें</string>
+    <string name="wheel_manager_name_hint">मेनू का नाम</string>
+    <string name="wheel_manager_cancel">रद्द करें</string>
+    <string name="wheel_manager_save">सहेजें</string>
+    <string name="wheel_manager_done">हो गया</string>
+    <string name="wheel_manager_root_label">की से खुलता है</string>
+    <string name="wheel_manager_entry_count">%1$d प्रविष्टियाँ</string>
+    <string name="wheel_manager_last_note">अंतिम मेनू हटाया नहीं जा सकता; खोलने के लिए की को एक चाहिए।</string>
 </resources>
