@@ -42,6 +42,12 @@ import org.chimeramc.client.util.MainThread;
  */
 public final class HitTimingOverlay {
     private static final float DRAG_THRESHOLD = 10f;
+
+    /** The three state verbs, as constants so the draw path never concatenates. */
+    private static final String LABEL_READY = "READY";
+    private static final String LABEL_HIT = "HIT";
+    private static final String LABEL_WAIT = "WAIT";
+
     private static final int REFRESH_MS = 33;
 
     private final Activity activity;
@@ -334,7 +340,9 @@ public final class HitTimingOverlay {
 
             // Label: a short verb in the state colour. The remaining time is drawn as a
             // separate dim caption so the two do not compete for the same line.
-            String label = idle ? "READY" : (decision.isGreen() ? "HIT" : "WAIT");
+            // Constants, not built per frame: the label is one of three fixed verbs and drawing
+            // runs on the game's frame tick (item 17).
+            String label = idle ? LABEL_READY : (decision.isGreen() ? LABEL_HIT : LABEL_WAIT);
             textPaint.setColor(color);
             float textCenterY = h / 2f - (textPaint.descent() + textPaint.ascent()) / 2f;
             float labelX = w / 2f;

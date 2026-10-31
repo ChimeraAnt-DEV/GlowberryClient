@@ -130,6 +130,13 @@ public final class ReachIndicatorOverlay {
         private final RectF border = new RectF();
         private final float density;
 
+        // The caption is reformatted only when the reading actually changes. This view redraws on
+        // the 50 ms refresh, and String.format allocates; the same peer at the same distance would
+        // otherwise build an identical string twenty times a second (item 17).
+        private String cachedText;
+        private String cachedPeerId;
+        private float cachedDistance = Float.NaN;
+
         ReachView(Context context) {
             super(context);
             density = getResources().getDisplayMetrics().density;
@@ -149,7 +156,7 @@ public final class ReachIndicatorOverlay {
             ReachIndicator.Reading reading = ReachIndicatorMod.read(camera);
             if (reading == null) return;
 
-            String text = reading.format();
+            String text = captionFor(reading);
             float padX = 10f * density;
             float padY = 6f * density;
             float textW = textPaint.measureText(text);
@@ -176,6 +183,20 @@ public final class ReachIndicatorOverlay {
             textPaint.setColor(0xFFEAF6FF);
             float baseline = cy - (textPaint.descent() + textPaint.ascent()) / 2f;
             canvas.drawText(text, cx, baseline, textPaint);
+        }
+
+        /** The caption text, rebuilt only when the peer or its distance changes. */
+        private String captionFor(ReachIndicator.Reading reading) {
+            boolean same = cachedText != null
+                    && reading.distanceBlocks == cachedDistance
+                    && reading.peerId != null && reading.peerId.equals(cachedPeerId);
+            if (same) {
+                return cachedText;
+            }
+            cachedText = reading.format();
+            cachedDistance = reading.distanceBlocks;
+            cachedPeerId = reading.peerId;
+            return cachedText;
         }
 
         /** The camera for the reading, or null when the local player feed is unavailable. */

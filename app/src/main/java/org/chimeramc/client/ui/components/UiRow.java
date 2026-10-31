@@ -16,11 +16,31 @@ public final class UiRow {
 
     /** The toggle's bounds within a row of the given rectangle. */
     public static RectF toggleBounds(RectF row, float density) {
+        float[] b = toggleBoundsArray(row.left, row.top, row.right, row.bottom, density);
+        return new RectF(b[0], b[1], b[2], b[3]);
+    }
+
+    /**
+     * The toggle's rectangle as {@code {left, top, right, bottom}}, pure and device-free.
+     *
+     * <p>The array form follows {@link UiWindow#boundsArray}: {@code RectF} is not on the unit-test
+     * classpath, and it also lets a caller fill a reused {@code RectF} instead of allocating one
+     * per draw.
+     */
+    public static float[] toggleBoundsArray(float left, float top, float right, float bottom,
+                                            float density) {
         float tw = UiTokens.TOGGLE_WIDTH * density;
         float th = UiTokens.TOGGLE_HEIGHT * density;
-        float right = row.right - 12f * density;
-        float top = row.centerY() - th / 2f;
-        return new RectF(right - tw, top, right, top + th);
+        float rightEdge = right - 12f * density;
+        float centerY = (top + bottom) / 2f;
+        float topEdge = centerY - th / 2f;
+        return new float[]{rightEdge - tw, topEdge, rightEdge, topEdge + th};
+    }
+
+    /** Fills {@code out} with the toggle bounds, allocating nothing. */
+    public static void toggleBoundsInto(RectF out, RectF row, float density) {
+        float[] b = toggleBoundsArray(row.left, row.top, row.right, row.bottom, density);
+        out.set(b[0], b[1], b[2], b[3]);
     }
 
     /** The leading icon's square within a row. */

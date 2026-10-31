@@ -16,6 +16,10 @@ public class HudOverlay extends View {
     private static final String TAG = "HudOverlay";
     private boolean isShowing = false;
     private final Paint paint = new Paint();
+    // Triangle scratch, reused so a TYPE_TRIANGLE_FILLED command does not allocate a Path on
+    // every frame (item 17). The draw path runs on the game's frame tick.
+    private final android.graphics.Path trianglePath = new android.graphics.Path();
+    private final android.graphics.RectF imageDst = new android.graphics.RectF();
 
     // The command list is drawn every frame, so a text command whose only placeholder is the
     // surface size must not rebuild its string each time. The cache holds the last command and its
@@ -740,7 +744,8 @@ public class HudOverlay extends View {
                     canvas.drawCircle(drawX, drawY, cmd.size, paint);
                 } else if (cmd.type == DrawCommand.TYPE_TRIANGLE_FILLED) {
                     paint.setStyle(Paint.Style.FILL);
-                    android.graphics.Path path = new android.graphics.Path();
+                    android.graphics.Path path = trianglePath;
+                    path.reset();
                     path.moveTo(drawX, drawY);
                     
                     float pt2X = cmd.w;
@@ -764,8 +769,8 @@ public class HudOverlay extends View {
                 } else if (cmd.type == DrawCommand.TYPE_IMAGE) {
                     android.graphics.Bitmap bitmap = getImage(cmd.imageId);
                     if (bitmap != null) {
-                        android.graphics.RectF dst = new android.graphics.RectF(drawX, drawY, drawX + cmd.w, drawY + cmd.h);
-                        canvas.drawBitmap(bitmap, null, dst, paint);
+                        imageDst.set(drawX, drawY, drawX + cmd.w, drawY + cmd.h);
+                        canvas.drawBitmap(bitmap, null, imageDst, paint);
                     }
                 }
 
