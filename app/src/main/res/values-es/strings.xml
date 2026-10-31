@@ -1047,4 +1047,8 @@ La migración debe completarse antes de continuar con GlowberryClient.</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (el cliente espera v%2$d)</string>
     <string name="about_input_backend_status">Backend de entrada: %1$s</string>
     <string name="diagnostics_field_input_backend">Backend de entrada</string>
+    <string name="crash_exit_reason_label">Motivo de la última salida:</string>
+    <string name="crash_disable_last_mod">Desactivar el mod que provocó el fallo</string>
+    <string name="crash_disable_no_suspects">No se registraron mods para este fallo.</string>
+    <string name="crash_disable_done">Se desactivaron %1$d mod(s). Vuelve a iniciar para probar sin ellos.</string>
 </resources>

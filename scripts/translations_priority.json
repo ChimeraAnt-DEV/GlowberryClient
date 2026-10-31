@@ -90,7 +90,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (coincide con el cliente)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (el cliente espera v%2$d)",
     "about_input_backend_status": "Backend de entrada: %1$s",
-    "diagnostics_field_input_backend": "Backend de entrada"
+    "diagnostics_field_input_backend": "Backend de entrada",
+    "crash_exit_reason_label": "Motivo de la última salida:",
+    "crash_disable_last_mod": "Desactivar el mod que provocó el fallo",
+    "crash_disable_no_suspects": "No se registraron mods para este fallo.",
+    "crash_disable_done": "Se desactivaron %1$d mod(s). Vuelve a iniciar para probar sin ellos."
   },
   "fr": {
     "nav_back": "Retour",
@@ -183,7 +187,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (correspond au client)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (le client attend v%2$d)",
     "about_input_backend_status": "Backend d’entrée : %1$s",
-    "diagnostics_field_input_backend": "Backend d’entrée"
+    "diagnostics_field_input_backend": "Backend d’entrée",
+    "crash_exit_reason_label": "Raison de la dernière fermeture :",
+    "crash_disable_last_mod": "Désactiver le mod qui a planté",
+    "crash_disable_no_suspects": "Aucun mod n\\'a été enregistré pour ce plantage.",
+    "crash_disable_done": "%1$d mod(s) désactivé(s). Relancez pour essayer sans eux."
   },
   "hi": {
     "nav_back": "वापस",
@@ -276,7 +284,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (क्लाइंट से मेल खाता है)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (क्लाइंट v%2$d की अपेक्षा करता है)",
     "about_input_backend_status": "इनपुट बैकएंड: %1$s",
-    "diagnostics_field_input_backend": "इनपुट बैकएंड"
+    "diagnostics_field_input_backend": "इनपुट बैकएंड",
+    "crash_exit_reason_label": "पिछले बंद होने का कारण:",
+    "crash_disable_last_mod": "क्रैश करने वाले मॉड को बंद करें",
+    "crash_disable_no_suspects": "इस क्रैश के लिए कोई मॉड दर्ज नहीं हुआ।",
+    "crash_disable_done": "%1$d मॉड बंद किए गए। इनके बिना आज़माने के लिए फिर से लॉन्च करें।"
   },
   "id": {
     "nav_back": "Kembali",
@@ -369,7 +381,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (cocok dengan klien)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (klien mengharapkan v%2$d)",
     "about_input_backend_status": "Backend masukan: %1$s",
-    "diagnostics_field_input_backend": "Backend masukan"
+    "diagnostics_field_input_backend": "Backend masukan",
+    "crash_exit_reason_label": "Alasan keluar terakhir:",
+    "crash_disable_last_mod": "Nonaktifkan mod yang menyebabkan crash",
+    "crash_disable_no_suspects": "Tidak ada mod yang tercatat untuk crash ini.",
+    "crash_disable_done": "%1$d mod dinonaktifkan. Luncurkan lagi untuk mencoba tanpa mod tersebut."
   },
   "ja": {
     "nav_back": "戻る",
@@ -462,7 +478,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d（クライアントと一致）",
     "diagnostics_preloader_abi_mismatch": "v%1$d（クライアントはv%2$dを期待）",
     "about_input_backend_status": "入力バックエンド: %1$s",
-    "diagnostics_field_input_backend": "入力バックエンド"
+    "diagnostics_field_input_backend": "入力バックエンド",
+    "crash_exit_reason_label": "前回の終了理由:",
+    "crash_disable_last_mod": "クラッシュしたModを無効にする",
+    "crash_disable_no_suspects": "このクラッシュに記録されたModはありません。",
+    "crash_disable_done": "%1$d個のModを無効にしました。もう一度起動して試してください。"
   },
   "pt": {
     "nav_back": "Voltar",
@@ -555,7 +575,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (corresponde ao cliente)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (o cliente espera v%2$d)",
     "about_input_backend_status": "Backend de entrada: %1$s",
-    "diagnostics_field_input_backend": "Backend de entrada"
+    "diagnostics_field_input_backend": "Backend de entrada",
+    "crash_exit_reason_label": "Motivo da última saída:",
+    "crash_disable_last_mod": "Desativar o mod que travou",
+    "crash_disable_no_suspects": "Nenhum mod foi registrado para esta falha.",
+    "crash_disable_done": "%1$d mod(s) desativado(s). Inicie novamente para testar sem eles."
   },
   "ru": {
     "nav_back": "Назад",
@@ -648,7 +672,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (совпадает с клиентом)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (клиент ожидает v%2$d)",
     "about_input_backend_status": "Бэкенд ввода: %1$s",
-    "diagnostics_field_input_backend": "Бэкенд ввода"
+    "diagnostics_field_input_backend": "Бэкенд ввода",
+    "crash_exit_reason_label": "Причина последнего завершения:",
+    "crash_disable_last_mod": "Отключить мод, вызвавший сбой",
+    "crash_disable_no_suspects": "Для этого сбоя не зарегистрировано ни одного мода.",
+    "crash_disable_done": "Отключено модов: %1$d. Запустите снова, чтобы попробовать без них."
   },
   "tr": {
     "nav_back": "Geri",
@@ -741,7 +769,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (istemciyle eşleşiyor)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (istemci v%2$d bekliyor)",
     "about_input_backend_status": "Giriş arka ucu: %1$s",
-    "diagnostics_field_input_backend": "Giriş arka ucu"
+    "diagnostics_field_input_backend": "Giriş arka ucu",
+    "crash_exit_reason_label": "Son çıkış nedeni:",
+    "crash_disable_last_mod": "Çökmeye neden olan modu devre dışı bırak",
+    "crash_disable_no_suspects": "Bu çökme için kayıtlı mod yok.",
+    "crash_disable_done": "%1$d mod devre dışı bırakıldı. Onlar olmadan denemek için yeniden başlatın."
   },
   "vi": {
     "nav_back": "Quay lại",
@@ -834,7 +866,11 @@
     "diagnostics_preloader_abi_ok": "v%1$d (khớp với ứng dụng)",
     "diagnostics_preloader_abi_mismatch": "v%1$d (ứng dụng mong đợi v%2$d)",
     "about_input_backend_status": "Phần phụ trợ nhập: %1$s",
-    "diagnostics_field_input_backend": "Phần phụ trợ nhập"
+    "diagnostics_field_input_backend": "Phần phụ trợ nhập",
+    "crash_exit_reason_label": "Lý do thoát lần trước:",
+    "crash_disable_last_mod": "Tắt mod gây lỗi",
+    "crash_disable_no_suspects": "Không có mod nào được ghi nhận cho lỗi này.",
+    "crash_disable_done": "Đã tắt %1$d mod. Hãy khởi chạy lại để thử mà không có chúng."
   },
   "zh-rCN": {
     "nav_back": "返回",
@@ -927,6 +963,10 @@
     "diagnostics_preloader_abi_ok": "v%1$d（与客户端一致）",
     "diagnostics_preloader_abi_mismatch": "v%1$d（客户端期望 v%2$d）",
     "about_input_backend_status": "输入后端：%1$s",
-    "diagnostics_field_input_backend": "输入后端"
+    "diagnostics_field_input_backend": "输入后端",
+    "crash_exit_reason_label": "上次退出的原因：",
+    "crash_disable_last_mod": "禁用导致崩溃的模组",
+    "crash_disable_no_suspects": "此次崩溃没有记录任何模组。",
+    "crash_disable_done": "已禁用 %1$d 个模组。请重新启动以在不加载它们的情况下尝试。"
   }
 }

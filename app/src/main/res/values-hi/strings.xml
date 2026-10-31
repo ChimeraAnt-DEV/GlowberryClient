@@ -1075,4 +1075,8 @@ GlowberryClient जारी रखने से पहले माइग्र
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (क्लाइंट v%2$d की अपेक्षा करता है)</string>
     <string name="about_input_backend_status">इनपुट बैकएंड: %1$s</string>
     <string name="diagnostics_field_input_backend">इनपुट बैकएंड</string>
+    <string name="crash_exit_reason_label">पिछले बंद होने का कारण:</string>
+    <string name="crash_disable_last_mod">क्रैश करने वाले मॉड को बंद करें</string>
+    <string name="crash_disable_no_suspects">इस क्रैश के लिए कोई मॉड दर्ज नहीं हुआ।</string>
+    <string name="crash_disable_done">%1$d मॉड बंद किए गए। इनके बिना आज़माने के लिए फिर से लॉन्च करें।</string>
 </resources>

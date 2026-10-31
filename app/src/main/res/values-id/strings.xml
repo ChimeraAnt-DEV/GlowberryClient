@@ -1071,4 +1071,8 @@ Migrasi harus selesai sebelum GlowberryClient dapat melanjutkan.</string>
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (klien mengharapkan v%2$d)</string>
     <string name="about_input_backend_status">Backend masukan: %1$s</string>
     <string name="diagnostics_field_input_backend">Backend masukan</string>
+    <string name="crash_exit_reason_label">Alasan keluar terakhir:</string>
+    <string name="crash_disable_last_mod">Nonaktifkan mod yang menyebabkan crash</string>
+    <string name="crash_disable_no_suspects">Tidak ada mod yang tercatat untuk crash ini.</string>
+    <string name="crash_disable_done">%1$d mod dinonaktifkan. Luncurkan lagi untuk mencoba tanpa mod tersebut.</string>
 </resources>

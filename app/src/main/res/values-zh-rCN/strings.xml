@@ -1068,4 +1068,8 @@
     <string name="diagnostics_preloader_abi_mismatch">v%1$d（客户端期望 v%2$d）</string>
     <string name="about_input_backend_status">输入后端：%1$s</string>
     <string name="diagnostics_field_input_backend">输入后端</string>
+    <string name="crash_exit_reason_label">上次退出的原因：</string>
+    <string name="crash_disable_last_mod">禁用导致崩溃的模组</string>
+    <string name="crash_disable_no_suspects">此次崩溃没有记录任何模组。</string>
+    <string name="crash_disable_done">已禁用 %1$d 个模组。请重新启动以在不加载它们的情况下尝试。</string>
 </resources>

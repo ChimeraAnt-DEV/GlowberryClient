@@ -108,6 +108,22 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btn_disable_last_mod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/surface_variant"
+                android:fontFamily="@font/misans"
+                android:minWidth="0dp"
+                android:minHeight="40dp"
+                android:paddingHorizontal="@dimen/space_6"
+                android:text="@string/crash_disable_last_mod"
+                android:textAllCaps="false"
+                android:textColor="@color/primary"
+                android:textAppearance="@style/TextAppearance.Glowberry.Label"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <Button
                 android:id="@+id/btn_back_to_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

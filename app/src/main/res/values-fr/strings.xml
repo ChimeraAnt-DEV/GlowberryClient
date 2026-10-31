@@ -1047,4 +1047,8 @@ La migration doit être terminée avant de continuer avec GlowberryClient.</stri
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (le client attend v%2$d)</string>
     <string name="about_input_backend_status">Backend d’entrée : %1$s</string>
     <string name="diagnostics_field_input_backend">Backend d’entrée</string>
+    <string name="crash_exit_reason_label">Raison de la dernière fermeture :</string>
+    <string name="crash_disable_last_mod">Désactiver le mod qui a planté</string>
+    <string name="crash_disable_no_suspects">Aucun mod n\'a été enregistré pour ce plantage.</string>
+    <string name="crash_disable_done">%1$d mod(s) désactivé(s). Relancez pour essayer sans eux.</string>
 </resources>

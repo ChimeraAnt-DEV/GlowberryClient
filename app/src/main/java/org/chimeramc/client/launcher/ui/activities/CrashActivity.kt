@@ -10,6 +10,11 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import org.chimeramc.client.R
 import org.chimeramc.client.core.crash.CrashReporter
+import org.chimeramc.client.core.crash.ProcessExitReasons
+import org.chimeramc.client.core.mods.ModManager
+import org.chimeramc.client.core.mods.ModSafeMode
+import org.chimeramc.client.core.versions.GameVersion
+import org.chimeramc.client.core.versions.VersionManager
 import org.chimeramc.client.launcher.core.minecraft.LaunchErrorDiagnosis
 import org.chimeramc.client.ui.animation.DynamicAnim
 import java.io.File
@@ -19,6 +24,7 @@ class CrashActivity : BaseActivity() {
 
     private var executor = Executors.newSingleThreadExecutor()
     private var logPath: String? = null
+    private var disableButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +54,13 @@ class CrashActivity : BaseActivity() {
                 LaunchErrorDiagnosis.label(cause) + "\n" +
                 getString(LaunchErrorDiagnosis.messageRes(cause)) + "\n\n"
 
+        val exitLine = exitReasonLine()
         tvDetails.text = buildString {
             append(causeLine)
+            if (exitLine.isNotEmpty()) {
+                append(getString(R.string.crash_exit_reason_label)).append(' ').append(exitLine)
+                    .append("\n\n")
+            }
             appendHeader(crashType, summary)
             if (!logPath.isNullOrBlank()) {
                 append(getString(R.string.crash_log_file_label)).append("\n")
@@ -65,6 +76,12 @@ class CrashActivity : BaseActivity() {
         btnShare.setOnClickListener {
             shareLogFile()
         }
+
+        val btnDisable = findViewById<Button>(R.id.btn_disable_last_mod)
+        disableButton = btnDisable
+        btnDisable.setOnClickListener { disableSuspectMods(tvDetails) }
+        DynamicAnim.applyPressScale(btnDisable)
+        refreshDisableAction()
 
         Handler(Looper.getMainLooper()).postDelayed({
             loadCrashDetails(tvDetails, crashType, summary)
@@ -84,8 +101,13 @@ class CrashActivity : BaseActivity() {
             val causeLine = getString(R.string.launch_error_cause_label) + " " +
                     LaunchErrorDiagnosis.label(cause) + "\n" +
                     getString(LaunchErrorDiagnosis.messageRes(cause)) + "\n\n"
+            val exitLine = exitReasonLine()
             val detailsText = buildString {
                 append(causeLine)
+                if (exitLine.isNotEmpty()) {
+                    append(getString(R.string.crash_exit_reason_label)).append(' ').append(exitLine)
+                        .append("\n\n")
+                }
                 appendHeader(crashType, summary)
 
                 if (!logPath.isNullOrEmpty()) {
@@ -129,6 +151,80 @@ class CrashActivity : BaseActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+    }
+
+    /**
+     * The platform's own record of why the previous process ended (API 30+), or an empty string
+     * below that or when there is no record. This is strictly better than the saved log tail for the
+     * cases a truncated log cannot distinguish, so it is shown above the stack when it exists.
+     */
+    private fun exitReasonLine(): String {
+        return try {
+            ProcessExitReasons.describe(ProcessExitReasons.read(this))
+        } catch (ignored: Throwable) {
+            ""
+        }
+    }
+
+    /**
+     * Shows the "disable the mod that crashed" button only when there really are suspect mods to
+     * disable, so it is never a button that does nothing. The suspects come from the same safe-mode
+     * store the Mods screen uses, so the two screens agree on which mods were live at the crash.
+     */
+    private fun refreshDisableAction() {
+        val button = disableButton ?: return
+        val suspects = try {
+            ModSafeMode.suspectModIds(this)
+        } catch (ignored: Throwable) {
+            emptyList()
+        }
+        button.visibility = if (suspects.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
+    }
+
+    /**
+     * Disables the mods recorded as loaded when the previous launch crashed, then acknowledges the
+     * crash so the same prompt is not shown again. This is the crash screen's own copy of the Mods
+     * screen's action: a user who landed straight on the crash report can fix it here rather than
+     * having to find the Mods tab first.
+     */
+    private fun disableSuspectMods(tvDetails: TextView) {
+        val suspects = try {
+            ModSafeMode.suspectModIds(this)
+        } catch (ignored: Throwable) {
+            emptyList()
+        }
+        if (suspects.isEmpty()) {
+            Toast.makeText(this, R.string.crash_disable_no_suspects, Toast.LENGTH_SHORT).show()
+            refreshDisableAction()
+            return
+        }
+        executor.execute {
+            var disabled = 0
+            try {
+                val manager = ModManager.getInstance()
+                val version: GameVersion? = VersionManager.getIfInitialized()?.selectedVersion
+                if (version != null) {
+                    manager.setCurrentVersion(version)
+                }
+                for (id in suspects) {
+                    manager.setModEnabled(id, false)
+                    disabled++
+                }
+            } catch (ignored: Throwable) {
+                // A failure to disable is reported below by the count, never as a crash.
+            }
+            ModSafeMode.acknowledgeCrash(this, true)
+            val finalDisabled = disabled
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                Toast.makeText(
+                    this,
+                    getString(R.string.crash_disable_done, finalDisabled),
+                    Toast.LENGTH_LONG
+                ).show()
+                refreshDisableAction()
+            }
+        }
     }
 
     private fun StringBuilder.appendHeader(crashType: String?, summary: String?) {

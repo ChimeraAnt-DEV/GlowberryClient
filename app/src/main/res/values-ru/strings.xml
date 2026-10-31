@@ -1078,4 +1078,8 @@
     <string name="diagnostics_preloader_abi_mismatch">v%1$d (клиент ожидает v%2$d)</string>
     <string name="about_input_backend_status">Бэкенд ввода: %1$s</string>
     <string name="diagnostics_field_input_backend">Бэкенд ввода</string>
+    <string name="crash_exit_reason_label">Причина последнего завершения:</string>
+    <string name="crash_disable_last_mod">Отключить мод, вызвавший сбой</string>
+    <string name="crash_disable_no_suspects">Для этого сбоя не зарегистрировано ни одного мода.</string>
+    <string name="crash_disable_done">Отключено модов: %1$d. Запустите снова, чтобы попробовать без них.</string>
 </resources>
