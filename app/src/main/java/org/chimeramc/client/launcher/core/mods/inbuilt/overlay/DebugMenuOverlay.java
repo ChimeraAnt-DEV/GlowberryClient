@@ -1,26 +1,28 @@
 package org.chimeramc.client.core.mods.inbuilt.overlay;
 
 import android.app.Activity;
+import android.os.SystemClock;
 
-import org.chimeramc.client.R;
-import org.chimeramc.client.core.mods.inbuilt.catalog.LocalPlayerReadouts;
+import org.chimeramc.client.BuildConfig;
+import org.chimeramc.client.core.mods.inbuilt.catalog.DebugScreenText;
 import org.chimeramc.client.core.mods.inbuilt.model.ModIds;
 import org.chimeramc.client.preloader.PreloaderInput;
 
 /**
- * A client-side debug readout in the shape of the Java Edition F3 screen: position, the chunk and
- * its corner, facing and pitch, health and the frame rate.
+ * The in-game debug screen, built in the shape of the Java Edition F3 overlay: version, frame
+ * rate, position, block and chunk, facing, speed, health and memory.
  *
  * <p>Everything here comes from data the client already reads — the local-player feed
- * ({@link LocalPlayerFeed}/{@link PreloaderInput}) and the frame meter — so it needs no native
- * entity feed. The formatting is delegated to {@link LocalPlayerReadouts}, the same class the
- * catalogue's coordinates/direction/chunk modules use, so the debug menu and those readouts cannot
- * disagree about which way is north or where a chunk starts.
+ * ({@link PreloaderInput}), the host frame meter and the render-thread frame-pacing feed — so it
+ * needs no native entity feed. The block itself is assembled by the pure {@link DebugScreenText},
+ * which shares {@code LocalPlayerReadouts} with the catalogue's coordinates/direction/chunk
+ * modules, so the debug menu and those readouts cannot disagree about which way is north or where
+ * a chunk starts.
  *
- * <p>Lines the Java F3 screen shows but this build cannot source are omitted rather than faked: the
- * entity count, the biome and the light level all need the game's own world structures, which the
- * shipped builds do not expose (game classes export no symbols). A missing line reads as "not
- * available"; an invented one would read as a real measurement.
+ * <p>Lines the Java F3 screen shows but this build cannot source are named "unavailable" rather
+ * than omitted or faked: the entity count, the biome and the light level all need the game's own
+ * world structures, which the shipped builds do not expose (game classes export no symbols). An
+ * omitted line reads as if the value were fine; an invented one is worse.
  */
 public class DebugMenuOverlay extends TextOverlay {
 
@@ -55,39 +57,72 @@ public class DebugMenuOverlay extends TextOverlay {
 
     @Override
     protected String buildText() {
-        StringBuilder b = new StringBuilder(activity.getString(R.string.mod_overlay_debug_title));
-        float[] pos = PreloaderInput.readLocalPlayerPosition();
-        String coords = LocalPlayerReadouts.coordinates(pos);
-        if (coords != null) {
-            b.append('\n').append(activity.getString(R.string.mod_overlay_pos, coords));
-            String chunk = LocalPlayerReadouts.chunk(pos);
-            if (chunk != null) {
-                b.append('\n').append(activity.getString(R.string.mod_overlay_chunk, chunk));
-            }
-            String origin = LocalPlayerReadouts.chunkOrigin(pos);
-            if (origin != null) {
-                b.append('\n').append(activity.getString(R.string.mod_overlay_chunk_origin, origin));
-            }
-        } else {
-            b.append('\n').append(activity.getString(R.string.mod_overlay_data_unavailable));
+        DebugScreenText.Snapshot s = new DebugScreenText.Snapshot();
+        s.clientVersion = BuildConfig.VERSION_NAME;
+        s.gameVersion = selectedGameVersion();
+        s.abi = primaryAbi();
+        s.fps = frameMeter.currentFps();
+        s.onePercentLowFps = frameMeter.currentOnePercentLowFps();
+        s.position = PreloaderInput.readLocalPlayerPosition();
+        s.rotation = PreloaderInput.readLocalPlayerRotation();
+        s.health = PreloaderInput.readLocalPlayerHealth();
+        s.speed = measureSpeed(s.position);
+        Runtime runtime = Runtime.getRuntime();
+        s.usedMemoryMb = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
+        s.totalMemoryMb = runtime.totalMemory() / (1024 * 1024);
+
+        int[] pacing = PreloaderInput.readFramePacing();
+        if (pacing != null && pacing.length >= 4) {
+            s.framePacingAvailable = true;
+            s.frameAverageUs = pacing[1];
+            s.frameWorstUs = pacing[2];
+            s.frameJittering = (pacing[3] & 1) != 0;
+            s.frameVsyncLocked = (pacing[3] & 2) != 0;
         }
-        float[] rot = PreloaderInput.readLocalPlayerRotation();
-        String direction = LocalPlayerReadouts.direction(rot);
-        if (direction != null) {
-            b.append('\n').append(activity.getString(R.string.mod_overlay_facing, direction));
+        return DebugScreenText.build(s);
+    }
+
+    /** The selected instance's version code, or "none selected". Never throws. */
+    private String selectedGameVersion() {
+        try {
+            org.chimeramc.client.core.versions.VersionManager manager =
+                    org.chimeramc.client.core.versions.VersionManager.getIfInitialized();
+            if (manager == null) return "none selected";
+            org.chimeramc.client.core.versions.GameVersion version =
+                    manager.getSelectedVersion();
+            if (version == null) return "none selected";
+            return version.versionCode != null && !version.versionCode.isEmpty()
+                    ? version.versionCode : version.displayName;
+        } catch (Throwable t) {
+            return "unknown";
         }
-        String pitch = LocalPlayerReadouts.pitch(rot);
-        if (pitch != null) {
-            b.append('\n').append(activity.getString(R.string.mod_overlay_pitch, pitch));
+    }
+
+    private static String primaryAbi() {
+        try {
+            String[] abis = android.os.Build.SUPPORTED_ABIS;
+            return abis != null && abis.length > 0 ? abis[0] : "unknown";
+        } catch (Throwable t) {
+            return "unknown";
         }
-        String health = LocalPlayerReadouts.health(PreloaderInput.readLocalPlayerHealth());
-        if (health != null) {
-            b.append('\n').append(activity.getString(R.string.mod_overlay_health, health));
+    }
+
+    // The horizontal speed is measured from two position samples; the previous sample and its
+    // timestamp are kept here rather than in the pure formatter, which only formats what it is given.
+    private float[] lastPosition;
+    private long lastPositionMs;
+
+    private double measureSpeed(float[] position) {
+        if (position == null || position.length < 3) return Double.NaN;
+        long now = SystemClock.uptimeMillis();
+        double speed = Double.NaN;
+        if (lastPosition != null && now > lastPositionMs) {
+            double dx = position[0] - lastPosition[0];
+            double dz = position[2] - lastPosition[2];
+            speed = Math.hypot(dx, dz) / ((now - lastPositionMs) / 1000.0);
         }
-        int fps = frameMeter.currentFps();
-        if (fps > 0) {
-            b.append('\n').append(activity.getString(R.string.mod_overlay_fps_value, fps));
-        }
-        return b.toString();
+        lastPosition = position;
+        lastPositionMs = now;
+        return speed;
     }
 }

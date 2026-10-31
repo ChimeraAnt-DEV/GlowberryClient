@@ -66,4 +66,9 @@ public final class FrameRateMeter {
     public int currentFps() {
         return counter.fps();
     }
+
+    /** The 1% low rate (the slowest recent frame), or 0 when there is no reading yet. */
+    public int currentOnePercentLowFps() {
+        return counter.onePercentLowFps();
+    }
 }
