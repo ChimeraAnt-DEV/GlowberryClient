@@ -106,6 +106,23 @@ public enum LauncherTab {
         return tabs[next];
     }
 
+    /**
+     * The tab a stored name refers to, or null when it is absent or unknown (item 77).
+     *
+     * <p>The launcher remembers the last destination so a cold start reopens where the user left
+     * off, and it stores the <em>name</em> rather than the view id: an id is a generated resource
+     * number that a later build can renumber, so a stored id would silently open a different tab
+     * after an update. An unknown name is treated as "no preference", which is why this returns
+     * null rather than falling back to a guess.
+     */
+    public static LauncherTab fromStoredName(String name) {
+        if (name == null) return null;
+        for (LauncherTab tab : values()) {
+            if (tab.name().equals(name)) return tab;
+        }
+        return null;
+    }
+
     /** The tab whose activity is [activityClass], or null when it is not a tab. */
     public static LauncherTab forActivity(Class<?> activityClass) {
         for (LauncherTab tab : values()) {

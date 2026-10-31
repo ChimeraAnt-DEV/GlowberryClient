@@ -114,6 +114,21 @@ public class LauncherTabTest {
     }
 
     @Test
+    public void aStoredTabNameRoundTripsAndAnUnknownOneIsNoPreference() {
+        // Item 77: the last destination is persisted so a cold start reopens where the user left
+        // off. It is stored by name, so a name this build does not have reads as "no preference"
+        // rather than opening a wrong tab - which is what storing a resource id would risk.
+        for (LauncherTab tab : LauncherTab.values()) {
+            assertSame(tab, LauncherTab.fromStoredName(tab.name()));
+        }
+        assertNull(LauncherTab.fromStoredName(null));
+        assertNull(LauncherTab.fromStoredName(""));
+        assertNull(LauncherTab.fromStoredName("COSMETICS"));
+        // A numeric id from an older build's settings file is not a name either.
+        assertNull(LauncherTab.fromStoredName("2131362345"));
+    }
+
+    @Test
     public void nonNavigationKeysAreIgnored() {
         assertFalse(LauncherTab.shouldHandleKey(KeyEvent.KEYCODE_BUTTON_A, true, false));
         assertFalse(LauncherTab.shouldHandleKey(KeyEvent.KEYCODE_DPAD_UP, true, false));

@@ -795,6 +795,15 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void setActiveNavTab(int activeTabId) {
+        // Remember the destination so a cold start reopens where the user left off (item 77).
+        // Recorded here, in the one place that knows the active tab, rather than in each
+        // activity's onCreate: every screen already calls this to tint its own entry, so the
+        // memory cannot drift from the highlight.
+        LauncherTab visited = LauncherTab.forViewId(activeTabId);
+        if (visited != null) {
+            org.chimeramc.client.settings.FeatureSettings.getInstance()
+                    .setLastNavTab(visited.name());
+        }
         if (!navBarInjected) return;
 
         PersonalizationManager pm = new PersonalizationManager(this);
@@ -1031,6 +1040,25 @@ public class BaseActivity extends AppCompatActivity {
     private int labelForTab(int tabId) {
         LauncherTab tab = LauncherTab.forViewId(tabId);
         return tab != null ? tab.labelRes() : 0;
+    }
+
+    /**
+     * The destination a cold start should open, or null to leave the caller's own default
+     * (item 77).
+     *
+     * <p>Reads the persisted tab name through {@link LauncherTab#fromStoredName}, so a name this
+     * build no longer has - or a settings file written by an older build - is "no preference"
+     * rather than a crash. The caller decides what "no preference" means; the splash opens Play.
+     */
+    public static LauncherTab rememberedTab() {
+        try {
+            return LauncherTab.fromStoredName(
+                    org.chimeramc.client.settings.FeatureSettings.getInstance().getLastNavTab());
+        } catch (Throwable t) {
+            // A settings read must never be able to stop the launcher from starting; falling
+            // through to the default screen is the same result as having no preference.
+            return null;
+        }
     }
 
     /**
