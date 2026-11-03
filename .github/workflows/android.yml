@@ -199,7 +199,7 @@ jobs:
 
       - name: Upload Debug APK
         if: env.HAS_GOOGLE_SERVICES == 'true'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ChimeraClient-debug-apk
           path: |
@@ -208,7 +208,7 @@ jobs:
 
       - name: Upload Unsigned Release APK
         if: env.HAS_GOOGLE_SERVICES == 'true'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ChimeraClient-release-unsigned-apk
           path: |
@@ -217,7 +217,7 @@ jobs:
 
       - name: Upload Beta APK
         if: env.HAS_GOOGLE_SERVICES == 'true'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ChimeraClient-beta-apk
           path: |
@@ -252,7 +252,7 @@ jobs:
 
       - name: Upload Signed APK Artifact
         if: env.HAS_GOOGLE_SERVICES == 'true' && startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ChimeraClient-${{ github.ref_name }}-release.apk
           path: |
@@ -400,7 +400,7 @@ jobs:
 
       - name: Upload instrumented test report
         if: always()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: instrumented-report-api${{ matrix.api-level }}
           path: |
