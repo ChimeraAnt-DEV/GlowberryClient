@@ -308,7 +308,7 @@ dependencies {
     // Android ships org.json in the platform, so the local unit-test runtime has stubs that
     // throw "not mocked". org.json:json is the same API as a plain jar, so a JSON-parsing
     // rule stays unit-testable without an instrumented test.
-    testImplementation 'org.json:json:20240303'
+    testImplementation 'org.json:json:20260814'
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 
